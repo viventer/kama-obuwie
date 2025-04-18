@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: #000f14;
+    --foreground: #f4f5f5;
+
+    --primary: #919da1;
+    --secondary: #00a1db;
+    --accent: #a758a4;
+
+    --card: #00171f;
+    --muted: #004d66;
+    --border: #007399;
+    --input: #006080;
+
+    --primary-foreground: #ffffff;
+    --secondary-foreground: #000000;
+    --accent-foreground: #000000;
+
+    --destructive: #d92638;
+    --destructive-foreground: #ffffff;
+
+    --success: #168d58;
+    --success-foreground: #ffffff;
+
+    --card-foreground: #fafff5;
+    --muted-foreground: #999999;
+
+    --ring: #0d77b5;
+
+    --chart-1: #0d77b5;
+    --chart-2: #00ccad;
+    --chart-3: #e05286;
+    --chart-4: #ffd400;
+    --chart-5: #b447eb;
+
+    --radius: 0.75rem;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      --background: #f4f5f5;
+      --foreground: #000f14;
+
+      --primary: #75858a;
+      --secondary: #005a7a;
+      --accent: #864684;
+
+      --card: #ffffff;
+      --muted: #393946;
+      --border: #454554;
+      --input: #393946;
+    }
+  }
+}
+
+@theme inline {
+  /* Główne kolory */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  /* UI: card, popover, muted, destructive, success */
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  /* Granice, input, ring */
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Kolory na wykresy */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Border radius */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+* {
+  font-family: "Ubuntu", "Arial";
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+.prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-links: var(--foreground);
+  --tw-prose-links-hover: var(--primary);
+  --tw-prose-blockquote: var(--foreground);
+}
+
+.prose blockquote {
+  color: var(--foreground);
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* color: hsl(var(--foreground)); */
+  background-color: hsl(var(--background));
+}
+
+.bg-lighter {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.bg-darker {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+button {
+  transition: all;
+  transition-duration: 0.15s;
+  transition-timing-function: ease-in-out;
+}

@@ -23,7 +23,6 @@
       "@/*": ["./*"],
       "@types/*": ["./@types/*"],
       "@components/*": ["./components/*"],
-      "@global/*": ["./global/*"],
       "@context/*": ["./context/*"]
     }
   },

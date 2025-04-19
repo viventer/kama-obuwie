@@ -36,10 +36,10 @@ export default function AppSidebar() {
               </LinkText>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <LinkText href="/brands">Marki</LinkText>
+              <LinkText href="/products/brands">Marki</LinkText>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <LinkText href="/product-types">Typy produktów</LinkText>
+              <LinkText href="/products/product-types">Typy produktów</LinkText>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
@@ -58,12 +58,10 @@ export default function AppSidebar() {
           <SidebarGroupLabel>Szablony</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <LinkText href="/description-templates">Szablony opisów</LinkText>
+              <LinkText href="/templates/description">Szablony opisów</LinkText>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <LinkText href="/package-dimensions">
-                Szablony wiadomości
-              </LinkText>
+              <LinkText href="/templates/message">Szablony wiadomości</LinkText>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
@@ -90,7 +88,7 @@ export default function AppSidebar() {
           <SidebarGroupLabel>Pozostałe</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <LinkText href="/package-dimensions">
+              <LinkText href="/net-profit-calc">
                 Kalkulator zysku netto
               </LinkText>
             </SidebarMenuItem>

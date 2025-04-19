@@ -3,7 +3,7 @@ import { Ubuntu, Ubuntu_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import AppSidebar from "./global/components/AppSidebar";
+import AppSidebar from "../components/global/AppSidebar";
 
 const ubuntuSans = Ubuntu({
   variable: "--font-ubuntu-sans",

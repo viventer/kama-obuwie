@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Ubuntu, Ubuntu_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import AppSidebar from "./global/components/AppSidebar";
 
 const ubuntuSans = Ubuntu({
   variable: "--font-ubuntu-sans",
@@ -33,7 +35,11 @@ export default async function RootLayout({
       <body
         className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text`}
       >
-        {children}
+        <SidebarProvider defaultOpen={false}>
+          <AppSidebar />
+          <SidebarTrigger className="mt-4 ml-4" />
+          <div className="my-12 mx-auto w-[90%] max-w-[1440px]">{children}</div>
+        </SidebarProvider>
         <Toaster
           toastOptions={{
             unstyled: true,

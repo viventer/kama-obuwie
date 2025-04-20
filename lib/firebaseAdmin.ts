@@ -5,7 +5,6 @@ import {
   ServiceAccount,
 } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
 const { FIREBASE_PROJECT_ID, FIREBASE_PRIVATE_KEY, FIREBASE_CLIENT_EMAIL } =
@@ -33,8 +32,7 @@ const adminApp = !getApps().length
     })
   : getApps()[0];
 
-const adminDB = getFirestore(adminApp);
 const adminAuth = getAuth(adminApp);
 const adminStorage = getStorage(adminApp);
 
-export { adminApp, adminDB, adminAuth, adminStorage };
+export { adminApp, adminAuth, adminStorage };

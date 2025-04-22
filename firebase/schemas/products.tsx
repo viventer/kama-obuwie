@@ -78,3 +78,27 @@ export type Product = z.infer<typeof ProductSchema>;
 export type AccessoriesGroup = z.infer<typeof AccessoriesGroupSchema>;
 export type ProductType = z.infer<typeof ProductSchema>["productType"];
 export type BrandInfo = z.infer<typeof BrandInfoSchema>;
+
+export const SizingTableUpdateDataSchema = SizingTableSchema.omit({ id: true })
+  .partial()
+  .strict();
+
+export const ProductCategoryUpdateDataSchema = ProductCategorySchema.omit({
+  id: true,
+})
+  .partial()
+  .strict();
+
+export const ProductUpdateDataSchema = ProductSchema.omit({ id: true })
+  .partial()
+  .strict();
+
+export const AccessoriesGroupUpdateDataSchema = AccessoriesGroupSchema.omit({
+  id: true,
+})
+  .partial()
+  .strict();
+
+export const BrandInfoUpdateDataSchema = BrandInfoSchema.omit({ id: true })
+  .partial()
+  .strict();

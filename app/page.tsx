@@ -1,7 +1,9 @@
-export default function Home() {
+import { getAllegroAccessToken } from "@/server-actions/allegro";
+
+export default async function Home() {
   return (
     <main>
-      <p>strona główna</p>
+      <p>home</p>
     </main>
   );
 }

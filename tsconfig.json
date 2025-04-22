@@ -22,6 +22,7 @@
     "paths": {
       "@/*": ["./*"],
       "@types/*": ["./@types/*"],
+      "@actions/*": ["./server-actions/*"],
       "@components/*": ["./components/*"],
       "@context/*": ["./context/*"]
     }

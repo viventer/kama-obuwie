@@ -2,8 +2,8 @@ import { ProductCategorySchema } from "@/firebase/schemas/products";
 import {
   getDocumentFromAdminDB,
   getDocumentsFromAdminDB,
-  response,
-} from "@/lib/utils";
+  apiResponse,
+} from "@/server-actions/helpers";
 import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -19,22 +19,22 @@ export async function POST(request: NextRequest) {
       variantParameters,
     });
   } catch (err) {
-    return response("Niepoprawne dane wejściowe.", 400);
+    return apiResponse("Niepoprawne dane wejściowe.", 400);
   }
 
   const { data } = await getDocumentFromAdminDB(id, "productCategories");
   if (data) {
-    return response("Kategoria już istnieje.", 409);
+    return apiResponse("Kategoria już istnieje.", 409);
   }
 
-  return response("Kategoria została dodana.", 201);
+  return apiResponse("Kategoria została dodana.", 201);
 }
 
 export async function GET() {
   const data = await getDocumentsFromAdminDB("productCategories");
   if (!data) {
-    return response("Nie znaleziono kategorii.", 404);
+    return apiResponse("Nie znaleziono kategorii.", 404);
   }
 
-  return response("Kategorie zostały pobrane.", 200, data);
+  return apiResponse("Kategorie zostały pobrane.", 200, data);
 }

@@ -47,6 +47,7 @@ export const ProductSchema = z.object({
   sizingTableId: NullableFirestoreId,
   mainCategoryId: NullableFirestoreId,
   accessoriesGroupId: NullableFirestoreId,
+  brandInfoId: NullableFirestoreId,
 });
 
 export const AccessoriesGroupSchema = z.object({
@@ -59,6 +60,14 @@ export const AccessoriesGroupSchema = z.object({
   connectedProducts: z.array(FirestoreId),
 });
 
+export const BrandInfoSchema = z.object({
+  id: FirestoreId,
+  brandName: z.string().min(3).max(32),
+  brandDescription: z.string().min(3).max(256),
+  brandLogoUrl: z.string().max(256),
+  connectedProductIds: z.array(NullableFirestoreId),
+});
+
 export type SizeKey = z.infer<typeof SizeKey>;
 export type CmValue = z.infer<typeof CmValue>;
 export type FirestoreId = z.infer<typeof FirestoreId>;
@@ -68,3 +77,4 @@ export type ProductCategory = z.infer<typeof ProductCategorySchema>;
 export type Product = z.infer<typeof ProductSchema>;
 export type AccessoriesGroup = z.infer<typeof AccessoriesGroupSchema>;
 export type ProductType = z.infer<typeof ProductSchema>["productType"];
+export type BrandInfo = z.infer<typeof BrandInfoSchema>;

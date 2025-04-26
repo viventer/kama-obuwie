@@ -102,3 +102,10 @@ export const AccessoriesGroupUpdateDataSchema = AccessoriesGroupSchema.omit({
 export const BrandInfoUpdateDataSchema = BrandInfoSchema.omit({ id: true })
   .partial()
   .strict();
+
+export type RootCategory =
+  | "accessories"
+  | "male"
+  | "female"
+  | "children"
+  | "childrenAccessories";

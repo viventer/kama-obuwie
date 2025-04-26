@@ -1,5 +1,3 @@
-import { getAllegroAccessToken } from "@/server-actions/allegro";
-
 export default async function Home() {
   return (
     <main>

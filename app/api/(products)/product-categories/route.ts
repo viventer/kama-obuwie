@@ -1,4 +1,5 @@
 import { ProductCategorySchema } from "@/firebase/schemas/products";
+import { getAllegroCategoryById } from "@/server-actions/allegro/categories";
 import {
   getDocumentFromAdminDB,
   getDocumentsFromAdminDB,
@@ -20,6 +21,15 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     return apiResponse("Niepoprawne dane wejściowe.", 400);
+  }
+
+  try {
+    const allegroCategory = await getAllegroCategoryById(allegroCategoryId);
+    if (!allegroCategory) {
+      return apiResponse("Nie znaleziono kategorii Allegro.", 404);
+    }
+  } catch (err) {
+    return apiResponse("Nie znaleziono kategorii Allegro.", 404);
   }
 
   const { data } = await getDocumentFromAdminDB(id, "productCategories");

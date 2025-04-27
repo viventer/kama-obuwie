@@ -1,13 +1,5 @@
 import { z } from "zod";
 
-const SizeKey = z.string().regex(/^\d+$/, {
-  message: "Rozmiar musi być liczbą całkowitą w formie stringa",
-});
-
-const CmValue = z.string().regex(/^\d+\s?cm$/, {
-  message: "Wartość musi być w formacie '<liczba> cm'",
-});
-
 const FirestoreId = z
   .string()
   .regex(/^(?!\.\.?$)(?!__.*__)(?!.*\/)[\s\S]{1,1500}$/, {
@@ -16,23 +8,41 @@ const FirestoreId = z
 
 const NullableFirestoreId = FirestoreId.nullable().default(null);
 
+export type RootCategory =
+  | "accessories"
+  | "male"
+  | "female"
+  | "children"
+  | "childrenAccessories";
+
+export const RootCategoryValues = [
+  "accessories",
+  "male",
+  "female",
+  "children",
+  "childrenAccessories",
+] as const;
+
 export const SizingTableSchema = z.object({
-  id: FirestoreId,
   name: z.string().min(3).max(32),
   shoeModelId: FirestoreId,
-  insoleLenghts: z.record(SizeKey, CmValue),
+  insoleLenghts: z.array(
+    z.object({
+      size: z.number(),
+      insoleLength: z.number(),
+    })
+  ),
 });
 
-export const ProductCategorySchema = z.object({
-  id: FirestoreId,
+export const CategorySchema = z.object({
   name: z.string().min(3).max(32),
   productType: z.enum(["shoe", "accessory"]),
+  rootCategory: z.enum(RootCategoryValues),
   allegroCategoryId: FirestoreId,
   variantParameters: z.array(z.string()).default([]),
 });
 
 export const ProductSchema = z.object({
-  id: FirestoreId,
   brand: z.string().min(3).max(32),
   productName: z.string().min(3).max(32),
   productType: z.enum(["shoe", "accessory"]),
@@ -43,7 +53,7 @@ export const ProductSchema = z.object({
   warrantyPeriod: z.number().min(0).max(240).default(0),
   parameters: z.record(z.string(), z.string()).default({}),
   purchasePrice: z.number(),
-  productCategoryId: NullableFirestoreId,
+  CategoryId: NullableFirestoreId,
   sizingTableId: NullableFirestoreId,
   mainCategoryId: NullableFirestoreId,
   accessoriesGroupId: NullableFirestoreId,
@@ -51,7 +61,6 @@ export const ProductSchema = z.object({
 });
 
 export const AccessoriesGroupSchema = z.object({
-  id: FirestoreId,
   type: z.string().min(3).max(32),
   brand: z.string().min(3).max(32),
   productName: z.string().min(3).max(32),
@@ -61,51 +70,28 @@ export const AccessoriesGroupSchema = z.object({
 });
 
 export const BrandInfoSchema = z.object({
-  id: FirestoreId,
   brandName: z.string().min(3).max(32),
   brandDescription: z.string().min(3).max(256),
   brandLogoUrl: z.string().max(256),
   connectedProductIds: z.array(NullableFirestoreId),
 });
 
-export type SizeKey = z.infer<typeof SizeKey>;
-export type CmValue = z.infer<typeof CmValue>;
 export type FirestoreId = z.infer<typeof FirestoreId>;
 export type NullableFirestoreId = z.infer<typeof NullableFirestoreId>;
 export type SizingTable = z.infer<typeof SizingTableSchema>;
-export type ProductCategory = z.infer<typeof ProductCategorySchema>;
+export type Category = z.infer<typeof CategorySchema>;
 export type Product = z.infer<typeof ProductSchema>;
 export type AccessoriesGroup = z.infer<typeof AccessoriesGroupSchema>;
 export type ProductType = z.infer<typeof ProductSchema>["productType"];
 export type BrandInfo = z.infer<typeof BrandInfoSchema>;
 
-export const SizingTableUpdateDataSchema = SizingTableSchema.omit({ id: true })
-  .partial()
-  .strict();
+export const SizingTableUpdateDataSchema = SizingTableSchema.partial().strict();
 
-export const ProductCategoryUpdateDataSchema = ProductCategorySchema.omit({
-  id: true,
-})
-  .partial()
-  .strict();
+export const CategoryUpdateDataSchema = CategorySchema.partial().strict();
 
-export const ProductUpdateDataSchema = ProductSchema.omit({ id: true })
-  .partial()
-  .strict();
+export const ProductUpdateDataSchema = ProductSchema.partial().strict();
 
-export const AccessoriesGroupUpdateDataSchema = AccessoriesGroupSchema.omit({
-  id: true,
-})
-  .partial()
-  .strict();
+export const AccessoriesGroupUpdateDataSchema =
+  AccessoriesGroupSchema.partial().strict();
 
-export const BrandInfoUpdateDataSchema = BrandInfoSchema.omit({ id: true })
-  .partial()
-  .strict();
-
-export type RootCategory =
-  | "accessories"
-  | "male"
-  | "female"
-  | "children"
-  | "childrenAccessories";
+export const BrandInfoUpdateDataSchema = BrandInfoSchema.partial().strict();

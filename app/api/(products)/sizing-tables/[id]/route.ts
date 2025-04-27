@@ -1,6 +1,10 @@
 import { NextRequest } from "next/server";
-import { SizingTableUpdateDataSchema } from "@/firebase/schemas/products";
+import {
+  SizingTable,
+  SizingTableUpdateDataSchema,
+} from "@/firebase/schemas/products";
 import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
+import { updateSizingTable } from "@/server-actions/products/sizingTables";
 
 export async function GET({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -16,21 +20,14 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   const { id } = params;
-  const body = await request.json();
+  const body: Partial<SizingTable> = await request.json();
 
   try {
-    SizingTableUpdateDataSchema.parse(body);
-  } catch {
-    return apiResponse("Niepoprawne dane wejściowe.", 400);
+    await updateSizingTable(id, body);
+  } catch (err) {
+    return apiResponse(`Błąd aktualizacji tabeli rozmiarów: ${err}`, 400);
   }
 
-  const updateData = body;
-  const { data, ref } = await getDocumentFromAdminDB(id, "sizingTables");
-  if (!data) {
-    return apiResponse("Tabela rozmiarów nie istnieje.", 404);
-  }
-
-  await ref.update(updateData);
   return apiResponse("Tabela rozmiarów została zaktualizowana.", 200);
 }
 

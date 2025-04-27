@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
-import { ProductCategoryUpdateDataSchema } from "@/firebase/schemas/products";
+import { CategoryUpdateDataSchema } from "@/firebase/schemas/products";
 import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
+import { updateCategory } from "@/server-actions/products/categories";
 
 export async function GET({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -18,19 +19,13 @@ export async function PATCH(
   const { id } = params;
   const body = await request.json();
 
-  try {
-    ProductCategoryUpdateDataSchema.parse(body);
-  } catch {
-    return apiResponse("Niepoprawne dane wejściowe.", 400);
-  }
-
   const updateData = body;
-  const { data, ref } = await getDocumentFromAdminDB(id, "productCategories");
-  if (!data) {
-    return apiResponse("Kategoria nie istnieje.", 404);
+  try {
+    await updateCategory(id, updateData);
+  } catch (err) {
+    return apiResponse(`Błąd aktualizacji kategorii: ${err}`, 400);
   }
 
-  await ref.update(updateData);
   return apiResponse("Kategoria została zaktualizowana.", 200);
 }
 

@@ -39,6 +39,11 @@ export async function getDocumentsFromAdminDB(
   if (snapshot.empty) {
     return null;
   }
-  const data = snapshot.docs.map((doc) => doc.data() as DocumentData);
+  const data = snapshot.docs.map((doc) => {
+    return {
+      id: doc.id,
+      ...doc.data(),
+    };
+  }) as DocumentData[];
   return data;
 }

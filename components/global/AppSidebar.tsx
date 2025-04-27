@@ -23,23 +23,19 @@ export default function AppSidebar() {
           <SidebarGroupLabel>Produkty</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <LinkText href="/products/create">Tworzenie produktów</LinkText>
+              <LinkText href="/create">Tworzenie produktów</LinkText>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <LinkText href="/products/assortment">
-                Zarządzanie asortymentem
-              </LinkText>
+              <LinkText href="/assortment">Zarządzanie asortymentem</LinkText>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <LinkText href="/products/sizing-tables">
-                Tabele rozmiarów
-              </LinkText>
+              <LinkText href="/sizing-tables">Tabele rozmiarów</LinkText>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <LinkText href="/products/brands">Marki</LinkText>
+              <LinkText href="/brands">Marki</LinkText>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <LinkText href="/products/product-types">Typy produktów</LinkText>
+              <LinkText href="/categories">Kategorie</LinkText>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>

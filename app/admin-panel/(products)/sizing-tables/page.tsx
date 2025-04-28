@@ -1,6 +1,5 @@
-import SearchBar from "@/components/adminPanel/global/SearchBar";
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import SizingTablesList from "@/components/adminPanel/products/SizingTablesList";
+import { DataTableDemo } from "@/components/adminPanel/products/SizingTablesList";
 import { SizingTable } from "@/firebase/schemas/products";
 import { getDocumentsFromAdminDB } from "@/server-actions/helpers";
 
@@ -12,9 +11,9 @@ export default async function page() {
   return (
     <>
       <SubpageHeading text="Tabele rozmiarów" />
-      <SearchBar placeholder="Szukaj tabeli rozmiarów" />
+      {/* <SearchBar placeholder="Szukaj tabeli rozmiarów" /> */}
       {sizingTables ? (
-        <SizingTablesList data={sizingTables} />
+        <DataTableDemo data={sizingTables} />
       ) : (
         <p>Brak tabel rozmiarów</p>
       )}

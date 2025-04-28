@@ -30,8 +30,6 @@
     --card-foreground: #fafff5;
     --muted-foreground: #999999;
 
-    --ring: #0d77b5;
-
     --chart-1: #0d77b5;
     --chart-2: #00ccad;
     --chart-3: #e05286;
@@ -72,8 +70,8 @@
   /* UI: card, popover, muted, destructive, success */
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--background);
+  --color-popover-foreground: var(--foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-destructive: var(--destructive);
@@ -82,9 +80,9 @@
   --color-success-foreground: var(--success-foreground);
 
   /* Granice, input, ring */
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
+  --color-border: var(--primary);
+  --color-input: var(--primary);
+  --color-ring: var(--primary);
 
   /* Kolory na wykresy */
   --color-chart-1: var(--chart-1);
@@ -106,7 +104,7 @@
   --sidebar-accent: var(--accent);
   --sidebar-accent-foreground: var(--accent-foreground);
   --sidebar-border: var(--border);
-  --sidebar-ring: var(--ring);
+  --sidebar-ring: var(--primary);
 }
 
 * {

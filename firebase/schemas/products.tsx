@@ -76,14 +76,16 @@ export const BrandInfoSchema = z.object({
   connectedProductIds: z.array(NullableFirestoreId),
 });
 
+type WithId<T> = T & { id: FirestoreId };
+
 export type FirestoreId = z.infer<typeof FirestoreId>;
 export type NullableFirestoreId = z.infer<typeof NullableFirestoreId>;
-export type SizingTable = z.infer<typeof SizingTableSchema>;
-export type Category = z.infer<typeof CategorySchema>;
-export type Product = z.infer<typeof ProductSchema>;
-export type AccessoriesGroup = z.infer<typeof AccessoriesGroupSchema>;
+export type SizingTable = WithId<z.infer<typeof SizingTableSchema>>;
+export type Category = WithId<z.infer<typeof CategorySchema>>;
+export type Product = WithId<z.infer<typeof ProductSchema>>;
+export type AccessoriesGroup = WithId<z.infer<typeof AccessoriesGroupSchema>>;
 export type ProductType = z.infer<typeof ProductSchema>["productType"];
-export type BrandInfo = z.infer<typeof BrandInfoSchema>;
+export type BrandInfo = WithId<z.infer<typeof BrandInfoSchema>>;
 
 export const SizingTableUpdateDataSchema = SizingTableSchema.partial().strict();
 

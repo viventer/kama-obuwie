@@ -57,6 +57,8 @@ export default function SizingTablesDataTable({
       columnNames={columnNames}
       actions={actions}
       renderRowSubComponent={renderRowSubComponent}
+      searchPlaceholder="Szukaj tabeli rozmiarów"
+      searchColumns={["name"]}
     />
   );
 }

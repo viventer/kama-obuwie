@@ -12,6 +12,8 @@ import {
 import {
   ColumnFiltersState,
   ExpandedState,
+  GlobalFilterFn,
+  Row,
   SortingState,
   VisibilityState,
   flexRender,
@@ -30,23 +32,49 @@ import {
   TableAction,
 } from "@/lib/dataTableColumns";
 import { Fragment, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function DataTable<T extends { id: string }>({
   data,
   columnNames,
   actions,
+  searchColumns,
   renderRowSubComponent,
+  searchPlaceholder = "Szukaj",
 }: {
   data: T[];
   columnNames: ColumnName<T>[];
   actions: TableAction[];
+  searchColumns: (keyof T)[];
   renderRowSubComponent?: (row: T) => React.ReactNode;
+  searchPlaceholder?: string;
 }) {
+  const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
+
+  const globalFilterFn: GlobalFilterFn<T> = (
+    row: Row<T>,
+    columnIds: string[],
+    filterValue: string
+  ) => {
+    return searchColumns.some((colKey) => {
+      const cellValue = row.getValue(colKey as string);
+      if (cellValue == null) return false;
+      return String(cellValue)
+        .toLowerCase()
+        .includes(filterValue.toLowerCase());
+    });
+  };
 
   const basicColumns = getDataTableColumns<T>(columnNames, actions);
 
@@ -54,11 +82,14 @@ export function DataTable<T extends { id: string }>({
     data,
     columns: basicColumns,
     state: {
+      globalFilter,
       sorting,
       columnFilters,
       columnVisibility,
       expanded,
     },
+    globalFilterFn,
+    onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
@@ -72,6 +103,41 @@ export function DataTable<T extends { id: string }>({
 
   return (
     <div className="w-full">
+      <div className="flex items-center py-4">
+        <Input
+          placeholder={searchPlaceholder}
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          className="max-w-sm"
+        />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Kolumny <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                const title = column.columnDef.header as string;
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {title}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -92,45 +158,41 @@ export function DataTable<T extends { id: string }>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => {
-                const isExpanded = row.getIsExpanded();
-                return (
-                  <Fragment key={row.id}>
-                    <TableRow
-                      data-state={isExpanded ? "expanded" : undefined}
-                      className="cursor-pointer"
-                      onClick={(e) => {
-                        // Prevent toggling when clicking on buttons or dropdowns
-                        const target = e.target as HTMLElement;
-                        if (
-                          target.closest("button") ||
-                          target.closest("[role='menu']") ||
-                          target.closest("[data-ignore-row-click]")
-                        ) {
-                          return;
-                        }
-                        row.toggleExpanded();
-                      }}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
+              table.getRowModel().rows.map((row) => (
+                <Fragment key={row.id}>
+                  <TableRow
+                    data-state={row.getIsExpanded() ? "expanded" : undefined}
+                    className="cursor-pointer"
+                    onClick={(e) => {
+                      const target = e.target as HTMLElement;
+                      if (
+                        target.closest("button") ||
+                        target.closest("[role='menu']") ||
+                        target.closest("[data-ignore-row-click]")
+                      ) {
+                        return;
+                      }
+                      row.toggleExpanded();
+                    }}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                  {row.getIsExpanded() && renderRowSubComponent && (
+                    <TableRow>
+                      <TableCell colSpan={basicColumns.length}>
+                        {renderRowSubComponent(row.original)}
+                      </TableCell>
                     </TableRow>
-                    {isExpanded && renderRowSubComponent && (
-                      <TableRow>
-                        <TableCell colSpan={basicColumns.length}>
-                          {renderRowSubComponent(row.original)}
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </Fragment>
-                );
-              })
+                  )}
+                </Fragment>
+              ))
             ) : (
               <TableRow>
                 <TableCell
@@ -156,7 +218,7 @@ export function DataTable<T extends { id: string }>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <ChevronLeft className="size-3" />
+            <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
@@ -164,7 +226,7 @@ export function DataTable<T extends { id: string }>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            <ChevronRight className="size-3" />
+            <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       </div>

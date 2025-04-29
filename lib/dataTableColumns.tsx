@@ -6,11 +6,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Category, SizingTable } from "@/firebase/schemas/products";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 
-export type ColumnName = {
+export type ColumnName<T> = {
   attributeName: string;
   displayName: string;
 };
@@ -20,32 +19,34 @@ export type TableAction = {
   onClick: () => void;
 };
 
-const selectAll: ColumnDef<Category | SizingTable, any> = {
-  id: "select",
-  header: ({ table }) => (
-    <Checkbox
-      checked={
-        table.getIsAllPageRowsSelected() ||
-        (table.getIsSomePageRowsSelected() && "indeterminate")
-      }
-      onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-      aria-label="Wybierz wszystkie wiersze"
-    />
-  ),
-  cell: ({ row }) => (
-    <Checkbox
-      checked={row.getIsSelected()}
-      onCheckedChange={(value) => row.toggleSelected(!!value)}
-      aria-label="Wybierz wiersz"
-    />
-  ),
-  enableSorting: false,
-  enableHiding: false,
-};
+function getSelectAllColumn<T>(): ColumnDef<T, unknown> {
+  return {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Wybierz wszystkie wiersze"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Wybierz wiersz"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  };
+}
 
-function getDataColumns<T extends Record<string, any>>(
-  columnNames: ColumnName[]
-): ColumnDef<T, any>[] {
+function getDataColumns<T>(
+  columnNames: ColumnName<T>[]
+): ColumnDef<T, unknown>[] {
   return columnNames.map(({ attributeName, displayName }) => ({
     accessorKey: attributeName,
     header: displayName,
@@ -56,13 +57,13 @@ function getDataColumns<T extends Record<string, any>>(
   }));
 }
 
-export function getDataTableColumns(
-  columnNames: ColumnName[],
+export function getDataTableColumns<T>(
+  columnNames: ColumnName<T>[],
   tableActions?: TableAction[]
-): ColumnDef<Category | SizingTable, any>[] {
-  const dataColumns = getDataColumns<Category | SizingTable>(columnNames);
+): ColumnDef<T, unknown>[] {
+  const dataColumns = getDataColumns<T>(columnNames);
 
-  const actionColumn: ColumnDef<Category | SizingTable, any> = {
+  const actionColumn: ColumnDef<T, unknown> = {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => (
@@ -84,5 +85,5 @@ export function getDataTableColumns(
     ),
   };
 
-  return [selectAll, ...dataColumns, actionColumn];
+  return [getSelectAllColumn<T>(), ...dataColumns, actionColumn];
 }

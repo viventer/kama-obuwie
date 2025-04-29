@@ -12,7 +12,7 @@ import LinkText from "../../global/LinkText";
 
 export default function AppSidebar() {
   return (
-    <Sidebar className="bg-sidebar-background ">
+    <Sidebar className="bg-sidebar-background">
       <SidebarHeader>
         <LinkText href="/admin-panel/">
           <h1 className="text-2xl font-medium px-3 py-2">Admin Panel</h1>

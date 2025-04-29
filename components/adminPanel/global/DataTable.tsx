@@ -1,4 +1,5 @@
-import { Input } from "@/components/ui/input";
+"use client";
+
 import {
   Table,
   TableBody,
@@ -9,147 +10,131 @@ import {
 } from "@/components/ui/table";
 
 import {
-  ColumnDef,
   ColumnFiltersState,
+  ExpandedState,
   SortingState,
   VisibilityState,
   flexRender,
   getCoreRowModel,
+  getExpandedRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  ColumnName,
+  getDataTableColumns,
+  TableAction,
+} from "@/lib/dataTableColumns";
+import { Fragment, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { Category, SizingTable } from "@/firebase/schemas/products";
-import { useState } from "react";
-
-export function DataTable({
+export function DataTable<T extends { id: string }>({
   data,
-  columns,
+  columnNames,
+  actions,
+  renderRowSubComponent,
 }: {
-  data: SizingTable[] | Category[];
-  columns: ColumnDef<SizingTable | Category>[];
+  data: T[];
+  columnNames: ColumnName<T>[];
+  actions: TableAction[];
+  renderRowSubComponent?: (row: T) => React.ReactNode;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
+  const [expanded, setExpanded] = useState<ExpandedState>({});
+
+  const basicColumns = getDataTableColumns<T>(columnNames, actions);
 
   const table = useReactTable({
     data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
+    columns: basicColumns,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
-      rowSelection,
+      expanded,
     },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
+    onExpandedChange: setExpanded,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
   });
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Szukaj tabeli"
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Kolumny <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                const title = column.columnDef.header as string;
-
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {title}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => {
+                const isExpanded = row.getIsExpanded();
+                return (
+                  <Fragment key={row.id}>
+                    <TableRow
+                      data-state={isExpanded ? "expanded" : undefined}
+                      className="cursor-pointer"
+                      onClick={(e) => {
+                        // Prevent toggling when clicking on buttons or dropdowns
+                        const target = e.target as HTMLElement;
+                        if (
+                          target.closest("button") ||
+                          target.closest("[role='menu']") ||
+                          target.closest("[data-ignore-row-click]")
+                        ) {
+                          return;
+                        }
+                        row.toggleExpanded();
+                      }}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                    {isExpanded && renderRowSubComponent && (
+                      <TableRow>
+                        <TableCell colSpan={basicColumns.length}>
+                          {renderRowSubComponent(row.original)}
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={basicColumns.length}
                   className="h-24 text-center"
                 >
                   Brak wyników.
@@ -171,7 +156,7 @@ export function DataTable({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Poprzednia
+            <ChevronLeft className="size-3" />
           </Button>
           <Button
             variant="outline"
@@ -179,7 +164,7 @@ export function DataTable({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Następna
+            <ChevronRight className="size-3" />
           </Button>
         </div>
       </div>

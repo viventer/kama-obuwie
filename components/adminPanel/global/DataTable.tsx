@@ -12,7 +12,6 @@ import {
 import {
   ColumnFiltersState,
   ExpandedState,
-  GlobalFilterFn,
   Row,
   SortingState,
   VisibilityState,
@@ -62,9 +61,9 @@ export function DataTable<T extends { id: string }>({
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
 
-  const globalFilterFn: GlobalFilterFn<T> = (
+  const globalFilterFn = (
     row: Row<T>,
-    columnIds: string[],
+    columnId: string,
     filterValue: string
   ) => {
     return searchColumns.some((colKey) => {

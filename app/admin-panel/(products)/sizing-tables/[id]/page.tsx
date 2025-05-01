@@ -1,3 +1,5 @@
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
+import SizingTableEditForm from "@/components/adminPanel/products/SizingTableEditForm";
 import { SizingTable } from "@/firebase/schemas/products";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
 import { notFound } from "next/navigation";
@@ -8,15 +10,8 @@ type Props = {
 };
 
 export async function generateMetadata(props: Props) {
-  const { id } = await props.params;
-  const result = await getDocumentFromAdminDB<SizingTable>("sizingTables", id);
-  const { data } = result;
-  if (!data) {
-    notFound();
-  }
-
   return {
-    title: `Edytuj tabelę rozmiarów ${data.name}`,
+    title: `Edytuj tabelę rozmiarów`,
   };
 }
 
@@ -28,5 +23,5 @@ export default async function SizingTableEditPage(props: Props) {
     notFound();
   }
 
-  return <div>{data.name}</div>;
+  return <SizingTableEditForm isNew={false} oldData={data} />;
 }

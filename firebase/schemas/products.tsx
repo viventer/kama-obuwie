@@ -25,8 +25,7 @@ export const RootCategoryValues = [
 
 export const SizingTableSchema = z.object({
   name: z.string().min(3).max(32),
-  shoeModelId: FirestoreId,
-  insoleLenghts: z.array(
+  insoleLengths: z.array(
     z.object({
       size: z.number(),
       insoleLength: z.number(),

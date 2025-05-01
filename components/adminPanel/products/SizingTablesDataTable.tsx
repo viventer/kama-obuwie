@@ -43,7 +43,7 @@ export default function SizingTablesDataTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {row.insoleLenghts.map((size) => (
+          {row.insoleLengths.map((size) => (
             <TableRow key={size.size}>
               <TableCell>{size.size}</TableCell>
               <TableCell>{size.insoleLength}</TableCell>

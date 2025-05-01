@@ -1,6 +1,7 @@
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { DocumentData, DocumentReference } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
+import { cache } from "react";
 
 export function apiResponse(
   message: string,
@@ -13,37 +14,33 @@ export function apiResponse(
   return NextResponse.json({ message }, { status });
 }
 
-export type DocumentDataWithRef = {
-  data: DocumentData | null;
+export type DocumentDataWithRef<T> = {
+  data: T | null;
   ref: DocumentReference;
 };
 
-export async function getDocumentFromAdminDB(
+export const getDocumentFromAdminDB = cache(async function <T>(
   collection: string,
   id: string
-): Promise<DocumentDataWithRef> {
+): Promise<DocumentDataWithRef<T>> {
   const ref = adminDB.collection(collection).doc(id);
   const doc = await ref.get();
   if (!doc.exists) {
     return { data: null, ref };
   }
-  const data = doc.data() as DocumentData;
-  return { data, ref };
-}
+  return { data: doc.data() as T, ref };
+});
 
-export async function getDocumentsFromAdminDB(
+export const getDocumentsFromAdminDB = cache(async function <T>(
   collection: string
-): Promise<DocumentData[] | null> {
+): Promise<(T & { id: string })[] | null> {
   const ref = adminDB.collection(collection);
   const snapshot = await ref.get();
   if (snapshot.empty) {
     return null;
   }
-  const data = snapshot.docs.map((doc) => {
-    return {
-      id: doc.id,
-      ...doc.data(),
-    };
-  }) as DocumentData[];
-  return data;
-}
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...(doc.data() as T),
+  }));
+});

@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useRouter } from "next/navigation";
 
 export default function SizingTablesDataTable({
   data,
@@ -21,11 +22,13 @@ export default function SizingTablesDataTable({
     { attributeName: "name", displayName: "Nazwa" },
   ];
 
+  const router = useRouter();
+
   const actions: TableAction[] = [
     {
       name: "Edytuj",
-      onClick: () => {
-        console.log("Edytuj");
+      onClick: (id) => {
+        router.push(`/admin-panel/sizing-tables/${id}`);
       },
     },
   ];

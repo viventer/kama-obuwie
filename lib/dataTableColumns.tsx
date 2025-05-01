@@ -16,10 +16,10 @@ export type ColumnName<T> = {
 
 export type TableAction = {
   name: string;
-  onClick: () => void;
+  onClick: (id?: string) => void;
 };
 
-function getSelectAllColumn<T>(): ColumnDef<T, unknown> {
+function getSelectAllColumn<T extends { id: string }>(): ColumnDef<T, unknown> {
   return {
     id: "select",
     header: ({ table }) => (
@@ -57,7 +57,7 @@ function getDataColumns<T>(
   }));
 }
 
-export function getDataTableColumns<T>(
+export function getDataTableColumns<T extends { id: string }>(
   columnNames: ColumnName<T>[],
   tableActions?: TableAction[]
 ): ColumnDef<T, unknown>[] {
@@ -76,7 +76,10 @@ export function getDataTableColumns<T>(
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           {tableActions?.map((action) => (
-            <DropdownMenuItem key={action.name} onClick={action.onClick}>
+            <DropdownMenuItem
+              key={action.name}
+              onClick={() => action.onClick(row.original.id)}
+            >
               {action.name}
             </DropdownMenuItem>
           ))}

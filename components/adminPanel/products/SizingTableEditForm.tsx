@@ -1,6 +1,6 @@
 "use client";
 
-import { SizingTable } from "@/firebase/schemas/products";
+import { SizingTableWithId } from "@/firebase/schemas/products";
 import SubpageHeading from "../global/SubpageHeading";
 import { useForm } from "react-hook-form";
 import {
@@ -26,17 +26,14 @@ import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 
 export default function SizingTableEditForm({
-  isNew,
   oldData,
 }: {
-  isNew: boolean;
-  oldData: SizingTable;
+  oldData: SizingTableWithId;
 }) {
   const params = useParams() as { id: string };
   const { id } = params;
 
-  const text = isNew ? "Dodaj tabelę rozmiarów" : "Edytuj tabelę rozmiarów";
-  const form = useForm<SizingTable>({
+  const form = useForm<SizingTableWithId>({
     defaultValues: {
       name: oldData.name || "",
       insoleLengths: oldData.insoleLengths.map((row) => ({
@@ -46,7 +43,7 @@ export default function SizingTableEditForm({
     },
   });
 
-  const [newData, setNewData] = useState<SizingTable>(oldData);
+  const [newData, setNewData] = useState<SizingTableWithId>(oldData);
 
   useEffect(() => {
     form.reset(newData);
@@ -96,7 +93,7 @@ export default function SizingTableEditForm({
 
   return (
     <>
-      <SubpageHeading text={text} />
+      <SubpageHeading text="Edytuj tabelę rozmiarów" />
       <Form {...form}>
         <div className="flex flex-col gap-4">
           <FormField
@@ -178,7 +175,7 @@ export default function SizingTableEditForm({
             className="mt-8 w-fit"
             onClick={(e) => handleSubmit(e)}
           >
-            {isNew ? "Utwórz" : "Zapisz"}
+            Zapisz
           </Button>
         </div>
       </Form>

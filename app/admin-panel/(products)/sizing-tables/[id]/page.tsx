@@ -1,5 +1,5 @@
 import SizingTableEditForm from "@/components/adminPanel/products/SizingTableEditForm";
-import { SizingTable } from "@/firebase/schemas/products";
+import { SizingTableWithId } from "@/firebase/schemas/products";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
 import { notFound } from "next/navigation";
 
@@ -16,12 +16,14 @@ export async function generateMetadata(props: Props) {
 
 export default async function SizingTableEditPage(props: Props) {
   const { id } = await props.params;
-  const result = await getDocumentFromAdminDB<SizingTable>("sizingTables", id);
+  const result = await getDocumentFromAdminDB<SizingTableWithId>(
+    "sizingTables",
+    id
+  );
   const { data, ref } = result;
-  console.log("data", data);
   if (!data) {
     notFound();
   }
 
-  return <SizingTableEditForm isNew={false} oldData={data} />;
+  return <SizingTableEditForm oldData={data} />;
 }

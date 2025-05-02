@@ -1,3 +1,5 @@
+"use server";
+
 import { adminDB } from "@/firebase/firebaseAdmin";
 import {
   Category,

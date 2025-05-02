@@ -6,7 +6,7 @@ import { NextRequest } from "next/server";
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { name, insoleLengths } = body;
-  const newSizingTable: Omit<SizingTable, "id"> = {
+  const newSizingTable: SizingTable = {
     name,
     insoleLengths,
   };

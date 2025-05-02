@@ -1,0 +1,43 @@
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
+import CategoriesDataTable from "@/components/adminPanel/products/CategoriesDataTable";
+import {
+  CategoryWithAllegroCategoryName,
+  CategoryWithId,
+} from "@/firebase/schemas/products";
+import { getAllegroCategoryById } from "@/server-actions/allegro/categories";
+import { getDocumentsFromAdminDB } from "@/server-actions/helpers";
+
+export default async function CategoriesPage() {
+  const categories = await getDocumentsFromAdminDB<CategoryWithId>(
+    "categories"
+  );
+
+  let categoriesWithAllegroCategoryName:
+    | CategoryWithAllegroCategoryName[]
+    | null = null;
+  if (categories?.length) {
+    const promises = categories.map(async (category) => {
+      const allegroCategoryName = await getAllegroCategoryById(
+        category.allegroCategoryId
+      );
+      return {
+        ...category,
+        allegroCategoryName: allegroCategoryName || "błędne ID",
+      };
+    });
+
+    categoriesWithAllegroCategoryName = await Promise.all(promises);
+  }
+
+  return (
+    <>
+      <SubpageHeading text="Kategorie produktów" />
+
+      {categoriesWithAllegroCategoryName ? (
+        <CategoriesDataTable data={categoriesWithAllegroCategoryName} />
+      ) : (
+        <p>Brak kategorii</p>
+      )}
+    </>
+  );
+}

@@ -1,29 +1,22 @@
 import { z } from "zod";
 
-const FirestoreId = z
-  .string()
-  .regex(/^(?!\.\.?$)(?!__.*__)(?!.*\/)[\s\S]{1,1500}$/, {
-    message: "Nieprawidłowy identyfikator dokumentu Firestore",
-  });
-
-const NullableFirestoreId = FirestoreId.nullable().default(null);
-
 export type RootCategory =
-  | "accessories"
-  | "male"
-  | "female"
-  | "children"
-  | "childrenAccessories";
+  | "akcesoria"
+  | "męskie"
+  | "damskie"
+  | "dziecięce"
+  | "akcesoria dziecięce";
 
 export const RootCategoryValues = [
-  "accessories",
-  "male",
-  "female",
-  "children",
-  "childrenAccessories",
+  "akcesoria",
+  "męskie",
+  "damskie",
+  "dziecięce",
+  "akcesoria dziecięce",
 ] as const;
 
 export const SizingTableSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(3).max(32),
   insoleLengths: z.array(
     z.object({
@@ -34,14 +27,20 @@ export const SizingTableSchema = z.object({
 });
 
 export const CategorySchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(3).max(32),
   productType: z.enum(["shoe", "accessory"]),
   rootCategory: z.enum(RootCategoryValues),
-  allegroCategoryId: FirestoreId,
+  allegroCategoryId: z.string(),
   variantParameters: z.array(z.string()).default([]),
 });
 
+export const CategorySchemaWithAllegroCategoryName = CategorySchema.merge(
+  z.object({ allegroCategoryName: z.string() })
+);
+
 export const ProductSchema = z.object({
+  id: z.string().optional(),
   brand: z.string().min(3).max(32),
   productName: z.string().min(3).max(32),
   productType: z.enum(["shoe", "accessory"]),
@@ -52,39 +51,51 @@ export const ProductSchema = z.object({
   warrantyPeriod: z.number().min(0).max(240).default(0),
   parameters: z.record(z.string(), z.string()).default({}),
   purchasePrice: z.number(),
-  CategoryId: NullableFirestoreId,
-  sizingTableId: NullableFirestoreId,
-  mainCategoryId: NullableFirestoreId,
-  accessoriesGroupId: NullableFirestoreId,
-  brandInfoId: NullableFirestoreId,
+  CategoryId: z.string().optional(),
+  sizingTableId: z.string().optional(),
+  mainCategoryId: z.string().optional(),
+  accessoriesGroupId: z.string().optional(),
+  brandInfoId: z.string().optional(),
 });
 
 export const AccessoriesGroupSchema = z.object({
+  id: z.string().optional(),
   type: z.string().min(3).max(32),
   brand: z.string().min(3).max(32),
   productName: z.string().min(3).max(32),
   samplePhotoUrl: z.string().max(256),
   connectingParameters: z.array(z.string()),
-  connectedProducts: z.array(FirestoreId),
+  connectedProducts: z.array(z.string().optional()),
 });
 
 export const BrandInfoSchema = z.object({
+  id: z.string().optional(),
   brandName: z.string().min(3).max(32),
   brandDescription: z.string().min(3).max(256),
   brandLogoUrl: z.string().max(256),
-  connectedProductIds: z.array(NullableFirestoreId),
+  connectedProductIds: z.array(z.string().optional()),
 });
 
-type WithId<T> = T & { id: FirestoreId };
-
-export type FirestoreId = z.infer<typeof FirestoreId>;
-export type NullableFirestoreId = z.infer<typeof NullableFirestoreId>;
-export type SizingTable = WithId<z.infer<typeof SizingTableSchema>>;
-export type Category = WithId<z.infer<typeof CategorySchema>>;
-export type Product = WithId<z.infer<typeof ProductSchema>>;
-export type AccessoriesGroup = WithId<z.infer<typeof AccessoriesGroupSchema>>;
+export type SizingTable = z.infer<typeof SizingTableSchema>;
+export type Category = z.infer<typeof CategorySchema>;
+export type Product = z.infer<typeof ProductSchema>;
+export type AccessoriesGroup = z.infer<typeof AccessoriesGroupSchema>;
 export type ProductType = z.infer<typeof ProductSchema>["productType"];
-export type BrandInfo = WithId<z.infer<typeof BrandInfoSchema>>;
+export type BrandInfo = z.infer<typeof BrandInfoSchema>;
+
+export type SizingTableWithId = Omit<SizingTable, "id"> & { id: string };
+export type CategoryWithId = Omit<Category, "id"> & { id: string };
+export type ProductWithId = Omit<Product, "id"> & { id: string };
+export type AccessoriesGroupWithId = Omit<AccessoriesGroup, "id"> & {
+  id: string;
+};
+export type BrandInfoWithId = Omit<BrandInfo, "id"> & { id: string };
+export type CategoryWithAllegroCategoryName = Omit<
+  z.infer<typeof CategorySchemaWithAllegroCategoryName>,
+  "id"
+> & {
+  id: string;
+};
 
 export const SizingTableUpdateDataSchema = SizingTableSchema.partial().strict();
 

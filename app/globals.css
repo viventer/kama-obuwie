@@ -112,6 +112,10 @@
   box-sizing: border-box;
 }
 
+b {
+  font-weight: 500;
+}
+
 .prose {
   --tw-prose-body: var(--foreground);
   --tw-prose-bold: var(--foreground);

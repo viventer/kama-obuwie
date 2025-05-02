@@ -2,7 +2,7 @@
 
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
 import { DataTable } from "../global/DataTable";
-import { SizingTable } from "@/firebase/schemas/products";
+import { SizingTable, SizingTableWithId } from "@/firebase/schemas/products";
 import {
   Table,
   TableBody,
@@ -20,9 +20,9 @@ import { useConfirmDialog } from "@/components/global/ConfirmDialogProvider";
 export default function SizingTablesDataTable({
   data,
 }: {
-  data: SizingTable[];
+  data: SizingTableWithId[];
 }) {
-  const columnNames: ColumnName<SizingTable>[] = [
+  const columnNames: ColumnName<SizingTableWithId>[] = [
     { attributeName: "name", displayName: "Nazwa" },
   ];
 
@@ -66,7 +66,7 @@ export default function SizingTablesDataTable({
     });
   };
 
-  const renderRowSubComponent = (row: SizingTable) => {
+  const renderRowSubComponent = (row: SizingTableWithId) => {
     return (
       <Table>
         <TableHeader>
@@ -89,12 +89,13 @@ export default function SizingTablesDataTable({
 
   const handleCreateSizingTable = async () => {
     try {
-      const resp = await axios.post("/api/sizing-tables", {
+      const newSizingTable: SizingTable = {
         name: "Nowa tabela rozmiarów",
         insoleLengths: [],
-      });
+      };
+
+      const resp = await axios.post("/api/sizing-tables", newSizingTable);
       const id = resp.data.id;
-      console.log(resp);
       router.push(`/admin-panel/sizing-tables/${id}`);
       showToast("Tabela rozmiarów została utworzona", "success");
     } catch (err) {

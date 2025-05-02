@@ -1,4 +1,3 @@
-import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import SizingTableEditForm from "@/components/adminPanel/products/SizingTableEditForm";
 import { SizingTable } from "@/firebase/schemas/products";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";

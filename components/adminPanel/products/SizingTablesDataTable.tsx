@@ -35,7 +35,27 @@ export default function SizingTablesDataTable({
         router.push(`/admin-panel/sizing-tables/${id}`);
       },
     },
+    {
+      name: "Usuń",
+      onClick: (id) => {
+        if (id === undefined) {
+          showToast("Nie można usunąć tabeli rozmiarów", "error");
+          return;
+        }
+        handleDeleteSizingTable(id);
+      },
+    },
   ];
+
+  const handleDeleteSizingTable = async (id: string) => {
+    try {
+      await axios.delete(`/api/sizing-tables/${id}`);
+      showToast("Tabela rozmiarów została usunięta", "success");
+      router.refresh();
+    } catch (err) {
+      showToast(`Nie udało się usunąć tabeli rozmiarów: ${err}`, "error");
+    }
+  };
 
   const renderRowSubComponent = (row: SizingTable) => {
     return (

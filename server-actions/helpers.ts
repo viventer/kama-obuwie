@@ -1,5 +1,5 @@
 import { adminDB } from "@/firebase/firebaseAdmin";
-import { DocumentData, DocumentReference } from "firebase-admin/firestore";
+import { DocumentReference } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
 import { cache } from "react";
 
@@ -25,6 +25,7 @@ export const getDocumentFromAdminDB = cache(async function <T>(
 ): Promise<DocumentDataWithRef<T>> {
   const ref = adminDB.collection(collection).doc(id);
   const doc = await ref.get();
+
   if (!doc.exists) {
     return { data: null, ref };
   }

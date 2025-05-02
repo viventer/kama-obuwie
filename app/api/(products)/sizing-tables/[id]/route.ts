@@ -31,9 +31,12 @@ export async function PATCH(
   return apiResponse("Tabela rozmiarów została zaktualizowana.", 200);
 }
 
-export async function DELETE({ params }: { params: { id: string } }) {
-  const { id } = params;
-  const { data, ref } = await getDocumentFromAdminDB(id, "sizingTables");
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const { data, ref } = await getDocumentFromAdminDB("sizingTables", id);
   if (!data) {
     return apiResponse("Tabela rozmiarów nie istnieje.", 404);
   }

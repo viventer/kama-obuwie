@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "../components/adminPanel/global/AppSidebar";
+import { ConfirmDialogProvider } from "@/components/global/ConfirmDialogProvider";
 
 const ubuntuSans = Ubuntu({
   variable: "--font-ubuntu-sans",
@@ -35,14 +36,16 @@ export default async function RootLayout({
       <body
         className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text`}
       >
-        {children}
-        <Toaster
-          toastOptions={{
-            unstyled: true,
-            className:
-              "bg-background flex gap-2 backdrop-blur-[0.2rem] items-center border-[0.1rem]  px-4 py-3 rounded-lg",
-          }}
-        />
+        <ConfirmDialogProvider>
+          {children}
+          <Toaster
+            toastOptions={{
+              unstyled: true,
+              className:
+                "bg-background flex gap-2 backdrop-blur-[0.2rem] items-center border-[0.1rem]  px-4 py-3 rounded-lg",
+            }}
+          />
+        </ConfirmDialogProvider>
       </body>
     </html>
   );

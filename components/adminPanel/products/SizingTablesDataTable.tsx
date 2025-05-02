@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useToast } from "@/hooks/useToast";
+import { useConfirmDialog } from "@/components/global/ConfirmDialogProvider";
 
 export default function SizingTablesDataTable({
   data,
@@ -47,14 +48,22 @@ export default function SizingTablesDataTable({
     },
   ];
 
+  const { showDialog } = useConfirmDialog();
+
   const handleDeleteSizingTable = async (id: string) => {
-    try {
-      await axios.delete(`/api/sizing-tables/${id}`);
-      showToast("Tabela rozmiarów została usunięta", "success");
-      router.refresh();
-    } catch (err) {
-      showToast(`Nie udało się usunąć tabeli rozmiarów: ${err}`, "error");
-    }
+    showDialog({
+      message: "Czy na pewno chcesz usunąć tę tabelę rozmiarów?",
+      description: "Ta operacja jest nieodwracalna.",
+      onConfirm: async () => {
+        try {
+          await axios.delete(`/api/sizing-tables/${id}`);
+          showToast("Tabela rozmiarów została usunięta", "success");
+          router.refresh();
+        } catch (err) {
+          showToast(`Nie udało się usunąć tabeli rozmiarów: ${err}`, "error");
+        }
+      },
+    });
   };
 
   const renderRowSubComponent = (row: SizingTable) => {

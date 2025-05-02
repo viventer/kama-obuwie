@@ -11,6 +11,7 @@ export default async function page() {
   return (
     <>
       <SubpageHeading text="Tabele rozmiarów" />
+
       {sizingTables ? (
         <SizingTablesDataTable data={sizingTables} />
       ) : (

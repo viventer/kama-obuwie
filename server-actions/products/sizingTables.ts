@@ -7,11 +7,15 @@ import {
   SizingTableUpdateDataSchema,
 } from "@/firebase/schemas/products";
 
-export async function createSizingTable(newSizingTable: SizingTable) {
+export async function createSizingTable(
+  newSizingTable: Omit<SizingTable, "id">
+) {
   SizingTableSchema.parse(newSizingTable);
   const sizingTableRef = adminDB.collection("sizingTables").doc();
 
   await sizingTableRef.set(newSizingTable);
+
+  return sizingTableRef.id;
 }
 
 export async function updateSizingTable(

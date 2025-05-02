@@ -22,7 +22,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { FormEvent, useEffect, useState } from "react";
 import { updateSizingTable } from "@/server-actions/products/sizingTables";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useToast } from "@/hooks/useToast";
 
 export default function SizingTableEditForm({
   isNew,
@@ -53,16 +54,28 @@ export default function SizingTableEditForm({
 
   const addRow = (e: FormEvent) => {
     e.preventDefault();
-    const lastSize = newData.insoleLengths[newData.insoleLengths.length - 1];
-    const newRow = {
-      size: lastSize.size + 1,
-      insoleLength: lastSize.insoleLength + 0.5,
-    };
+
+    let newRow;
+    if (newData.insoleLengths.length === 0) {
+      newRow = {
+        size: 0,
+        insoleLength: 0,
+      };
+    } else {
+      const lastSize = newData.insoleLengths[newData.insoleLengths.length - 1];
+      newRow = {
+        size: lastSize.size + 1,
+        insoleLength: lastSize.insoleLength + 0.5,
+      };
+    }
     setNewData((prev) => ({
       ...prev,
       insoleLengths: [...prev.insoleLengths, newRow],
     }));
   };
+
+  const { showToast } = useToast();
+  const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -71,8 +84,14 @@ export default function SizingTableEditForm({
       name: data.name,
       insoleLengths: data.insoleLengths,
     };
-    console.log("Updated data:", id);
-    await updateSizingTable(id, updatedData);
+    console.log("updatedData", updatedData);
+    try {
+      await updateSizingTable(id, updatedData);
+      showToast("Tabela rozmiarów została zaktualizowana.", "success");
+      router.push("/admin-panel/sizing-tables");
+    } catch (err) {
+      showToast(`Błąd aktualizacji tabeli rozmiarów: ${err}`, "error");
+    }
   };
 
   return (
@@ -113,6 +132,9 @@ export default function SizingTableEditForm({
                             <Input
                               type="number"
                               {...field}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
                               className="border-none"
                             />
                           </FormControl>
@@ -131,6 +153,9 @@ export default function SizingTableEditForm({
                             <Input
                               type="number"
                               {...field}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
                               className="border-none"
                             />
                           </FormControl>

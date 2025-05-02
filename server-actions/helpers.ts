@@ -9,7 +9,7 @@ export function apiResponse(
   data?: Record<string, any>
 ): Response {
   if (status >= 200 && status < 400) {
-    return NextResponse.json({ message, data }, { status });
+    return NextResponse.json({ message, ...data }, { status });
   }
   return NextResponse.json({ message }, { status });
 }

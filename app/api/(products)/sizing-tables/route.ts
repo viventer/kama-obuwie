@@ -5,20 +5,20 @@ import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { name, shoeModelId, insoleLenghts } = body;
-  const newSizingTable: SizingTable = {
+  const { name, insoleLengths } = body;
+  const newSizingTable: Omit<SizingTable, "id"> = {
     name,
-    shoeModelId,
-    insoleLenghts,
+    insoleLengths,
   };
 
   try {
-    await createSizingTable(newSizingTable);
+    const id = await createSizingTable(newSizingTable);
+    return apiResponse("Tabela rozmiarów została dodana.", 201, {
+      id,
+    });
   } catch (err) {
     return apiResponse(`Błąd tworzenia tabeli rozmiarów: ${err}`, 400);
   }
-
-  return apiResponse("Tabela rozmiarów została dodana.", 201);
 }
 
 export async function GET() {

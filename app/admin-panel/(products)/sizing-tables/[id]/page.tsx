@@ -19,6 +19,7 @@ export default async function SizingTableEditPage(props: Props) {
   const { id } = await props.params;
   const result = await getDocumentFromAdminDB<SizingTable>("sizingTables", id);
   const { data, ref } = result;
+  console.log("data", data);
   if (!data) {
     notFound();
   }

@@ -23,7 +23,7 @@ export default function AppSidebar() {
           <SidebarGroupLabel>Produkty</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <LinkText href="/admin-panel/create-products">
+              <LinkText href="/admin-panel/create-products/shoes">
                 Tworzenie produktów
               </LinkText>
             </SidebarMenuItem>

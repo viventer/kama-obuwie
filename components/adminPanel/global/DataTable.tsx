@@ -39,6 +39,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import DataTableRow from "./DataTableRow";
+import DataTableRowWithImage from "./DataTableRowWithImage";
 
 export function DataTable<T extends { id: string }>({
   data,
@@ -47,6 +49,8 @@ export function DataTable<T extends { id: string }>({
   searchColumns,
   renderRowSubComponent,
   searchPlaceholder = "Szukaj",
+  hasImages = false,
+  imageUrl,
 }: {
   data: T[];
   columnNames: ColumnName<T>[];
@@ -54,6 +58,8 @@ export function DataTable<T extends { id: string }>({
   searchColumns: (keyof T)[];
   renderRowSubComponent?: (row: T) => React.ReactNode;
   searchPlaceholder?: string;
+  hasImages?: boolean;
+  imageUrl?: string;
 }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -139,50 +145,34 @@ export function DataTable<T extends { id: string }>({
       </div>
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
+          {!hasImages && (
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+          )}
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <Fragment key={row.id}>
-                  <TableRow
-                    data-state={row.getIsExpanded() ? "expanded" : undefined}
-                    className="cursor-pointer"
-                    onClick={(e) => {
-                      const target = e.target as HTMLElement;
-                      if (
-                        target.closest("button") ||
-                        target.closest("[role='menu']") ||
-                        target.closest("[data-ignore-row-click]")
-                      ) {
-                        return;
-                      }
-                      row.toggleExpanded();
-                    }}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+                  {hasImages && imageUrl ? (
+                    <DataTableRowWithImage<T> row={row} imageUrl={imageUrl} />
+                  ) : (
+                    <DataTableRow<T> row={row} />
+                  )}
+
                   {row.getIsExpanded() && renderRowSubComponent && (
                     <TableRow>
                       <TableCell colSpan={basicColumns.length}>

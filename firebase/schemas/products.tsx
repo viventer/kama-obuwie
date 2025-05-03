@@ -38,20 +38,34 @@ export const CategorySchemaWithAllegroCategoryName = CategorySchema.merge(
   z.object({ allegroCategoryName: z.string() })
 );
 
+export const DescriptionElementSchema = z.object({
+  type: z.enum(["text", "image"]),
+  content: z.string().optional(),
+  imageUrl: z.string().url().optional(),
+});
+
+export const DescriptionRowSchema = z.array(DescriptionElementSchema).nonempty({
+  message: "DescriptionRow musi zawierać co najmniej jeden element",
+});
+
+export const DescriptionSchema = z.array(DescriptionRowSchema);
+
 export const ProductSchema = z.object({
   id: z.string().optional(),
   brand: z.string().min(3).max(32),
   productName: z.string().min(3).max(32),
-  rawPhotosUrl: z.array(z.string().max(256)).max(20).default([]),
-  editedPhotosUrl: z.array(z.string().max(256)).max(20).default([]),
+  productType: z.enum(["obuwie", "akcesoria"]),
+  samplePhotoUrl: z.string().url(),
+  rawPhotosUrl: z.array(z.string().url()).max(20).default([]),
+  editedPhotosUrl: z.array(z.string().url()).max(20).default([]),
   shoeTypes: z.array(z.string().min(3).max(32)).default([]),
   colors: z.array(z.string().min(3).max(32)).default([]),
   warrantyPeriod: z.number().min(0).max(240).default(0),
   parameters: z.record(z.string(), z.string()).default({}),
+  description: DescriptionSchema.default([]),
   purchasePrice: z.number(),
-  CategoryId: z.string().optional(),
+  categoryId: z.string().optional(),
   sizingTableId: z.string().optional(),
-  mainCategoryId: z.string().optional(),
   accessoriesGroupId: z.string().optional(),
   brandInfoId: z.string().optional(),
 });
@@ -61,17 +75,15 @@ export const AccessoriesGroupSchema = z.object({
   type: z.string().min(3).max(32),
   brand: z.string().min(3).max(32),
   productName: z.string().min(3).max(32),
-  samplePhotoUrl: z.string().max(256),
+  samplePhotoUrl: z.string().url(),
   connectingParameters: z.array(z.string()),
-  connectedProducts: z.array(z.string().optional()),
 });
 
 export const BrandInfoSchema = z.object({
   id: z.string().optional(),
   brandName: z.string().min(3).max(32),
   brandDescription: z.string().min(3).max(256),
-  brandLogoUrl: z.string().max(256),
-  connectedProductIds: z.array(z.string().optional()),
+  brandLogoUrl: z.string().url().optional(),
 });
 
 export type SizingTable = z.infer<typeof SizingTableSchema>;
@@ -93,6 +105,10 @@ export type CategoryWithAllegroCategoryName = Omit<
 > & {
   id: string;
 };
+
+export type DescriptionElement = z.infer<typeof DescriptionElementSchema>;
+export type DescriptionRow = z.infer<typeof DescriptionRowSchema>;
+export type Description = z.infer<typeof DescriptionSchema>;
 
 export const SizingTableUpdateDataSchema = SizingTableSchema.partial().strict();
 

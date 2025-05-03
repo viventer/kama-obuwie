@@ -12,6 +12,8 @@ export async function createCategory(newCategory: Category) {
   const categoryRef = adminDB.collection("categories").doc();
 
   await categoryRef.set(newCategory);
+
+  return categoryRef.id;
 }
 
 export async function updateCategory(

@@ -6,8 +6,8 @@ import {
 import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
 import { updateSizingTable } from "@/server-actions/products/sizingTables";
 
-export async function GET({ params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const data = await getDocumentFromAdminDB(id, "sizingTables");
   if (!data) {
     return apiResponse("Tabela rozmiarów nie istnieje.", 404);
@@ -17,9 +17,9 @@ export async function GET({ params }: { params: { id: string } }) {
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
   const body: Partial<SizingTable> = await request.json();
 
   try {

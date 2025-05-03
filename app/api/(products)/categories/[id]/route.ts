@@ -2,9 +2,9 @@ import { NextRequest } from "next/server";
 import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
 import { updateCategory } from "@/server-actions/products/categories";
 
-export async function GET({ params }: { params: { id: string } }) {
-  const { id } = params;
-  const data = await getDocumentFromAdminDB(id, "productCategories");
+export async function GET({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const data = await getDocumentFromAdminDB(id, "categories");
   if (!data) {
     return apiResponse("Kategoria nie istnieje.", 404);
   }
@@ -13,9 +13,9 @@ export async function GET({ params }: { params: { id: string } }) {
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
   const body = await request.json();
 
   const updateData = body;
@@ -28,9 +28,12 @@ export async function PATCH(
   return apiResponse("Kategoria została zaktualizowana.", 200);
 }
 
-export async function DELETE({ params }: { params: { id: string } }) {
-  const { id } = params;
-  const { data, ref } = await getDocumentFromAdminDB(id, "productCategories");
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  const { data, ref } = await getDocumentFromAdminDB("categories", id);
   if (!data) {
     return apiResponse("Kategoria nie istnieje.", 404);
   }

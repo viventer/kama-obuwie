@@ -15,16 +15,15 @@ export async function POST(request: NextRequest) {
   };
 
   try {
-    await createCategory(newCategory);
+    const id = await createCategory(newCategory);
+    return apiResponse("Kategoria została dodana.", 201, { id });
   } catch (err) {
     return apiResponse(`Błąd dodawania kategorii: ${err}`, 400);
   }
-
-  return apiResponse("Kategoria została dodana.", 201);
 }
 
 export async function GET() {
-  const data = await getDocumentsFromAdminDB("productCategories");
+  const data = await getDocumentsFromAdminDB("categories");
   if (!data) {
     return apiResponse("Nie znaleziono kategorii.", 404);
   }

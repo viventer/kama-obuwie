@@ -1,23 +1,14 @@
-import { adminDB } from "@/firebase/firebaseAdmin";
-import { Category, CategorySchema } from "@/firebase/schemas/products";
-import { getAllegroCategoryById } from "@/server-actions/allegro/categories";
+import { Category } from "@/firebase/schemas/products";
 import { getDocumentsFromAdminDB, apiResponse } from "@/server-actions/helpers";
 import { createCategory } from "@/server-actions/products/categories";
 import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const {
-    name,
-    productType,
-    allegroCategoryId,
-    variantParameters,
-    rootCategory,
-  } = body;
+  const { name, allegroCategoryId, variantParameters, rootCategory } = body;
 
   const newCategory: Category = {
     name,
-    productType,
     allegroCategoryId,
     variantParameters,
     rootCategory,

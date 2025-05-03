@@ -135,7 +135,10 @@ export async function getAllegroCategories(
   const data = resp.data.categories as AllegroCategory[];
   const allegroCategories = serializeCategories(data);
 
-  if (rootCategory === "dziecięce" || rootCategory === "akcesoria dziecięce") {
+  if (
+    rootCategory === "obuwie dziecięce" ||
+    rootCategory === "akcesoria dziecięce"
+  ) {
     const kidsCategories = await getKidsCategories(
       allegroCategories,
       allegroHeaders,
@@ -194,9 +197,9 @@ export async function getAllegroCategories(
     );
 
     const category =
-      rootCategory === "męskie"
+      rootCategory === "obuwie męskie"
         ? maleCategoriesChildren
-        : rootCategory === "damskie"
+        : rootCategory === "obuwie damskie"
         ? femaleCategoriesChildren
         : accessoriesCategoriesChildren;
 

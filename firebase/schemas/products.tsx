@@ -2,16 +2,16 @@ import { z } from "zod";
 
 export type RootCategory =
   | "akcesoria"
-  | "męskie"
-  | "damskie"
-  | "dziecięce"
+  | "obuwie męskie"
+  | "obuwie damskie"
+  | "obuwie dziecięce"
   | "akcesoria dziecięce";
 
 export const RootCategoryValues = [
+  "obuwie męskie",
+  "obuwie damskie",
+  "obuwie dziecięce",
   "akcesoria",
-  "męskie",
-  "damskie",
-  "dziecięce",
   "akcesoria dziecięce",
 ] as const;
 
@@ -29,7 +29,6 @@ export const SizingTableSchema = z.object({
 export const CategorySchema = z.object({
   id: z.string().optional(),
   name: z.string().min(3).max(32),
-  productType: z.enum(["shoe", "accessory"]),
   rootCategory: z.enum(RootCategoryValues),
   allegroCategoryId: z.string(),
   variantParameters: z.array(z.string()).default([]),
@@ -43,7 +42,6 @@ export const ProductSchema = z.object({
   id: z.string().optional(),
   brand: z.string().min(3).max(32),
   productName: z.string().min(3).max(32),
-  productType: z.enum(["shoe", "accessory"]),
   rawPhotosUrl: z.array(z.string().max(256)).max(20).default([]),
   editedPhotosUrl: z.array(z.string().max(256)).max(20).default([]),
   shoeTypes: z.array(z.string().min(3).max(32)).default([]),
@@ -80,7 +78,6 @@ export type SizingTable = z.infer<typeof SizingTableSchema>;
 export type Category = z.infer<typeof CategorySchema>;
 export type Product = z.infer<typeof ProductSchema>;
 export type AccessoriesGroup = z.infer<typeof AccessoriesGroupSchema>;
-export type ProductType = z.infer<typeof ProductSchema>["productType"];
 export type BrandInfo = z.infer<typeof BrandInfoSchema>;
 
 export type SizingTableWithId = Omit<SizingTable, "id"> & { id: string };

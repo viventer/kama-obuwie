@@ -81,10 +81,9 @@ export default function CategoriesDataTable({
     try {
       const newCategory: Category = {
         name: "Nowa kategoria",
-        productType: "shoe",
         allegroCategoryId: "",
         variantParameters: [],
-        rootCategory: "męskie",
+        rootCategory: "obuwie męskie",
       };
 
       const resp = await axios.post("/api/categories", newCategory);

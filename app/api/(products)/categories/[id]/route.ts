@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import { CategoryUpdateDataSchema } from "@/firebase/schemas/products";
 import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
 import { updateCategory } from "@/server-actions/products/categories";
 

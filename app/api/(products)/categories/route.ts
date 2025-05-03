@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   const data = await getDocumentsFromAdminDB("categories");
   if (!data) {
-    return apiResponse("Nie znaleziono kategorii.", 404);
+    return apiResponse("Nie znaleziono kategorii.", 204);
   }
 
   return apiResponse("Kategorie zostały pobrane.", 200, data);

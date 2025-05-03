@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   const sizingTables = await getDocumentsFromAdminDB("sizingTables");
   if (!sizingTables) {
-    return apiResponse("Nie znaleziono tabel rozmiarów.", 404);
+    return apiResponse("Nie znaleziono tabel rozmiarów.", 204);
   }
 
   return apiResponse("Tabela rozmiarów została pobrana.", 200, sizingTables);

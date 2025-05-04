@@ -83,7 +83,6 @@ export default function CreateProductsNewDataTable({
         brand: "Nazwa marki",
         manufacturerCode: "Kod producenta",
         productType: "obuwie",
-        samplePhotoUrl: "",
         purchasePrice: 123,
         creationStage: "new",
       };

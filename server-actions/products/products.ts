@@ -5,6 +5,7 @@ import { Product, ProductSchema } from "@/firebase/schemas/productsSchemas";
 
 export async function createProduct(newProduct: Product) {
   ProductSchema.parse(newProduct);
+
   const productRef = adminDB.collection("products").doc();
 
   await productRef.set(newProduct);

@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Ubuntu, Ubuntu_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import AppSidebar from "../components/adminPanel/global/AppSidebar";
 import { ConfirmDialogProvider } from "@/components/global/ConfirmDialogProvider";
 
 const ubuntuSans = Ubuntu({

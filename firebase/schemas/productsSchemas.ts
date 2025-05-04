@@ -55,7 +55,7 @@ export const ProductSchema = z.object({
   brand: z.string().min(3).max(32),
   manufacturerCode: z.string().min(3).max(32),
   productType: z.enum(["obuwie", "akcesoria"]),
-  samplePhotoUrl: z.string().url(),
+  samplePhotoUrl: z.string().url().optional(),
   rawPhotosUrl: z.array(z.string().url()).max(20).default([]).optional(),
   editedPhotosUrl: z.array(z.string().url()).max(20).default([]).optional(),
   shoeTypes: z.array(z.string().min(3).max(32)).default([]).optional(),

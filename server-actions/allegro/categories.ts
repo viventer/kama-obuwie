@@ -7,7 +7,7 @@ import {
 } from "@/server-actions/allegro/global";
 import axios from "axios";
 import { getAllegroAccessToken } from "./auth";
-import { RootCategory } from "@/firebase/schemas/products";
+import { RootCategory } from "@/firebase/schemas/productsSchemas";
 
 export type SerializedAllegroCategory = {
   id: string;

@@ -5,7 +5,7 @@ import { DataTable } from "../global/DataTable";
 import {
   Category,
   CategoryWithAllegroCategoryName,
-} from "@/firebase/schemas/products";
+} from "@/firebase/schemas/productsSchemas";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import axios from "axios";

@@ -1,7 +1,7 @@
 "use server";
 
 import { adminDB } from "@/firebase/firebaseAdmin";
-import { Product, ProductSchema } from "@/firebase/schemas/products";
+import { Product, ProductSchema } from "@/firebase/schemas/productsSchemas";
 
 export async function createProduct(newProduct: Product) {
   ProductSchema.parse(newProduct);

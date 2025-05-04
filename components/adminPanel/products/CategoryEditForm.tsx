@@ -3,7 +3,7 @@
 import {
   CategoryWithId,
   RootCategoryValues,
-} from "@/firebase/schemas/products";
+} from "@/firebase/schemas/productsSchemas";
 import { useToast } from "@/hooks/useToast";
 import { updateCategory } from "@/server-actions/products/categories";
 import { useParams, useRouter } from "next/navigation";

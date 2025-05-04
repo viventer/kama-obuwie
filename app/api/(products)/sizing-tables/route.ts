@@ -1,4 +1,4 @@
-import { SizingTable } from "@/firebase/schemas/products";
+import { SizingTable } from "@/firebase/schemas/productsSchemas";
 import { getDocumentsFromAdminDB, apiResponse } from "@/server-actions/helpers";
 import { createSizingTable } from "@/server-actions/products/sizingTables";
 import { NextRequest } from "next/server";

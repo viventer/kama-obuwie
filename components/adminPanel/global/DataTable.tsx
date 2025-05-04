@@ -50,7 +50,7 @@ export function DataTable<T extends { id: string }>({
   renderRowSubComponent,
   searchPlaceholder = "Szukaj",
   hasImages = false,
-  imageUrl,
+  imageUrlAttribute,
 }: {
   data: T[];
   columnNames: ColumnName<T>[];
@@ -59,7 +59,7 @@ export function DataTable<T extends { id: string }>({
   renderRowSubComponent?: (row: T) => React.ReactNode;
   searchPlaceholder?: string;
   hasImages?: boolean;
-  imageUrl?: string;
+  imageUrlAttribute?: keyof T;
 }) {
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -167,8 +167,11 @@ export function DataTable<T extends { id: string }>({
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <Fragment key={row.id}>
-                  {hasImages && imageUrl ? (
-                    <DataTableRowWithImage<T> row={row} imageUrl={imageUrl} />
+                  {hasImages && imageUrlAttribute ? (
+                    <DataTableRowWithImage<T>
+                      row={row}
+                      imageUrlAttribute={imageUrlAttribute}
+                    />
                   ) : (
                     <DataTableRow<T> row={row} />
                   )}

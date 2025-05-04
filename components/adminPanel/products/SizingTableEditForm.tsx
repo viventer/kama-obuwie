@@ -1,6 +1,6 @@
 "use client";
 
-import { SizingTableWithId } from "@/firebase/schemas/products";
+import { SizingTableWithId } from "@/firebase/schemas/productsSchemas";
 import SubpageHeading from "../global/SubpageHeading";
 import { useForm } from "react-hook-form";
 import {

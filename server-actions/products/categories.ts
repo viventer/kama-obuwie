@@ -5,7 +5,7 @@ import {
   Category,
   CategorySchema,
   CategoryUpdateDataSchema,
-} from "@/firebase/schemas/products";
+} from "@/firebase/schemas/productsSchemas";
 
 export async function createCategory(newCategory: Category) {
   CategorySchema.parse(newCategory);

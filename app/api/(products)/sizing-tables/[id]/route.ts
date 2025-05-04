@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { SizingTable } from "@/firebase/schemas/products";
+import { SizingTable } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
 import { updateSizingTable } from "@/server-actions/products/sizingTables";
 

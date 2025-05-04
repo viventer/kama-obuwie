@@ -1,12 +1,6 @@
-import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import ProductTypeSelector from "@/components/adminPanel/products/ProductTypeSelector";
+import { ProductTypeContextProvider } from "@/components/adminPanel/products/ProductsTypeContext";
 import { ReactNode } from "react";
 
 export default async function layout({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <SubpageHeading text="Nowe produkty" />
-      <ProductTypeSelector />
-    </>
-  );
+  return <ProductTypeContextProvider>{children}</ProductTypeContextProvider>;
 }

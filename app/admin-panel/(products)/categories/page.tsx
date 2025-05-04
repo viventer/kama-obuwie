@@ -3,7 +3,7 @@ import CategoriesDataTable from "@/components/adminPanel/products/CategoriesData
 import {
   CategoryWithAllegroCategoryName,
   CategoryWithId,
-} from "@/firebase/schemas/products";
+} from "@/firebase/schemas/productsSchemas";
 import { getAllegroCategoryById } from "@/server-actions/allegro/categories";
 import { getDocumentsFromAdminDB } from "@/server-actions/helpers";
 

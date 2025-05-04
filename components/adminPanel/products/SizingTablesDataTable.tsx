@@ -2,7 +2,10 @@
 
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
 import { DataTable } from "../global/DataTable";
-import { SizingTable, SizingTableWithId } from "@/firebase/schemas/products";
+import {
+  SizingTable,
+  SizingTableWithId,
+} from "@/firebase/schemas/productsSchemas";
 import {
   Table,
   TableBody,

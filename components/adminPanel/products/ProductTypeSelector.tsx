@@ -15,9 +15,9 @@ export default function ProductTypeSelector() {
       defaultValue="obuwie"
       onValueChange={(value) => {
         if (value === "obuwie" && !isShoesPage) {
-          router.push("/admin-panel/create-products/shoes");
+          router.push(pathname.replace("accessories", "shoes"));
         } else if (value === "akcesoria" && !isAccessoriesPage) {
-          router.push("/admin-panel/create-products/accessories");
+          router.push(pathname.replace("shoes", "accessories"));
         }
       }}
     >

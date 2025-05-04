@@ -1,5 +1,5 @@
 import SizingTableEditForm from "@/components/adminPanel/products/SizingTableEditForm";
-import { SizingTableWithId } from "@/firebase/schemas/products";
+import { SizingTableWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
 import { notFound } from "next/navigation";
 

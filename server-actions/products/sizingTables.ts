@@ -5,7 +5,7 @@ import {
   SizingTable,
   SizingTableSchema,
   SizingTableUpdateDataSchema,
-} from "@/firebase/schemas/products";
+} from "@/firebase/schemas/productsSchemas";
 
 export async function createSizingTable(newSizingTable: SizingTable) {
   SizingTableSchema.parse(newSizingTable);

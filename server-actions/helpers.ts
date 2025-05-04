@@ -33,13 +33,20 @@ export const getDocumentFromAdminDB = cache(async function <T>(
 });
 
 export const getDocumentsFromAdminDB = cache(async function <T>(
-  collection: string
+  collection: string,
+  queryFn?: (
+    ref: FirebaseFirestore.CollectionReference
+  ) => FirebaseFirestore.Query
 ): Promise<(T & { id: string })[] | null> {
-  const ref = adminDB.collection(collection);
+  const colRef = adminDB.collection(collection);
+
+  const ref: FirebaseFirestore.Query = queryFn ? queryFn(colRef) : colRef;
+
   const snapshot = await ref.get();
   if (snapshot.empty) {
     return null;
   }
+
   return snapshot.docs.map((doc) => ({
     id: doc.id,
     ...(doc.data() as T),

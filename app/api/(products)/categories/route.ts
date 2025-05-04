@@ -1,4 +1,4 @@
-import { Category } from "@/firebase/schemas/products";
+import { Category } from "@/firebase/schemas/productsSchemas";
 import { getDocumentsFromAdminDB, apiResponse } from "@/server-actions/helpers";
 import { createCategory } from "@/server-actions/products/categories";
 import { NextRequest } from "next/server";

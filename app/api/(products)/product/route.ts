@@ -1,4 +1,4 @@
-import { Product } from "@/firebase/schemas/products";
+import { Product } from "@/firebase/schemas/productsSchemas";
 import { apiResponse, getDocumentsFromAdminDB } from "@/server-actions/helpers";
 import { createProduct } from "@/server-actions/products/products";
 import { NextRequest } from "next/server";

@@ -3,7 +3,10 @@ import { Product } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
 import { updateProduct } from "@/server-actions/products/products";
 
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params;
   const data = await getDocumentFromAdminDB(id, "products");
   if (!data) {

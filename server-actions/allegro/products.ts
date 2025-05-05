@@ -1,0 +1,19 @@
+import axios from "axios";
+import { getAllegroAccessToken } from "./auth";
+import { ALLEGRO_API_BASE_URL, getAllegroHeaders } from "./global";
+
+export async function getProductParameters(allegroCategoryId: string) {
+  const accessToken = await getAllegroAccessToken();
+  const allegroHeaders = getAllegroHeaders(accessToken);
+  const url = `${ALLEGRO_API_BASE_URL}/sale/categories/${allegroCategoryId}/product-parameters`;
+  const response = await axios.get(url, {
+    headers: allegroHeaders,
+  });
+
+  if (response.status !== 200) {
+    throw new Error("Failed to fetch product parameters");
+  }
+
+  const parameters = response.data.parameters;
+  return parameters;
+}

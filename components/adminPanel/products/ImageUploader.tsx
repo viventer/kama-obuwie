@@ -11,17 +11,20 @@ import {
   getImageUrl,
   uploadImageToStorage,
 } from "@/server-actions/images/images";
+import { cn } from "@/lib/utils";
 
 interface ImageUploaderProps {
   setFileName: (fileName: string) => void;
   fileName: string;
   folderPath: string;
+  className?: string;
 }
 
 export default function ImageUploader({
   fileName,
   setFileName,
   folderPath,
+  className,
 }: ImageUploaderProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -100,7 +103,7 @@ export default function ImageUploader({
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn("flex flex-col gap-2", className)}>
       <div
         {...getRootProps()}
         className="border-2 border-dashed rounded text-center cursor-pointer w-full aspect-[3/2] flex items-center justify-center relative"
@@ -109,7 +112,7 @@ export default function ImageUploader({
         {isDragActive ? (
           <p>Upuść obrazek tutaj...</p>
         ) : !imageUrl ? (
-          <div className="flex items-center gap-4 m-4">
+          <div className="flex items-center gap-2 m-4">
             <ImageIcon className="size-20 hidden sm:block" />
             <p className="text-left">
               Przeciągnij i upuść obrazek lub kliknij, aby wybrać

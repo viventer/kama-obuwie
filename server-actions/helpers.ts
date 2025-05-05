@@ -1,4 +1,4 @@
-import { adminDB, adminStorage } from "@/firebase/firebaseAdmin";
+import { adminDB } from "@/firebase/firebaseAdmin";
 import { DocumentReference } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
 import { cache } from "react";
@@ -9,7 +9,7 @@ export function apiResponse(
   data?: Record<string, any>
 ): Response {
   if (status >= 200 && status < 400) {
-    return NextResponse.json({ message, ...data }, { status });
+    return NextResponse.json({ ...data }, { status });
   }
   return NextResponse.json({ message }, { status });
 }

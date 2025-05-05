@@ -41,7 +41,7 @@ export const CategorySchemaWithAllegroCategoryName = CategorySchema.merge(
 export const DescriptionElementSchema = z.object({
   type: z.enum(["text", "image"]),
   content: z.string().optional(),
-  imageUrl: z.string().url().optional(),
+  image: z.string().optional(),
 });
 
 export const DescriptionRowSchema = z.array(DescriptionElementSchema).nonempty({
@@ -55,9 +55,9 @@ export const ProductSchema = z.object({
   brand: z.string().min(3).max(32),
   manufacturerCode: z.string().min(3).max(32),
   productType: z.enum(["obuwie", "akcesoria"]),
-  samplePhotoUrl: z.string().url().optional(),
-  rawPhotosUrl: z.array(z.string().url()).max(20).default([]).optional(),
-  editedPhotosUrl: z.array(z.string().url()).max(20).default([]).optional(),
+  samplePhoto: z.string().optional(),
+  rawPhotos: z.array(z.string()).max(20).default([]).optional(),
+  editedPhotos: z.array(z.string()).max(20).default([]).optional(),
   shoeTypes: z.array(z.string().min(3).max(32)).default([]).optional(),
   colors: z.array(z.string().min(3).max(32)).default([]).optional(),
   warrantyPeriod: z.number().min(0).max(240).default(0).optional(),
@@ -84,7 +84,7 @@ export const AccessoriesGroupSchema = z.object({
   type: z.string().min(3).max(32),
   brand: z.string().min(3).max(32),
   productName: z.string().min(3).max(32),
-  samplePhotoUrl: z.string().url(),
+  samplePhoto: z.string(),
   connectingParameters: z.array(z.string()),
 });
 
@@ -92,7 +92,7 @@ export const BrandInfoSchema = z.object({
   id: z.string().optional(),
   brandName: z.string().min(3).max(32),
   brandDescription: z.string().min(3).max(256),
-  brandLogoUrl: z.string().url().optional(),
+  brandLogo: z.string().optional(),
 });
 
 export type SizingTable = z.infer<typeof SizingTableSchema>;

@@ -1,4 +1,4 @@
-import { adminDB } from "@/firebase/firebaseAdmin";
+import { adminDB, adminStorage } from "@/firebase/firebaseAdmin";
 import { DocumentReference } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
 import { cache } from "react";

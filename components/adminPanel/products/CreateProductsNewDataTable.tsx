@@ -8,12 +8,15 @@ import { ColumnName, TableAction } from "@/lib/dataTableColumns";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { DataTable } from "../global/DataTable";
+import { useProductTypeContext } from "./ProductsTypeContext";
 
 export default function CreateProductsNewDataTable({
   data,
 }: {
   data: ProductWithId[];
 }) {
+  const { productType } = useProductTypeContext();
+
   const columnNames: ColumnName<ProductWithId>[] = [
     { attributeName: "brand", displayName: "Marka" },
     { attributeName: "manufacturerCode", displayName: "Kod producenta" },
@@ -89,7 +92,7 @@ export default function CreateProductsNewDataTable({
 
       const resp = await axios.post("/api/products", newProduct);
       const id = resp.data.id;
-      router.push(`/admin-panel/products/${id}`);
+      router.push(`/admin-panel/create-products/new/${id}`);
       showToast("Produkt został utworzony", "success");
     } catch (err) {
       showToast(`Nie udało się utworzyć produktu: ${err}`, "error");
@@ -107,7 +110,8 @@ export default function CreateProductsNewDataTable({
         searchPlaceholder="Szukaj tabeli"
         searchColumns={["brand", "manufacturerCode"]}
         hasImages={true}
-        imageUrlAttribute="samplePhotoUrl"
+        imageAttribute="samplePhoto"
+        imageFolderPath={`products/sample-photos/${productType}`}
       />
     </>
   );

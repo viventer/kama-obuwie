@@ -2,7 +2,35 @@ import axios from "axios";
 import { getAllegroAccessToken } from "./auth";
 import { ALLEGRO_API_BASE_URL, getAllegroHeaders } from "./global";
 
-export async function getProductParameters(allegroCategoryId: string) {
+type DictionaryValue = {
+  id: string;
+  value: string;
+  dependsOnValueIds: string[];
+};
+
+type Restrictions = {
+  multipleChoices: boolean;
+};
+
+export type AllegroProductParameters = {
+  id: string;
+  name: string;
+  type: "dictionary";
+  required: boolean;
+  requiredIf: null;
+  displayedIf: null;
+  dictionary: DictionaryValue[];
+  restrictions?: Restrictions;
+  unit: string | null;
+};
+
+export type AllegroProductParametersResponse = {
+  [key: string]: AllegroProductParameters;
+};
+
+export async function getProductParameters(
+  allegroCategoryId: string
+): Promise<AllegroProductParametersResponse> {
   const accessToken = await getAllegroAccessToken();
   const allegroHeaders = getAllegroHeaders(accessToken);
   const url = `${ALLEGRO_API_BASE_URL}/sale/categories/${allegroCategoryId}/product-parameters`;

@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  ProductWithId,
-  RootCategory,
-} from "@/firebase/schemas/productsSchemas";
+import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { useForm } from "react-hook-form";
 import ImageUploader from "./ImageUploader";
 import SubpageHeading from "../global/SubpageHeading";
@@ -16,11 +13,8 @@ import {
 } from "@/components/ui/form";
 import { useProductTypeContext } from "./ProductsTypeContext";
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
-import { getProductParameters } from "@/server-actions/allegro/products";
-import { getAllegroCategories } from "@/server-actions/allegro/categories";
-import axios from "axios";
-import { useToast } from "@/hooks/useToast";
+
+import AddColorVariants from "./AddColorVariants";
 
 export default function ProductCreateForm({
   oldData,
@@ -28,38 +22,13 @@ export default function ProductCreateForm({
   oldData: ProductWithId;
 }) {
   const { productType } = useProductTypeContext();
-  const { showToast } = useToast();
-
-  useEffect(() => {
-    (async function () {
-      const rootCategory: RootCategory =
-        productType == "shoes" ? "obuwie męskie" : "akcesoria";
-      const resp = await axios.get(`/api/allegro/categories/${rootCategory}`);
-      if (resp.status !== 200) {
-        showToast("Nie udało się pobrać kategorii.", "error");
-        return;
-      }
-
-      const categoryId = resp.data[0].id;
-
-      const { data: parameters } = await axios.get(
-        `/api/allegro/parameters/${categoryId}`
-      );
-      if (!parameters) {
-        showToast("Nie udało się pobrać parametrów.", "error");
-        return;
-      }
-
-      console.log("Product parameters", parameters);
-    })();
-  }, []);
 
   const form = useForm<ProductWithId>({
     defaultValues: {
       brand: oldData.brand || "",
       manufacturerCode: oldData.manufacturerCode || "",
       purchasePrice: oldData.purchasePrice || 0.0,
-      colors: oldData.colors || [],
+      colorVariants: oldData.colorVariants || [],
       samplePhoto: oldData.samplePhoto || "",
     },
   });
@@ -119,6 +88,13 @@ export default function ProductCreateForm({
                   <Input type="number" />
                 </FormControl>
               </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="colorVariants"
+            render={({ field }) => (
+              <AddColorVariants value={field.value} onChange={field.onChange} />
             )}
           />
         </Form>

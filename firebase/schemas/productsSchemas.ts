@@ -50,6 +50,12 @@ export const DescriptionRowSchema = z.array(DescriptionElementSchema).nonempty({
 
 export const DescriptionSchema = z.array(DescriptionRowSchema);
 
+export const ColorVariantSchema = z.object({
+  color: z.string().min(3).max(32),
+  additionalColor: z.string().min(3).max(32).optional(),
+  shade: z.string().min(3).max(32).optional(),
+});
+
 export const ProductSchema = z.object({
   id: z.string().optional(),
   brand: z.string().min(3).max(32),
@@ -59,7 +65,7 @@ export const ProductSchema = z.object({
   rawPhotos: z.array(z.string()).max(20).default([]).optional(),
   editedPhotos: z.array(z.string()).max(20).default([]).optional(),
   shoeTypes: z.array(z.string().min(3).max(32)).default([]).optional(),
-  colors: z.array(z.string().min(3).max(32)).default([]).optional(),
+  colorVariants: z.array(ColorVariantSchema).default([]).optional(),
   warrantyPeriod: z.number().min(0).max(240).default(0).optional(),
   parameters: z.record(z.string(), z.string()).default({}).optional(),
   description: DescriptionSchema.default([]).optional(),
@@ -118,6 +124,8 @@ export type CategoryWithAllegroCategoryName = Omit<
 export type DescriptionElement = z.infer<typeof DescriptionElementSchema>;
 export type DescriptionRow = z.infer<typeof DescriptionRowSchema>;
 export type Description = z.infer<typeof DescriptionSchema>;
+
+export type ColorVariant = z.infer<typeof ColorVariantSchema>;
 
 export const SizingTableUpdateDataSchema = SizingTableSchema.partial().strict();
 

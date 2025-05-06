@@ -4,18 +4,15 @@ import {
   AllegroColorWithShades,
   AllegroColorWithShadesResponse,
 } from "@/app/api/allegro/parameters/shoeColors/route";
-import { FormControl, FormItem, FormLabel } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { FormItem, FormLabel } from "@/components/ui/form";
+
 import { ColorVariant } from "@/firebase/schemas/productsSchemas";
 import { useToast } from "@/hooks/useToast";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import MiniLoader from "../global/MiniLoader";
+import ColorVariantValuesSelector from "./ColorVariantValuesSelector";
+import { Button } from "@/components/ui/button";
 
 export default function AddColorVariants({
   value = [{ color: "", additionalColor: "", shade: "" }],
@@ -71,53 +68,29 @@ export default function AddColorVariants({
     })();
   }, []);
 
-  const updateAt = (index: number, patch: Partial<ColorVariant>) => {
-    const newArr = value.map((v, i) => (i === index ? { ...v, ...patch } : v));
-    onChange(newArr);
-  };
-
-  const removeAt = (index: number) => {
-    const newArr = value.filter((_, i) => i !== index);
-    onChange(newArr);
-  };
-
   const addEmpty = () => {
-    onChange([
-      ...value,
-      { color: "", additionalColor: undefined, shade: undefined },
-    ]);
+    onChange([...value, { color: "", additionalColor: "", shade: "" }]);
   };
 
   return (
     <FormItem>
       <FormLabel>Warianty kolorystyczne</FormLabel>
       {loading ? (
-        <p>ładowanie</p>
+        <MiniLoader />
       ) : (
         value.map((colorVariant, index) => (
-          <FormControl key={index}>
-            <Select
-              value={value[0].color}
-              onValueChange={(value) => updateAt(index, { color: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Wybierz kolor" />
-                <SelectContent className="bg-card border-primary">
-                  {colorOptions.map((color, i) => (
-                    <SelectItem
-                      key={i}
-                      value={color}
-                      className="text-base z-50 focus:bg-secondary focus:text-background dark:focus:text-text hover:cursor-pointer"
-                    >
-                      {color}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </SelectTrigger>
-            </Select>
-          </FormControl>
+          <ColorVariantValuesSelector
+            key={index}
+            index={index}
+            value={value}
+            onChange={onChange}
+            colorOptions={colorOptions}
+            additionalColorOptions={additionalColorOptions}
+            colorsWithShades={colorsWithShades}
+          />
         ))
       )}
+      {!loading && <Button onClick={addEmpty}>Dodaj wariant</Button>}
     </FormItem>
   );
 }

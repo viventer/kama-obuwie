@@ -18,7 +18,6 @@ export async function createProduct(newProduct: Product) {
 }
 
 export async function updateProduct(id: string, updateData: Partial<Product>) {
-  console.log("updateData", updateData);
   ProductPartialSchema.parse(updateData);
   const productRef = adminDB.collection("products").doc(id);
   const productDoc = await productRef.get();

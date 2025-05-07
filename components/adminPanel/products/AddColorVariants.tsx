@@ -56,13 +56,6 @@ export default function AddColorVariants({
       setColorOptions(allegroColors);
       setAdditionalColorOptions(allegroAdditionalColors);
       setColorsWithShades(allegroColorsWithShades);
-      onChange([
-        {
-          color: "",
-          additionalColor: "",
-          shade: "",
-        },
-      ]);
 
       setLoading(false);
     })();

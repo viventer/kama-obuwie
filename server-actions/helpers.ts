@@ -29,7 +29,7 @@ export const getDocumentFromAdminDB = cache(async function <T>(
   if (!doc.exists) {
     return { data: null, ref };
   }
-  return { data: doc.data() as T, ref };
+  return { data: { ...doc.data(), id: doc.id } as T, ref };
 });
 
 export const getDocumentsFromAdminDB = cache(async function <T>(

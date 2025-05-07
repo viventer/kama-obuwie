@@ -30,7 +30,6 @@ export const uploadImageToStorage = cache(async function (
   const bucket = adminStorage.bucket();
   const filePath = `${folderPath}/${fileName}`;
   const fileRef = bucket.file(filePath);
-  console.log("ścieżka do pliku", filePath);
 
   const buffer = Buffer.from(bufferString, "base64");
 

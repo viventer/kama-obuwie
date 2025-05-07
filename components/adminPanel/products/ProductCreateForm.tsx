@@ -21,18 +21,22 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import axios from "axios";
 
-export default function ProductCreateForm() {
+export default function ProductCreateForm({
+  oldData,
+}: {
+  oldData?: ProductWithId;
+}) {
   const { productType } = useProductTypeContext();
   const { showToast } = useToast();
   const router = useRouter();
 
   const form = useForm<ProductWithId>({
     defaultValues: {
-      brand: "",
-      manufacturerCode: "",
-      purchasePrice: 0,
-      colorVariants: [],
-      samplePhoto: "",
+      brand: oldData?.brand || "",
+      manufacturerCode: oldData?.manufacturerCode || "",
+      purchasePrice: oldData?.purchasePrice || 0,
+      colorVariants: oldData?.colorVariants || [],
+      samplePhoto: oldData?.samplePhoto || "",
       creationStage: "new",
       productType: productType,
     },
@@ -46,9 +50,16 @@ export default function ProductCreateForm() {
     const data: Product = form.getValues();
     data.purchasePrice = Number(data.purchasePrice);
     try {
-      const resp = await axios.post("/api/products", data);
-      if (resp.status !== 201) {
-        throw new Error("Nie udało się utworzyć produktu.");
+      if (oldData) {
+        const resp = await axios.patch(`/api/products/${oldData.id}`, data);
+        if (resp.status !== 200) {
+          throw new Error("Nie udało się edytować produktu.");
+        }
+      } else {
+        const resp = await axios.post("/api/products", data);
+        if (resp.status !== 201) {
+          throw new Error("Nie udało się utworzyć produktu.");
+        }
       }
       showToast("Produkt został pomyślnie utworzony.", "success");
       router.push("/admin-panel/create-products/new");

@@ -23,7 +23,6 @@ export default function DataTableRowWithImage<T>({
 
     (async () => {
       const url = await getImageUrl(imageFileName, imageFolderPath);
-      console.log(url);
       if (url) {
         setImageUrl(url);
       }

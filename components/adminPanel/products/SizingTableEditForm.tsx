@@ -81,7 +81,6 @@ export default function SizingTableEditForm({
       name: data.name,
       insoleLengths: data.insoleLengths,
     };
-    console.log("updatedData", updatedData);
     try {
       await updateSizingTable(id, updatedData);
       showToast("Tabela rozmiarów została zaktualizowana.", "success");

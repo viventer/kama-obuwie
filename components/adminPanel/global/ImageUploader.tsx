@@ -69,8 +69,6 @@ export default function ImageUploader({
             file.type
           );
 
-          console.log("Uploaded image URL:", newImageUrl);
-
           setImageUrl(newImageUrl);
 
           showToast("Zdjęcie zostało przesłane.", "success");

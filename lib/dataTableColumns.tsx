@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ColorVariant } from "@/firebase/schemas/productsSchemas";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 
@@ -51,6 +52,17 @@ function getDataColumns<T>(
     accessorKey: attributeName,
     header: displayName,
     cell: ({ row }) => {
+      if (attributeName === "colorVariants") {
+        const value = row.getValue(attributeName) as ColorVariant[];
+        const colors = value.map((colorVariant: ColorVariant) => {
+          const primaryColor = colorVariant.shade || colorVariant.color;
+          const additionalColor = colorVariant.additionalColor;
+          return `${primaryColor}${
+            additionalColor ? "/" + additionalColor : ""
+          }`;
+        });
+        return colors.join(", ");
+      }
       const value = row.getValue(attributeName);
       return Array.isArray(value) ? value.join(", ") : value;
     },

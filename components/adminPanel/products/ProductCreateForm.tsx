@@ -30,7 +30,7 @@ export default function ProductCreateForm() {
     defaultValues: {
       brand: "",
       manufacturerCode: "",
-      purchasePrice: 0.0,
+      purchasePrice: 0,
       colorVariants: [],
       samplePhoto: "",
       creationStage: "new",
@@ -38,9 +38,13 @@ export default function ProductCreateForm() {
     },
   });
 
+  const colorVariants = form.watch("colorVariants");
+  const purchasePrice = form.watch("purchasePrice");
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const data: Product = form.getValues();
+    data.purchasePrice = Number(data.purchasePrice);
     try {
       const resp = await axios.post("/api/products", data);
       if (resp.status !== 201) {
@@ -111,7 +115,7 @@ export default function ProductCreateForm() {
                   <Input
                     type="number"
                     value={field.value}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    onChange={field.onChange}
                   />
                 </FormControl>
               </FormItem>
@@ -131,7 +135,12 @@ export default function ProductCreateForm() {
           <Button
             onClick={(e) => handleSubmit(e)}
             className="w-fit mt-8"
-            // disabled={!form.formState.isValid}
+            disabled={
+              !form.formState.isValid ||
+              !colorVariants ||
+              colorVariants[0].color === "" ||
+              purchasePrice <= 0
+            }
           >
             Utwórz
           </Button>

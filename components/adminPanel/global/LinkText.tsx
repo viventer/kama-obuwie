@@ -14,7 +14,7 @@ export default function LinkText({
     <Link
       href={href}
       className={cn(
-        "decoration-1 decoration-accent/50 underline underline-offset-3 hover:decoration-accent transition-all duration-150",
+        "decoration-1 decoration-accent/0 underline underline-offset-3 hover:decoration-accent transition-all duration-150",
         className
       )}
     >

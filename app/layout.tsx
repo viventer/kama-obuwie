@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Ubuntu, Ubuntu_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { ConfirmDialogProvider } from "@/components/global/ConfirmDialogProvider";
+import { ConfirmDialogProvider } from "@/components/adminPanel/global/ConfirmDialogProvider";
 
 const ubuntuSans = Ubuntu({
   variable: "--font-ubuntu-sans",

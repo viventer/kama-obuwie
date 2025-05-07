@@ -1,5 +1,5 @@
 import { AllegroColorWithShades } from "@/app/api/allegro/parameters/shoeColors/route";
-import IconButton from "@/components/global/IconButton";
+import IconButton from "@/components/adminPanel/global/IconButton";
 import { FormControl, FormLabel } from "@/components/ui/form";
 import {
   Select,
@@ -64,7 +64,7 @@ export default function ColorVariantValuesSelector({
             className="hover:text-destructive"
             onClick={() => removeAt(index)}
           >
-            <TrashIcon />
+            <TrashIcon className="size-5" />
           </IconButton>
         ) : null}
       </div>
@@ -78,28 +78,6 @@ export default function ColorVariantValuesSelector({
             <SelectValue placeholder="Wybierz kolor główny" />
             <SelectContent className="bg-card border-primary">
               {colorOptions.map((color, i) => (
-                <SelectItem
-                  key={i}
-                  value={color}
-                  className="text-base z-50 focus:bg-secondary focus:text-background dark:focus:text-text hover:cursor-pointer"
-                >
-                  {color}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </SelectTrigger>
-        </Select>
-      </FormControl>
-      <FormLabel className="font-normal text-sm">Kolor dodatkowy</FormLabel>
-      <FormControl>
-        <Select
-          value={value[index].additionalColor}
-          onValueChange={(value) => updateAt(index, { additionalColor: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Wybierz kolor dodatkowy" />
-            <SelectContent className="bg-card border-primary">
-              {additionalColorOptions.map((color, i) => (
                 <SelectItem
                   key={i}
                   value={color}
@@ -140,6 +118,28 @@ export default function ColorVariantValuesSelector({
           </FormControl>
         </>
       ) : null}
+      <FormLabel className="font-normal text-sm">Kolor dodatkowy</FormLabel>
+      <FormControl>
+        <Select
+          value={value[index].additionalColor}
+          onValueChange={(value) => updateAt(index, { additionalColor: value })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Wybierz kolor dodatkowy" />
+            <SelectContent className="bg-card border-primary">
+              {additionalColorOptions.map((color, i) => (
+                <SelectItem
+                  key={i}
+                  value={color}
+                  className="text-base z-50 focus:bg-secondary focus:text-background dark:focus:text-text hover:cursor-pointer"
+                >
+                  {color}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </SelectTrigger>
+        </Select>
+      </FormControl>
     </div>
   );
 }

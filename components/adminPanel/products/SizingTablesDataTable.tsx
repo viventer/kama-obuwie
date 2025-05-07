@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useToast } from "@/hooks/useToast";
-import { useConfirmDialog } from "@/components/global/ConfirmDialogProvider";
+import { useConfirmDialog } from "@/components/adminPanel/global/ConfirmDialogProvider";
 
 export default function SizingTablesDataTable({
   data,

@@ -12,6 +12,7 @@ import {
   uploadImageToStorage,
 } from "@/server-actions/images/images";
 import { cn } from "@/lib/utils";
+import { getNewFileName } from "./helpers/files";
 
 interface ImageUploaderProps {
   setFileName: (fileName: string) => void;
@@ -57,12 +58,14 @@ export default function ImageUploader({
           if (fileName) {
             await deleteImageFromStorage(fileName, folderPath);
           }
-          setFileName(file.name);
+
+          const newFileName = getNewFileName(file.name);
+          setFileName(newFileName);
 
           const newImageUrl = await uploadImageToStorage(
             bufferString,
             folderPath,
-            file.name,
+            newFileName,
             file.type
           );
 

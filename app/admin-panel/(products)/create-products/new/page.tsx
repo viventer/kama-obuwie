@@ -12,11 +12,7 @@ export default async function CreateProductsNewPage() {
   return (
     <>
       <SubpageHeading text="Nowe produkty" />
-      {products ? (
-        <CreateProductsNewDataTable data={products} />
-      ) : (
-        <p>Brak nowych produktów</p>
-      )}
+      <CreateProductsNewDataTable data={products || null} />
     </>
   );
 }

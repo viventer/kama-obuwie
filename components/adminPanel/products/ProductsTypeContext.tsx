@@ -1,5 +1,6 @@
 "use client";
 
+import { ProductType } from "@/firebase/schemas/productsSchemas";
 import {
   createContext,
   Dispatch,
@@ -9,8 +10,8 @@ import {
 } from "react";
 
 interface ProductTypeContext {
-  productType: "shoes" | "accessories";
-  setProductType: Dispatch<SetStateAction<"shoes" | "accessories">>;
+  productType: ProductType;
+  setProductType: Dispatch<SetStateAction<ProductType>>;
 }
 
 const ProductTypeContext = createContext<ProductTypeContext | undefined>(
@@ -22,9 +23,7 @@ export function ProductTypeContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [productType, setProductType] = useState<"shoes" | "accessories">(
-    "shoes"
-  );
+  const [productType, setProductType] = useState<ProductType>("obuwie");
 
   return (
     <ProductTypeContext.Provider value={{ productType, setProductType }}>

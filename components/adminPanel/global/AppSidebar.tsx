@@ -8,7 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import LinkText from "../../global/LinkText";
+import LinkText from "./LinkText";
 
 export default function AppSidebar() {
   return (

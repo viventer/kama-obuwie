@@ -1,4 +1,4 @@
-import IconButton from "@/components/global/IconButton";
+import IconButton from "@/components/adminPanel/global/IconButton";
 import { Input } from "@/components/ui/input";
 import { SearchIcon } from "lucide-react";
 import React from "react";

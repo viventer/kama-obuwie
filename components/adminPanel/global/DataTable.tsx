@@ -63,6 +63,13 @@ export function DataTable<T extends { id: string }>({
   imageAttribute?: keyof T;
   imageFolderPath?: string;
 }) {
+  const [pagination, setPagination] = useState<{
+    pageIndex: number;
+    pageSize: number;
+  }>({
+    pageIndex: 0,
+    pageSize: hasImages ? 10 : 30,
+  });
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -94,6 +101,7 @@ export function DataTable<T extends { id: string }>({
       columnFilters,
       columnVisibility,
       expanded,
+      pagination,
     },
     globalFilterFn,
     onGlobalFilterChange: setGlobalFilter,
@@ -106,6 +114,7 @@ export function DataTable<T extends { id: string }>({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
+    onPaginationChange: setPagination,
   });
 
   return (

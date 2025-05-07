@@ -1,6 +1,6 @@
 "use client";
 
-import { useConfirmDialog } from "@/components/global/ConfirmDialogProvider";
+import { useConfirmDialog } from "@/components/adminPanel/global/ConfirmDialogProvider";
 import { Button } from "@/components/ui/button";
 import { Product, ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { useToast } from "@/hooks/useToast";
@@ -13,14 +13,14 @@ import { useProductTypeContext } from "./ProductsTypeContext";
 export default function CreateProductsNewDataTable({
   data,
 }: {
-  data: ProductWithId[];
+  data: ProductWithId[] | null;
 }) {
   const { productType } = useProductTypeContext();
 
   const columnNames: ColumnName<ProductWithId>[] = [
     { attributeName: "brand", displayName: "Marka" },
     { attributeName: "manufacturerCode", displayName: "Kod producenta" },
-    { attributeName: "colors", displayName: "Kolory" },
+    { attributeName: "colorVariants", displayName: "Warianty" },
     { attributeName: "purchasePrice", displayName: "Cena zakupu" },
   ];
 
@@ -81,38 +81,26 @@ export default function CreateProductsNewDataTable({
   ];
 
   const handleCreateProduct = async () => {
-    try {
-      const newProduct: Product = {
-        brand: "Nazwa marki",
-        manufacturerCode: "Kod producenta",
-        productType: "obuwie",
-        purchasePrice: 123,
-        creationStage: "new",
-      };
-
-      const resp = await axios.post("/api/products", newProduct);
-      const id = resp.data.id;
-      router.push(`/admin-panel/create-products/new/${id}`);
-      showToast("Produkt został utworzony", "success");
-    } catch (err) {
-      showToast(`Nie udało się utworzyć produktu: ${err}`, "error");
-      return;
-    }
+    router.push("/admin-panel/create-products/new/form");
   };
 
   return (
     <>
       <Button onClick={handleCreateProduct}>Utwórz nowy</Button>
-      <DataTable
-        data={data}
-        columnNames={columnNames}
-        actions={actions}
-        searchPlaceholder="Szukaj tabeli"
-        searchColumns={["brand", "manufacturerCode"]}
-        hasImages={true}
-        imageAttribute="samplePhoto"
-        imageFolderPath={`products/sample-photos/${productType}`}
-      />
+      {data ? (
+        <DataTable
+          data={data}
+          columnNames={columnNames}
+          actions={actions}
+          searchPlaceholder="Szukaj tabeli"
+          searchColumns={["brand", "manufacturerCode"]}
+          hasImages={true}
+          imageAttribute="samplePhoto"
+          imageFolderPath={`products/sample-photos/${productType}`}
+        />
+      ) : (
+        <p className="mt-4">Brak nowych produktów</p>
+      )}
     </>
   );
 }

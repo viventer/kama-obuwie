@@ -1,7 +1,11 @@
 "use server";
 
 import { adminDB } from "@/firebase/firebaseAdmin";
-import { Product, ProductSchema } from "@/firebase/schemas/productsSchemas";
+import {
+  Product,
+  ProductPartialSchema,
+  ProductSchema,
+} from "@/firebase/schemas/productsSchemas";
 
 export async function createProduct(newProduct: Product) {
   ProductSchema.parse(newProduct);
@@ -14,7 +18,8 @@ export async function createProduct(newProduct: Product) {
 }
 
 export async function updateProduct(id: string, updateData: Partial<Product>) {
-  ProductSchema.parse(updateData);
+  console.log("updateData", updateData);
+  ProductPartialSchema.parse(updateData);
   const productRef = adminDB.collection("products").doc(id);
   const productDoc = await productRef.get();
   if (!productDoc.exists) {

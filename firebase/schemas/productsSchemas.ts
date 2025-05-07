@@ -7,6 +7,8 @@ export type RootCategory =
   | "obuwie dziecięce"
   | "akcesoria dziecięce";
 
+export type ProductType = "obuwie" | "akcesoria";
+
 export const RootCategoryValues = [
   "obuwie męskie",
   "obuwie damskie",
@@ -52,8 +54,8 @@ export const DescriptionSchema = z.array(DescriptionRowSchema);
 
 export const ColorVariantSchema = z.object({
   color: z.string().min(3).max(32),
-  additionalColor: z.string().min(3).max(32).optional(),
-  shade: z.string().min(3).max(32).optional(),
+  additionalColor: z.string().optional(),
+  shade: z.string().optional(),
 });
 
 export const ProductSchema = z.object({
@@ -66,7 +68,7 @@ export const ProductSchema = z.object({
   editedPhotos: z.array(z.string()).max(20).default([]).optional(),
   shoeTypes: z.array(z.string().min(3).max(32)).default([]).optional(),
   colorVariants: z.array(ColorVariantSchema).default([]).optional(),
-  warrantyPeriod: z.number().min(0).max(240).default(0).optional(),
+  warrantyPeriod: z.number().max(240).default(0).optional(),
   parameters: z.record(z.string(), z.string()).default({}).optional(),
   description: DescriptionSchema.default([]).optional(),
   purchasePrice: z.number(),
@@ -84,6 +86,8 @@ export const ProductSchema = z.object({
   accessoriesGroupId: z.string().optional(),
   brandInfoId: z.string().optional(),
 });
+
+export const ProductPartialSchema = ProductSchema.partial();
 
 export const AccessoriesGroupSchema = z.object({
   id: z.string().optional(),

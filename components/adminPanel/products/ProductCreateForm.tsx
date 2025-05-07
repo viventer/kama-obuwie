@@ -1,8 +1,8 @@
 "use client";
 
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import { Product, ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { useForm } from "react-hook-form";
-import ImageUploader from "./ImageUploader";
+import ImageUploader from "../global/ImageUploader";
 import SubpageHeading from "../global/SubpageHeading";
 import {
   Form,
@@ -15,23 +15,43 @@ import { useProductTypeContext } from "./ProductsTypeContext";
 import { Input } from "@/components/ui/input";
 
 import AddColorVariants from "./AddColorVariants";
+import { Button } from "@/components/ui/button";
+import { FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/useToast";
+import axios from "axios";
 
-export default function ProductCreateForm({
-  oldData,
-}: {
-  oldData: ProductWithId;
-}) {
+export default function ProductCreateForm() {
   const { productType } = useProductTypeContext();
+  const { showToast } = useToast();
+  const router = useRouter();
 
   const form = useForm<ProductWithId>({
     defaultValues: {
-      brand: oldData.brand || "",
-      manufacturerCode: oldData.manufacturerCode || "",
-      purchasePrice: oldData.purchasePrice || 0.0,
-      colorVariants: oldData.colorVariants || [],
-      samplePhoto: oldData.samplePhoto || "",
+      brand: "",
+      manufacturerCode: "",
+      purchasePrice: 0.0,
+      colorVariants: [],
+      samplePhoto: "",
+      creationStage: "new",
+      productType: productType,
     },
   });
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const data: Product = form.getValues();
+    try {
+      const resp = await axios.post("/api/products", data);
+      if (resp.status !== 201) {
+        throw new Error("Nie udało się utworzyć produktu.");
+      }
+      showToast("Produkt został pomyślnie utworzony.", "success");
+      router.push("/admin-panel/create-products/new");
+    } catch (error) {
+      showToast(`Wystąpił błąd podczas tworzenia produktu: ${error}`, "error");
+    }
+  };
 
   return (
     <>
@@ -39,6 +59,7 @@ export default function ProductCreateForm({
       <div className="max-w-[300px] flex flex-col gap-4">
         <Form {...form}>
           <FormField
+            rules={{ required: "Zdjęcie poglądowe jest wymagane" }}
             control={form.control}
             name="samplePhoto"
             render={({ field }) => (
@@ -61,19 +82,20 @@ export default function ProductCreateForm({
               <FormItem>
                 <FormLabel>Marka</FormLabel>
                 <FormControl>
-                  <Input type="text" />
+                  <Input type="text" {...field} />
                 </FormControl>
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
+            rules={{ required: "Kod producenta jest wymagany." }}
             name="manufacturerCode"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Kod producenta</FormLabel>
                 <FormControl>
-                  <Input type="text" />
+                  <Input type="text" {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -81,11 +103,16 @@ export default function ProductCreateForm({
           <FormField
             control={form.control}
             name="purchasePrice"
+            rules={{ required: "Cena zakupu jest wymagana." }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Cena zakupu</FormLabel>
                 <FormControl>
-                  <Input type="number" />
+                  <Input
+                    type="number"
+                    value={field.value}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -93,10 +120,21 @@ export default function ProductCreateForm({
           <FormField
             control={form.control}
             name="colorVariants"
+            rules={{
+              required:
+                "Przynajmniej jeden wariant kolorystyczny jest wymagany.",
+            }}
             render={({ field }) => (
               <AddColorVariants value={field.value} onChange={field.onChange} />
             )}
           />
+          <Button
+            onClick={(e) => handleSubmit(e)}
+            className="w-fit mt-8"
+            // disabled={!form.formState.isValid}
+          >
+            Utwórz
+          </Button>
         </Form>
       </div>
     </>

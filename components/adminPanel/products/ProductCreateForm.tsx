@@ -20,6 +20,7 @@ import { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import axios from "axios";
+import { useConfirmDialog } from "../global/ConfirmDialogProvider";
 
 export default function ProductCreateForm({
   oldData,
@@ -49,6 +50,7 @@ export default function ProductCreateForm({
     e.preventDefault();
     const data: Product = form.getValues();
     data.purchasePrice = Number(data.purchasePrice);
+    data.productType = productType;
     try {
       if (oldData) {
         const resp = await axios.patch(`/api/products/${oldData.id}`, data);
@@ -67,6 +69,25 @@ export default function ProductCreateForm({
       showToast(`Wystąpił błąd podczas tworzenia produktu: ${error}`, "error");
     }
   };
+
+  const { showDialog } = useConfirmDialog();
+  const handleReject = async (e: FormEvent) => {
+    e.preventDefault();
+
+    showDialog({
+      message: "Czy na pewno chcesz odrzucić zmiany?",
+      description: "Ta operacja jest nieodwracalna.",
+      onConfirm: async () => {
+        router.back();
+        showToast("Zmiany zostały odrzucone.", "success");
+      },
+    });
+  };
+
+  const areColorVariantsValid =
+    colorVariants &&
+    colorVariants.length == 0 &&
+    colorVariants[0]?.color === "";
 
   return (
     <>
@@ -132,29 +153,42 @@ export default function ProductCreateForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="colorVariants"
-            rules={{
-              required:
-                "Przynajmniej jeden wariant kolorystyczny jest wymagany.",
-            }}
-            render={({ field }) => (
-              <AddColorVariants value={field.value} onChange={field.onChange} />
-            )}
-          />
-          <Button
-            onClick={(e) => handleSubmit(e)}
-            className="w-fit mt-8"
-            disabled={
-              !form.formState.isValid ||
-              !colorVariants ||
-              colorVariants[0].color === "" ||
-              purchasePrice <= 0
-            }
-          >
-            Utwórz
-          </Button>
+          {productType === "obuwie" ? (
+            <FormField
+              control={form.control}
+              name="colorVariants"
+              rules={{
+                required:
+                  "Przynajmniej jeden wariant kolorystyczny jest wymagany.",
+              }}
+              render={({ field }) => (
+                <AddColorVariants
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          ) : null}
+          <div className="flex mt-8 gap-4">
+            <Button
+              onClick={(e) => handleSubmit(e)}
+              className="w-fit"
+              disabled={
+                !form.formState.isValid ||
+                (productType === "obuwie" && !areColorVariantsValid) ||
+                purchasePrice <= 0
+              }
+            >
+              Utwórz
+            </Button>
+            <Button
+              onClick={(e) => handleReject(e)}
+              className="w-fit"
+              variant="destructive"
+            >
+              Odrzuć
+            </Button>
+          </div>
         </Form>
       </div>
     </>

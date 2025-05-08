@@ -1,35 +1,27 @@
 "use client";
 
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { usePathname, useRouter } from "next/navigation";
+import { useProductTypeContext } from "./ProductsTypeContext";
+import { Tabs, TabsTrigger, TabsList } from "@/components/ui/tabs";
+import { ProductType } from "@/firebase/schemas/productsSchemas";
 
 export default function ProductTypeSelector() {
-  const pathname = usePathname();
-  const isShoesPage = pathname.includes("shoes");
-  const isAccessoriesPage = pathname.includes("accessories");
-  const router = useRouter();
+  const { productType, setProductType } = useProductTypeContext();
 
   return (
-    <RadioGroup
+    <Tabs
+      className="mb-4"
       defaultValue="obuwie"
-      onValueChange={(value) => {
-        if (value === "obuwie" && !isShoesPage) {
-          router.push(pathname.replace("accessories", "shoes"));
-        } else if (value === "akcesoria" && !isAccessoriesPage) {
-          router.push(pathname.replace("shoes", "accessories"));
-        }
-      }}
+      value={productType}
+      onValueChange={(value) => setProductType(value as ProductType)}
     >
-      <Label className="text-lg">Typ produktów</Label>
-      <div className="flex items-center gap-2">
-        <RadioGroupItem id="shoes" value="obuwie" />
-        <Label htmlFor="shoes">Obuwie</Label>
-      </div>
-      <div className="flex items-center gap-2">
-        <RadioGroupItem id="accessories" value="akcesoria" />
-        <Label htmlFor="accessories">Akcesoria</Label>
-      </div>
-    </RadioGroup>
+      <TabsList className="flex gap-2">
+        <TabsTrigger value="obuwie" className="flex items-center gap-2">
+          <p>Obuwie</p>
+        </TabsTrigger>
+        <TabsTrigger value="akcesoria" className="flex items-center gap-2">
+          <p>Akcesoria</p>
+        </TabsTrigger>
+      </TabsList>
+    </Tabs>
   );
 }

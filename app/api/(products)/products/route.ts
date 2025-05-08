@@ -13,8 +13,15 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
-  const data = await getDocumentsFromAdminDB("products");
+export async function GET(request: NextRequest) {
+  const type = request.nextUrl.searchParams.get("type");
+  const queryFn =
+    type === "obuwie" || type === "akcesoria"
+      ? (ref: FirebaseFirestore.CollectionReference) =>
+          ref.where("productType", "==", type)
+      : undefined;
+
+  const data = await getDocumentsFromAdminDB("products", queryFn);
   if (!data) {
     return apiResponse("Nie znaleziono produktów.", 204);
   }

@@ -9,6 +9,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { DataTable } from "../global/DataTable";
 import { useProductTypeContext } from "./ProductsTypeContext";
+import { useEffect, useState } from "react";
 
 export default function CreateProductsNewDataTable({
   data,
@@ -16,6 +17,20 @@ export default function CreateProductsNewDataTable({
   data: ProductWithId[] | null;
 }) {
   const { productType } = useProductTypeContext();
+  const [filteredData, setFilteredData] = useState<ProductWithId[] | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+
+    const newData = data.filter(
+      (product) => product.productType === productType
+    );
+    setFilteredData(newData);
+  }, [data, productType]);
 
   const columnNames: ColumnName<ProductWithId>[] = [
     { attributeName: "brand", displayName: "Marka" },
@@ -88,9 +103,9 @@ export default function CreateProductsNewDataTable({
   return (
     <>
       <Button onClick={handleCreateProduct}>Utwórz nowy</Button>
-      {data ? (
+      {filteredData ? (
         <DataTable
-          data={data}
+          data={filteredData}
           columnNames={columnNames}
           actions={actions}
           searchPlaceholder="Szukaj tabeli"

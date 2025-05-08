@@ -21,6 +21,19 @@ export default function CreateProductsNewDataTable({
     null
   );
 
+  const elementaryColumnNames = [
+    { attributeName: "brand", displayName: "Marka" },
+    { attributeName: "manufacturerCode", displayName: "Kod producenta" },
+    { attributeName: "purchasePrice", displayName: "Cena zakupu" },
+  ];
+  const shoesProductColumnNames = [
+    ...elementaryColumnNames,
+    { attributeName: "colorVariants", displayName: "Warianty" },
+  ];
+  const [columnNames, setColumnNames] = useState<ColumnName<ProductWithId>[]>(
+    elementaryColumnNames
+  );
+
   useEffect(() => {
     if (!data) {
       return;
@@ -30,14 +43,16 @@ export default function CreateProductsNewDataTable({
       (product) => product.productType === productType
     );
     setFilteredData(newData);
-  }, [data, productType]);
 
-  const columnNames: ColumnName<ProductWithId>[] = [
-    { attributeName: "brand", displayName: "Marka" },
-    { attributeName: "manufacturerCode", displayName: "Kod producenta" },
-    { attributeName: "colorVariants", displayName: "Warianty" },
-    { attributeName: "purchasePrice", displayName: "Cena zakupu" },
-  ];
+    if (
+      productType === "obuwie" &&
+      columnNames.length !== shoesProductColumnNames.length
+    ) {
+      setColumnNames(shoesProductColumnNames);
+    } else if (productType === "akcesoria") {
+      setColumnNames(elementaryColumnNames);
+    }
+  }, [data, productType]);
 
   const router = useRouter();
   const { showToast } = useToast();

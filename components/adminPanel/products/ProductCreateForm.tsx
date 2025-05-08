@@ -179,7 +179,7 @@ export default function ProductCreateForm({
                 purchasePrice <= 0
               }
             >
-              Utwórz
+              Zapisz
             </Button>
             <Button
               onClick={(e) => handleReject(e)}

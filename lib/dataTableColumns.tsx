@@ -1,3 +1,4 @@
+import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -55,11 +56,8 @@ function getDataColumns<T>(
       if (attributeName === "colorVariants") {
         const value = row.getValue(attributeName) as ColorVariant[];
         const colors = value.map((colorVariant: ColorVariant) => {
-          const primaryColor = colorVariant.shade || colorVariant.color;
-          const additionalColor = colorVariant.additionalColor;
-          return `${primaryColor}${
-            additionalColor ? "/" + additionalColor : ""
-          }`;
+          const colorVariantName = getColorVariantName(colorVariant);
+          return colorVariantName;
         });
         return colors.join(", ");
       }

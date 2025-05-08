@@ -9,11 +9,14 @@ import {
   TextIcon,
   Wand2Icon,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function CreationStageSelector() {
-  const [selectedStage, setSelectedStage] = useState("new");
+  const pathname = usePathname();
+  const currentStage = pathname.split("/").pop();
+
+  const [selectedStage, setSelectedStage] = useState(currentStage);
   const router = useRouter();
 
   const onChange = (value: string) => {
@@ -26,7 +29,6 @@ export default function CreationStageSelector() {
       className="fixed left-0 bottom-0 pb-4 w-screen flex flex-row justify-center"
       onValueChange={onChange}
       value={selectedStage}
-      defaultValue="new"
     >
       <TabsList className="flex justify-between w-[90%] max-w-lg">
         <TabsTrigger value="new">

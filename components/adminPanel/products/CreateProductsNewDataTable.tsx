@@ -123,7 +123,7 @@ export default function CreateProductsNewDataTable({
           data={filteredData}
           columnNames={columnNames}
           actions={actions}
-          searchPlaceholder="Szukaj tabeli"
+          searchPlaceholder="Szukaj produktu"
           searchColumns={["brand", "manufacturerCode"]}
           hasImages={true}
           imageAttribute="samplePhoto"

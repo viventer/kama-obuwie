@@ -17,6 +17,16 @@ export const RootCategoryValues = [
   "akcesoria dziecięce",
 ] as const;
 
+export const ProductCreationStages = [
+  "new",
+  "photos",
+  "photosEdit",
+  "parameters",
+  "description",
+  "postOffer",
+  "done",
+] as const;
+
 export const SizingTableSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(3).max(32),
@@ -58,13 +68,20 @@ export const ColorVariantSchema = z.object({
   shade: z.string().optional(),
 });
 
+export const ProductCreationStageSchema = z.enum(ProductCreationStages);
+
+export const RawPhotoSchema = z.object({
+  colorVariantName: z.string().optional(),
+  photo: z.string(),
+});
+
 export const ProductSchema = z.object({
   id: z.string().optional(),
   brand: z.string().max(32).optional(),
   manufacturerCode: z.string().min(3).max(32),
   productType: z.enum(["obuwie", "akcesoria"]),
   samplePhoto: z.string().optional(),
-  rawPhotos: z.array(z.string()).max(20).default([]).optional(),
+  rawPhotos: z.array(RawPhotoSchema).default([]).optional(),
   editedPhotos: z.array(z.string()).max(20).default([]).optional(),
   shoeTypes: z.array(z.string().min(3).max(32)).default([]).optional(),
   colorVariants: z.array(ColorVariantSchema).default([]).optional(),
@@ -72,15 +89,7 @@ export const ProductSchema = z.object({
   parameters: z.record(z.string(), z.string()).default({}).optional(),
   description: DescriptionSchema.default([]).optional(),
   purchasePrice: z.number(),
-  creationStage: z.enum([
-    "new",
-    "photos",
-    "photosEdit",
-    "parameters",
-    "description",
-    "postOffer",
-    "done",
-  ]),
+  creationStage: ProductCreationStageSchema,
   categoryId: z.string().optional(),
   sizingTableId: z.string().optional(),
   accessoriesGroupId: z.string().optional(),
@@ -130,6 +139,10 @@ export type DescriptionRow = z.infer<typeof DescriptionRowSchema>;
 export type Description = z.infer<typeof DescriptionSchema>;
 
 export type ColorVariant = z.infer<typeof ColorVariantSchema>;
+
+export type ProductCreationStage = z.infer<typeof ProductCreationStageSchema>;
+
+export type RawPhoto = z.infer<typeof RawPhotoSchema>;
 
 export const SizingTableUpdateDataSchema = SizingTableSchema.partial().strict();
 

@@ -60,7 +60,7 @@ export const ColorVariantSchema = z.object({
 
 export const ProductSchema = z.object({
   id: z.string().optional(),
-  brand: z.string().min(3).max(32),
+  brand: z.string().max(32).optional(),
   manufacturerCode: z.string().min(3).max(32),
   productType: z.enum(["obuwie", "akcesoria"]),
   samplePhoto: z.string().optional(),

@@ -64,7 +64,7 @@ export default function DataTableRowWithImage<T>({
           <img
             src={imageUrl}
             alt="Product Image"
-            className="size-16 sm:size-32 object-cover"
+            className="size-16 sm:size-32 object-contain"
           />
         ) : (
           <ImageIcon className="min-w-16 h-16 sm:min-w-32 sm:h-32" />

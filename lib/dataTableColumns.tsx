@@ -63,7 +63,7 @@ function getDataColumns<T>(
         });
         return colors.join(", ");
       }
-      const value = row.getValue(attributeName);
+      const value = row.getValue(attributeName) || "brak";
       return Array.isArray(value) ? value.join(", ") : value;
     },
   }));

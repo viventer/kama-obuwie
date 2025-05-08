@@ -57,8 +57,9 @@ export default function CreateProductsNewDataTable({
             "Produkt został przeniesiony do kolejnego etapu.",
             "success"
           );
+          router.refresh();
         } catch (err) {
-          showToast("Nie można przenieść produktu: ${err}", "error");
+          showToast(`Nie można przenieść produktu: ${err}`, "error");
         }
       },
     },

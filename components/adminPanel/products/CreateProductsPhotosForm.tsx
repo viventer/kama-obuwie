@@ -17,6 +17,7 @@ export default async function CreateProductsPhotosForm({
     samplePhoto as string,
     `products/sample-photos/obuwie`
   );
+  const folderPath = `products/raw-photos/obuwie/${id}`;
 
   return (
     <div>
@@ -42,11 +43,15 @@ export default async function CreateProductsPhotosForm({
             <ProductImagesUploader
               variant={variant}
               oldPhotos={rawPhotos || []}
+              folderPath={`${folderPath}/${getColorVariantName(variant)}`}
             />
           </Fragment>
         ))
       ) : (
-        <ProductImagesUploader oldPhotos={rawPhotos || []} />
+        <ProductImagesUploader
+          oldPhotos={rawPhotos || []}
+          folderPath={folderPath}
+        />
       )}
     </div>
   );

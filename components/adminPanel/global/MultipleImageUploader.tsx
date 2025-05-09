@@ -2,8 +2,6 @@
 
 import React, { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
-import Image from "next/image";
-import { TrashIcon } from "lucide-react";
 import {
   deleteImageFromStorage,
   getImageUrl,
@@ -29,22 +27,22 @@ import {
 import SortableImage from "./SortableImage";
 
 interface MultipleImageUploaderProps {
-  setFileNames: (fileNames: string[]) => void;
-  fileNames: string[];
+  setFilePaths: (filePaths: string[]) => void;
+  filePaths: string[];
   folderPath: string;
   className?: string;
 }
 
 interface ImageItem {
-  id: string;
+  filePath: string;
   url: string;
 }
 
 export default function MultipleImageUploader({
-  fileNames,
-  folderPath,
+  filePaths,
   className,
-  setFileNames,
+  setFilePaths,
+  folderPath,
 }: MultipleImageUploaderProps) {
   const [images, setImages] = useState<ImageItem[]>([]);
   const { showToast } = useToast();
@@ -52,16 +50,16 @@ export default function MultipleImageUploader({
   useEffect(() => {
     (async () => {
       const loaded: ImageItem[] = [];
-      for (const name of fileNames) {
-        const url = await getImageUrl(name, folderPath);
-        if (url) loaded.push({ id: name, url });
+      for (const path of filePaths) {
+        const url = await getImageUrl(path);
+        if (url) loaded.push({ filePath: path, url });
       }
       setImages(loaded);
     })();
   }, []);
 
   useEffect(() => {
-    setFileNames(images.map((img) => img.id));
+    setFilePaths(images.map((img) => img.filePath));
   }, [images]);
 
   const onDrop = useCallback(
@@ -71,14 +69,10 @@ export default function MultipleImageUploader({
           const buffer = Buffer.from(await file.arrayBuffer());
           const newName = getNewFileName(file.name);
           const base64 = buffer.toString("base64");
-          const url = await uploadImageToStorage(
-            base64,
-            folderPath,
-            newName,
-            file.type
-          );
+          const filePath = `${folderPath}/${newName}`;
+          const url = await uploadImageToStorage(base64, filePath, file.type);
           setImages((prev) => {
-            const updated = [...prev, { id: newName, url }];
+            const updated = [...prev, { filePath, url }];
             return updated;
           });
           showToast("Zdjęcie przesłane.", "success");
@@ -108,8 +102,8 @@ export default function MultipleImageUploader({
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const oldIndex = images.findIndex((i) => i.id === active.id);
-      const newIndex = images.findIndex((i) => i.id === over.id);
+      const oldIndex = images.findIndex((i) => i.filePath === active.id);
+      const newIndex = images.findIndex((i) => i.filePath === over.id);
       setImages((prev) => {
         const reordered = arrayMove(prev, oldIndex, newIndex);
         return reordered;
@@ -117,11 +111,11 @@ export default function MultipleImageUploader({
     }
   };
 
-  const removeImage = async (id: string) => {
+  const removeImage = async (filePath: string) => {
     try {
-      await deleteImageFromStorage(id, folderPath);
+      await deleteImageFromStorage(filePath);
       setImages((prev) => {
-        const updated = prev.filter((i) => i.id !== id);
+        const updated = prev.filter((i) => i.filePath !== filePath);
         return updated;
       });
       showToast("Zdjęcie usunięte.", "success");
@@ -154,16 +148,16 @@ export default function MultipleImageUploader({
         onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={images.map((img) => img.id)}
+          items={images.map((img) => img.filePath)}
           strategy={rectSortingStrategy}
         >
           <div className="flex flex-wrap gap-2">
             {images.map((img) => (
               <SortableImage
-                key={img.id}
-                id={img.id}
+                key={img.filePath}
+                id={img.filePath}
                 url={img.url}
-                onRemove={() => removeImage(img.id)}
+                onRemove={() => removeImage(img.filePath)}
               />
             ))}
           </div>

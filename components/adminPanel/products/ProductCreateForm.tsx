@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 
 import AddColorVariants from "./AddColorVariants";
 import { Button } from "@/components/ui/button";
-import { FormEvent } from "react";
+import { FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import axios from "axios";
@@ -85,9 +85,7 @@ export default function ProductCreateForm({
   };
 
   const areColorVariantsValid =
-    colorVariants &&
-    colorVariants.length == 0 &&
-    colorVariants[0]?.color === "";
+    colorVariants && colorVariants.length > 0 && colorVariants[0]?.color !== "";
 
   return (
     <>
@@ -103,8 +101,8 @@ export default function ProductCreateForm({
                 <FormLabel>Zdjęcie poglądowe</FormLabel>
                 <FormControl>
                   <ImageUploader
-                    fileName={field.value || ""}
-                    setFileName={field.onChange}
+                    filePath={field.value || ""}
+                    setFilePath={field.onChange}
                     folderPath={`products/sample-photos/${productType}`}
                   />
                 </FormControl>

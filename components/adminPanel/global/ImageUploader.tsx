@@ -1,7 +1,7 @@
 "use client";
 
 import { useToast } from "@/hooks/useToast";
-import React, { useCallback, useState, useEffect, useRef } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 
 import Image from "next/image";
@@ -15,15 +15,15 @@ import { cn } from "@/lib/utils";
 import { getNewFileName } from "./helpers/files";
 
 interface ImageUploaderProps {
-  setFileName: (fileName: string) => void;
-  fileName: string;
+  setFilePath: (filePath: string) => void;
+  filePath: string;
   folderPath: string;
   className?: string;
 }
 
 export default function ImageUploader({
-  fileName,
-  setFileName,
+  filePath,
+  setFilePath,
   folderPath,
   className,
 }: ImageUploaderProps) {
@@ -31,12 +31,13 @@ export default function ImageUploader({
 
   useEffect(() => {
     (async function () {
-      const imageUrl = await getImageUrl(fileName, folderPath);
+      if (!filePath) return;
+      const imageUrl = await getImageUrl(filePath);
       if (imageUrl) {
         setImageUrl(imageUrl);
       }
     })();
-  }, [fileName]);
+  }, [filePath]);
 
   const { showToast } = useToast();
 
@@ -55,17 +56,17 @@ export default function ImageUploader({
           const buffer = Buffer.from(arrayBuffer);
           const bufferString = buffer.toString("base64");
 
-          if (fileName) {
-            await deleteImageFromStorage(fileName, folderPath);
+          if (filePath) {
+            await deleteImageFromStorage(filePath);
           }
 
           const newFileName = getNewFileName(file.name);
-          setFileName(newFileName);
+          const newFilePath = `${folderPath}/${newFileName}`;
+          setFilePath(newFilePath);
 
           const newImageUrl = await uploadImageToStorage(
             bufferString,
-            folderPath,
-            newFileName,
+            newFilePath,
             file.type
           );
 
@@ -78,7 +79,7 @@ export default function ImageUploader({
         }
       })();
     },
-    [fileName, showToast]
+    [filePath, showToast]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -91,11 +92,11 @@ export default function ImageUploader({
 
   const handleDeleteImage = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    if (!fileName) return;
+    if (!filePath) return;
     try {
-      deleteImageFromStorage(fileName, folderPath);
+      deleteImageFromStorage(filePath);
       setImageUrl("");
-      setFileName("");
+      setFilePath("");
       showToast("Obrazek został usunięty", "success");
     } catch (error) {
       showToast("Błąd usuwania obrazka", "error");

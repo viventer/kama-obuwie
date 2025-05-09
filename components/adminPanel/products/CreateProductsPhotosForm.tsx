@@ -1,4 +1,4 @@
-import { ProductWithId, RawPhoto } from "@/firebase/schemas/productsSchemas";
+import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "./helpers/productsHelpers";
 import ProductImagesUploader from "./ProductImagesUploader";
 import { Fragment } from "react";
@@ -13,10 +13,7 @@ export default async function CreateProductsPhotosForm({
 }) {
   const { id, colorVariants, rawPhotos, samplePhoto, manufacturerCode } =
     productData;
-  const samplePhotoUrl = await getImageUrl(
-    samplePhoto as string,
-    `products/sample-photos/obuwie`
-  );
+  const samplePhotoUrl = await getImageUrl(samplePhoto as string);
   const folderPath = `products/raw-photos/obuwie/${id}`;
 
   return (

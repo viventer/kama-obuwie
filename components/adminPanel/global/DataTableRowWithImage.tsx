@@ -18,11 +18,11 @@ export default function DataTableRowWithImage<T>({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const imageFileName = row.original[imageAttribute] as string;
-    if (!imageFileName) return;
+    const imageFilePath = row.original[imageAttribute] as string;
+    if (!imageFilePath) return;
 
     (async () => {
-      const url = await getImageUrl(imageFileName, imageFolderPath);
+      const url = await getImageUrl(imageFilePath);
       if (url) {
         setImageUrl(url);
       }

@@ -72,7 +72,7 @@ export const ProductCreationStageSchema = z.enum(ProductCreationStages);
 
 export const RawPhotoSchema = z.object({
   colorVariantName: z.string().optional(),
-  photo: z.string(),
+  filePath: z.string(),
 });
 
 export const ProductSchema = z.object({

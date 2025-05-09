@@ -2,7 +2,8 @@
 
 import { ColorVariant, RawPhoto } from "@/firebase/schemas/productsSchemas";
 import MultipleImageUploader from "../global/MultipleImageUploader";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { getColorVariantName } from "./helpers/productsHelpers";
 
 export default function ProductImagesUploader({
   variant,
@@ -13,16 +14,21 @@ export default function ProductImagesUploader({
   oldPhotos: RawPhoto[];
   folderPath: string;
 }) {
-  const [fileNames, setFileNames] = useState<string[]>([]);
-  useEffect(() => {
-    console.log(fileNames);
-  }, [fileNames]);
+  const colorVariantName = variant ? getColorVariantName(variant) : "";
+  const filteredOldPhotos = oldPhotos.filter((photo) => {
+    if (!colorVariantName) return true;
+    return photo.colorVariantName === colorVariantName;
+  });
+
+  const oldFilePaths = filteredOldPhotos.map((photo) => photo.filePath);
+
+  const [filePaths, setFilePaths] = useState<string[]>(oldFilePaths || []);
 
   return (
     <div>
       <MultipleImageUploader
-        fileNames={fileNames}
-        setFileNames={setFileNames}
+        setFilePaths={setFilePaths}
+        filePaths={filePaths}
         folderPath={folderPath}
       />
     </div>

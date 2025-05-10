@@ -7,17 +7,14 @@ import {
 } from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "./helpers/productsHelpers";
 import ProductImagesUploader from "./ProductImagesUploader";
-import { FormEvent, Fragment, useEffect, useState } from "react";
+import { FormEvent, Fragment, useState } from "react";
 import SubpageHeading from "../global/SubpageHeading";
 import Image from "next/image";
 import axios from "axios";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import {
-  deleteUnusedRawPhotosFromStorage,
-  getImagesUrls,
-} from "@/server-actions/images/images";
+import { deleteUnusedRawPhotosFromStorage } from "@/server-actions/images/images";
 
 export default function CreateProductsPhotosForm({
   productData,
@@ -52,6 +49,12 @@ export default function CreateProductsPhotosForm({
     }
   };
 
+  const handleReject = (e: FormEvent) => {
+    e.preventDefault();
+    router.push("/admin-panel/create-products/photos");
+    showToast("Zmiany zostały odrzucone", "default");
+  };
+
   return (
     <div>
       <SubpageHeading text={`Dodaj zdjęcia do produktu`} />
@@ -67,7 +70,7 @@ export default function CreateProductsPhotosForm({
           <p className="font-bold">{manufacturerCode}</p>
         </section>
       )}
-      {colorVariants ? (
+      {colorVariants && colorVariants.length > 0 ? (
         colorVariants.map((variant, i) => (
           <Fragment key={i}>
             <h2 className="text-xl font-bold mb-4">
@@ -88,7 +91,12 @@ export default function CreateProductsPhotosForm({
           folderPath={folderPath}
         />
       )}
-      <Button onClick={handleSubmit}>Zapisz</Button>
+      <div className="flex gap-4">
+        <Button onClick={handleSubmit}>Zapisz</Button>
+        <Button onClick={handleReject} variant={"destructive"}>
+          Odrzuć
+        </Button>
+      </div>
     </div>
   );
 }

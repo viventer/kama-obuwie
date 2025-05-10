@@ -5,7 +5,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 
 import Image from "next/image";
-import { DeleteIcon, ImageIcon, ReplaceIcon } from "lucide-react";
+import { ImageIcon, ReplaceIcon, TrashIcon } from "lucide-react";
 import {
   deleteImageFromStorage,
   getImageUrl,
@@ -13,6 +13,7 @@ import {
 } from "@/server-actions/images/images";
 import { cn } from "@/lib/utils";
 import { getNewFileName } from "./helpers/files";
+import IconButton from "./IconButton";
 
 interface ImageUploaderProps {
   setFilePath: (filePath: string) => void;
@@ -108,7 +109,7 @@ export default function ImageUploader({
     <div className={cn("flex flex-col gap-2", className)}>
       <div
         {...getRootProps()}
-        className="border-2 border-dashed rounded text-center cursor-pointer w-full aspect-[3/2] flex items-center justify-center relative"
+        className="border-2 border-dashed rounded text-center cursor-pointer w-full aspect-[3/2] flex items-center justify-center relative bg-primary/15"
       >
         <input {...getInputProps()} />
         {isDragActive ? (
@@ -129,15 +130,15 @@ export default function ImageUploader({
               className="w-full aspect-[3/2] object-contain"
             />
             <div className="text-3xl z-10 w-full h-full bg-transparent backdrop-brightness-100 items-center justify-center flex relative transition-all ease-in-out opacity-0 hover:backdrop-brightness-[25%] hover:opacity-100">
-              <button
+              <IconButton
                 className="absolute right-0 top-0 m-2 hover:text-destructive"
-                onClick={handleDeleteImage}
+                onClick={(e: any) => handleDeleteImage(e)}
               >
-                <DeleteIcon className="size-8 " />
-              </button>
-              <button className="hover:text-accent">
-                <ReplaceIcon className="size-12 " />
-              </button>
+                <TrashIcon className="size-6" />
+              </IconButton>
+              <IconButton className="hover:text-accent">
+                <ReplaceIcon className="size-8 " />
+              </IconButton>
             </div>
           </>
         )}

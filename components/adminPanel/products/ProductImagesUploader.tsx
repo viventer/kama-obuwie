@@ -2,7 +2,7 @@
 
 import { ColorVariant, RawPhoto } from "@/firebase/schemas/productsSchemas";
 import MultipleImageUploader from "../global/MultipleImageUploader";
-import { useEffect, useState } from "react";
+import { Dispatch, useEffect, useState } from "react";
 import { getColorVariantName } from "./helpers/productsHelpers";
 import { deleteRawPhoto } from "@/server-actions/images/images";
 import { useParams } from "next/navigation";
@@ -16,7 +16,7 @@ export default function ProductImagesUploader({
   variant?: ColorVariant;
   oldPhotos: RawPhoto[];
   folderPath: string;
-  setNewRawPhotos: (photos: RawPhoto[]) => void;
+  setNewRawPhotos: Dispatch<React.SetStateAction<RawPhoto[]>>;
 }) {
   const params = useParams();
   const { id } = params as { id: string };
@@ -46,7 +46,7 @@ export default function ProductImagesUploader({
   }, [filePaths]);
 
   return (
-    <div>
+    <div className="mb-8">
       <MultipleImageUploader
         setFilePaths={setFilePaths}
         filePaths={filePaths}

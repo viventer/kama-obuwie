@@ -59,9 +59,23 @@ export default function CreateProductsPhotosDataTable({
     {
       name: "Przenieś dalej",
       onClick: async (id) => {
+        const productData = filteredData?.find((product) => product.id === id);
+        if (!productData) {
+          showToast("Nie można znaleźć produktu", "error");
+          return;
+        }
+        const { rawPhotos } = productData;
+        if (!rawPhotos || rawPhotos?.length === 0) {
+          showToast(
+            "Nie można przenieść produktu, ponieważ nie ma dodanych zdjęć.",
+            "error"
+          );
+          return;
+        }
+
         try {
           const updateData: Partial<Product> = {
-            creationStage: "photos",
+            creationStage: "photosEdit",
           };
           await axios.patch(`/api/products/${id}`, updateData);
           showToast(

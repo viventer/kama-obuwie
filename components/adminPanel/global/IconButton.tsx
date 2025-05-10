@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { FormEvent } from "react";
 
 export default function IconButton({
   children,
@@ -9,7 +10,7 @@ export default function IconButton({
   children: React.ReactNode;
   className?: string;
   disabled?: boolean;
-  onClick?: () => void;
+  onClick?: (e?: FormEvent) => void;
 }) {
   return (
     <button

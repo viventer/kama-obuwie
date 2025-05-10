@@ -5,6 +5,7 @@ import { ImageIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { getImageUrl } from "@/server-actions/images/images";
+import Image from "next/image";
 
 export default function DataTableRowWithImage<T>({
   row,
@@ -61,10 +62,12 @@ export default function DataTableRowWithImage<T>({
       </TableCell>
       <TableCell className="flex items-center gap-4 min-w-[200px]">
         {imageUrl ? (
-          <img
+          <Image
             src={imageUrl}
             alt="Product Image"
-            className="size-16 sm:size-32 object-contain"
+            width={128}
+            height={128}
+            className="size-16 sm:size-32 object-contain bg-primary/15"
           />
         ) : (
           <ImageIcon className="min-w-16 h-16 sm:min-w-32 sm:h-32" />

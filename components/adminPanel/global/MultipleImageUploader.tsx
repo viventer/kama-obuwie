@@ -144,38 +144,40 @@ export default function MultipleImageUploader({
         {...getRootProps()}
         className={cn(
           "border-2 border-dashed rounded p-4 text-center cursor-pointer",
-          isDragActive && "border-blue-500"
+          isDragActive && "border-accent"
         )}
       >
         <input {...getInputProps()} />
-        <p>
-          {isDragActive
-            ? "Upuść zdjęcia tutaj…"
-            : "Przeciągnij lub kliknij, aby wybrać zdjęcia"}
-        </p>
+        <div>
+          {images.length > 0 ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={images.map((img) => img.filePath)}
+                strategy={rectSortingStrategy}
+              >
+                <div className="flex flex-wrap gap-2">
+                  {images.map((img) => (
+                    <SortableImage
+                      key={img.filePath}
+                      id={img.filePath}
+                      url={img.url}
+                      onRemove={() => removeImage(img.filePath)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          ) : isDragActive ? (
+            <p>Upuść zdjęcia tutaj…</p>
+          ) : (
+            <p>Przeciągnij lub kliknij, aby wybrać zdjęcia</p>
+          )}
+        </div>
       </div>
-
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={images.map((img) => img.filePath)}
-          strategy={rectSortingStrategy}
-        >
-          <div className="flex flex-wrap gap-2">
-            {images.map((img) => (
-              <SortableImage
-                key={img.filePath}
-                id={img.filePath}
-                url={img.url}
-                onRemove={() => removeImage(img.filePath)}
-              />
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
     </div>
   );
 }

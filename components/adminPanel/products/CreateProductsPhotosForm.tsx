@@ -1,20 +1,56 @@
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+"use client";
+
+import {
+  Product,
+  ProductWithId,
+  RawPhoto,
+} from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "./helpers/productsHelpers";
 import ProductImagesUploader from "./ProductImagesUploader";
-import { Fragment } from "react";
+import { FormEvent, Fragment, useEffect, useState } from "react";
 import SubpageHeading from "../global/SubpageHeading";
 import Image from "next/image";
-import { getImageUrl } from "@/server-actions/images/images";
+import axios from "axios";
+import { useToast } from "@/hooks/useToast";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import {
+  deleteUnusedRawPhotosFromStorage,
+  getImagesUrls,
+} from "@/server-actions/images/images";
 
-export default async function CreateProductsPhotosForm({
+export default function CreateProductsPhotosForm({
   productData,
+  samplePhotoUrl,
 }: {
   productData: ProductWithId;
+  samplePhotoUrl: string | null;
 }) {
-  const { id, colorVariants, rawPhotos, samplePhoto, manufacturerCode } =
-    productData;
-  const samplePhotoUrl = await getImageUrl(samplePhoto as string);
+  const { id, colorVariants, rawPhotos, manufacturerCode } = productData;
+
   const folderPath = `products/raw-photos/obuwie/${id}`;
+
+  const [newRawPhotos, setNewRawPhotos] = useState<RawPhoto[]>(rawPhotos || []);
+
+  const { showToast } = useToast();
+
+  const router = useRouter();
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const updateData: Partial<Product> = {
+      rawPhotos: newRawPhotos,
+    };
+
+    try {
+      await axios.patch(`/api/products/${id}`, updateData);
+      await deleteUnusedRawPhotosFromStorage(productData.id);
+      showToast("Zdjęcia zostały dodane do produktu", "success");
+      router.push("/admin-panel/create-products/photos");
+    } catch (err) {
+      showToast("Nie udało się zapisać zmian w produkcie", "error");
+    }
+  };
 
   return (
     <div>
@@ -41,15 +77,18 @@ export default async function CreateProductsPhotosForm({
               variant={variant}
               oldPhotos={rawPhotos || []}
               folderPath={`${folderPath}/${getColorVariantName(variant)}`}
+              setNewRawPhotos={setNewRawPhotos}
             />
           </Fragment>
         ))
       ) : (
         <ProductImagesUploader
           oldPhotos={rawPhotos || []}
+          setNewRawPhotos={setNewRawPhotos}
           folderPath={folderPath}
         />
       )}
+      <Button onClick={handleSubmit}>Zapisz</Button>
     </div>
   );
 }

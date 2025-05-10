@@ -4,6 +4,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import {
   deleteImageFromStorage,
+  getImagesUrls,
   getImageUrl,
   uploadImageToStorage,
 } from "@/server-actions/images/images";
@@ -31,6 +32,7 @@ interface MultipleImageUploaderProps {
   filePaths: string[];
   folderPath: string;
   className?: string;
+  onImageDelete?: (filePath: string) => Promise<void>;
 }
 
 interface ImageItem {
@@ -43,17 +45,25 @@ export default function MultipleImageUploader({
   className,
   setFilePaths,
   folderPath,
+  onImageDelete,
 }: MultipleImageUploaderProps) {
   const [images, setImages] = useState<ImageItem[]>([]);
   const { showToast } = useToast();
 
   useEffect(() => {
     (async () => {
-      const loaded: ImageItem[] = [];
-      for (const path of filePaths) {
-        const url = await getImageUrl(path);
-        if (url) loaded.push({ filePath: path, url });
+      const urls = await getImagesUrls(filePaths);
+
+      if (!urls) {
+        setImages([]);
+        return;
       }
+
+      const loaded: ImageItem[] = urls.map((url, idx) => ({
+        filePath: filePaths[idx],
+        url,
+      }));
+
       setImages(loaded);
     })();
   }, []);
@@ -75,7 +85,6 @@ export default function MultipleImageUploader({
             const updated = [...prev, { filePath, url }];
             return updated;
           });
-          showToast("Zdjęcie przesłane.", "success");
         } catch (err) {
           console.error(err);
           showToast("Błąd przesyłania zdjęcia.", "error");
@@ -113,7 +122,11 @@ export default function MultipleImageUploader({
 
   const removeImage = async (filePath: string) => {
     try {
-      await deleteImageFromStorage(filePath);
+      if (onImageDelete) {
+        onImageDelete(filePath);
+      } else {
+        await deleteImageFromStorage(filePath);
+      }
       setImages((prev) => {
         const updated = prev.filter((i) => i.filePath !== filePath);
         return updated;

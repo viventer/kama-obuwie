@@ -1,6 +1,7 @@
 import CreateProductsPhotosForm from "@/components/adminPanel/products/CreateProductsPhotosForm";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
+import { getImageUrl } from "@/server-actions/images/images";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -22,5 +23,15 @@ export default async function ProductEditPage(props: Props) {
     notFound();
   }
 
-  return <CreateProductsPhotosForm productData={data} />;
+  let samplePhotoUrl: string | null = null;
+  if (data.samplePhoto) {
+    samplePhotoUrl = await getImageUrl(data.samplePhoto);
+  }
+
+  return (
+    <CreateProductsPhotosForm
+      productData={data}
+      samplePhotoUrl={samplePhotoUrl}
+    />
+  );
 }

@@ -10,7 +10,7 @@ export default async function layout({
     <SidebarProvider defaultOpen={false}>
       <AppSidebar />
       <SidebarTrigger className="mt-4 ml-4 absolute left-0 md:static" />
-      <main className="my-12 mx-auto w-[90%] max-w-[1440px]">{children}</main>
+      <main className="my-20 mx-auto w-[90%] max-w-[1440px]">{children}</main>
     </SidebarProvider>
   );
 }

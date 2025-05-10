@@ -3,6 +3,8 @@
 import { adminStorage } from "@/firebase/firebaseAdmin";
 import { ImageUrlSchema } from "@/firebase/schemas/otherSchemas";
 import { cache } from "react";
+import { getDocumentFromAdminDB } from "../helpers";
+import { ProductWithId, RawPhoto } from "@/firebase/schemas/productsSchemas";
 
 export const getImageUrl = cache(async function (
   filePath: string
@@ -18,6 +20,27 @@ export const getImageUrl = cache(async function (
   }
 
   return imageUrl;
+});
+
+export const getImagesUrls = cache(async function (
+  filePaths: string[]
+): Promise<string[] | null> {
+  const bucket = adminStorage.bucket();
+  const urls: string[] = [];
+
+  for (const filePath of filePaths) {
+    const fileRef = bucket.file(filePath);
+    const imageUrl = fileRef.publicUrl();
+
+    try {
+      ImageUrlSchema.parse(imageUrl);
+      urls.push(imageUrl);
+    } catch (err) {
+      return null;
+    }
+  }
+
+  return urls;
 });
 
 export const uploadImageToStorage = cache(async function (
@@ -73,4 +96,46 @@ export const deleteImageFromStorage = cache(async function (
   const bucket = adminStorage.bucket();
   const fileRef = bucket.file(filePath);
   await fileRef.delete();
+});
+
+export const deleteRawPhoto = cache(async function (
+  filePath: string,
+  productId: string
+): Promise<void> {
+  const bucket = adminStorage.bucket();
+  const fileRef = bucket.file(filePath);
+  await fileRef.delete();
+
+  const { data: productData, ref: productRef } =
+    await getDocumentFromAdminDB<ProductWithId>("products", productId);
+
+  if (!productData?.rawPhotos) return;
+
+  const filteredPhotos = productData.rawPhotos.filter(
+    (photo) => photo.filePath !== filePath
+  );
+  productData.rawPhotos = filteredPhotos;
+  await productRef.set(productData);
+});
+
+export const deleteUnusedRawPhotosFromStorage = cache(async function (
+  productId: string
+): Promise<void> {
+  const bucket = adminStorage.bucket();
+
+  const { data: productData, ref: productRef } =
+    await getDocumentFromAdminDB<ProductWithId>("products", productId);
+
+  const photosPaths =
+    productData?.rawPhotos?.map((photo) => photo.filePath) || [];
+
+  const prefix = `products/raw-photos/${
+    productData?.productType || "obuwie"
+  }/${productId}/`;
+
+  const [files] = await bucket.getFiles({ prefix });
+
+  const unusedFiles = files.filter((file) => !photosPaths.includes(file.name));
+
+  await Promise.all(unusedFiles.map((file) => file.delete()));
 });

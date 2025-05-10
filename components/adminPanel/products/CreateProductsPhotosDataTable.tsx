@@ -1,7 +1,5 @@
 "use client";
 
-import { useConfirmDialog } from "@/components/adminPanel/global/ConfirmDialogProvider";
-import { Button } from "@/components/ui/button";
 import { Product, ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { useToast } from "@/hooks/useToast";
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
@@ -10,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { DataTable } from "../global/DataTable";
 import { useProductTypeContext } from "./ProductsTypeContext";
 import { useEffect, useState } from "react";
-import ProductImagesUploader from "./CreateProductsPhotosForm";
 
 export default function CreateProductsPhotosDataTable({
   data,
@@ -57,23 +54,6 @@ export default function CreateProductsPhotosDataTable({
 
   const router = useRouter();
   const { showToast } = useToast();
-  const { showDialog } = useConfirmDialog();
-
-  const handleDeleteProduct = async (id: string) => {
-    showDialog({
-      message: "Czy na pewno chcesz usunąć ten produkt?",
-      description: "Ta operacja jest nieodwracalna.",
-      onConfirm: async () => {
-        try {
-          await axios.delete(`/api/products/${id}`);
-          showToast("Produkt został usunięty", "success");
-          router.refresh();
-        } catch (err) {
-          showToast(`Nie udało się usunąć produktu: ${err}`, "error");
-        }
-      },
-    });
-  };
 
   const actions: TableAction[] = [
     {
@@ -89,6 +69,25 @@ export default function CreateProductsPhotosDataTable({
             "success"
           );
           router.refresh();
+        } catch (err) {
+          showToast(`Nie można przenieść produktu: ${err}`, "error");
+        }
+      },
+    },
+    {
+      name: "Cofnij do poprzedniego etapu",
+      onClick: async (id) => {
+        try {
+          const updateData: Partial<Product> = {
+            creationStage: "new",
+          };
+          await axios.patch(`/api/products/${id}`, updateData);
+          showToast(
+            "Produkt został przeniesiony do poprzedniego etapu.",
+            "success"
+          );
+          router.refresh();
+          setFilteredData(filteredData);
         } catch (err) {
           showToast(`Nie można przenieść produktu: ${err}`, "error");
         }

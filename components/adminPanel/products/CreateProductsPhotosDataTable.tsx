@@ -1,6 +1,10 @@
 "use client";
 
-import { Product, ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  Product,
+  ProductCreationStage,
+  ProductWithId,
+} from "@/firebase/schemas/productsSchemas";
 import { useToast } from "@/hooks/useToast";
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
 import axios from "axios";
@@ -9,13 +13,17 @@ import { DataTable } from "../global/DataTable";
 import { useProductTypeContext } from "./ProductsTypeContext";
 import { useEffect, useState } from "react";
 
+type ProductWithStatus = ProductWithId & { isReady: boolean };
+
 export default function CreateProductsPhotosDataTable({
   data,
+  creationStage,
 }: {
   data: ProductWithId[] | null;
+  creationStage: ProductCreationStage;
 }) {
   const { productType } = useProductTypeContext();
-  const [filteredData, setFilteredData] = useState<ProductWithId[] | null>(
+  const [filteredData, setFilteredData] = useState<ProductWithStatus[] | null>(
     null
   );
 
@@ -28,9 +36,9 @@ export default function CreateProductsPhotosDataTable({
     ...elementaryColumnNames,
     { attributeName: "colorVariants", displayName: "Warianty" },
   ];
-  const [columnNames, setColumnNames] = useState<ColumnName<ProductWithId>[]>(
-    elementaryColumnNames
-  );
+  const [columnNames, setColumnNames] = useState<
+    ColumnName<ProductWithStatus>[]
+  >(elementaryColumnNames);
 
   useEffect(() => {
     if (!data) {
@@ -40,7 +48,20 @@ export default function CreateProductsPhotosDataTable({
     const newData = data.filter(
       (product) => product.productType === productType
     );
-    setFilteredData(newData);
+    const newDataWithStatus: ProductWithStatus[] = newData.map((product) => {
+      const { rawPhotos, editedPhotos } = product;
+      const hasRawPhotos = (rawPhotos && rawPhotos?.length > 0) || false;
+      const hasEditedPhotos =
+        (editedPhotos && editedPhotos?.length > 0) || false;
+      const isReady =
+        (creationStage === "photosEdit" && hasEditedPhotos) ||
+        (creationStage === "photos" && hasRawPhotos);
+      return {
+        ...product,
+        isReady,
+      };
+    });
+    setFilteredData(newDataWithStatus);
 
     if (
       productType === "obuwie" &&
@@ -65,7 +86,13 @@ export default function CreateProductsPhotosDataTable({
           return;
         }
         const { rawPhotos } = productData;
-        if (!rawPhotos || rawPhotos?.length === 0) {
+        const { editedPhotos } = productData;
+        const hasRawPhotos = rawPhotos && rawPhotos?.length > 0;
+        const hasEditedPhotos = editedPhotos && editedPhotos?.length > 0;
+        if (
+          (creationStage === "photosEdit" && !hasEditedPhotos) ||
+          (creationStage === "photos" && !hasRawPhotos)
+        ) {
           showToast(
             "Nie można przenieść produktu, ponieważ nie ma dodanych zdjęć.",
             "error"
@@ -75,7 +102,8 @@ export default function CreateProductsPhotosDataTable({
 
         try {
           const updateData: Partial<Product> = {
-            creationStage: "photosEdit",
+            creationStage:
+              creationStage == "photosEdit" ? "parameters" : "photosEdit",
           };
           await axios.patch(`/api/products/${id}`, updateData);
           showToast(
@@ -93,7 +121,7 @@ export default function CreateProductsPhotosDataTable({
       onClick: async (id) => {
         try {
           const updateData: Partial<Product> = {
-            creationStage: "new",
+            creationStage: creationStage == "photosEdit" ? "photos" : "new",
           };
           await axios.patch(`/api/products/${id}`, updateData);
           showToast(
@@ -110,7 +138,9 @@ export default function CreateProductsPhotosDataTable({
     {
       name: "Dodaj zdjęcia",
       onClick: (id) => {
-        router.push(`/admin-panel/create-products/photos/${id}`);
+        const endpoint =
+          creationStage === "photosEdit" ? "photos-edit" : "photos";
+        router.push(`/admin-panel/create-products/${endpoint}/${id}`);
       },
     },
   ];
@@ -127,6 +157,7 @@ export default function CreateProductsPhotosDataTable({
           hasImages={true}
           imageAttribute="samplePhoto"
           imageFolderPath={`products/sample-photos/${productType}`}
+          isReadyAttribute="isReady"
         />
       ) : (
         <p className="mt-4">Brak nowych produktów</p>

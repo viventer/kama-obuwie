@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  EditedPhoto,
   Product,
+  ProductCreationStage,
   ProductWithId,
   RawPhoto,
 } from "@/firebase/schemas/productsSchemas";
@@ -14,20 +16,33 @@ import axios from "axios";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { deleteUnusedRawPhotosFromStorage } from "@/server-actions/images/images";
+import { deleteUnusedPhotosFromStorage } from "@/server-actions/images/images";
+import { useProductTypeContext } from "./ProductsTypeContext";
 
 export default function CreateProductsPhotosForm({
   productData,
   samplePhotoUrl,
+  creationStage,
 }: {
   productData: ProductWithId;
   samplePhotoUrl: string | null;
+  creationStage: ProductCreationStage;
 }) {
-  const { id, colorVariants, rawPhotos, manufacturerCode } = productData;
+  const { id, colorVariants, rawPhotos, manufacturerCode, editedPhotos } =
+    productData;
 
-  const folderPath = `products/raw-photos/obuwie/${id}`;
+  const { productType } = useProductTypeContext();
+
+  const storageEndpoint =
+    creationStage === "photos" ? "raw-photos" : "edited-photos";
+  const urlEndpoint = creationStage === "photos" ? "photos" : "photos-edit";
+
+  const folderPath = `products/${storageEndpoint}/${productType}/${id}`;
 
   const [newRawPhotos, setNewRawPhotos] = useState<RawPhoto[]>(rawPhotos || []);
+  const [newEditedPhotos, setNewEditedPhotos] = useState<EditedPhoto[]>(
+    editedPhotos || []
+  );
 
   const { showToast } = useToast();
 
@@ -35,15 +50,23 @@ export default function CreateProductsPhotosForm({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const updateData: Partial<Product> = {
-      rawPhotos: newRawPhotos,
-    };
+    let updateData: Partial<Product> | null = null;
+
+    if (creationStage === "photos") {
+      updateData = {
+        rawPhotos: newRawPhotos,
+      };
+    } else {
+      updateData = {
+        editedPhotos: newEditedPhotos,
+      };
+    }
 
     try {
       await axios.patch(`/api/products/${id}`, updateData);
-      await deleteUnusedRawPhotosFromStorage(productData.id);
+      await deleteUnusedPhotosFromStorage(productData.id, storageEndpoint);
       showToast("Zdjęcia zostały dodane do produktu", "success");
-      router.push("/admin-panel/create-products/photos");
+      router.push(`/admin-panel/create-products/${urlEndpoint}`);
     } catch (err) {
       showToast("Nie udało się zapisać zmian w produkcie", "error");
     }
@@ -51,9 +74,14 @@ export default function CreateProductsPhotosForm({
 
   const handleReject = (e: FormEvent) => {
     e.preventDefault();
-    router.push("/admin-panel/create-products/photos");
+    router.push(`/admin-panel/create-products/${urlEndpoint}`);
     showToast("Zmiany zostały odrzucone", "default");
   };
+
+  const setNewPhotos =
+    creationStage === "photos" ? setNewRawPhotos : setNewEditedPhotos;
+
+  const oldPhotos = creationStage === "photos" ? rawPhotos : editedPhotos;
 
   return (
     <div>
@@ -78,16 +106,16 @@ export default function CreateProductsPhotosForm({
             </h2>
             <ProductImagesUploader
               variant={variant}
-              oldPhotos={rawPhotos || []}
+              oldPhotos={oldPhotos || []}
               folderPath={`${folderPath}/${getColorVariantName(variant)}`}
-              setNewRawPhotos={setNewRawPhotos}
+              setNewPhotos={setNewPhotos}
             />
           </Fragment>
         ))
       ) : (
         <ProductImagesUploader
-          oldPhotos={rawPhotos || []}
-          setNewRawPhotos={setNewRawPhotos}
+          oldPhotos={oldPhotos || []}
+          setNewPhotos={setNewPhotos}
           folderPath={folderPath}
         />
       )}

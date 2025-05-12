@@ -1,6 +1,10 @@
 "use client";
 
-import { ColorVariant, RawPhoto } from "@/firebase/schemas/productsSchemas";
+import {
+  ColorVariant,
+  EditedPhoto,
+  RawPhoto,
+} from "@/firebase/schemas/productsSchemas";
 import MultipleImageUploader from "../global/MultipleImageUploader";
 import { Dispatch, useEffect, useState } from "react";
 import { getColorVariantName } from "./helpers/productsHelpers";
@@ -11,12 +15,12 @@ export default function ProductImagesUploader({
   variant,
   oldPhotos,
   folderPath,
-  setNewRawPhotos,
+  setNewPhotos,
 }: {
   variant?: ColorVariant;
-  oldPhotos: RawPhoto[];
+  oldPhotos: RawPhoto[] | EditedPhoto[];
   folderPath: string;
-  setNewRawPhotos: Dispatch<React.SetStateAction<RawPhoto[]>>;
+  setNewPhotos: Dispatch<React.SetStateAction<RawPhoto[]>>;
 }) {
   const params = useParams();
   const { id } = params as { id: string };
@@ -32,11 +36,11 @@ export default function ProductImagesUploader({
   const [filePaths, setFilePaths] = useState<string[]>(oldFilePaths || []);
 
   useEffect(() => {
-    const newPhotos: RawPhoto[] = filePaths.map((filePath) => ({
+    const newPhotos: RawPhoto[] | EditedPhoto[] = filePaths.map((filePath) => ({
       filePath,
       colorVariantName: colorVariantName || "",
     }));
-    setNewRawPhotos((prev) => {
+    setNewPhotos((prev) => {
       const filteredOldPhotos = prev.filter((photo) => {
         if (!colorVariantName) return true;
         return photo.colorVariantName !== colorVariantName;

@@ -32,6 +32,7 @@ export default async function ProductEditPage(props: Props) {
     <CreateProductsPhotosForm
       productData={data}
       samplePhotoUrl={samplePhotoUrl}
+      creationStage="photos"
     />
   );
 }

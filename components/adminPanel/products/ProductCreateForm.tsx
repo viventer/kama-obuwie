@@ -144,6 +144,7 @@ export default function ProductCreateForm({
                 <FormControl>
                   <Input
                     type="number"
+                    min={0}
                     value={field.value}
                     onChange={field.onChange}
                   />

@@ -95,7 +95,7 @@ export default function MultipleImageUploader({
   );
 
   const onDropRejected = useCallback(() => {
-    showToast("Nieprawidłowy plik lub za duży (max 5 MB).", "error");
+    showToast("Nieprawidłowy plik lub za duży (max 10 MB).", "error");
   }, [showToast]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -103,7 +103,7 @@ export default function MultipleImageUploader({
     onDropRejected,
     accept: { "image/*": [] },
     multiple: true,
-    maxSize: 5 * 1024 * 1024,
+    maxSize: 10 * 1024 * 1024,
   });
 
   const sensors = useSensors(useSensor(PointerSensor));

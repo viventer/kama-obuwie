@@ -12,7 +12,10 @@ export default async function CreateProductsPhotosPage() {
   return (
     <>
       <SubpageHeading text="Dodaj zdjęcia" />
-      <CreateProductsPhotosDataTable data={products || null} />
+      <CreateProductsPhotosDataTable
+        data={products || null}
+        creationStage="photos"
+      />
     </>
   );
 }

@@ -52,6 +52,7 @@ export function DataTable<T extends { id: string }>({
   hasImages = false,
   imageAttribute,
   imageFolderPath,
+  isReadyAttribute,
 }: {
   data: T[];
   columnNames: ColumnName<T>[];
@@ -62,6 +63,7 @@ export function DataTable<T extends { id: string }>({
   hasImages?: boolean;
   imageAttribute?: keyof T;
   imageFolderPath?: string;
+  isReadyAttribute?: keyof T;
 }) {
   const [pagination, setPagination] = useState<{
     pageIndex: number;
@@ -183,6 +185,7 @@ export function DataTable<T extends { id: string }>({
                       row={row}
                       imageAttribute={imageAttribute}
                       imageFolderPath={imageFolderPath}
+                      isReadyAttribute={isReadyAttribute}
                     />
                   ) : (
                     <DataTableRow<T> row={row} />

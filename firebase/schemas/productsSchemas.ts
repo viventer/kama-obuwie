@@ -75,6 +75,8 @@ export const RawPhotoSchema = z.object({
   filePath: z.string(),
 });
 
+export const EditedPhotoSchema = RawPhotoSchema;
+
 export const ProductSchema = z.object({
   id: z.string().optional(),
   brand: z.string().max(32).optional(),
@@ -82,7 +84,7 @@ export const ProductSchema = z.object({
   productType: z.enum(["obuwie", "akcesoria"]),
   samplePhoto: z.string().optional(),
   rawPhotos: z.array(RawPhotoSchema).default([]).optional(),
-  editedPhotos: z.array(z.string()).max(20).default([]).optional(),
+  editedPhotos: z.array(EditedPhotoSchema).default([]).optional(),
   shoeTypes: z.array(z.string().min(3).max(32)).default([]).optional(),
   colorVariants: z.array(ColorVariantSchema).default([]).optional(),
   warrantyPeriod: z.number().max(240).default(0).optional(),
@@ -143,6 +145,7 @@ export type ColorVariant = z.infer<typeof ColorVariantSchema>;
 export type ProductCreationStage = z.infer<typeof ProductCreationStageSchema>;
 
 export type RawPhoto = z.infer<typeof RawPhotoSchema>;
+export type EditedPhoto = z.infer<typeof EditedPhotoSchema>;
 
 export const SizingTableUpdateDataSchema = SizingTableSchema.partial().strict();
 

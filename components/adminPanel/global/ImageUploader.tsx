@@ -43,7 +43,7 @@ export default function ImageUploader({
   const { showToast } = useToast();
 
   const onDropRejected = useCallback(() => {
-    showToast("Plik jest za duży! Maksymalny rozmiar to 5 MB.", "error");
+    showToast("Plik jest za duży! Maksymalny rozmiar to 10 MB.", "error");
   }, [showToast]);
 
   const onDrop = useCallback(
@@ -88,7 +88,7 @@ export default function ImageUploader({
     onDropRejected,
     accept: { "image/*": [] },
     maxFiles: 1,
-    maxSize: 5 * 1024 * 1024,
+    maxSize: 10 * 1024 * 1024,
   });
 
   const handleDeleteImage = async (e: React.MouseEvent<HTMLButtonElement>) => {

@@ -4,7 +4,11 @@ import { adminStorage } from "@/firebase/firebaseAdmin";
 import { ImageUrlSchema } from "@/firebase/schemas/otherSchemas";
 import { cache } from "react";
 import { getDocumentFromAdminDB } from "../helpers";
-import { ProductWithId, RawPhoto } from "@/firebase/schemas/productsSchemas";
+import {
+  EditedPhoto,
+  ProductWithId,
+  RawPhoto,
+} from "@/firebase/schemas/productsSchemas";
 
 export const getImageUrl = cache(async function (
   filePath: string
@@ -118,18 +122,26 @@ export const deleteRawPhoto = cache(async function (
   await productRef.set(productData);
 });
 
-export const deleteUnusedRawPhotosFromStorage = cache(async function (
-  productId: string
+export const deleteUnusedPhotosFromStorage = cache(async function (
+  productId: string,
+  storageEndpoint: "raw-photos" | "edited-photos"
 ): Promise<void> {
   const bucket = adminStorage.bucket();
 
   const { data: productData, ref: productRef } =
     await getDocumentFromAdminDB<ProductWithId>("products", productId);
 
-  const photosPaths =
-    productData?.rawPhotos?.map((photo) => photo.filePath) || [];
+  let photosPaths: string[] = [];
+  if (storageEndpoint === "raw-photos") {
+    photosPaths =
+      productData?.rawPhotos?.map((photo: RawPhoto) => photo.filePath) || [];
+  } else if (storageEndpoint === "edited-photos") {
+    photosPaths =
+      productData?.editedPhotos?.map((photo: EditedPhoto) => photo.filePath) ||
+      [];
+  }
 
-  const prefix = `products/raw-photos/${
+  const prefix = `products/${storageEndpoint}/${
     productData?.productType || "obuwie"
   }/${productId}/`;
 

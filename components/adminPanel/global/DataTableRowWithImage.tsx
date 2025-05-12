@@ -11,16 +11,23 @@ export default function DataTableRowWithImage<T>({
   row,
   imageAttribute,
   imageFolderPath,
+  isReadyAttribute,
 }: {
   row: Row<T>;
   imageAttribute: keyof T;
   imageFolderPath: string;
+  isReadyAttribute?: keyof T;
 }) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState<boolean>(false);
 
   useEffect(() => {
     const imageFilePath = row.original[imageAttribute] as string;
     if (!imageFilePath) return;
+    if (isReadyAttribute) {
+      const isReadyValue = row.original[isReadyAttribute] as boolean;
+      setIsReady(isReadyValue);
+    }
 
     (async () => {
       const url = await getImageUrl(imageFilePath);
@@ -60,14 +67,20 @@ export default function DataTableRowWithImage<T>({
       <TableCell>
         {flexRender(checkboxCellColumnDef, checkboxCellContext)}
       </TableCell>
-      <TableCell className="flex items-center gap-4 min-w-[200px]">
+      <TableCell className="flex items-center gap-4 min-w-[200px] ">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt="Product Image"
             width={128}
             height={128}
-            className="size-16 sm:size-32 object-contain bg-primary/15"
+            className={`size-16 sm:size-32 object-contain bg-primary/15 border-b-[0.2rem] ${
+              isReady
+                ? "border-b-success"
+                : isReadyAttribute
+                ? "border-b-destructive"
+                : "border-b-primary"
+            } border-l-solid`}
           />
         ) : (
           <ImageIcon className="min-w-16 h-16 sm:min-w-32 sm:h-32" />

@@ -32,7 +32,11 @@ export default async function ProductEditPage(props: Props) {
   }
 
   const folderPath = `products/raw-photos/${data.productType}/${data.id}`;
-  const downloadName = `raw-${data.manufacturerCode}`;
+  const serializedManufacturerCode = data.manufacturerCode.replace(
+    /[^a-zA-Z0-9]/g,
+    "-"
+  );
+  const downloadName = `raw-${serializedManufacturerCode}`;
   const params = new URLSearchParams({
     folderPath,
     downloadName,

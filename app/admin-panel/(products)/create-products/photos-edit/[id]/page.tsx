@@ -1,7 +1,12 @@
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import CreateProductsPhotosForm from "@/components/adminPanel/products/CreateProductsPhotosForm";
+import { Button } from "@/components/ui/button";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
 import { getImageUrl } from "@/server-actions/images/images";
+import Image from "next/image";
+import Link from "next/link";
+
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -19,20 +24,44 @@ export default async function ProductEditPage(props: Props) {
   const { id } = await props.params;
   const result = await getDocumentFromAdminDB<ProductWithId>("products", id);
   const { data } = result;
-  if (!data) {
-    notFound();
-  }
+  if (!data) notFound();
 
   let samplePhotoUrl: string | null = null;
   if (data.samplePhoto) {
     samplePhotoUrl = await getImageUrl(data.samplePhoto);
   }
 
+  const folderPath = `products/raw-photos/${data.productType}/${data.id}`;
+  const downloadName = `raw-${data.manufacturerCode}`;
+  const params = new URLSearchParams({
+    folderPath,
+    downloadName,
+  });
+
   return (
-    <CreateProductsPhotosForm
-      productData={data}
-      samplePhotoUrl={samplePhotoUrl}
-      creationStage="photosEdit"
-    />
+    <>
+      <SubpageHeading text={`Dodaj zdjęcia do produktu`} />
+      {samplePhotoUrl && (
+        <section className="mb-8">
+          <Image
+            src={samplePhotoUrl}
+            alt="Zdjęcie poglądowe"
+            width={500}
+            height={500}
+            className="w-[10rem] aspect-square object-contain bg-primary/15 border-primary border-[0.1rem] border-solid rounded-sm mb-2"
+          />
+          <p className="font-bold">{data.manufacturerCode}</p>
+        </section>
+      )}
+      <Button className="mb-8" asChild>
+        <Link
+          href={`/api/products/downloadPhotos?${params.toString()}`}
+          className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Pobierz surowe zdjęcia (ZIP)
+        </Link>
+      </Button>
+      <CreateProductsPhotosForm productData={data} creationStage="photosEdit" />
+    </>
   );
 }

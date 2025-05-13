@@ -21,11 +21,9 @@ import { useProductTypeContext } from "./ProductsTypeContext";
 
 export default function CreateProductsPhotosForm({
   productData,
-  samplePhotoUrl,
   creationStage,
 }: {
   productData: ProductWithId;
-  samplePhotoUrl: string | null;
   creationStage: ProductCreationStage;
 }) {
   const { id, colorVariants, rawPhotos, manufacturerCode, editedPhotos } =
@@ -85,19 +83,6 @@ export default function CreateProductsPhotosForm({
 
   return (
     <div>
-      <SubpageHeading text={`Dodaj zdjęcia do produktu`} />
-      {samplePhotoUrl && (
-        <section className="mb-8">
-          <Image
-            src={samplePhotoUrl}
-            alt="Zdjęcie poglądowe"
-            width={500}
-            height={500}
-            className="w-[10rem] aspect-square object-contain bg-primary/15 border-primary border-[0.1rem] border-solid rounded-sm mb-2"
-          />
-          <p className="font-bold">{manufacturerCode}</p>
-        </section>
-      )}
       {colorVariants && colorVariants.length > 0 ? (
         colorVariants.map((variant, i) => (
           <Fragment key={i}>

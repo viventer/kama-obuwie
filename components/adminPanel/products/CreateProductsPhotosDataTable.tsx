@@ -146,22 +146,16 @@ export default function CreateProductsPhotosDataTable({
   ];
 
   return (
-    <>
-      {filteredData ? (
-        <DataTable
-          data={filteredData}
-          columnNames={columnNames}
-          actions={actions}
-          searchPlaceholder="Szukaj produktu"
-          searchColumns={["brand", "manufacturerCode"]}
-          hasImages={true}
-          imageAttribute="samplePhoto"
-          imageFolderPath={`products/sample-photos/${productType}`}
-          isReadyAttribute="isReady"
-        />
-      ) : (
-        <p className="mt-4">Brak nowych produktów</p>
-      )}
-    </>
+    <DataTable
+      data={filteredData || []}
+      columnNames={columnNames}
+      actions={actions}
+      searchPlaceholder="Szukaj produktu"
+      searchColumns={["brand", "manufacturerCode"]}
+      hasImages={true}
+      imageAttribute="samplePhoto"
+      imageFolderPath={`products/sample-photos/${productType}`}
+      isReadyAttribute="isReady"
+    />
   );
 }

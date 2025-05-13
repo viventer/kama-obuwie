@@ -118,20 +118,16 @@ export default function CreateProductsNewDataTable({
   return (
     <>
       <Button onClick={handleCreateProduct}>Utwórz nowy</Button>
-      {filteredData ? (
-        <DataTable
-          data={filteredData}
-          columnNames={columnNames}
-          actions={actions}
-          searchPlaceholder="Szukaj produktu"
-          searchColumns={["brand", "manufacturerCode"]}
-          hasImages={true}
-          imageAttribute="samplePhoto"
-          imageFolderPath={`products/sample-photos/${productType}`}
-        />
-      ) : (
-        <p className="mt-4">Brak nowych produktów</p>
-      )}
+      <DataTable
+        data={filteredData || []}
+        columnNames={columnNames}
+        actions={actions}
+        searchPlaceholder="Szukaj produktu"
+        searchColumns={["brand", "manufacturerCode"]}
+        hasImages={true}
+        imageAttribute="samplePhoto"
+        imageFolderPath={`products/sample-photos/${productType}`}
+      />
     </>
   );
 }

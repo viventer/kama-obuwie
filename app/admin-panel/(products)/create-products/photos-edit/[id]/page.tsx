@@ -16,7 +16,7 @@ type Props = {
 
 export async function generateMetadata(props: Props) {
   return {
-    title: `Dodaj zdjęcia produktu`,
+    title: `Dodaj edytowane zdjęcia produktu`,
   };
 }
 
@@ -44,7 +44,7 @@ export default async function ProductEditPage(props: Props) {
 
   return (
     <>
-      <SubpageHeading text={`Dodaj zdjęcia do produktu`} />
+      <SubpageHeading text={`Dodaj edytowane zdjęcia do produktu`} />
       {samplePhotoUrl && (
         <section className="mb-8">
           <Image

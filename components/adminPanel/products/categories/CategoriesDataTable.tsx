@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
-import { DataTable } from "../global/DataTable";
+import { DataTable } from "../../global/data-table/DataTable";
 import {
   Category,
   CategoryWithAllegroCategoryName,

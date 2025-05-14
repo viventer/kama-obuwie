@@ -2,8 +2,7 @@
 
 import { Product, ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { useForm } from "react-hook-form";
-import ImageUploader from "../global/ImageUploader";
-import SubpageHeading from "../global/SubpageHeading";
+import SubpageHeading from "../../global/SubpageHeading";
 import {
   Form,
   FormControl,
@@ -11,16 +10,17 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
-import { useProductTypeContext } from "./ProductsTypeContext";
+import { useProductTypeContext } from "../ProductsTypeContext";
 import { Input } from "@/components/ui/input";
 
-import AddColorVariants from "./AddColorVariants";
+import AddColorVariants from "../AddColorVariants";
 import { Button } from "@/components/ui/button";
-import { FormEvent, useEffect } from "react";
+import { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import axios from "axios";
-import { useConfirmDialog } from "../global/ConfirmDialogProvider";
+import { useConfirmDialog } from "../../global/ConfirmDialogProvider";
+import ImageUploader from "../../global/uploaders/ImageUploader";
 
 export default function ProductCreateForm({
   oldData,
@@ -79,7 +79,7 @@ export default function ProductCreateForm({
       description: "Ta operacja jest nieodwracalna.",
       onConfirm: async () => {
         router.back();
-        showToast("Zmiany zostały odrzucone.", "success");
+        showToast("Zmiany zostały odrzucone.", "default");
       },
     });
   };

@@ -9,8 +9,8 @@ import { useToast } from "@/hooks/useToast";
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { DataTable } from "../global/DataTable";
-import { useProductTypeContext } from "./ProductsTypeContext";
+import { DataTable } from "../../global/data-table/DataTable";
+import { useProductTypeContext } from "../ProductsTypeContext";
 import { useEffect, useState } from "react";
 
 type ProductWithStatus = ProductWithId & { isReady: boolean };

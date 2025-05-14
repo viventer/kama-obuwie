@@ -1,5 +1,5 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import CreateProductsParametersDataTable from "@/components/adminPanel/products/CreateProductsParametersDataTable";
+import CreateProductsParametersDataTable from "@/components/adminPanel/products/create/CreateProductsParametersDataTable";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentsFromAdminDB } from "@/server-actions/helpers";
 
@@ -11,7 +11,7 @@ export default async function CreateProductsNewPage() {
 
   return (
     <>
-      <SubpageHeading text="Dodaj parametry" />
+      <SubpageHeading text="Uzupełnij parametry" />
       <CreateProductsParametersDataTable data={products || null} />
     </>
   );

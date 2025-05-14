@@ -1,4 +1,4 @@
-import CreationStageSelector from "@/components/adminPanel/products/CreationStageSelector";
+import CreationStageSelector from "@/components/adminPanel/products/create/CreationStageSelector";
 import { ProductTypeContextProvider } from "@/components/adminPanel/products/ProductsTypeContext";
 import ProductTypeSelector from "@/components/adminPanel/products/ProductTypeSelector";
 import { ReactNode } from "react";

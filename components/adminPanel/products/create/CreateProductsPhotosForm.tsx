@@ -7,17 +7,15 @@ import {
   ProductWithId,
   RawPhoto,
 } from "@/firebase/schemas/productsSchemas";
-import { getColorVariantName } from "./helpers/productsHelpers";
-import ProductImagesUploader from "./ProductImagesUploader";
+import { getColorVariantName } from "../helpers/productsHelpers";
+import ProductImagesUploader from "../ProductImagesUploader";
 import { FormEvent, Fragment, useState } from "react";
-import SubpageHeading from "../global/SubpageHeading";
-import Image from "next/image";
 import axios from "axios";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { deleteUnusedPhotosFromStorage } from "@/server-actions/images/images";
-import { useProductTypeContext } from "./ProductsTypeContext";
+import { useProductTypeContext } from "../ProductsTypeContext";
 
 export default function CreateProductsPhotosForm({
   productData,
@@ -26,8 +24,7 @@ export default function CreateProductsPhotosForm({
   productData: ProductWithId;
   creationStage: ProductCreationStage;
 }) {
-  const { id, colorVariants, rawPhotos, manufacturerCode, editedPhotos } =
-    productData;
+  const { id, colorVariants, rawPhotos, editedPhotos } = productData;
 
   const { productType } = useProductTypeContext();
 

@@ -91,6 +91,7 @@ export const ProductSchema = z.object({
   parameters: z.record(z.string(), z.string()).default({}).optional(),
   description: DescriptionSchema.default([]).optional(),
   purchasePrice: z.number(),
+  rootCategory: z.enum(RootCategoryValues).optional(),
   creationStage: ProductCreationStageSchema,
   categoryId: z.string().optional(),
   sizingTableId: z.string().optional(),

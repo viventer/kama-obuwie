@@ -1,4 +1,4 @@
-import ProductCreateForm from "@/components/adminPanel/products/ProductCreateForm";
+import ProductCreateForm from "@/components/adminPanel/products/create/ProductCreateForm";
 
 export async function generateMetadata() {
   return {

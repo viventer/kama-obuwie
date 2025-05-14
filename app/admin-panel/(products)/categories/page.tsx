@@ -1,5 +1,5 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import CategoriesDataTable from "@/components/adminPanel/products/CategoriesDataTable";
+import CategoriesDataTable from "@/components/adminPanel/products/categories/CategoriesDataTable";
 import {
   CategoryWithAllegroCategoryName,
   CategoryWithId,

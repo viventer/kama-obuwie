@@ -7,11 +7,11 @@ import { useToast } from "@/hooks/useToast";
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { DataTable } from "../global/DataTable";
-import { useProductTypeContext } from "./ProductsTypeContext";
+import { DataTable } from "../../global/data-table/DataTable";
+import { useProductTypeContext } from "../ProductsTypeContext";
 import { useEffect, useState } from "react";
 
-export default function CreateProductsParametersDataTable({
+export default function CreateProductsNewDataTable({
   data,
 }: {
   data: ProductWithId[] | null;
@@ -58,13 +58,29 @@ export default function CreateProductsParametersDataTable({
   const { showToast } = useToast();
   const { showDialog } = useConfirmDialog();
 
+  const handleDeleteProduct = async (id: string) => {
+    showDialog({
+      message: "Czy na pewno chcesz usunąć ten produkt?",
+      description: "Ta operacja jest nieodwracalna.",
+      onConfirm: async () => {
+        try {
+          await axios.delete(`/api/products/${id}`);
+          showToast("Produkt został usunięty", "success");
+          router.refresh();
+        } catch (err) {
+          showToast(`Nie udało się usunąć produktu: ${err}`, "error");
+        }
+      },
+    });
+  };
+
   const actions: TableAction[] = [
     {
       name: "Przenieś dalej",
       onClick: async (id) => {
         try {
           const updateData: Partial<Product> = {
-            creationStage: "description",
+            creationStage: "photos",
           };
           await axios.patch(`/api/products/${id}`, updateData);
           showToast(
@@ -78,42 +94,40 @@ export default function CreateProductsParametersDataTable({
       },
     },
     {
-      name: "Dodaj parametry",
+      name: "Edytuj",
       onClick: (id) => {
-        router.push(`/admin-panel/create-products/parameters/${id}`);
+        router.push(`/admin-panel/create-products/new/${id}`);
       },
     },
     {
-      name: "Cofnij do poprzedniego etapu",
-      onClick: async (id) => {
-        try {
-          const updateData: Partial<Product> = {
-            creationStage: "photosEdit",
-          };
-          await axios.patch(`/api/products/${id}`, updateData);
-          showToast(
-            "Produkt został przeniesiony do poprzedniego etapu.",
-            "success"
-          );
-          router.refresh();
-          setFilteredData(filteredData);
-        } catch (err) {
-          showToast(`Nie można przenieść produktu: ${err}`, "error");
+      name: "Usuń",
+      onClick: (id) => {
+        if (id === undefined) {
+          showToast("Nie można usunąć produktu", "error");
+          return;
         }
+        handleDeleteProduct(id);
       },
     },
   ];
 
+  const handleCreateProduct = async () => {
+    router.push("/admin-panel/create-products/new/form");
+  };
+
   return (
-    <DataTable
-      data={filteredData || []}
-      columnNames={columnNames}
-      actions={actions}
-      searchPlaceholder="Szukaj produktu"
-      searchColumns={["brand", "manufacturerCode"]}
-      hasImages={true}
-      imageAttribute="samplePhoto"
-      imageFolderPath={`products/sample-photos/${productType}`}
-    />
+    <>
+      <Button onClick={handleCreateProduct}>Utwórz nowy</Button>
+      <DataTable
+        data={filteredData || []}
+        columnNames={columnNames}
+        actions={actions}
+        searchPlaceholder="Szukaj produktu"
+        searchColumns={["brand", "manufacturerCode"]}
+        hasImages={true}
+        imageAttribute="samplePhoto"
+        imageFolderPath={`products/sample-photos/${productType}`}
+      />
+    </>
   );
 }

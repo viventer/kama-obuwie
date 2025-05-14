@@ -1,6 +1,13 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
-import { getDocumentFromAdminDB } from "@/server-actions/helpers";
+import EditProductParametersForm from "@/components/adminPanel/products/EditProductParametersForm";
+import {
+  CategoryWithId,
+  ProductWithId,
+} from "@/firebase/schemas/productsSchemas";
+import {
+  getDocumentFromAdminDB,
+  getDocumentsFromAdminDB,
+} from "@/server-actions/helpers";
 import { getImageUrl } from "@/server-actions/images/images";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -23,6 +30,16 @@ export default async function ProductEditPage(props: Props) {
   if (!data) {
     notFound();
   }
+  const availableCategories: CategoryWithId[] | null =
+    await getDocumentsFromAdminDB<CategoryWithId>("categories");
+
+  const filteredCategories = availableCategories?.filter((category) => {
+    if (data.productType === "akcesoria") {
+      return category.rootCategory.includes("akcesoria");
+    } else {
+      return category.rootCategory.includes("obuwie");
+    }
+  });
 
   let samplePhotoUrl: string | null = null;
   if (data.samplePhoto) {
@@ -32,18 +49,7 @@ export default async function ProductEditPage(props: Props) {
   return (
     <>
       <SubpageHeading text={`Uzupełnij parametry produktu`} />
-      {samplePhotoUrl && (
-        <section className="mb-8">
-          <Image
-            src={samplePhotoUrl}
-            alt="Zdjęcie poglądowe"
-            width={500}
-            height={500}
-            className="w-[10rem] aspect-square object-contain bg-primary/15 border-primary border-[0.1rem] border-solid rounded-sm mb-2"
-          />
-          <p className="font-bold">{data.manufacturerCode}</p>
-        </section>
-      )}
+      <EditProductParametersForm oldData={data} />
     </>
   );
 }

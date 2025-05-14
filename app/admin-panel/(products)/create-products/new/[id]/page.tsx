@@ -1,4 +1,4 @@
-import ProductCreateForm from "@/components/adminPanel/products/ProductCreateForm";
+import ProductCreateForm from "@/components/adminPanel/products/create/ProductCreateForm";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
 import { notFound } from "next/navigation";

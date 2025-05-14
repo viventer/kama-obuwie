@@ -1,5 +1,5 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import CreateProductsPhotosForm from "@/components/adminPanel/products/CreateProductsPhotosForm";
+import CreateProductsPhotosForm from "@/components/adminPanel/products/create/CreateProductsPhotosForm";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
 import { getImageUrl } from "@/server-actions/images/images";

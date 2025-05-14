@@ -1,15 +1,12 @@
 "use client";
 
-import {
-  CategoryWithId,
-  RootCategoryValues,
-} from "@/firebase/schemas/productsSchemas";
+import { CategoryWithId } from "@/firebase/schemas/productsSchemas";
 import { useToast } from "@/hooks/useToast";
 import { updateCategory } from "@/server-actions/products/categories";
 import { useParams, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import SubpageHeading from "../global/SubpageHeading";
+import SubpageHeading from "../../global/SubpageHeading";
 import {
   Form,
   FormControl,
@@ -30,6 +27,7 @@ import {
   SerializedAllegroCategory,
 } from "@/server-actions/allegro/categories";
 import { Button } from "@/components/ui/button";
+import RootCategorySelector from "./RootCategorySelector";
 
 export default function CategoryEditForm({
   oldData,
@@ -100,31 +98,10 @@ export default function CategoryEditForm({
             control={form.control}
             name="rootCategory"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Kategoria główna</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value}
-                  defaultValue="obuwie męskie"
-                >
-                  <FormControl>
-                    <SelectTrigger className="text-base border-primary ">
-                      <SelectValue className="text-base z-50" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="bg-card border-primary">
-                    {RootCategoryValues.map((rootCategory) => (
-                      <SelectItem
-                        key={rootCategory}
-                        value={rootCategory}
-                        className="text-base z-50"
-                      >
-                        {rootCategory}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
+              <RootCategorySelector
+                onChange={field.onChange}
+                value={field.value}
+              />
             )}
           />
           <FormField

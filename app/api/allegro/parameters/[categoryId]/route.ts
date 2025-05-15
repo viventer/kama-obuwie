@@ -16,6 +16,7 @@ export async function GET(
     const productParameters = await getProductParameters(categoryId);
     return apiResponse("Pobrano parametry.", 200, productParameters);
   } catch (err) {
+    console.error("Error fetching product parameters:", err);
     return apiResponse("Błąd pobierania parametrów.", 400);
   }
 }

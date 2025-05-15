@@ -2,9 +2,12 @@ import { NextRequest } from "next/server";
 import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
 import { updateCategory } from "@/server-actions/products/categories";
 
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params;
-  const data = await getDocumentFromAdminDB(id, "categories");
+  const data = await getDocumentFromAdminDB("categories", id);
   if (!data) {
     return apiResponse("Kategoria nie istnieje.", 404);
   }

@@ -12,20 +12,20 @@ type Restrictions = {
   multipleChoices: boolean;
 };
 
-export type AllegroProductParameters = {
+export type AllegroProductParameter = {
   id: string;
   name: string;
-  type: "dictionary";
+  type: "dictionary" | "float" | "integer" | "string" | "boolean";
   required: boolean;
   requiredIf: null;
   displayedIf: null;
-  dictionary: DictionaryValue[];
+  dictionary?: DictionaryValue[];
   restrictions?: Restrictions;
   unit: string | null;
 };
 
 export type AllegroProductParametersResponse = {
-  [key: string]: AllegroProductParameters;
+  [key: string]: AllegroProductParameter;
 };
 
 export async function getProductParameters(

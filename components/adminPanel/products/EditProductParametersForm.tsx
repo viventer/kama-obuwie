@@ -19,13 +19,15 @@ import { Input } from "@/components/ui/input";
 import AddColorVariants from "./AddColorVariants";
 import { Button } from "@/components/ui/button";
 import { useConfirmDialog } from "../global/ConfirmDialogProvider";
-import { FormEvent, useEffect } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import CategorySelector from "./categories/CategorySelector";
 import RootCategorySelector from "./categories/RootCategorySelector";
 import SizingTableSelector from "./sizing-tables/SizingTableSelector";
 import ImageUploader from "../global/uploaders/ImageUploader";
+import AllegroParametersSection from "./AllegroParametersSection";
+import { DocumentDataWithRef } from "@/server-actions/helpers";
 
 export default function EditProductParametersForm({
   oldData,
@@ -59,11 +61,26 @@ export default function EditProductParametersForm({
   const warrantyPeriod = form.watch("warrantyPeriod") as number;
   const areColorVariantsValid =
     colorVariants && colorVariants.length > 0 && colorVariants[0]?.color !== "";
-  const sizingTableId = form.watch("sizingTableId");
+  const categoryId = form.watch("categoryId");
+  const [allegroCategoryId, setAllegroCategoryId] = useState<
+    string | undefined
+  >(undefined);
 
-  // useEffect(() => {
-  //   console.log(sizingTableId);
-  // }, [sizingTableId]);
+  useEffect(() => {
+    if (!categoryId) return;
+
+    (async function () {
+      const { data } = await axios.get<DocumentDataWithRef<CategoryWithId>>(
+        `/api/categories/${categoryId}`
+      );
+      if (!data?.data) {
+        showToast("Błąd pobierania kategorii.", "error");
+        return;
+      }
+      const newAllegroCategoryId = data.data.allegroCategoryId;
+      setAllegroCategoryId(newAllegroCategoryId);
+    })();
+  }, [categoryId]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -221,6 +238,7 @@ export default function EditProductParametersForm({
               value={field.value}
               onChange={field.onChange}
               rootCategory={rootCategory}
+              setAllegroCategoryId={setAllegroCategoryId}
             />
           )}
         />
@@ -232,6 +250,17 @@ export default function EditProductParametersForm({
           }}
           render={({ field }) => (
             <SizingTableSelector
+              value={field.value}
+              onChange={field.onChange}
+            />
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="parameters"
+          render={({ field }) => (
+            <AllegroParametersSection
+              allegroCategoryId={allegroCategoryId}
               value={field.value}
               onChange={field.onChange}
             />

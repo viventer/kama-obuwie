@@ -2,8 +2,7 @@ import {
   CategoryWithId,
   RootCategory,
 } from "@/firebase/schemas/productsSchemas";
-import { useProductTypeContext } from "../ProductsTypeContext";
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/useToast";
 import { FormControl, FormLabel } from "@/components/ui/form";
@@ -19,10 +18,12 @@ export default function CategorySelector({
   value,
   onChange,
   rootCategory,
+  setAllegroCategoryId,
 }: {
   value: string | undefined;
   onChange: (value: string) => void;
   rootCategory: RootCategory | undefined;
+  setAllegroCategoryId: Dispatch<SetStateAction<string | undefined>>;
 }) {
   const { showToast } = useToast();
   const [categories, setCategories] = useState<CategoryWithId[]>([]);
@@ -45,6 +46,17 @@ export default function CategorySelector({
       setCategories(filteredCategories);
     })();
   }, [rootCategory]);
+
+  useEffect(() => {
+    const allegroCategoryId = categories.find(
+      (category) => category.id === value
+    )?.allegroCategoryId;
+
+    if (allegroCategoryId) {
+      console.log("Allegro category ID:", allegroCategoryId);
+      setAllegroCategoryId(allegroCategoryId);
+    }
+  }, [value]);
 
   return (
     <div className={`${categories.length > 0 ? "block" : "hidden"}`}>

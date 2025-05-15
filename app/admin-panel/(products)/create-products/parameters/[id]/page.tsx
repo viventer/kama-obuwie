@@ -1,15 +1,8 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import EditProductParametersForm from "@/components/adminPanel/products/EditProductParametersForm";
-import {
-  CategoryWithId,
-  ProductWithId,
-} from "@/firebase/schemas/productsSchemas";
-import {
-  getDocumentFromAdminDB,
-  getDocumentsFromAdminDB,
-} from "@/server-actions/helpers";
+import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import { getDocumentFromAdminDB } from "@/server-actions/helpers";
 import { getImageUrl } from "@/server-actions/images/images";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 
 type Props = {
@@ -29,21 +22,6 @@ export default async function ProductEditPage(props: Props) {
   const { data } = result;
   if (!data) {
     notFound();
-  }
-  const availableCategories: CategoryWithId[] | null =
-    await getDocumentsFromAdminDB<CategoryWithId>("categories");
-
-  const filteredCategories = availableCategories?.filter((category) => {
-    if (data.productType === "akcesoria") {
-      return category.rootCategory.includes("akcesoria");
-    } else {
-      return category.rootCategory.includes("obuwie");
-    }
-  });
-
-  let samplePhotoUrl: string | null = null;
-  if (data.samplePhoto) {
-    samplePhotoUrl = await getImageUrl(data.samplePhoto);
   }
 
   return (

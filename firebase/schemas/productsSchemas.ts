@@ -77,6 +77,21 @@ export const RawPhotoSchema = z.object({
 
 export const EditedPhotoSchema = RawPhotoSchema;
 
+const ParamValueSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+  z.array(z.string()),
+  z.array(z.number()),
+]);
+
+export const ProductParametersSchema = z.object({
+  required: z.record(z.string(), ParamValueSchema).default({}),
+  optional: z.record(z.string(), ParamValueSchema).default({}),
+});
+
+export type ProductParameters = z.infer<typeof ProductParametersSchema>;
+
 export const ProductSchema = z.object({
   id: z.string().optional(),
   brand: z.string().max(32).optional(),
@@ -88,7 +103,7 @@ export const ProductSchema = z.object({
   shoeTypes: z.array(z.string().min(3).max(32)).default([]).optional(),
   colorVariants: z.array(ColorVariantSchema).default([]).optional(),
   warrantyPeriod: z.number().max(240).default(0).optional(),
-  parameters: z.record(z.string(), z.string()).default({}).optional(),
+  parameters: ProductParametersSchema.default({}),
   description: DescriptionSchema.default([]).optional(),
   purchasePrice: z.number(),
   rootCategory: z.enum(RootCategoryValues).optional(),

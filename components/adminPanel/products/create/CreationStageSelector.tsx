@@ -9,12 +9,15 @@ import {
   TextIcon,
   Wand2Icon,
 } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function CreationStageSelector() {
   const pathname = usePathname();
   const currentStage = pathname.split("/").pop();
+
+  const params = useParams();
+  const isDetailPage = params?.productId || params?.id;
 
   const [selectedStage, setSelectedStage] = useState(currentStage);
   const router = useRouter();
@@ -26,7 +29,9 @@ export default function CreationStageSelector() {
 
   return (
     <Tabs
-      className="fixed left-0 bottom-0 pb-4 w-screen flex flex-row justify-center"
+      className={`${
+        isDetailPage ? "hidden" : "flex"
+      } fixed left-0 bottom-0 pb-4 w-screen flex-row justify-center`}
       onValueChange={onChange}
       value={selectedStage}
     >

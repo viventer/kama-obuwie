@@ -1,8 +1,7 @@
 "use client";
 
 import { SizingTableWithId } from "@/firebase/schemas/productsSchemas";
-import SubpageHeading from "../global/SubpageHeading";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -20,69 +19,70 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent } from "react";
 import { updateSizingTable } from "@/server-actions/products/sizingTables";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
+import FormWrapper from "../../global/form/FormWrapper";
+
+type FormValues = {
+  name: string;
+  insoleLengths: Array<{
+    size: string;
+    insoleLength: string;
+  }>;
+};
 
 export default function SizingTableEditForm({
   oldData,
 }: {
   oldData: SizingTableWithId;
 }) {
-  const params = useParams() as { id: string };
-  const { id } = params;
+  const { id } = useParams() as { id: string };
+  const router = useRouter();
+  const { showToast } = useToast();
 
-  const form = useForm<SizingTableWithId>({
+  const form = useForm<FormValues>({
     defaultValues: {
-      name: oldData.name || "",
+      name: oldData.name,
       insoleLengths: oldData.insoleLengths.map((row) => ({
-        size: row.size ?? 0,
-        insoleLength: row.insoleLength ?? 0,
+        size: String(row.size),
+        insoleLength: String(row.insoleLength),
       })),
     },
   });
 
-  const [newData, setNewData] = useState<SizingTableWithId>(oldData);
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "insoleLengths",
+  });
 
-  useEffect(() => {
-    form.reset(newData);
-  }, [newData, form]);
-
+  // Dodawanie nowego wiersza: większy rozmiar o 1 i długość wkładki o 0.5
   const addRow = (e: FormEvent) => {
     e.preventDefault();
-
-    let newRow;
-    if (newData.insoleLengths.length === 0) {
-      newRow = {
-        size: 0,
-        insoleLength: 0,
-      };
-    } else {
-      const lastSize = newData.insoleLengths[newData.insoleLengths.length - 1];
-      newRow = {
-        size: lastSize.size + 1,
-        insoleLength: lastSize.insoleLength + 0.5,
-      };
-    }
-    setNewData((prev) => ({
-      ...prev,
-      insoleLengths: [...prev.insoleLengths, newRow],
-    }));
+    const values = form.getValues("insoleLengths");
+    const lastRow = values[values.length - 1];
+    const lastSize = lastRow ? Number(lastRow.size) : 0;
+    const lastInsole = lastRow ? Number(lastRow.insoleLength) : 0;
+    append({
+      size: String(lastSize + 1),
+      insoleLength: String((lastInsole + 0.5).toFixed(2)),
+    });
   };
-
-  const { showToast } = useToast();
-  const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const data = form.getValues();
-    const updatedData = {
+    const payload = {
       name: data.name,
-      insoleLengths: data.insoleLengths,
+      insoleLengths: data.insoleLengths.map((row) => ({
+        size: Number(row.size),
+        insoleLength: Number(row.insoleLength),
+      })),
     };
+
     try {
-      await updateSizingTable(id, updatedData);
+      await updateSizingTable(id, payload);
       showToast("Tabela rozmiarów została zaktualizowana.", "success");
       router.push("/admin-panel/sizing-tables");
     } catch (err) {
@@ -91,8 +91,7 @@ export default function SizingTableEditForm({
   };
 
   return (
-    <>
-      <SubpageHeading text="Edytuj tabelę rozmiarów" />
+    <FormWrapper headingText="Edytuj tabelę rozmiarów">
       <Form {...form}>
         <div className="flex flex-col gap-4">
           <FormField
@@ -113,11 +112,12 @@ export default function SizingTableEditForm({
               <TableRow>
                 <TableHead>Rozmiar</TableHead>
                 <TableHead>Długość wkładki</TableHead>
+                <TableHead></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {form.getValues("insoleLengths").map((_, i) => (
-                <TableRow key={i}>
+              {fields.map((field, i) => (
+                <TableRow key={field.id}>
                   <TableCell>
                     <FormField
                       control={form.control}
@@ -128,9 +128,7 @@ export default function SizingTableEditForm({
                             <Input
                               type="number"
                               {...field}
-                              onChange={(e) =>
-                                field.onChange(Number(e.target.value))
-                              }
+                              onChange={(e) => field.onChange(e.target.value)}
                               className="border-none"
                             />
                           </FormControl>
@@ -149,15 +147,19 @@ export default function SizingTableEditForm({
                             <Input
                               type="number"
                               {...field}
-                              onChange={(e) =>
-                                field.onChange(Number(e.target.value))
-                              }
+                              onChange={(e) => field.onChange(e.target.value)}
                               className="border-none"
                             />
                           </FormControl>
                         </FormItem>
                       )}
                     />
+                  </TableCell>
+
+                  <TableCell>
+                    <Button variant="ghost" size="sm" onClick={() => remove(i)}>
+                      Usuń
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -172,12 +174,12 @@ export default function SizingTableEditForm({
             type="submit"
             variant="outline"
             className="mt-8 w-fit"
-            onClick={(e) => handleSubmit(e)}
+            onClick={handleSubmit}
           >
             Zapisz
           </Button>
         </div>
       </Form>
-    </>
+    </FormWrapper>
   );
 }

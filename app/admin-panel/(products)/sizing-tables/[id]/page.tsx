@@ -1,4 +1,4 @@
-import SizingTableEditForm from "@/components/adminPanel/products/SizingTableEditForm";
+import SizingTableEditForm from "@/components/adminPanel/products/sizing-tables/SizingTableEditForm";
 import { SizingTableWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
 import { notFound } from "next/navigation";

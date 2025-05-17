@@ -1,5 +1,5 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import SizingTablesDataTable from "@/components/adminPanel/products/SizingTablesDataTable";
+import SizingTablesDataTable from "@/components/adminPanel/products/sizing-tables/SizingTablesDataTable";
 import { SizingTableWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentsFromAdminDB } from "@/server-actions/helpers";
 

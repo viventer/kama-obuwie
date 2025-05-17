@@ -1,7 +1,6 @@
 "use client";
 
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
-import { DataTable } from "../global/DataTable";
 import {
   SizingTable,
   SizingTableWithId,
@@ -19,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useToast } from "@/hooks/useToast";
 import { useConfirmDialog } from "@/components/adminPanel/global/ConfirmDialogProvider";
+import { DataTable } from "../../global/data-table/DataTable";
 
 export default function SizingTablesDataTable({
   data,

@@ -1,3 +1,4 @@
+import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import EditProductParametersForm from "@/components/adminPanel/products/EditProductParametersForm";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
@@ -25,9 +26,8 @@ export default async function ProductEditPage(props: Props) {
   }
 
   return (
-    <>
-      <SubpageHeading text={`Uzupełnij parametry produktu`} />
+    <FormWrapper headingText="Uzupełnij parametry produktu">
       <EditProductParametersForm oldData={data} />
-    </>
+    </FormWrapper>
   );
 }

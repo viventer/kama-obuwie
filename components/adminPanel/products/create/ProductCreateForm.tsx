@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/useToast";
 import axios from "axios";
 import { useConfirmDialog } from "../../global/ConfirmDialogProvider";
 import ImageUploader from "../../global/uploaders/ImageUploader";
+import FormWrapper from "../../global/form/FormWrapper";
 
 export default function ProductCreateForm({
   oldData,
@@ -88,9 +89,8 @@ export default function ProductCreateForm({
     colorVariants && colorVariants.length > 0 && colorVariants[0]?.color !== "";
 
   return (
-    <>
-      <SubpageHeading text="Utwórz produkt" />
-      <div className="max-w-[300px] flex flex-col gap-4">
+    <FormWrapper headingText="Utwórz produkt">
+      <div className="flex flex-col gap-4">
         <Form {...form}>
           <FormField
             rules={{ required: "Zdjęcie poglądowe jest wymagane" }}
@@ -190,6 +190,6 @@ export default function ProductCreateForm({
           </div>
         </Form>
       </div>
-    </>
+    </FormWrapper>
   );
 }

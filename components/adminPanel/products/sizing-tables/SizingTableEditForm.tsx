@@ -57,7 +57,6 @@ export default function SizingTableEditForm({
     name: "insoleLengths",
   });
 
-  // Dodawanie nowego wiersza: większy rozmiar o 1 i długość wkładki o 0.5
   const addRow = (e: FormEvent) => {
     e.preventDefault();
     const values = form.getValues("insoleLengths");

@@ -106,7 +106,7 @@ export default function ImageUploader({
   };
 
   return (
-    <div className={cn("flex flex-col gap-2", className)}>
+    <div className={cn("flex flex-col gap-2 max-w-xs", className)}>
       <div
         {...getRootProps()}
         className="border-2 border-dashed rounded text-center cursor-pointer w-full aspect-[3/2] flex items-center justify-center relative bg-primary/15"

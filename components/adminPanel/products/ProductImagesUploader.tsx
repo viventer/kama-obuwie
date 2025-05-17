@@ -5,11 +5,11 @@ import {
   EditedPhoto,
   RawPhoto,
 } from "@/firebase/schemas/productsSchemas";
-import MultipleImageUploader from "../global/MultipleImageUploader";
 import { Dispatch, useEffect, useState } from "react";
-import { getColorVariantName } from "./helpers/productsHelpers";
 import { deleteRawPhoto } from "@/server-actions/images/images";
 import { useParams } from "next/navigation";
+import MultipleImageUploader from "../global/uploaders/MultipleImageUploader";
+import { getColorVariantName } from "./helpers/productsHelpers";
 
 export default function ProductImagesUploader({
   variant,

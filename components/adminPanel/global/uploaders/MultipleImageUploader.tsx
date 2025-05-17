@@ -5,12 +5,10 @@ import { useDropzone } from "react-dropzone";
 import {
   deleteImageFromStorage,
   getImagesUrls,
-  getImageUrl,
   uploadImageToStorage,
 } from "@/server-actions/images/images";
 import { useToast } from "@/hooks/useToast";
 import { cn } from "@/lib/utils";
-import { getNewFileName } from "./helpers/files";
 
 import {
   DndContext,
@@ -26,6 +24,7 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import SortableImage from "./SortableImage";
+import { getNewFileName } from "../helpers/files";
 
 interface MultipleImageUploaderProps {
   setFilePaths: (filePaths: string[]) => void;

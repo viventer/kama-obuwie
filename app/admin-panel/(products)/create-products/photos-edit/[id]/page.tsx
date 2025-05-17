@@ -1,3 +1,4 @@
+import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import CreateProductsPhotosForm from "@/components/adminPanel/products/create/CreateProductsPhotosForm";
 import { Button } from "@/components/ui/button";
@@ -43,8 +44,7 @@ export default async function ProductEditPage(props: Props) {
   });
 
   return (
-    <>
-      <SubpageHeading text={`Dodaj edytowane zdjęcia do produktu`} />
+    <FormWrapper headingText="Dodaj edytowane zdjęcia do produktu">
       {samplePhotoUrl && (
         <section className="mb-8">
           <Image
@@ -66,6 +66,6 @@ export default async function ProductEditPage(props: Props) {
         </Link>
       </Button>
       <CreateProductsPhotosForm productData={data} creationStage="photosEdit" />
-    </>
+    </FormWrapper>
   );
 }

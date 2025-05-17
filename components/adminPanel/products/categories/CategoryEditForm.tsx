@@ -6,7 +6,6 @@ import { updateCategory } from "@/server-actions/products/categories";
 import { useParams, useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import SubpageHeading from "../../global/SubpageHeading";
 import {
   Form,
   FormControl,
@@ -28,6 +27,7 @@ import {
 } from "@/server-actions/allegro/categories";
 import { Button } from "@/components/ui/button";
 import RootCategorySelector from "./RootCategorySelector";
+import FormWrapper from "../../global/form/FormWrapper";
 
 export default function CategoryEditForm({
   oldData,
@@ -77,8 +77,7 @@ export default function CategoryEditForm({
   };
 
   return (
-    <div className="w-full max-w-lg">
-      <SubpageHeading text="Edytuj kategorię" />
+    <FormWrapper headingText="Edytuj kategorię">
       <Form {...form}>
         <div className="flex flex-col gap-4">
           <FormField
@@ -154,6 +153,6 @@ export default function CategoryEditForm({
           </Button>
         </div>
       </Form>
-    </div>
+    </FormWrapper>
   );
 }

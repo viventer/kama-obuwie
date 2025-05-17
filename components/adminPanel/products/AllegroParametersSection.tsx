@@ -6,6 +6,12 @@ import { useEffect, useState } from "react";
 import { ProductParameters } from "@/firebase/schemas/productsSchemas";
 import AllegroParametersSectionFormItem from "./AllegroParametersSectionFormItem";
 import MiniLoader from "../global/MiniLoader";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 
 export const allegroParametersToSkip = [
   "Marka",
@@ -35,9 +41,7 @@ export default function AllegroParametersSection({
   const optionalValues = value?.optional || {};
 
   useEffect(() => {
-    if (!allegroCategoryId) {
-      return;
-    }
+    if (!allegroCategoryId) return;
 
     const fetchParameters = async () => {
       try {
@@ -46,15 +50,15 @@ export default function AllegroParametersSection({
         );
         const listData: AllegroProductParameter[] = Object.values(data);
         const optional = listData.filter(
-          (parameter) =>
-            (parameter.required === false || parameter.name === "EAN (GTIN)") &&
-            !allegroParametersToSkip.includes(parameter.name)
+          (p) =>
+            (p.required === false || p.name === "EAN (GTIN)") &&
+            !allegroParametersToSkip.includes(p.name)
         );
         const required = listData.filter(
-          (parameter) =>
-            parameter.required === true &&
-            parameter.name !== "EAN (GTIN)" &&
-            !allegroParametersToSkip.includes(parameter.name)
+          (p) =>
+            p.required === true &&
+            p.name !== "EAN (GTIN)" &&
+            !allegroParametersToSkip.includes(p.name)
         );
 
         setOptionalParameters(optional);
@@ -78,26 +82,42 @@ export default function AllegroParametersSection({
   }
 
   return (
-    <section className="flex flex-col gap-4">
-      {requiredParameters?.map((parameter) => (
-        <AllegroParametersSectionFormItem
-          parameter={parameter}
-          onChange={onChange}
-          optionalValues={optionalValues}
-          requiredValues={requiredValues}
-          key={parameter.name}
-        />
-      ))}
+    <section className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
+        {requiredParameters.map((parameter) => (
+          <AllegroParametersSectionFormItem
+            key={parameter.name}
+            parameter={parameter}
+            onChange={onChange}
+            optionalValues={optionalValues}
+            requiredValues={requiredValues}
+          />
+        ))}
+      </div>
 
-      {optionalParameters?.map((parameter) => (
-        <AllegroParametersSectionFormItem
-          parameter={parameter}
-          onChange={onChange}
-          optionalValues={optionalValues}
-          requiredValues={requiredValues}
-          key={parameter.name}
-        />
-      ))}
+      <Accordion
+        type="single"
+        collapsible
+        defaultValue=""
+        className="shadow-md bg-background/50 rounded-sm max-w-md px-4"
+      >
+        <AccordionItem value="optional">
+          <AccordionTrigger className="font-semibold text-lg hover:cursor-pointer">
+            Parametry opcjonalne
+          </AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-4 pt-2">
+            {optionalParameters.map((parameter) => (
+              <AllegroParametersSectionFormItem
+                key={parameter.name}
+                parameter={parameter}
+                onChange={onChange}
+                optionalValues={optionalValues}
+                requiredValues={requiredValues}
+              />
+            ))}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </section>
   );
 }

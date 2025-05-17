@@ -53,15 +53,11 @@ export default function EditProductParametersForm({
       parameters: oldData?.parameters || {},
       rootCategory: oldData?.rootCategory,
     },
+    mode: "onSubmit",
   });
 
-  const colorVariants = form.watch("colorVariants");
-  const rootCategory = form.watch("rootCategory");
-  const purchasePrice = form.watch("purchasePrice");
-  const warrantyPeriod = form.watch("warrantyPeriod") as number;
-  const areColorVariantsValid =
-    colorVariants && colorVariants.length > 0 && colorVariants[0]?.color !== "";
   const categoryId = form.watch("categoryId");
+  const rootCategory = form.watch("rootCategory");
   const [allegroCategoryId, setAllegroCategoryId] = useState<
     string | undefined
   >(undefined);
@@ -88,6 +84,27 @@ export default function EditProductParametersForm({
     data.purchasePrice = Number(data.purchasePrice);
     data.warrantyPeriod = Number(data.warrantyPeriod);
     data.productType = productType;
+
+    const hasValidColorVariants =
+      productType !== "obuwie" ||
+      (data.colorVariants &&
+        data.colorVariants.length > 0 &&
+        data.colorVariants[0]?.color !== "");
+    const purchasePriceValid = Number(data.purchasePrice) > 0;
+    const warrantyPeriodValid = Number(data.warrantyPeriod) >= 0;
+
+    const isValid = await form.trigger();
+
+    if (
+      !isValid ||
+      !hasValidColorVariants ||
+      !purchasePriceValid ||
+      !warrantyPeriodValid
+    ) {
+      showToast("Proszę poprawić błędy w formularzu.", "error");
+      return;
+    }
+
     try {
       if (oldData) {
         const resp = await axios.patch(`/api/products/${oldData.id}`, data);
@@ -258,6 +275,23 @@ export default function EditProductParametersForm({
         <FormField
           control={form.control}
           name="parameters"
+          rules={{
+            validate: (value) => {
+              const entries = Object.entries(value.required || {});
+              const allFilled = entries.every(([_, val]) => {
+                if (typeof val === "string") {
+                  return val.trim() !== "";
+                }
+                if (Array.isArray(val)) {
+                  return val.length > 0;
+                }
+                return val !== null && val !== undefined;
+              });
+              return (
+                allFilled || "Musisz uzupełnić wszystkie wymagane parametry."
+              );
+            },
+          }}
           render={({ field }) => (
             <AllegroParametersSection
               allegroCategoryId={allegroCategoryId}
@@ -267,16 +301,7 @@ export default function EditProductParametersForm({
           )}
         />
         <div className="flex mt-8 gap-4">
-          <Button
-            onClick={(e) => handleSubmit(e)}
-            className="w-fit"
-            disabled={
-              !form.formState.isValid ||
-              (productType === "obuwie" && !areColorVariantsValid) ||
-              purchasePrice <= 0 ||
-              warrantyPeriod < 0
-            }
-          >
+          <Button onClick={(e) => handleSubmit(e)} className="w-fit">
             Zapisz
           </Button>
           <Button

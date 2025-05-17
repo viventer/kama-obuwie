@@ -7,18 +7,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+export type Option = {
+  name: string;
+  value: string;
+};
+
 export default function SingleSelect({
   label,
   onChange,
   value,
   defaultValue,
   availableOptions,
+  placeholder = "Wybierz",
 }: {
   label: string;
   onChange: (...event: any[]) => void;
   value: string | undefined;
   defaultValue?: string;
-  availableOptions: string[];
+  placeholder?: string;
+  availableOptions: Option[];
 }) {
   return (
     <FormItem>
@@ -30,13 +37,17 @@ export default function SingleSelect({
       >
         <FormControl>
           <SelectTrigger className="text-base border-primary ">
-            <SelectValue className="text-base z-50" placeholder="Wybierz" />
+            <SelectValue className="text-base z-50" placeholder={placeholder} />
           </SelectTrigger>
         </FormControl>
         <SelectContent className="bg-card border-primary">
           {availableOptions.map((option) => (
-            <SelectItem key={option} value={option} className="text-base z-50">
-              {option}
+            <SelectItem
+              key={option.value}
+              value={option.value}
+              className="text-base z-50"
+            >
+              {option.name}
             </SelectItem>
           ))}
         </SelectContent>

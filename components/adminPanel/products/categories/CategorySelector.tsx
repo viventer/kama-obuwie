@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import SingleSelect from "../../global/form/SingleSelect";
 
 export default function CategorySelector({
   value,
@@ -60,25 +61,15 @@ export default function CategorySelector({
 
   return (
     <div className={`${categories.length > 0 ? "block" : "hidden"}`}>
-      <FormLabel className="mb-2">Kategoria</FormLabel>
-      <FormControl>
-        <Select value={value} onValueChange={onChange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Wybierz" />
-            <SelectContent className="bg-card border-primary">
-              {categories.map((category, i) => (
-                <SelectItem
-                  key={i}
-                  value={category.id}
-                  className="text-base z-50 focus:bg-secondary focus:text-foreground dark:focus:text-text hover:cursor-pointer"
-                >
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </SelectTrigger>
-        </Select>
-      </FormControl>
+      <SingleSelect
+        label="Kategoria"
+        onChange={onChange}
+        value={value}
+        availableOptions={categories.map((category) => ({
+          name: category.name,
+          value: category.id,
+        }))}
+      />
     </div>
   );
 }

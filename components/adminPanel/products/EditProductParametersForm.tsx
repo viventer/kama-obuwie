@@ -122,7 +122,7 @@ export default function EditProductParametersForm({
   };
 
   return (
-    <div className="max-w-[300px] flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <Form {...form}>
         <FormField
           rules={{ required: "Zdjęcie poglądowe jest wymagane" }}

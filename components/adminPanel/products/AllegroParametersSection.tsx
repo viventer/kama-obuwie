@@ -101,7 +101,6 @@ export default function AllegroParametersSection({
           parameter.type === "dictionary" &&
           parameter.restrictions?.multipleChoices
         ) {
-          // traktujemy jako optional, bo multipick
           return (
             <MultipleSelect
               key={nameKey}
@@ -109,7 +108,10 @@ export default function AllegroParametersSection({
               value={(optionalValues[nameKey] as string[]) || []}
               onChange={(vals) => handleParamChange(nameKey, vals, true)}
               availableOptions={
-                parameter.dictionary?.map((el) => el.value) || []
+                parameter.dictionary?.map((el) => ({
+                  name: el.value,
+                  value: el.value,
+                })) || []
               }
             />
           );
@@ -123,7 +125,10 @@ export default function AllegroParametersSection({
               value={current}
               onChange={(val) => handleParamChange(nameKey, val, false)}
               availableOptions={
-                parameter.dictionary?.map((el) => el.value) || []
+                parameter.dictionary?.map((el) => ({
+                  name: el.value,
+                  value: el.value,
+                })) || []
               }
             />
           );
@@ -174,7 +179,10 @@ export default function AllegroParametersSection({
               value={(optionalValues[nameKey] as string[]) || []}
               onChange={(vals) => handleParamChange(nameKey, vals, true)}
               availableOptions={
-                parameter.dictionary?.map((el) => el.value) || []
+                parameter.dictionary?.map((el) => ({
+                  name: el.value,
+                  value: el.value,
+                })) || []
               }
             />
           );
@@ -188,7 +196,10 @@ export default function AllegroParametersSection({
               value={current as string}
               onChange={(val) => handleParamChange(nameKey, val, false)}
               availableOptions={
-                parameter.dictionary?.map((el) => el.value) || []
+                parameter.dictionary?.map((el) => ({
+                  name: el.value,
+                  value: el.value,
+                })) || []
               }
             />
           );

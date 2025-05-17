@@ -1,5 +1,5 @@
 import React from "react";
-import { FormControl, FormItem, FormLabel } from "@/components/ui/form";
+import { FormItem, FormLabel } from "@/components/ui/form";
 import {
   Popover,
   PopoverContent,
@@ -8,12 +8,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronDown } from "lucide-react";
+import { Option } from "./SingleSelect";
 
 interface MultiSelectProps {
   label: string;
   value: string[];
   onChange: (values: string[]) => void;
-  availableOptions: string[];
+  availableOptions: Option[];
 }
 
 export default function MultipleSelect({
@@ -45,14 +46,14 @@ export default function MultipleSelect({
         <PopoverContent className="w-full max-h-60 overflow-auto">
           {availableOptions.map((option) => (
             <div
-              key={option}
+              key={option.value}
               className="flex items-center space-x-2 p-2 hover:bg-accent hover:rounded"
             >
               <Checkbox
-                checked={isSelected(option)}
-                onCheckedChange={() => toggleOption(option)}
+                checked={isSelected(option.value)}
+                onCheckedChange={() => toggleOption(option.value)}
               />
-              <span className="text-base">{option}</span>
+              <span className="text-base">{option.name}</span>
             </div>
           ))}
         </PopoverContent>

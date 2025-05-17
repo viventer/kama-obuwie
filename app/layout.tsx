@@ -32,7 +32,7 @@ export default async function RootLayout({
       className="scrollbar scrollbar-track-transparent scrollbar-thumb-primary overflow-hidden"
     >
       <body
-        className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen overflow-auto scrollbar pb-8`}
+        className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen overflow-auto scrollbar pb-8  [scrollbar-gutter:stable]`}
       >
         <ConfirmDialogProvider>
           {children}

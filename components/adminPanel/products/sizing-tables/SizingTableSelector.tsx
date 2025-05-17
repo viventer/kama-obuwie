@@ -4,7 +4,6 @@ import {
   SelectTrigger,
   SelectValue,
   SelectContent,
-  SelectItem,
 } from "@/components/ui/select";
 import {
   Command,

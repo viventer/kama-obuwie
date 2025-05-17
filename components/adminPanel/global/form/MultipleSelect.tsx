@@ -1,12 +1,12 @@
 import React from "react";
 import { FormItem, FormLabel } from "@/components/ui/form";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronDown } from "lucide-react";
 import { Option } from "./SingleSelect";
 
@@ -34,30 +34,27 @@ export default function MultipleSelect({
   };
 
   return (
-    <FormItem>
+    <FormItem className="w-full">
       <FormLabel>{label}</FormLabel>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button className="justify-between w-full text-base">
-            {value.length > 0 ? value.join(", ") : "Wybierz..."}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button className="justify-between w-full text-base  bg-transparent border-input focus-visible:border-secondary border hover:bg-primary/15 hover:cursor-pointer font-normal">
+            {value.length > 0 ? value.join(", ") : "Wybierz"}
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-full max-h-60 overflow-auto">
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-md max-h-60 overflow-auto scrollbar">
           {availableOptions.map((option) => (
-            <div
+            <DropdownMenuCheckboxItem
               key={option.value}
-              className="flex items-center space-x-2 p-2 hover:bg-accent hover:rounded"
+              checked={isSelected(option.value)}
+              onCheckedChange={() => toggleOption(option.value)}
             >
-              <Checkbox
-                checked={isSelected(option.value)}
-                onCheckedChange={() => toggleOption(option.value)}
-              />
-              <span className="text-base">{option.name}</span>
-            </div>
+              {option.name}
+            </DropdownMenuCheckboxItem>
           ))}
-        </PopoverContent>
-      </Popover>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </FormItem>
   );
 }

@@ -92,6 +92,13 @@ export const ProductParametersSchema = z.object({
 
 export type ProductParameters = z.infer<typeof ProductParametersSchema>;
 
+export const rangeSizeSchema = z.object({
+  from: z.number(),
+  to: z.number(),
+});
+
+export type RangeSize = z.infer<typeof rangeSizeSchema>;
+
 export const ProductSchema = z.object({
   id: z.string().optional(),
   brand: z.string().max(32).optional(),
@@ -104,6 +111,7 @@ export const ProductSchema = z.object({
   colorVariants: z.array(ColorVariantSchema).default([]).optional(),
   warrantyPeriod: z.number().max(240).default(0).optional(),
   parameters: ProductParametersSchema.default({}),
+  rangeSizes: z.array(rangeSizeSchema).optional(),
   description: DescriptionSchema.default([]).optional(),
   purchasePrice: z.number(),
   rootCategory: z.enum(RootCategoryValues).optional(),

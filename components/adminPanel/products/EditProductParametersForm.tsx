@@ -1,4 +1,3 @@
-// EditProductParametersForm.tsx
 "use client";
 
 import {
@@ -29,6 +28,7 @@ import SizingTableSelector from "./sizing-tables/SizingTableSelector";
 import ImageUploader from "../global/uploaders/ImageUploader";
 import AllegroParametersSection from "./AllegroParametersSection";
 import { DocumentDataWithRef } from "@/server-actions/helpers";
+import RangeSizesFormItem from "./RangeSizesFormItem";
 
 export default function EditProductParametersForm({
   oldData,
@@ -53,6 +53,7 @@ export default function EditProductParametersForm({
       sizingTableId: oldData?.sizingTableId || "",
       parameters: oldData?.parameters || {},
       rootCategory: oldData?.rootCategory,
+      rangeSizes: oldData?.rangeSizes || [],
     },
     mode: "onSubmit",
   });
@@ -232,7 +233,21 @@ export default function EditProductParametersForm({
               )}
             />
           </>
-        ) : null}
+        ) : (
+          <FormField
+            control={form.control}
+            name="rangeSizes"
+            rules={{
+              required: "Zakresy rozmiarów są wymagane",
+            }}
+            render={({ field }) => (
+              <RangeSizesFormItem
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="warrantyPeriod"

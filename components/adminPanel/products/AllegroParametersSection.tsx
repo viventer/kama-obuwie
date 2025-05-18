@@ -1,13 +1,9 @@
-// AllegroParametersSection.tsx
 "use client";
 
 import { AllegroProductParameter } from "@/server-actions/allegro/products";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import {
-  ProductParameters,
-  ProductWithId,
-} from "@/firebase/schemas/productsSchemas";
+import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import AllegroParametersSectionFormItem from "./AllegroParametersSectionFormItem";
 import MiniLoader from "../global/MiniLoader";
 import {
@@ -26,6 +22,7 @@ export const allegroParametersToSkip = [
   "Kolor",
   "Odcień",
   "Kolor dodatkowy",
+  "Rozmiar zakresowy",
 ];
 
 export default function AllegroParametersSection({

@@ -56,13 +56,34 @@ export default function CreateProductsParametersDataTable({
 
   const router = useRouter();
   const { showToast } = useToast();
-  const { showDialog } = useConfirmDialog();
 
   const actions: TableAction[] = [
     {
       name: "Przenieś dalej",
       onClick: async (id) => {
         try {
+          const productData = data?.find((product) => product.id === id);
+          const requiredParameters = productData?.parameters?.required;
+          if (!requiredParameters) {
+            showToast(
+              "Nie można przenieść produktu. Brak wymaganych parametrów.",
+              "error"
+            );
+            return;
+          }
+          const allRequiredFilled = Object.values(requiredParameters).every(
+            (value) => {
+              if (Array.isArray(value)) return value.length > 0;
+              return value !== null && value !== undefined && value !== "";
+            }
+          );
+          if (!allRequiredFilled) {
+            showToast(
+              "Nie można przenieść produktu. Uzupełnij wszystkie wymagane parametry.",
+              "error"
+            );
+            return;
+          }
           const updateData: Partial<Product> = {
             creationStage: "description",
           };

@@ -90,7 +90,7 @@ export default function AllegroParametersSection({
             key={parameter.name}
             control={control}
             name={`parameters.required.${parameter.name}`}
-            defaultValue={currentParams.required[parameter.name] || ""}
+            defaultValue={currentParams?.required?.[parameter.name] || ""}
             rules={{ required: true }}
             render={({ field }) => (
               <AllegroParametersSectionFormItem
@@ -120,7 +120,7 @@ export default function AllegroParametersSection({
                 key={parameter.name}
                 control={control}
                 name={`parameters.optional.${parameter.name}`}
-                defaultValue={currentParams.optional[parameter.name] || ""}
+                defaultValue={currentParams?.required?.[parameter.name] || ""}
                 render={({ field }) => (
                   <AllegroParametersSectionFormItem
                     key={parameter.name}

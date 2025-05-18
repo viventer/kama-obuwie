@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { FormControl, FormItem, FormLabel } from "@/components/ui/form";
 import {
   Select,
@@ -6,6 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import IconButton from "../IconButton";
+import { XIcon } from "lucide-react";
 
 export type Option = {
   name: string;
@@ -30,28 +33,36 @@ export default function SingleSelect({
   return (
     <FormItem>
       <FormLabel>{label}</FormLabel>
-      <Select
-        onValueChange={onChange}
-        value={value}
-        defaultValue={defaultValue}
-      >
-        <FormControl>
-          <SelectTrigger className="text-base border-primary ">
-            <SelectValue className="text-base z-50" placeholder={placeholder} />
-          </SelectTrigger>
-        </FormControl>
-        <SelectContent className="bg-card border-primary">
-          {availableOptions.map((option) => (
-            <SelectItem
-              key={option.value}
-              value={option.value}
-              className="text-base z-50"
-            >
-              {option.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex gap-2">
+        <Select
+          onValueChange={onChange}
+          value={value}
+          defaultValue={defaultValue}
+        >
+          <FormControl>
+            <SelectTrigger className="text-base border-primary ">
+              <SelectValue
+                className="text-base z-50"
+                placeholder={placeholder}
+              />
+            </SelectTrigger>
+          </FormControl>
+          <SelectContent className="bg-card border-primary">
+            {availableOptions.map((option) => (
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                className="text-base z-50"
+              >
+                {option.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <IconButton onClick={() => onChange("")} className="text-primary">
+          <XIcon className="size-6" />
+        </IconButton>
+      </div>
     </FormItem>
   );
 }

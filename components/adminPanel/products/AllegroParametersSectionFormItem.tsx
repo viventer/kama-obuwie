@@ -1,4 +1,3 @@
-// AllegroParametersSectionFormItem.tsx
 import { AllegroProductParameter } from "@/server-actions/allegro/products";
 import MultipleSelect from "../global/form/MultipleSelect";
 import SingleSelect from "../global/form/SingleSelect";

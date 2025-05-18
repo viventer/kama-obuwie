@@ -5,14 +5,6 @@ import {
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/useToast";
-import { FormControl, FormLabel } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import SingleSelect from "../../global/form/SingleSelect";
 
 export default function CategorySelector({
@@ -54,7 +46,6 @@ export default function CategorySelector({
     )?.allegroCategoryId;
 
     if (allegroCategoryId) {
-      console.log("Allegro category ID:", allegroCategoryId);
       setAllegroCategoryId(allegroCategoryId);
     }
   }, [value]);

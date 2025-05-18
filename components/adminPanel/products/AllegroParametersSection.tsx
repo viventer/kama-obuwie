@@ -62,6 +62,8 @@ export default function AllegroParametersSection({
             !allegroParametersToSkip.includes(p.name)
         );
 
+        console.log("Optional parameters:", optional);
+        console.log("Required parameters:", required);
         setOptionalParameters(optional);
         setRequiredParameters(required);
       } catch (error) {
@@ -72,20 +74,18 @@ export default function AllegroParametersSection({
     fetchParameters();
   }, [allegroCategoryId]);
 
-  if (
-    !requiredParameters ||
-    requiredParameters.length === 0 ||
-    !optionalParameters ||
-    optionalParameters.length === 0 ||
-    !allegroCategoryId
-  ) {
+  if (!allegroCategoryId) {
+    return null;
+  }
+
+  if (!optionalParameters || optionalParameters.length === 0) {
     return <MiniLoader />;
   }
 
   return (
     <section className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
-        {requiredParameters.map((parameter) => (
+        {requiredParameters?.map((parameter) => (
           <Controller
             key={parameter.name}
             control={control}

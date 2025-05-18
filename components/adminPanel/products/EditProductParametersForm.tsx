@@ -96,8 +96,6 @@ export default function EditProductParametersForm({
 
     const isValid = await form.trigger();
 
-    console.log(data);
-
     if (
       !isValid ||
       !hasValidColorVariants ||
@@ -205,17 +203,35 @@ export default function EditProductParametersForm({
           )}
         />
         {productType === "obuwie" ? (
-          <FormField
-            control={form.control}
-            name="colorVariants"
-            rules={{
-              required:
-                "Przynajmniej jeden wariant kolorystyczny jest wymagany.",
-            }}
-            render={({ field }) => (
-              <AddColorVariants value={field.value} onChange={field.onChange} />
-            )}
-          />
+          <>
+            <FormField
+              control={form.control}
+              name="colorVariants"
+              rules={{
+                required:
+                  "Przynajmniej jeden wariant kolorystyczny jest wymagany.",
+              }}
+              render={({ field }) => (
+                <AddColorVariants
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="sizingTableId"
+              rules={{
+                required: "Tabela rozmiarów jest wymagana.",
+              }}
+              render={({ field }) => (
+                <SizingTableSelector
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              )}
+            />
+          </>
         ) : null}
         <FormField
           control={form.control}
@@ -259,19 +275,6 @@ export default function EditProductParametersForm({
               onChange={field.onChange}
               rootCategory={rootCategory}
               setAllegroCategoryId={setAllegroCategoryId}
-            />
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="sizingTableId"
-          rules={{
-            required: "Tabela rozmiarów jest wymagana.",
-          }}
-          render={({ field }) => (
-            <SizingTableSelector
-              value={field.value}
-              onChange={field.onChange}
             />
           )}
         />

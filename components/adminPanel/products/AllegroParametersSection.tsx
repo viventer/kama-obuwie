@@ -1,9 +1,13 @@
+// AllegroParametersSection.tsx
 "use client";
 
 import { AllegroProductParameter } from "@/server-actions/allegro/products";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { ProductParameters } from "@/firebase/schemas/productsSchemas";
+import {
+  ProductParameters,
+  ProductWithId,
+} from "@/firebase/schemas/productsSchemas";
 import AllegroParametersSectionFormItem from "./AllegroParametersSectionFormItem";
 import MiniLoader from "../global/MiniLoader";
 import {
@@ -12,6 +16,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+import { Controller, useFormContext } from "react-hook-form";
 
 export const allegroParametersToSkip = [
   "Marka",
@@ -25,20 +30,16 @@ export const allegroParametersToSkip = [
 
 export default function AllegroParametersSection({
   allegroCategoryId,
-  value,
-  onChange,
 }: {
   allegroCategoryId: string | undefined;
-  value: ProductParameters;
-  onChange: (newParams: ProductParameters) => void;
 }) {
   const [optionalParameters, setOptionalParameters] =
     useState<AllegroProductParameter[]>();
   const [requiredParameters, setRequiredParameters] =
     useState<AllegroProductParameter[]>();
 
-  const requiredValues = value?.required || {};
-  const optionalValues = value?.optional || {};
+  const { control, watch } = useFormContext<ProductWithId>();
+  const currentParams = watch("parameters") || { required: {}, optional: {} };
 
   useEffect(() => {
     if (!allegroCategoryId) return;
@@ -85,12 +86,20 @@ export default function AllegroParametersSection({
     <section className="flex flex-col gap-6">
       <div className="flex flex-col gap-4">
         {requiredParameters.map((parameter) => (
-          <AllegroParametersSectionFormItem
+          <Controller
             key={parameter.name}
-            parameter={parameter}
-            onChange={onChange}
-            optionalValues={optionalValues}
-            requiredValues={requiredValues}
+            control={control}
+            name={`parameters.required.${parameter.name}`}
+            defaultValue={currentParams.required[parameter.name] || ""}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <AllegroParametersSectionFormItem
+                key={parameter.name}
+                parameter={parameter}
+                onChange={field.onChange}
+                value={field.value}
+              />
+            )}
           />
         ))}
       </div>
@@ -107,12 +116,19 @@ export default function AllegroParametersSection({
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 pt-2">
             {optionalParameters.map((parameter) => (
-              <AllegroParametersSectionFormItem
+              <Controller
                 key={parameter.name}
-                parameter={parameter}
-                onChange={onChange}
-                optionalValues={optionalValues}
-                requiredValues={requiredValues}
+                control={control}
+                name={`parameters.optional.${parameter.name}`}
+                defaultValue={currentParams.optional[parameter.name] || ""}
+                render={({ field }) => (
+                  <AllegroParametersSectionFormItem
+                    key={parameter.name}
+                    parameter={parameter}
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
+                )}
               />
             ))}
           </AccordionContent>

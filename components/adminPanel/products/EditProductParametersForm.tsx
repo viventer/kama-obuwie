@@ -1,3 +1,4 @@
+// EditProductParametersForm.tsx
 "use client";
 
 import {
@@ -95,13 +96,15 @@ export default function EditProductParametersForm({
 
     const isValid = await form.trigger();
 
+    console.log(data);
+
     if (
       !isValid ||
       !hasValidColorVariants ||
       !purchasePriceValid ||
       !warrantyPeriodValid
     ) {
-      showToast("Proszę poprawić błędy w formularzu.", "error");
+      showToast("W formularzu występują błędy.", "error");
       return;
     }
 
@@ -272,34 +275,9 @@ export default function EditProductParametersForm({
             />
           )}
         />
-        <FormField
-          control={form.control}
-          name="parameters"
-          rules={{
-            validate: (value) => {
-              const entries = Object.entries(value.required || {});
-              const allFilled = entries.every(([_, val]) => {
-                if (typeof val === "string") {
-                  return val.trim() !== "";
-                }
-                if (Array.isArray(val)) {
-                  return val.length > 0;
-                }
-                return val !== null && val !== undefined;
-              });
-              return (
-                allFilled || "Musisz uzupełnić wszystkie wymagane parametry."
-              );
-            },
-          }}
-          render={({ field }) => (
-            <AllegroParametersSection
-              allegroCategoryId={allegroCategoryId}
-              value={field.value}
-              onChange={field.onChange}
-            />
-          )}
-        />
+
+        <AllegroParametersSection allegroCategoryId={allegroCategoryId} />
+
         <div className="flex mt-8 gap-4">
           <Button onClick={(e) => handleSubmit(e)} className="w-fit">
             Zapisz

@@ -36,13 +36,17 @@ export default function EditProductParametersForm({
 }: {
   oldData: ProductWithId;
 }) {
-  const { productType } = useProductTypeContext();
+  const { productType, setProductType } = useProductTypeContext();
   const { showToast } = useToast();
   const router = useRouter();
 
   type FormData = Omit<Product, "rangeSizes"> & {
     rangeSizes: RangeSizeString[];
   };
+
+  useEffect(() => {
+    setProductType(oldData.productType);
+  }, [oldData]);
 
   const form = useForm<FormData>({
     defaultValues: {

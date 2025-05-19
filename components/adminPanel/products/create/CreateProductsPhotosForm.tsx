@@ -9,7 +9,7 @@ import {
 } from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "../helpers/productsHelpers";
 import ProductImagesUploader from "../ProductImagesUploader";
-import { FormEvent, Fragment, useState } from "react";
+import { FormEvent, Fragment, useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/button";
@@ -26,7 +26,7 @@ export default function CreateProductsPhotosForm({
 }) {
   const { id, colorVariants, rawPhotos, editedPhotos } = productData;
 
-  const { productType } = useProductTypeContext();
+  const { productType, setProductType } = useProductTypeContext();
 
   const storageEndpoint =
     creationStage === "photos" ? "raw-photos" : "edited-photos";
@@ -40,6 +40,10 @@ export default function CreateProductsPhotosForm({
   );
 
   const { showToast } = useToast();
+
+  useEffect(() => {
+    setProductType(productData.productType);
+  }, [productData]);
 
   const router = useRouter();
 

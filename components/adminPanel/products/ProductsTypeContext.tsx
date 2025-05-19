@@ -1,7 +1,6 @@
 "use client";
 
 import { ProductType } from "@/firebase/schemas/productsSchemas";
-import { usePathname } from "next/navigation";
 import {
   createContext,
   Dispatch,
@@ -24,12 +23,7 @@ export function ProductTypeContextProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const isShoesPath = pathname.includes("obuwie");
-
-  const [productType, setProductType] = useState<ProductType>(
-    isShoesPath ? "obuwie" : "akcesoria"
-  );
+  const [productType, setProductType] = useState<ProductType>("obuwie");
 
   return (
     <ProductTypeContext.Provider value={{ productType, setProductType }}>

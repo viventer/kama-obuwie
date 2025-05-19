@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 
 import AddColorVariants from "../AddColorVariants";
 import { Button } from "@/components/ui/button";
-import { FormEvent } from "react";
+import { FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import axios from "axios";
@@ -28,7 +28,7 @@ export default function ProductCreateForm({
 }: {
   oldData?: ProductWithId;
 }) {
-  const { productType } = useProductTypeContext();
+  const { productType, setProductType } = useProductTypeContext();
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -43,6 +43,10 @@ export default function ProductCreateForm({
       productType: productType,
     },
   });
+
+  useEffect(() => {
+    setProductType(oldData?.productType || productType);
+  }, [oldData]);
 
   const colorVariants = form.watch("colorVariants");
   const purchasePrice = form.watch("purchasePrice");

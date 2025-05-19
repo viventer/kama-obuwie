@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
 import { Option } from "./SingleSelect";
+import { truncateString } from "@/lib/utils";
 
 interface MultiSelectProps {
   label: string;
@@ -33,13 +34,16 @@ export default function MultipleSelect({
     }
   };
 
+  const joinedValues = value.length > 0 ? value.join(", ") : "Wybierz";
+  const truncatedJoinedValues = truncateString(joinedValues, 42);
+
   return (
     <FormItem className="w-full">
       <FormLabel>{label}</FormLabel>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button className="justify-between w-full text-base  bg-transparent border-input focus-visible:border-secondary border hover:bg-primary/15 hover:cursor-pointer font-normal">
-            {value.length > 0 ? value.join(", ") : "Wybierz"}
+          <Button className="justify-between w-full text-base  bg-transparent border-input focus-visible:border-secondary border hover:bg-primary/15 hover:cursor-pointer font-normal ">
+            <p>{truncatedJoinedValues}</p>
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>

@@ -4,6 +4,7 @@ import {
   CategoryWithId,
   Product,
   ProductWithId,
+  RangeSize,
 } from "@/firebase/schemas/productsSchemas";
 import { useProductTypeContext } from "./ProductsTypeContext";
 import { useToast } from "@/hooks/useToast";
@@ -28,7 +29,7 @@ import SizingTableSelector from "./sizing-tables/SizingTableSelector";
 import ImageUploader from "../global/uploaders/ImageUploader";
 import AllegroParametersSection from "./AllegroParametersSection";
 import { DocumentDataWithRef } from "@/server-actions/helpers";
-import RangeSizesFormItem from "./RangeSizesFormItem";
+import RangeSizesFormItem, { RangeSizeString } from "./RangeSizesFormItem";
 
 export default function EditProductParametersForm({
   oldData,
@@ -39,21 +40,30 @@ export default function EditProductParametersForm({
   const { showToast } = useToast();
   const router = useRouter();
 
-  const form = useForm<ProductWithId>({
+  type FormData = Omit<Product, "rangeSizes"> & {
+    rangeSizes: RangeSizeString[];
+  };
+
+  const form = useForm<FormData>({
     defaultValues: {
-      brand: oldData?.brand || "",
-      manufacturerCode: oldData?.manufacturerCode || "",
-      purchasePrice: oldData?.purchasePrice || 0,
-      colorVariants: oldData?.colorVariants || [],
-      samplePhoto: oldData?.samplePhoto || "",
-      creationStage: oldData?.creationStage || "new",
+      brand: oldData.brand || "",
+      manufacturerCode: oldData.manufacturerCode || "",
+      purchasePrice: oldData.purchasePrice || 0,
+      colorVariants: oldData.colorVariants || [],
+      samplePhoto: oldData.samplePhoto || "",
+      creationStage: oldData.creationStage || "new",
       productType: productType,
-      warrantyPeriod: oldData?.warrantyPeriod || 0,
-      categoryId: oldData?.categoryId,
-      sizingTableId: oldData?.sizingTableId || "",
-      parameters: oldData?.parameters || {},
-      rootCategory: oldData?.rootCategory,
-      rangeSizes: oldData?.rangeSizes || [],
+      warrantyPeriod: oldData.warrantyPeriod || 0,
+      categoryId: oldData.categoryId,
+      sizingTableId: oldData.sizingTableId || "",
+      parameters: oldData.parameters || {},
+      rootCategory: oldData.rootCategory,
+      rangeSizes: oldData.rangeSizes
+        ? oldData.rangeSizes.map((rs) => ({
+            from: String(rs.from),
+            to: String(rs.to),
+          }))
+        : [{ from: "0", to: "0" }],
     },
     mode: "onSubmit",
   });
@@ -82,18 +92,30 @@ export default function EditProductParametersForm({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const data: Product = form.getValues();
-    data.purchasePrice = Number(data.purchasePrice);
-    data.warrantyPeriod = Number(data.warrantyPeriod);
-    data.productType = productType;
+    const data = form.getValues();
+    const purchasePriceNum = Number(data.purchasePrice);
+    const warrantyPeriodNum = Number(data.warrantyPeriod);
+
+    const rangeSizesNum: RangeSize[] = (data.rangeSizes || []).map((rs) => ({
+      from: Number(rs.from),
+      to: Number(rs.to),
+    }));
+
+    const payload: Product = {
+      ...data,
+      purchasePrice: purchasePriceNum,
+      warrantyPeriod: warrantyPeriodNum,
+      productType,
+      rangeSizes: rangeSizesNum,
+    };
 
     const hasValidColorVariants =
       productType !== "obuwie" ||
       (data.colorVariants &&
         data.colorVariants.length > 0 &&
         data.colorVariants[0]?.color !== "");
-    const purchasePriceValid = Number(data.purchasePrice) > 0;
-    const warrantyPeriodValid = Number(data.warrantyPeriod) >= 0;
+    const purchasePriceValid = purchasePriceNum > 0;
+    const warrantyPeriodValid = warrantyPeriodNum >= 0;
 
     const isValid = await form.trigger();
 
@@ -109,7 +131,7 @@ export default function EditProductParametersForm({
 
     try {
       if (oldData) {
-        const resp = await axios.patch(`/api/products/${oldData.id}`, data);
+        const resp = await axios.patch(`/api/products/${oldData.id}`, payload);
         if (resp.status !== 200) {
           throw new Error("Nie udało się edytować produktu.");
         }

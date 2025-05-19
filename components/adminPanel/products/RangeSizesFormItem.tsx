@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { RangeSize } from "@/firebase/schemas/productsSchemas";
 import {
   Table,
   TableBody,
@@ -8,42 +7,50 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  FormField,
-  FormItem,
-  FormControl,
-  FormLabel,
-} from "@/components/ui/form";
+import { FormItem, FormControl, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+export interface RangeSizeString {
+  from: string;
+  to: string;
+}
+
 interface RangeSizesFormItemProps {
-  value?: RangeSize[];
-  onChange: (value: RangeSize[]) => void;
+  value?: RangeSizeString[];
+  onChange: (value: RangeSizeString[]) => void;
 }
 
 export default function RangeSizesFormItem({
   value = [],
   onChange,
 }: RangeSizesFormItemProps) {
-  const [rows, setRows] = useState<RangeSize[]>(value);
+  const [rows, setRows] = useState<RangeSizeString[]>(
+    value.length > 0 ? value : [{ from: "0", to: "0" }]
+  );
 
   useEffect(() => {
-    setRows(value);
+    setRows(value.length > 0 ? value : [{ from: "0", to: "0" }]);
   }, [value]);
 
-  const handleUpdate = (index: number, key: keyof RangeSize, raw: string) => {
-    const num = parseInt(raw, 10);
-    if (isNaN(num)) return;
+  const handleUpdate = (
+    index: number,
+    key: keyof RangeSizeString,
+    raw: string
+  ) => {
     const updated = rows.map((row, i) =>
-      i === index ? { ...row, [key]: num } : row
+      i === index ? { ...row, [key]: raw } : row
     );
     setRows(updated);
     onChange(updated);
   };
 
   const addRow = () => {
-    const newRow: RangeSize = { from: 0, to: 0 };
+    const last = rows[rows.length - 1] || { from: "0", to: "0" };
+    const newRow: RangeSizeString = {
+      from: (parseInt(last.from, 10) + 1).toString(),
+      to: (parseInt(last.to, 10) + 1).toString(),
+    };
     const updated = [...rows, newRow];
     setRows(updated);
     onChange(updated);
@@ -56,7 +63,7 @@ export default function RangeSizesFormItem({
   };
 
   return (
-    <div>
+    <div className="max-w-md">
       <FormLabel>Rozmiary zakresowe</FormLabel>
       <Table>
         <TableHeader>
@@ -71,7 +78,6 @@ export default function RangeSizesFormItem({
           {rows.map((row, index) => (
             <TableRow key={index}>
               <TableCell>{index + 1}</TableCell>
-
               <TableCell>
                 <FormItem>
                   <FormControl>
@@ -86,7 +92,6 @@ export default function RangeSizesFormItem({
                   </FormControl>
                 </FormItem>
               </TableCell>
-
               <TableCell>
                 <FormItem>
                   <FormControl>
@@ -101,7 +106,6 @@ export default function RangeSizesFormItem({
                   </FormControl>
                 </FormItem>
               </TableCell>
-
               <TableCell>
                 <Button
                   variant="ghost"

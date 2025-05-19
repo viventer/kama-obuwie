@@ -1,7 +1,5 @@
 "use client";
 
-import { useConfirmDialog } from "@/components/adminPanel/global/ConfirmDialogProvider";
-import { Button } from "@/components/ui/button";
 import { Product, ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { useToast } from "@/hooks/useToast";
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
@@ -64,25 +62,28 @@ export default function CreateProductsParametersDataTable({
         try {
           const productData = data?.find((product) => product.id === id);
           const requiredParameters = productData?.parameters?.required;
-          if (!requiredParameters) {
+          const optionalParameters = productData?.parameters?.optional;
+          if (!requiredParameters && !optionalParameters) {
             showToast(
-              "Nie można przenieść produktu. Brak wymaganych parametrów.",
+              "Nie można przenieść produktu. Nie dodałeś parametrów.",
               "error"
             );
             return;
           }
-          const allRequiredFilled = Object.values(requiredParameters).every(
-            (value) => {
-              if (Array.isArray(value)) return value.length > 0;
-              return value !== null && value !== undefined && value !== "";
-            }
-          );
-          if (!allRequiredFilled) {
-            showToast(
-              "Nie można przenieść produktu. Uzupełnij wszystkie wymagane parametry.",
-              "error"
+          if (requiredParameters) {
+            const allRequiredFilled = Object.values(requiredParameters).every(
+              (value) => {
+                if (Array.isArray(value)) return value.length > 0;
+                return value !== null && value !== undefined && value !== "";
+              }
             );
-            return;
+            if (!allRequiredFilled) {
+              showToast(
+                "Nie można przenieść produktu. Uzupełnij wszystkie wymagane parametry.",
+                "error"
+              );
+              return;
+            }
           }
           const updateData: Partial<Product> = {
             creationStage: "description",

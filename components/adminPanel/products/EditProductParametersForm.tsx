@@ -260,7 +260,24 @@ export default function EditProductParametersForm({
             control={form.control}
             name="rangeSizes"
             rules={{
-              required: "Zakresy rozmiarów są wymagane",
+              required: "Co najmniej jeden zakres jest wymagany",
+              validate: {
+                atLeastOne: (val) =>
+                  (Array.isArray(val) && val.length > 0) ||
+                  "Musisz dodać przynajmniej jeden zakres",
+                fromLessThanTo: (val) =>
+                  val.every((r) => Number(r.from) < Number(r.to)) ||
+                  "W każdym zakresie `from` musi być mniejsze niż `to`",
+                allIntegers: (val) =>
+                  val.every(
+                    (r) =>
+                      Number.isInteger(Number(r.from)) &&
+                      Number.isInteger(Number(r.to))
+                  ) || "Wszystkie wartości muszą być liczbami całkowitymi",
+                minGreaterThanTen: (val) =>
+                  val.every((r) => Number(r.from) > 10 && Number(r.to) > 10) ||
+                  "`from` i `to` muszą być większe niż 10",
+              },
             }}
             render={({ field }) => (
               <RangeSizesFormItem

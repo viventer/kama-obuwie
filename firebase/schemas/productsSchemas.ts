@@ -51,13 +51,15 @@ export const CategorySchemaWithAllegroCategoryName = CategorySchema.merge(
 );
 
 export const DescriptionElementSchema = z.object({
-  type: z.enum(["text", "image"]),
   content: z.string().optional(),
   image: z.string().optional(),
 });
 
-export const DescriptionRowSchema = z.array(DescriptionElementSchema).nonempty({
-  message: "DescriptionRow musi zawierać co najmniej jeden element",
+export const DescriptionRowSchema = z.object({
+  elementsTypes: z.array(z.enum(["text", "image"])),
+  elements: z.array(DescriptionElementSchema).nonempty({
+    message: "DescriptionRow musi zawierać co najmniej jeden element",
+  }),
 });
 
 export const DescriptionSchema = z.array(DescriptionRowSchema);

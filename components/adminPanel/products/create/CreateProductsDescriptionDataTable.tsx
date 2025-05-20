@@ -1,6 +1,10 @@
 "use client";
 
-import { Product, ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  DescriptionSchema,
+  Product,
+  ProductWithId,
+} from "@/firebase/schemas/productsSchemas";
 import { useProductTypeContext } from "../ProductsTypeContext";
 import { useEffect, useState } from "react";
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
@@ -61,32 +65,18 @@ export default function CreateProductsDescriptionDataTable({
       onClick: async (id) => {
         try {
           const productData = data?.find((product) => product.id === id);
-          const requiredParameters = productData?.parameters?.required;
-          const optionalParameters = productData?.parameters?.optional;
-          if (!requiredParameters && !optionalParameters) {
+          const description = productData?.description;
+          if (!description || description.length === 0) {
             showToast(
-              "Nie można przenieść produktu. Nie dodałeś parametrów.",
+              "Nie można przenieść produktu, ponieważ nie ma opisu.",
               "error"
             );
             return;
           }
-          if (requiredParameters) {
-            const allRequiredFilled = Object.values(requiredParameters).every(
-              (value) => {
-                if (Array.isArray(value)) return value.length > 0;
-                return value !== null && value !== undefined && value !== "";
-              }
-            );
-            if (!allRequiredFilled) {
-              showToast(
-                "Nie można przenieść produktu. Uzupełnij wszystkie wymagane parametry.",
-                "error"
-              );
-              return;
-            }
-          }
+          DescriptionSchema.parse(description);
+
           const updateData: Partial<Product> = {
-            creationStage: "description",
+            creationStage: "postOffer",
           };
           await axios.patch(`/api/products/${id}`, updateData);
           showToast(
@@ -100,9 +90,9 @@ export default function CreateProductsDescriptionDataTable({
       },
     },
     {
-      name: "Uzupełnij parametry",
+      name: "Utwórz opis",
       onClick: (id) => {
-        router.push(`/admin-panel/create-products/parameters/${id}`);
+        router.push(`/admin-panel/create-products/description/${id}`);
       },
     },
     {
@@ -110,7 +100,7 @@ export default function CreateProductsDescriptionDataTable({
       onClick: async (id) => {
         try {
           const updateData: Partial<Product> = {
-            creationStage: "photosEdit",
+            creationStage: "parameters",
           };
           await axios.patch(`/api/products/${id}`, updateData);
           showToast(

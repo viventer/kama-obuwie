@@ -5,7 +5,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import AllegroParametersSectionFormItem from "./AllegroParametersSectionFormItem";
-import MiniLoader from "../global/MiniLoader";
+import MiniLoader from "../../global/MiniLoader";
 import {
   Accordion,
   AccordionItem,

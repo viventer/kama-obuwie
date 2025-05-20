@@ -1,7 +1,7 @@
 import { AllegroProductParameter } from "@/server-actions/allegro/products";
-import MultipleSelect from "../global/form/MultipleSelect";
-import SingleSelect from "../global/form/SingleSelect";
-import InputFormItem from "../global/form/InputFormItem";
+import MultipleSelect from "../../global/form/MultipleSelect";
+import SingleSelect from "../../global/form/SingleSelect";
+import InputFormItem from "../../global/form/InputFormItem";
 
 export default function AllegroParametersSectionFormItem({
   parameter,

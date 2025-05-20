@@ -6,7 +6,7 @@ import {
   ProductWithId,
   RangeSize,
 } from "@/firebase/schemas/productsSchemas";
-import { useProductTypeContext } from "./ProductsTypeContext";
+import { useProductTypeContext } from "../ProductsTypeContext";
 import { useToast } from "@/hooks/useToast";
 import { useForm } from "react-hook-form";
 import {
@@ -17,16 +17,16 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import AddColorVariants from "./AddColorVariants";
+import AddColorVariants from "../AddColorVariants";
 import { Button } from "@/components/ui/button";
-import { useConfirmDialog } from "../global/ConfirmDialogProvider";
+import { useConfirmDialog } from "../../global/ConfirmDialogProvider";
 import { FormEvent, useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import CategorySelector from "./categories/CategorySelector";
-import RootCategorySelector from "./categories/RootCategorySelector";
-import SizingTableSelector from "./sizing-tables/SizingTableSelector";
-import ImageUploader from "../global/uploaders/ImageUploader";
+import CategorySelector from "../categories/CategorySelector";
+import RootCategorySelector from "../categories/RootCategorySelector";
+import SizingTableSelector from "../sizing-tables/SizingTableSelector";
+import ImageUploader from "../../global/uploaders/ImageUploader";
 import AllegroParametersSection from "./AllegroParametersSection";
 import { DocumentDataWithRef } from "@/server-actions/helpers";
 import RangeSizesFormItem, { RangeSizeString } from "./RangeSizesFormItem";

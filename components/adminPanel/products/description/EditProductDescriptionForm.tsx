@@ -11,6 +11,7 @@ import {
   DescriptionSchema,
 } from "@/firebase/schemas/productsSchemas";
 import DescriptionRow from "./DescriptionRow";
+import { useEffect } from "react";
 
 export interface DescriptionFormValues {
   description: Description;
@@ -42,24 +43,32 @@ export const EditProductDescriptionForm = ({
     name: "description",
   });
 
+  useEffect(() => {
+    console.log("descriptionRows", descriptionRows.fields);
+  }, [descriptionRows.fields]);
+
   return (
     <Form {...form}>
       {descriptionRows.fields.map((row, rowIndex) => (
         <DescriptionRow
-          key={rowIndex}
+          key={row.id}
           index={rowIndex}
           onDeleteRow={() => descriptionRows.remove(rowIndex)}
+          moveRow={(from, to) => descriptionRows.move(from, to)}
+          totalRows={descriptionRows.fields.length}
         />
       ))}
 
       <Button
         type="button"
-        onClick={() =>
+        onClick={() => {
           descriptionRows.append({
             elementsTypes: ["text"],
             elements: [{ content: "" }, { image: "" }],
-          })
-        }
+          });
+
+          form.setValue("selectedRow", descriptionRows.fields.length);
+        }}
         className="mb-4"
       >
         Dodaj wiersz

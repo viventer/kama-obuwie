@@ -13,8 +13,6 @@ export default function DescriptionElementTypeSelector({
     value ? value.join(".") : "image.text"
   );
 
-  console.log("tabValue", tabValue);
-
   const onTabValueChange = (newValue: string) => {
     setTabValue(newValue);
     const newValues = newValue.split(".") as ("text" | "image")[];

@@ -1,22 +1,21 @@
-import {
-  FieldArrayWithId,
-  useFieldArray,
-  useFormContext,
-  UseFormReturn,
-} from "react-hook-form";
-import { DescriptionFormValues } from "./EditProductDescriptionForm";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { FormField } from "@/components/ui/form";
 import DescriptionElementTypeSelector from "./DescriptionElementTypeSelector";
 import IconButton from "../../global/IconButton";
-import { XIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowUpIcon, XIcon } from "lucide-react";
 import DescriptionElementImageSelector from "./DescriptionElementImageSelector";
+import { MouseEvent } from "react";
 
 export default function DescriptionRow({
   index,
   onDeleteRow,
+  moveRow,
+  totalRows,
 }: {
   onDeleteRow: () => void;
   index: number;
+  moveRow: (from: number, to: number) => void;
+  totalRows: number;
 }) {
   const form = useFormContext();
 
@@ -34,13 +33,11 @@ export default function DescriptionRow({
         selectedRow === index ? "border-primary/50" : "border-transparent"
       } transition-all `}
       onClick={() => form.setValue("selectedRow", index)}
-      onBlur={() => form.setValue("selectedRow", -1)}
-      onFocus={() => form.setValue("selectedRow", index)}
     >
       <div
         className={`${
           selectedRow === index ? "flex" : "hidden"
-        } w-full items-center justify-between mb-2`}
+        } w-full items-center justify-between mb-2 z-50`}
       >
         <FormField
           control={form.control}
@@ -52,11 +49,45 @@ export default function DescriptionRow({
             />
           )}
         />
-        {index !== 0 && (
-          <IconButton className="hover:text-destructive" onClick={onDeleteRow}>
-            <XIcon />
-          </IconButton>
-        )}
+        <div>
+          {index < totalRows - 1 && (
+            <IconButton
+              onClick={(e) => {
+                if (!e) return;
+                e.stopPropagation();
+                moveRow(index, index + 1);
+                form.setValue("selectedRow", index + 1);
+              }}
+            >
+              <ArrowDownIcon />
+            </IconButton>
+          )}
+          {index > 0 && (
+            <>
+              <IconButton
+                onClick={(e) => {
+                  if (!e) return;
+                  e.stopPropagation();
+                  moveRow(index, index - 1);
+                  form.setValue("selectedRow", index - 1);
+                }}
+              >
+                <ArrowUpIcon />
+              </IconButton>
+              <IconButton
+                className="hover:text-destructive"
+                onClick={(e) => {
+                  if (!e) return;
+                  e.stopPropagation();
+                  onDeleteRow();
+                  form.setValue("selectedRow", -1);
+                }}
+              >
+                <XIcon />
+              </IconButton>
+            </>
+          )}
+        </div>
       </div>
 
       {elementsFieldsArray.fields.map((elem, elemIndex) => {

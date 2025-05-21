@@ -3,29 +3,39 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Form } from "@/components/ui/form";
+import { Form, FormField } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
 import {
   Description,
   DescriptionSchema,
+  EditedPhoto,
+  EditedPhotoSchema,
 } from "@/firebase/schemas/productsSchemas";
 import DescriptionRow from "./DescriptionRow";
 import { useEffect } from "react";
+import PhotosReorder from "../PhotosReorder";
 
 export interface DescriptionFormValues {
   description: Description;
   selectedRow: number;
+  reorderedPhotos: EditedPhoto[];
 }
 
 export const EditProductDescriptionForm = ({
   oldDescription,
+  oldPhotos,
 }: {
   oldDescription: Description | undefined;
+  oldPhotos: EditedPhoto[];
 }) => {
   const form = useForm<DescriptionFormValues>({
     resolver: zodResolver(
-      z.object({ description: DescriptionSchema, selectedRow: z.number() })
+      z.object({
+        description: DescriptionSchema,
+        selectedRow: z.number(),
+        reorderedPhotos: z.array(EditedPhotoSchema),
+      })
     ),
     defaultValues: {
       description: oldDescription || [
@@ -35,6 +45,7 @@ export const EditProductDescriptionForm = ({
         },
       ],
       selectedRow: 0,
+      reorderedPhotos: oldPhotos,
     },
   });
 
@@ -49,6 +60,13 @@ export const EditProductDescriptionForm = ({
 
   return (
     <Form {...form}>
+      <FormField
+        control={form.control}
+        name={"reorderedPhotos" as const}
+        render={({ field }) => (
+          <PhotosReorder photos={field.value} setPhotos={field.onChange} />
+        )}
+      />
       {descriptionRows.fields.map((row, rowIndex) => (
         <DescriptionRow
           key={row.id}

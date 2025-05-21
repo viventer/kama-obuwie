@@ -1,6 +1,6 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import { EditProductDescriptionForm } from "@/components/adminPanel/products/description/EditProductDescriptionForm";
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import { EditedPhoto, ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
 import { notFound } from "next/navigation";
 
@@ -25,7 +25,10 @@ export default async function ProductEditPage(props: Props) {
 
   return (
     <FormWrapper headingText="Utwórz opis produktu">
-      <EditProductDescriptionForm oldDescription={data.description} />
+      <EditProductDescriptionForm
+        oldDescription={data.description}
+        oldPhotos={data.editedPhotos as EditedPhoto[]}
+      />
     </FormWrapper>
   );
 }

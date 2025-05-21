@@ -9,7 +9,7 @@ export default function SortableImage({
 }: {
   id: string;
   url: string;
-  onRemove: () => void;
+  onRemove?: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
@@ -30,17 +30,19 @@ export default function SortableImage({
       {...listeners}
     >
       <Image src={url} alt="" fill className="object-cover" draggable={false} />
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          onRemove();
-        }}
-        onPointerDown={(e) => e.stopPropagation()}
-        className="absolute top-2 right-2"
-      >
-        <TrashIcon className="size-4 text-destructive" />
-      </button>
+      {onRemove && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            onRemove();
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="absolute top-2 right-2"
+        >
+          <TrashIcon className="size-4 text-destructive" />
+        </button>
+      )}
     </div>
   );
 }

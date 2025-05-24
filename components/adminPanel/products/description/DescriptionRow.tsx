@@ -4,7 +4,6 @@ import DescriptionElementTypeSelector from "./DescriptionElementTypeSelector";
 import IconButton from "../../global/IconButton";
 import { ArrowDownIcon, ArrowUpIcon, XIcon } from "lucide-react";
 import DescriptionElementImageSelector from "./DescriptionElementImageSelector";
-import { MouseEvent } from "react";
 
 export default function DescriptionRow({
   index,
@@ -31,7 +30,7 @@ export default function DescriptionRow({
     <div
       className={`mb-8 px-3 py-2 rounded-sm border ${
         selectedRow === index ? "border-primary/50" : "border-transparent"
-      } transition-all `}
+      } transition-all`}
       onClick={() => form.setValue("selectedRow", index)}
     >
       <div
@@ -89,13 +88,30 @@ export default function DescriptionRow({
           )}
         </div>
       </div>
+      <div className="flex justify-center items-center gap-10">
+        {elementsFieldsArray.fields.map((elem, elemIndex) => {
+          if (elementsTypes.length === 1 && elemIndex === 1) {
+            return null;
+          }
 
-      {elementsFieldsArray.fields.map((elem, elemIndex) => {
-        if (elementsTypes.length === 1 && elemIndex === 1) {
-          return null;
-        }
+          if (elementsTypes[elemIndex] === "image") {
+            return (
+              <FormField
+                key={elem.id}
+                control={form.control}
+                name={
+                  `description.${index}.elements.${elemIndex}.image` as const
+                }
+                render={({ field }) => (
+                  <DescriptionElementImageSelector
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
+                )}
+              />
+            );
+          }
 
-        if (elementsTypes[elemIndex] === "image") {
           return (
             <FormField
               key={elem.id}
@@ -104,31 +120,17 @@ export default function DescriptionRow({
                 `description.${index}.elements.${elemIndex}.content` as const
               }
               render={({ field }) => (
-                <DescriptionElementImageSelector
-                  onChange={field.onChange}
-                  value={field.value}
+                <input
+                  {...field}
+                  type="text"
+                  placeholder="Wpisz treść opisu"
+                  className="border rounded-xl p-2 w-full"
                 />
               )}
             />
           );
-        }
-
-        return (
-          <FormField
-            key={elem.id}
-            control={form.control}
-            name={`description.${index}.elements.${elemIndex}.content` as const}
-            render={({ field }) => (
-              <input
-                {...field}
-                type="text"
-                placeholder="Wpisz treść opisu"
-                className="border rounded-xl p-2 w-full"
-              />
-            )}
-          />
-        );
-      })}
+        })}
+      </div>
     </div>
   );
 }

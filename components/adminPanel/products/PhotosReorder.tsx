@@ -1,6 +1,6 @@
 "use client";
 
-import { EditedPhoto } from "@/firebase/schemas/productsSchemas";
+import { EditedPhotoWithUrl } from "@/firebase/schemas/productsSchemas";
 import {
   closestCenter,
   DndContext,
@@ -15,45 +15,24 @@ import {
   SortableContext,
 } from "@dnd-kit/sortable";
 import SortableImage from "../global/uploaders/SortableImage";
-import { Fragment, useEffect, useState } from "react";
-import { getImageUrl } from "@/server-actions/images/images";
+import { useEffect, useState } from "react";
 import { FormLabel } from "@/components/ui/form";
-
-type EditedPhotoWithUrl = EditedPhoto & { url: string };
 
 export default function PhotosReorder({
   photos,
   setPhotos,
 }: {
-  photos: EditedPhoto[];
-  setPhotos: (photos: EditedPhoto[]) => void;
+  photos: EditedPhotoWithUrl[];
+  setPhotos: (photos: EditedPhotoWithUrl[]) => void;
 }) {
   const sensors = useSensors(useSensor(PointerSensor));
-  const [photosWithUrls, setPhotosWithUrls] = useState<EditedPhotoWithUrl[]>(
-    []
+  const [photosWithUrls, setPhotosWithUrls] =
+    useState<EditedPhotoWithUrl[]>(photos);
+  const uniqueVariants = Array.from(
+    new Set(
+      photos.map((p) => p.colorVariantName).filter((n): n is string => !!n)
+    )
   );
-  const [variants, setVariants] = useState<string[]>([]);
-
-  useEffect(() => {
-    const fetchUrls = async () => {
-      const colorVariantsNames = photos
-        .map((photo) => photo.colorVariantName)
-        .filter((name): name is string => name !== undefined);
-      const uniqueColorVariantsNames = Array.from(new Set(colorVariantsNames));
-      if (uniqueColorVariantsNames.length !== 0) {
-        setVariants(uniqueColorVariantsNames);
-      }
-      const urls = await Promise.all(
-        photos.map(async (photo) => {
-          const url = (await getImageUrl(photo.filePath)) as string;
-          return { ...photo, url: url };
-        })
-      );
-      setPhotosWithUrls(urls);
-    };
-
-    fetchUrls();
-  }, []);
 
   useEffect(() => {
     setPhotos(photosWithUrls);
@@ -84,7 +63,7 @@ export default function PhotosReorder({
             items={photos.map((photo) => photo.filePath)}
             strategy={rectSortingStrategy}
           >
-            {variants.map((variant) => {
+            {uniqueVariants.map((variant) => {
               const photosForVariant = photosWithUrls.filter(
                 (p) => p.colorVariantName === variant
               );

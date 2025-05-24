@@ -23,7 +23,7 @@ export default function SingleSelect({
   availableOptions,
   placeholder = "Wybierz",
 }: {
-  label: string;
+  label?: string;
   onChange: (...event: any[]) => void;
   value: string | undefined;
   defaultValue?: string;
@@ -32,7 +32,7 @@ export default function SingleSelect({
 }) {
   return (
     <FormItem>
-      <FormLabel>{label}</FormLabel>
+      {label && <FormLabel>{label}</FormLabel>}
       <div className="flex gap-2">
         <Select
           onValueChange={onChange}

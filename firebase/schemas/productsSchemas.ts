@@ -79,6 +79,10 @@ export const RawPhotoSchema = z.object({
 
 export const EditedPhotoSchema = RawPhotoSchema;
 
+export const EditedPhotoWithUrlSchema = EditedPhotoSchema.extend({
+  url: z.string(),
+});
+
 const ParamValueSchema = z.union([
   z.string(),
   z.number(),
@@ -172,6 +176,7 @@ export type ProductCreationStage = z.infer<typeof ProductCreationStageSchema>;
 
 export type RawPhoto = z.infer<typeof RawPhotoSchema>;
 export type EditedPhoto = z.infer<typeof EditedPhotoSchema>;
+export type EditedPhotoWithUrl = z.infer<typeof EditedPhotoWithUrlSchema>;
 
 export const SizingTableUpdateDataSchema = SizingTableSchema.partial().strict();
 

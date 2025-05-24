@@ -11,6 +11,8 @@ import {
   DescriptionSchema,
   EditedPhoto,
   EditedPhotoSchema,
+  EditedPhotoWithUrl,
+  EditedPhotoWithUrlSchema,
 } from "@/firebase/schemas/productsSchemas";
 import DescriptionRow from "./DescriptionRow";
 import { useEffect } from "react";
@@ -19,7 +21,7 @@ import PhotosReorder from "../PhotosReorder";
 export interface DescriptionFormValues {
   description: Description;
   selectedRow: number;
-  reorderedPhotos: EditedPhoto[];
+  reorderedPhotos: EditedPhotoWithUrl[];
 }
 
 export const EditProductDescriptionForm = ({
@@ -27,14 +29,14 @@ export const EditProductDescriptionForm = ({
   oldPhotos,
 }: {
   oldDescription: Description | undefined;
-  oldPhotos: EditedPhoto[];
+  oldPhotos: EditedPhotoWithUrl[];
 }) => {
   const form = useForm<DescriptionFormValues>({
     resolver: zodResolver(
       z.object({
         description: DescriptionSchema,
         selectedRow: z.number(),
-        reorderedPhotos: z.array(EditedPhotoSchema),
+        reorderedPhotos: z.array(EditedPhotoWithUrlSchema),
       })
     ),
     defaultValues: {

@@ -1,3 +1,5 @@
+"use client";
+
 import { useSortable } from "@dnd-kit/sortable";
 import { TrashIcon } from "lucide-react";
 import Image from "next/image";

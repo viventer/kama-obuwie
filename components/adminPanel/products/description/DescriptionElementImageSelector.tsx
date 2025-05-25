@@ -22,7 +22,7 @@ export default function DescriptionElementImageSelector({
   return (
     <FormItem className="w-full flex align-center justify-center max-w-full">
       <div className="w-fit flex flex-col justify-center gap-2">
-        {value ? (
+        {firstVariantPhotos[Number(value) - 1]?.url ? (
           <Image
             src={firstVariantPhotos[Number(value) - 1].url}
             alt=""

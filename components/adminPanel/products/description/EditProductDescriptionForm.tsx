@@ -40,10 +40,10 @@ export const EditProductDescriptionForm = ({
       })
     ),
     defaultValues: {
-      description: oldDescription || [
+      description: oldDescription ?? [
         {
-          elementsTypes: ["text"],
-          elements: [{ content: "" }, { image: "" }],
+          elementsTypes: ["image", "text"],
+          elements: [{ image: "" }, { content: "" }],
         },
       ],
       selectedRow: 0,
@@ -56,9 +56,11 @@ export const EditProductDescriptionForm = ({
     name: "description",
   });
 
+  const description = form.watch("description.0.elements");
+
   useEffect(() => {
-    console.log("descriptionRows", descriptionRows.fields);
-  }, [descriptionRows.fields]);
+    console.log("description", description);
+  }, [description]);
 
   return (
     <Form {...form}>
@@ -83,8 +85,8 @@ export const EditProductDescriptionForm = ({
         type="button"
         onClick={() => {
           descriptionRows.append({
-            elementsTypes: ["text"],
-            elements: [{ content: "" }, { image: "" }],
+            elementsTypes: ["image", "text"],
+            elements: [{ image: "" }, { content: "" }],
           });
 
           form.setValue("selectedRow", descriptionRows.fields.length);

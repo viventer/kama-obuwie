@@ -1,9 +1,13 @@
+"use client";
+
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { FormField } from "@/components/ui/form";
 import DescriptionElementTypeSelector from "./DescriptionElementTypeSelector";
 import IconButton from "../../global/IconButton";
 import { ArrowDownIcon, ArrowUpIcon, XIcon } from "lucide-react";
 import DescriptionElementImageSelector from "./DescriptionElementImageSelector";
+import dynamic from "next/dynamic";
+import { useMemo } from "react";
 
 export default function DescriptionRow({
   index,
@@ -16,6 +20,14 @@ export default function DescriptionRow({
   moveRow: (from: number, to: number) => void;
   totalRows: number;
 }) {
+  const DynamicTextEditor = useMemo(() => {
+    return dynamic(() => import("./DescriptionTextEditor"), {
+      loading: () => <p>loading...</p>,
+
+      ssr: false,
+    });
+  }, []);
+
   const form = useFormContext();
 
   const elementsTypes = form.watch(`description.${index}.elementsTypes`);
@@ -44,7 +56,15 @@ export default function DescriptionRow({
           render={({ field }) => (
             <DescriptionElementTypeSelector
               value={field.value}
-              onChange={field.onChange}
+              onChange={(newTypes) => {
+                field.onChange(newTypes);
+
+                const newElements = newTypes.map((type) => {
+                  return type === "image" ? { image: "" } : { content: "" };
+                });
+
+                form.setValue(`description.${index}.elements`, newElements);
+              }}
             />
           )}
         />
@@ -90,43 +110,35 @@ export default function DescriptionRow({
       </div>
       <div className="flex justify-center items-center gap-10">
         {elementsFieldsArray.fields.map((elem, elemIndex) => {
-          if (elementsTypes.length === 1 && elemIndex === 1) {
-            return null;
-          }
+          const elementType = elementsTypes[elemIndex];
 
-          if (elementsTypes[elemIndex] === "image") {
-            return (
-              <FormField
-                key={elem.id}
-                control={form.control}
-                name={
-                  `description.${index}.elements.${elemIndex}.image` as const
-                }
-                render={({ field }) => (
-                  <DescriptionElementImageSelector
-                    onChange={field.onChange}
-                    value={field.value}
-                  />
-                )}
-              />
-            );
-          }
+          if (!elementType) return null;
+
+          const namePrefix = `description.${index}.elements.${elemIndex}`;
 
           return (
             <FormField
               key={elem.id}
               control={form.control}
               name={
-                `description.${index}.elements.${elemIndex}.content` as const
+                elementType === "image"
+                  ? `${namePrefix}.image`
+                  : `${namePrefix}.content`
               }
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="text"
-                  placeholder="Wpisz treść opisu"
-                  className="border rounded-xl p-2 w-full"
-                />
-              )}
+              render={({ field }) =>
+                elementType === "image" ? (
+                  <DescriptionElementImageSelector
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
+                ) : (
+                  <DynamicTextEditor
+                    id={`editor-${index}-${elemIndex}`}
+                    onChange={field.onChange}
+                    value={field.value}
+                  />
+                )
+              }
             />
           );
         })}

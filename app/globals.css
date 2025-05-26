@@ -189,6 +189,21 @@ button {
   }
 }
 
-.ql-editor p {
+.ql-editor {
+  min-width: 100% !important;
+}
+
+.ql-editor p,
+.ql-editor li,
+.ql-editor ol {
   font-size: 1rem;
+  max-width: 100%;
+}
+
+.ql-editor h1 {
+  font-size: 1.6rem !important;
+}
+
+.ql-editor h2 {
+  font-size: 1.2rem !important;
 }

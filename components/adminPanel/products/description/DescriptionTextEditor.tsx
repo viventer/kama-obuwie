@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 
@@ -27,8 +27,10 @@ export default function DescriptionTextEditor({
     onChange(value);
   };
 
+  const [currentValue, setCurrentValue] = useState(value);
+
   return (
-    <div className="h-fit w-1/2 min-w-1/2">
+    <div className="h-fit md:w-1/2 md:min-w-1/2 w-full">
       <div id={toolbarId}>
         <span className="ql-formats">
           <button className="ql-header" value="1">
@@ -49,10 +51,11 @@ export default function DescriptionTextEditor({
 
       <ReactQuill
         theme="snow"
-        value={value}
-        onChange={(value) => change(value)}
+        value={currentValue}
+        onChange={(value) => setCurrentValue(value)}
         modules={modules}
         className="h-fit w-full min-w-full scrollbar"
+        onBlur={() => change(currentValue)}
       />
     </div>
   );

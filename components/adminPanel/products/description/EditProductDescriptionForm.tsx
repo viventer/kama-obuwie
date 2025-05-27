@@ -71,6 +71,7 @@ export const EditProductDescriptionForm = ({
           <PhotosReorder photos={field.value} setPhotos={field.onChange} />
         )}
       />
+      <h3 className="font-bold">Edytuj opis</h3>
       {descriptionRows.fields.map((row, rowIndex) => (
         <DescriptionRow
           key={row.id}
@@ -101,7 +102,7 @@ export const EditProductDescriptionForm = ({
         onClick={() => console.log(form.getValues())}
         className="w-full"
       >
-        Zapisz opis
+        Zapisz zmiany
       </Button>
     </Form>
   );

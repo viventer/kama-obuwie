@@ -52,7 +52,7 @@ export default function PhotosReorder({
 
   return (
     <div>
-      <FormLabel className="mb-4">Zmień kolejność zdjęć</FormLabel>
+      <h3 className="mb-4 font-bold">Zmień kolejność zdjęć w ofercie</h3>
       {photos.length > 0 ? (
         <DndContext
           sensors={sensors}
@@ -74,7 +74,7 @@ export default function PhotosReorder({
                   key={variant}
                 >
                   <h2 className="text-foreground/85 mb-2">{variant}</h2>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex sm:flex-wrap gap-2 overflow-x-auto scrollbar">
                     {photosForVariant.map((photo, idx) => (
                       <div
                         key={photo.filePath}

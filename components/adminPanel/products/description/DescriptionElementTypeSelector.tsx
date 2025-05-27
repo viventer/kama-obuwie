@@ -20,8 +20,12 @@ export default function DescriptionElementTypeSelector({
   };
 
   return (
-    <Tabs onValueChange={onTabValueChange} value={tabValue}>
-      <TabsList>
+    <Tabs
+      onValueChange={onTabValueChange}
+      value={tabValue}
+      className="overflow-x-auto scrollbar"
+    >
+      <TabsList className="w-full h-fit flex overflow-x-auto scrollbar">
         <TabsTrigger value="text">
           <TextIcon className="size-4" />
         </TabsTrigger>

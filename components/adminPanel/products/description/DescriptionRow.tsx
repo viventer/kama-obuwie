@@ -48,7 +48,7 @@ export default function DescriptionRow({
       <div
         className={`${
           selectedRow === index ? "flex" : "hidden"
-        } w-full items-center justify-between mb-2 z-50`}
+        } w-full items-center justify-between gap-2 mb-2 z-50`}
       >
         <FormField
           control={form.control}
@@ -108,7 +108,7 @@ export default function DescriptionRow({
           )}
         </div>
       </div>
-      <div className="flex justify-center items-center gap-10">
+      <div className="flex justify-center items-center gap-10 md:flex-row flex-col">
         {elementsFieldsArray.fields.map((elem, elemIndex) => {
           const elementType = elementsTypes[elemIndex];
 

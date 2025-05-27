@@ -51,7 +51,7 @@ export default function PhotosReorder({
   };
 
   return (
-    <div>
+    <div className="mb-8">
       <h3 className="mb-4 font-bold">Zmień kolejność zdjęć w ofercie</h3>
       {photos.length > 0 ? (
         <DndContext

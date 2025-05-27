@@ -9,14 +9,17 @@ import { Button } from "@/components/ui/button";
 import {
   Description,
   DescriptionSchema,
-  EditedPhoto,
   EditedPhotoSchema,
   EditedPhotoWithUrl,
   EditedPhotoWithUrlSchema,
 } from "@/firebase/schemas/productsSchemas";
 import DescriptionRow from "./DescriptionRow";
-import { useEffect } from "react";
 import PhotosReorder from "../PhotosReorder";
+import { useConfirmDialog } from "../../global/ConfirmDialogProvider";
+import { FormEvent } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useToast } from "@/hooks/useToast";
+import axios from "axios";
 
 export interface DescriptionFormValues {
   description: Description;
@@ -56,11 +59,53 @@ export const EditProductDescriptionForm = ({
     name: "description",
   });
 
-  const description = form.watch("description.0.elements");
+  const { showDialog } = useConfirmDialog();
+  const { showToast } = useToast();
+  const router = useRouter();
+  const handleReject = async (e: FormEvent) => {
+    e.preventDefault();
 
-  useEffect(() => {
-    console.log("description", description);
-  }, [description]);
+    showDialog({
+      message: "Czy na pewno chcesz odrzucić zmiany?",
+      description: "Ta operacja jest nieodwracalna.",
+      onConfirm: async () => {
+        router.back();
+        showToast("Zmiany zostały odrzucone.", "default");
+      },
+    });
+  };
+
+  const { id } = useParams();
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    const data: DescriptionFormValues = form.getValues();
+    const newEditedPhotos = data.reorderedPhotos.map((photo) => ({
+      colorVariantName: photo.colorVariantName || "",
+      filePath: photo.filePath || "",
+    }));
+    try {
+      DescriptionSchema.parse(data.description);
+      z.array(EditedPhotoSchema).parse(newEditedPhotos);
+    } catch (error) {
+      showToast(`Wystąpił błąd walidacji danych: ${error}`, "error");
+      return;
+    }
+
+    try {
+      const resp = await axios.patch(`/api/products/${id}`, {
+        description: data.description,
+        editedPhotos: newEditedPhotos,
+      });
+      if (resp.status !== 200) {
+        throw new Error("Nie udało się edytować produktu.");
+      }
+      showToast("Opis został pomyślnie edytowany.", "success");
+      router.push("/admin-panel/create-products/description");
+    } catch (error) {
+      showToast(`Wystąpił błąd podczas edycji opisu: ${error}`, "error");
+    }
+  };
 
   return (
     <Form {...form}>
@@ -71,7 +116,7 @@ export const EditProductDescriptionForm = ({
           <PhotosReorder photos={field.value} setPhotos={field.onChange} />
         )}
       />
-      <h3 className="font-bold">Edytuj opis</h3>
+      <h3 className="font-bold mb-2">Edytuj opis</h3>
       {descriptionRows.fields.map((row, rowIndex) => (
         <DescriptionRow
           key={row.id}
@@ -97,13 +142,19 @@ export const EditProductDescriptionForm = ({
         Dodaj wiersz
       </Button>
 
-      <Button
-        type="button"
-        onClick={() => console.log(form.getValues())}
-        className="w-full"
-      >
-        Zapisz zmiany
-      </Button>
+      <div className="flex gap-4 mt-8">
+        <Button type="button" onClick={handleSubmit} className="w-fit">
+          Zapisz
+        </Button>
+        <Button
+          type="button"
+          onClick={handleReject}
+          className="w-fit"
+          variant="destructive"
+        >
+          Odrzuć
+        </Button>
+      </div>
     </Form>
   );
 };

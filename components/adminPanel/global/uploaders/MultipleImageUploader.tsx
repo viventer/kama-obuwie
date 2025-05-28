@@ -159,9 +159,9 @@ export default function MultipleImageUploader({
                 strategy={rectSortingStrategy}
               >
                 <div className="flex flex-wrap gap-2">
-                  {images.map((img) => (
+                  {images.map((img, idx) => (
                     <SortableImage
-                      key={img.filePath}
+                      key={idx}
                       id={img.filePath}
                       url={img.url}
                       onRemove={() => removeImage(img.filePath)}

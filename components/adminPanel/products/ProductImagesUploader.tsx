@@ -26,28 +26,34 @@ export default function ProductImagesUploader({
   const { id } = params as { id: string };
 
   const colorVariantName = variant ? getColorVariantName(variant) : "";
+
   const filteredOldPhotos = oldPhotos.filter((photo) => {
     if (!colorVariantName) return true;
     return photo.colorVariantName === colorVariantName;
   });
 
   const oldFilePaths = filteredOldPhotos.map((photo) => photo.filePath);
-
-  const [filePaths, setFilePaths] = useState<string[]>(oldFilePaths || []);
+  const [filePaths, setFilePaths] = useState<string[]>(oldFilePaths);
 
   useEffect(() => {
-    const newPhotos: RawPhoto[] | EditedPhoto[] = filePaths.map((filePath) => ({
+    const uniquePaths = Array.from(new Set(filePaths));
+    if (uniquePaths.length !== filePaths.length) {
+      setFilePaths(uniquePaths);
+      return;
+    }
+
+    const newPhotos: RawPhoto[] = uniquePaths.map((filePath) => ({
       filePath,
       colorVariantName: colorVariantName || "",
     }));
+
     setNewPhotos((prev) => {
-      const filteredOldPhotos = prev.filter((photo) => {
-        if (!colorVariantName) return true;
-        return photo.colorVariantName !== colorVariantName;
-      });
-      return [...filteredOldPhotos, ...newPhotos];
+      const otherVariants = prev.filter(
+        (photo) => photo.colorVariantName !== colorVariantName
+      );
+      return [...otherVariants, ...newPhotos];
     });
-  }, [filePaths]);
+  }, [filePaths, colorVariantName, setNewPhotos]);
 
   return (
     <div className="mb-8">

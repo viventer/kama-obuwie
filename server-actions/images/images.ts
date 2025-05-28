@@ -151,3 +151,9 @@ export const deleteUnusedPhotosFromStorage = cache(async function (
 
   await Promise.all(unusedFiles.map((file) => file.delete()));
 });
+
+export const makeFilePublic = cache(async function (filePath: string) {
+  const bucket = adminStorage.bucket();
+  const fileRef = bucket.file(filePath);
+  fileRef.makePublic();
+});

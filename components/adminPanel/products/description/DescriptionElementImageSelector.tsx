@@ -7,8 +7,9 @@ import Image from "next/image";
 import { useFormContext } from "react-hook-form";
 import SingleSelect from "../../global/form/SingleSelect";
 import { useEffect, useState } from "react";
-import { getImageUrl, makeFilePublic } from "@/server-actions/images/images";
+import { getImageUrl } from "@/server-actions/images/images";
 import { choosingSizeImageFilePath } from "@/lib/constants";
+import { useProductTypeContext } from "../ProductsTypeContext";
 
 export default function DescriptionElementImageSelector({
   onChange,
@@ -17,6 +18,8 @@ export default function DescriptionElementImageSelector({
   onChange: (value: string) => void;
   value: string | undefined;
 }) {
+  const { productType } = useProductTypeContext();
+
   const form = useFormContext();
   const photos = form.watch("reorderedPhotos") as EditedPhotoWithUrl[];
   const firstVariantPhotos = photos.filter(
@@ -26,10 +29,14 @@ export default function DescriptionElementImageSelector({
     name: (index + 1).toString(),
     value: (index + 1).toString(),
   }));
-  availableOptions.push({ name: "Rozmiarówka", value: "rozmiarówka" });
+  if (productType.includes("obuwie")) {
+    availableOptions.push({ name: "Rozmiarówka", value: "rozmiarówka" });
+  }
   const [choosingSizeUrl, setChoosingSizeUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!productType.includes("obuwie")) return;
+
     (async () => {
       const url = await getImageUrl(choosingSizeImageFilePath);
       setChoosingSizeUrl(url);

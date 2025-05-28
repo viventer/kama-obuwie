@@ -25,7 +25,10 @@ export default function DescriptionTextEditor({
   const [currentValue, setCurrentValue] = useState(value);
 
   return (
-    <div className="h-fit md:w-1/2 md:min-w-1/2 w-full">
+    <div
+      className="h-fit md:w-1/2 md:min-w-1/2 w-full"
+      onBlur={() => onChange(currentValue)}
+    >
       <div id={toolbarId}>
         <span className="ql-formats">
           <button className="ql-header" value="1">
@@ -50,7 +53,6 @@ export default function DescriptionTextEditor({
         onChange={(value) => setCurrentValue(value)}
         modules={modules}
         className="h-fit w-full min-w-full scrollbar"
-        onBlur={() => onChange(currentValue)}
       />
     </div>
   );

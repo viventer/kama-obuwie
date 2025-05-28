@@ -7,6 +7,23 @@ export type RootCategory =
   | "obuwie dziecięce"
   | "akcesoria dziecięce";
 
+export type DescriptionVariable =
+  | "rozmiar"
+  | "kolor"
+  | "marka"
+  | "kod producenta"
+  | "rozmiarówka"
+  | "długość wkładki";
+
+export const DescriptionVariables: DescriptionVariable[] = [
+  "rozmiar",
+  "kolor",
+  "marka",
+  "kod producenta",
+  "rozmiarówka",
+  "długość wkładki",
+];
+
 export type ProductType = "obuwie" | "akcesoria";
 
 export const RootCategoryValues = [

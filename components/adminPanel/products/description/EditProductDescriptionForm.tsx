@@ -20,6 +20,7 @@ import { FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import axios from "axios";
+import DescriptionVariablesList from "./DescriptionVariablesList";
 
 export interface DescriptionFormValues {
   description: Description;
@@ -117,6 +118,9 @@ export const EditProductDescriptionForm = ({
           <PhotosReorder photos={field.value} setPhotos={field.onChange} />
         )}
       />
+
+      <DescriptionVariablesList />
+
       <h3 className="font-bold mb-2">Edytuj opis</h3>
       {descriptionRows.fields.map((row, rowIndex) => (
         <DescriptionRow

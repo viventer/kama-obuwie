@@ -16,7 +16,7 @@ type Props = {
 
 export async function generateMetadata(props: Props) {
   return {
-    title: `Uzupełnij parametry produktu`,
+    title: `Utwórz opis produktu`,
   };
 }
 

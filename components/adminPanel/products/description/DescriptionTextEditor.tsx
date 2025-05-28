@@ -22,11 +22,6 @@ export default function DescriptionTextEditor({
     [toolbarId]
   );
 
-  const change = (value: string) => {
-    console.log("change", value);
-    onChange(value);
-  };
-
   const [currentValue, setCurrentValue] = useState(value);
 
   return (
@@ -55,7 +50,7 @@ export default function DescriptionTextEditor({
         onChange={(value) => setCurrentValue(value)}
         modules={modules}
         className="h-fit w-full min-w-full scrollbar"
-        onBlur={() => change(currentValue)}
+        onBlur={() => onChange(currentValue)}
       />
     </div>
   );

@@ -79,6 +79,7 @@ export const EditProductDescriptionForm = ({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
     const data: DescriptionFormValues = form.getValues();
     const newEditedPhotos = data.reorderedPhotos.map((photo) => ({
       colorVariantName: photo.colorVariantName || "",

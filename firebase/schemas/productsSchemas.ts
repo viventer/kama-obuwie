@@ -195,6 +195,8 @@ export type RawPhoto = z.infer<typeof RawPhotoSchema>;
 export type EditedPhoto = z.infer<typeof EditedPhotoSchema>;
 export type EditedPhotoWithUrl = z.infer<typeof EditedPhotoWithUrlSchema>;
 
+export type ProductWithStatus = ProductWithId & { isReady: boolean };
+
 export const SizingTableUpdateDataSchema = SizingTableSchema.partial().strict();
 
 export const CategoryUpdateDataSchema = CategorySchema.partial().strict();

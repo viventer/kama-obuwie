@@ -1,6 +1,10 @@
 "use client";
 
-import { Product, ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  Product,
+  ProductWithId,
+  ProductWithStatus,
+} from "@/firebase/schemas/productsSchemas";
 import { useToast } from "@/hooks/useToast";
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
 import axios from "axios";
@@ -15,7 +19,7 @@ export default function CreateProductsParametersDataTable({
   data: ProductWithId[] | null;
 }) {
   const { productType } = useProductTypeContext();
-  const [filteredData, setFilteredData] = useState<ProductWithId[] | null>(
+  const [filteredData, setFilteredData] = useState<ProductWithStatus[] | null>(
     null
   );
 
@@ -28,9 +32,9 @@ export default function CreateProductsParametersDataTable({
     ...elementaryColumnNames,
     { attributeName: "colorVariants", displayName: "Warianty" },
   ];
-  const [columnNames, setColumnNames] = useState<ColumnName<ProductWithId>[]>(
-    elementaryColumnNames
-  );
+  const [columnNames, setColumnNames] = useState<
+    ColumnName<ProductWithStatus>[]
+  >(elementaryColumnNames);
 
   useEffect(() => {
     if (!data) {
@@ -40,7 +44,28 @@ export default function CreateProductsParametersDataTable({
     const newData = data.filter(
       (product) => product.productType === productType
     );
-    setFilteredData(newData);
+    const newDataWithStatus: ProductWithStatus[] = newData.map((product) => {
+      const requiredParameters = product?.parameters?.required;
+      const optionalParameters = product?.parameters?.optional;
+      if (!requiredParameters && !optionalParameters) {
+        return { ...product, isReady: false };
+      }
+      if (requiredParameters) {
+        const allRequiredFilled = Object.values(requiredParameters).every(
+          (value) => {
+            if (Array.isArray(value)) return value.length > 0;
+            return value !== null && value !== undefined && value !== "";
+          }
+        );
+        if (!allRequiredFilled) {
+          console.log(requiredParameters);
+          return { ...product, isReady: false };
+        }
+      }
+      return { ...product, isReady: true };
+    });
+
+    setFilteredData(newDataWithStatus);
 
     if (
       productType === "obuwie" &&
@@ -60,30 +85,15 @@ export default function CreateProductsParametersDataTable({
       name: "Przenieś dalej",
       onClick: async (id) => {
         try {
-          const productData = data?.find((product) => product.id === id);
-          const requiredParameters = productData?.parameters?.required;
-          const optionalParameters = productData?.parameters?.optional;
-          if (!requiredParameters && !optionalParameters) {
+          const productData = filteredData?.find(
+            (product) => product.id === id
+          );
+          if (!productData || !productData.isReady) {
             showToast(
-              "Nie można przenieść produktu. Nie dodałeś parametrów.",
+              "Nie można przenieść produktu. Uzupełnij wszystkie wymagane parametry.",
               "error"
             );
             return;
-          }
-          if (requiredParameters) {
-            const allRequiredFilled = Object.values(requiredParameters).every(
-              (value) => {
-                if (Array.isArray(value)) return value.length > 0;
-                return value !== null && value !== undefined && value !== "";
-              }
-            );
-            if (!allRequiredFilled) {
-              showToast(
-                "Nie można przenieść produktu. Uzupełnij wszystkie wymagane parametry.",
-                "error"
-              );
-              return;
-            }
           }
           const updateData: Partial<Product> = {
             creationStage: "description",
@@ -136,6 +146,7 @@ export default function CreateProductsParametersDataTable({
       hasImages={true}
       imageAttribute="samplePhoto"
       imageFolderPath={`products/sample-photos/${productType}`}
+      isReadyAttribute="isReady"
     />
   );
 }

@@ -35,8 +35,21 @@ export default function AllegroParametersSection({
   const [requiredParameters, setRequiredParameters] =
     useState<AllegroProductParameter[]>();
 
-  const { control, watch } = useFormContext<ProductWithId>();
+  const { control, watch, setValue } = useFormContext<ProductWithId>();
   const currentParams = watch("parameters") || { required: {}, optional: {} };
+
+  const updateCurrentParams = (
+    paramsList: AllegroProductParameter[],
+    type: "optional" | "required"
+  ) => {
+    const allowedParamNames = paramsList.map((p) => p.name);
+    const filteredParams = Object.fromEntries(
+      Object.entries(currentParams[type]).filter(([key]) =>
+        allowedParamNames.includes(key)
+      )
+    );
+    setValue(`parameters.${type}`, filteredParams);
+  };
 
   useEffect(() => {
     if (!allegroCategoryId) return;
@@ -59,8 +72,9 @@ export default function AllegroParametersSection({
             !allegroParametersToSkip.includes(p.name)
         );
 
-        console.log("Optional parameters:", optional);
-        console.log("Required parameters:", required);
+        updateCurrentParams(optional, "optional");
+        updateCurrentParams(required, "required");
+
         setOptionalParameters(optional);
         setRequiredParameters(required);
       } catch (error) {
@@ -117,7 +131,7 @@ export default function AllegroParametersSection({
                 key={parameter.name}
                 control={control}
                 name={`parameters.optional.${parameter.name}`}
-                defaultValue={currentParams?.required?.[parameter.name] || ""}
+                defaultValue={currentParams?.optional?.[parameter.name] || ""}
                 render={({ field }) => (
                   <AllegroParametersSectionFormItem
                     key={parameter.name}

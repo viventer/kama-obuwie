@@ -79,9 +79,9 @@ export default function SizingTableSelector({
                 {filtered.map((tbl) => (
                   <CommandItem
                     key={tbl.id}
-                    onSelect={(categoryName) => {
+                    onSelect={(tableName) => {
                       const id = filtered.find(
-                        (tbl) => tbl.name === categoryName
+                        (tbl) => tbl.name === tableName
                       )?.id;
                       onChange(id || "");
                       setQuery("");

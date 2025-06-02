@@ -12,11 +12,13 @@ export default function DataTableRowWithImage<T>({
   imageAttribute,
   imageFolderPath,
   isReadyAttribute,
+  onRowClick,
 }: {
   row: Row<T>;
   imageAttribute: keyof T;
   imageFolderPath: string;
   isReadyAttribute?: keyof T;
+  onRowClick?: (row: Row<T>) => void;
 }) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isReady, setIsReady] = useState<boolean>(false);
@@ -62,6 +64,9 @@ export default function DataTableRowWithImage<T>({
           return;
         }
         row.toggleExpanded();
+        if (onRowClick) {
+          onRowClick(row);
+        }
       }}
     >
       <TableCell>

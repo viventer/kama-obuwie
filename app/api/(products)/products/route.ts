@@ -15,11 +15,22 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get("type");
-  const queryFn =
-    type === "obuwie" || type === "akcesoria"
-      ? (ref: FirebaseFirestore.CollectionReference) =>
-          ref.where("productType", "==", type)
-      : undefined;
+  const creationStageParam = request.nextUrl.searchParams.get("creationStage");
+  const stages = creationStageParam ? creationStageParam.split(",") : null;
+
+  const queryFn = (ref: FirebaseFirestore.CollectionReference) => {
+    let query: FirebaseFirestore.Query = ref;
+
+    if (type === "obuwie" || type === "akcesoria") {
+      query = query.where("productType", "==", type);
+    }
+
+    if (stages && stages.length > 0) {
+      query = query.where("creationStage", "in", stages);
+    }
+
+    return query;
+  };
 
   const data = await getDocumentsFromAdminDB("products", queryFn);
   if (!data) {

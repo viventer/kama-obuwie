@@ -22,6 +22,8 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  RowSelectionState,
+  ColumnDef,
 } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
@@ -39,8 +41,10 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
 import DataTableRow from "./DataTableRow";
 import DataTableRowWithImage from "./DataTableRowWithImage";
+import IndeterminateCheckbox from "./IndeterminateCheckbox";
 
 export function DataTable<T extends { id: string }>({
   data,
@@ -53,10 +57,13 @@ export function DataTable<T extends { id: string }>({
   imageAttribute,
   imageFolderPath,
   isReadyAttribute,
+  onRowClick,
+  maxSelectable,
+  onSelectionChange,
 }: {
   data: T[];
   columnNames: ColumnName<T>[];
-  actions: TableAction[];
+  actions?: TableAction[];
   searchColumns: (keyof T)[];
   renderRowSubComponent?: (row: T) => React.ReactNode;
   searchPlaceholder?: string;
@@ -64,6 +71,9 @@ export function DataTable<T extends { id: string }>({
   imageAttribute?: keyof T;
   imageFolderPath?: string;
   isReadyAttribute?: keyof T;
+  onRowClick?: (row: T) => void;
+  maxSelectable?: number;
+  onSelectionChange?: (selected: T[]) => void;
 }) {
   const [pagination, setPagination] = useState<{
     pageIndex: number;
@@ -77,6 +87,7 @@ export function DataTable<T extends { id: string }>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const globalFilterFn = (
     row: Row<T>,
@@ -94,9 +105,64 @@ export function DataTable<T extends { id: string }>({
 
   const basicColumns = getDataTableColumns<T>(columnNames, actions);
 
+  const selectionColumn: ColumnDef<T, any> = {
+    id: "select",
+    header: () => null,
+    cell: ({ row }) => {
+      const isChecked = !!rowSelection[row.id];
+
+      return (
+        <Checkbox
+          checked={isChecked}
+          onCheckedChange={(value) => {
+            if (value) {
+              // Jeśli zaznaczamy wiersz
+              if (maxSelectable === 1) {
+                setRowSelection({ [row.id]: true });
+                onSelectionChange?.([row.original]);
+              } else {
+                setRowSelection((prev) => {
+                  const next = { ...prev, [row.id]: true };
+                  const selectedObjs = data.filter((item) =>
+                    Object.keys(next).includes(item.id)
+                  );
+                  onSelectionChange?.(selectedObjs);
+                  return next;
+                });
+              }
+            } else {
+              // Jeśli odznaczamy wiersz
+              if (maxSelectable === 1) {
+                setRowSelection({});
+                onSelectionChange?.([]);
+              } else {
+                setRowSelection((prev) => {
+                  const copy = { ...prev };
+                  delete copy[row.id];
+                  const selectedObjs = data.filter((item) =>
+                    Object.keys(copy).includes(item.id)
+                  );
+                  onSelectionChange?.(selectedObjs);
+                  return copy;
+                });
+              }
+            }
+          }}
+          onClick={(e) => e.stopPropagation()}
+        />
+      );
+    },
+    enableSorting: false,
+    enableColumnFilter: false,
+    size: 40,
+  };
+
+  const allColumns = [selectionColumn, ...basicColumns];
+
   const table = useReactTable({
     data,
-    columns: basicColumns,
+    columns: allColumns,
+    getRowId: (row) => row.id, // Dodano getRowId
     state: {
       globalFilter,
       sorting,
@@ -104,6 +170,7 @@ export function DataTable<T extends { id: string }>({
       columnVisibility,
       expanded,
       pagination,
+      rowSelection,
     },
     globalFilterFn,
     onGlobalFilterChange: setGlobalFilter,
@@ -111,12 +178,12 @@ export function DataTable<T extends { id: string }>({
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onExpandedChange: setExpanded,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-    onPaginationChange: setPagination,
   });
 
   return (
@@ -156,6 +223,7 @@ export function DataTable<T extends { id: string }>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
       <div className="rounded-md border">
         <Table>
           {!hasImages && (
@@ -176,6 +244,7 @@ export function DataTable<T extends { id: string }>({
               ))}
             </TableHeader>
           )}
+
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
@@ -186,14 +255,18 @@ export function DataTable<T extends { id: string }>({
                       imageAttribute={imageAttribute}
                       imageFolderPath={imageFolderPath}
                       isReadyAttribute={isReadyAttribute}
+                      onRowClick={() => onRowClick?.(row.original)}
                     />
                   ) : (
-                    <DataTableRow<T> row={row} />
+                    <DataTableRow<T>
+                      row={row}
+                      onRowClick={() => onRowClick?.(row.original)}
+                    />
                   )}
 
                   {row.getIsExpanded() && renderRowSubComponent && (
                     <TableRow>
-                      <TableCell colSpan={basicColumns.length}>
+                      <TableCell colSpan={allColumns.length}>
                         {renderRowSubComponent(row.original)}
                       </TableCell>
                     </TableRow>
@@ -203,7 +276,7 @@ export function DataTable<T extends { id: string }>({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={basicColumns.length}
+                  colSpan={allColumns.length}
                   className="h-24 text-center"
                 >
                   Brak wyników.
@@ -213,9 +286,10 @@ export function DataTable<T extends { id: string }>({
           </TableBody>
         </Table>
       </div>
+
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          wybrano {table.getFilteredSelectedRowModel().rows.length} z{" "}
+          wybrano {table.getSelectedRowModel().rows.length} z{" "}
           {table.getFilteredRowModel().rows.length} rzędów.
         </div>
         <div className="space-x-2">

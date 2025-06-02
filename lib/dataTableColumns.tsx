@@ -73,6 +73,10 @@ export function getDataTableColumns<T extends { id: string }>(
 ): ColumnDef<T, unknown>[] {
   const dataColumns = getDataColumns<T>(columnNames);
 
+  if (!tableActions || tableActions.length === 0) {
+    return [getSelectAllColumn<T>(), ...dataColumns];
+  }
+
   const actionColumn: ColumnDef<T, unknown> = {
     id: "actions",
     enableHiding: false,

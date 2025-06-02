@@ -16,11 +16,12 @@ import {
 import DescriptionRow from "./DescriptionRow";
 import PhotosReorder from "../PhotosReorder";
 import { useConfirmDialog } from "../../global/ConfirmDialogProvider";
-import { FormEvent } from "react";
+import { FormEvent, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import axios from "axios";
 import DescriptionVariablesList from "./DescriptionVariablesList";
+import ImportProductDescription from "./ImportProductDescription";
 
 export interface DescriptionFormValues {
   description: Description;
@@ -109,6 +110,10 @@ export const EditProductDescriptionForm = ({
     }
   };
 
+  const updateDescriptionRows = (description: Description) => {
+    descriptionRows.replace(description);
+  };
+
   return (
     <Form {...form}>
       <FormField
@@ -116,6 +121,18 @@ export const EditProductDescriptionForm = ({
         name={"reorderedPhotos" as const}
         render={({ field }) => (
           <PhotosReorder photos={field.value} setPhotos={field.onChange} />
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name={"description" as const}
+        render={({ field }) => (
+          <ImportProductDescription
+            setDescription={(description: Description) => {
+              updateDescriptionRows(description);
+            }}
+          />
         )}
       />
 

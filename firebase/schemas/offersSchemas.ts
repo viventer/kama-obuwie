@@ -52,7 +52,8 @@ export const OfferSchema = z.object({
   id: z.string(),
   title: z.string().min(3).max(75),
   productId: z.string(),
-  colorVariant: z.string().optional(),
+  signature: z.string(), // manufacturer code + color variant name
+  colorVariantName: z.string().optional(),
   sellingPrices: z.array(SellingPriceSchema),
   initialSellingPrices: z.array(SellingPriceSchema),
   statsId: z.string().optional(),

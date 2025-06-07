@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { SalesChannelSchema } from "./otherSchemas";
 
-export const rateSchema = z.object({
+export const shippingRateSchema = z.object({
   name: z.string().min(3).max(64),
   deliveryMethod: z.object({
     id: z.string(),
@@ -28,7 +28,7 @@ export const rateSchema = z.object({
 export const ShippingRatesSchema = z.object({
   salesChannel: SalesChannelSchema,
   allegroId: z.string().optional(),
-  rates: z.array(rateSchema),
+  rates: z.array(shippingRateSchema),
 });
 
 export const SellingPriceSchema = z.object({
@@ -77,3 +77,9 @@ export const OfferSchema = z.object({
     )
     .optional(),
 });
+
+export type ShippingRate = z.infer<typeof shippingRateSchema>;
+export type ShippingRates = z.infer<typeof ShippingRatesSchema>;
+export type SellingPrice = z.infer<typeof SellingPriceSchema>;
+export type Availability = z.infer<typeof AvailabilitySchema>;
+export type Offer = z.infer<typeof OfferSchema>;

@@ -57,52 +57,9 @@ export default function CreateProductsPostOfferDataTable({
 
   const actions: TableAction[] = [
     {
-      name: "Przenieś dalej",
-      onClick: async (id) => {
-        try {
-          const productData = data?.find((product) => product.id === id);
-          const requiredParameters = productData?.parameters?.required;
-          const optionalParameters = productData?.parameters?.optional;
-          if (!requiredParameters && !optionalParameters) {
-            showToast(
-              "Nie można przenieść produktu. Nie dodałeś parametrów.",
-              "error"
-            );
-            return;
-          }
-          if (requiredParameters) {
-            const allRequiredFilled = Object.values(requiredParameters).every(
-              (value) => {
-                if (Array.isArray(value)) return value.length > 0;
-                return value !== null && value !== undefined && value !== "";
-              }
-            );
-            if (!allRequiredFilled) {
-              showToast(
-                "Nie można przenieść produktu. Uzupełnij wszystkie wymagane parametry.",
-                "error"
-              );
-              return;
-            }
-          }
-          const updateData: Partial<Product> = {
-            creationStage: "description",
-          };
-          await axios.patch(`/api/products/${id}`, updateData);
-          showToast(
-            "Produkt został przeniesiony do kolejnego etapu.",
-            "success"
-          );
-          router.refresh();
-        } catch (err) {
-          showToast(`Nie można przenieść produktu: ${err}`, "error");
-        }
-      },
-    },
-    {
-      name: "Uzupełnij parametry",
+      name: "Wystaw ofertę",
       onClick: (id) => {
-        router.push(`/admin-panel/create-products/parameters/${id}`);
+        router.push(`/admin-panel/create-products/post-offer/${id}`);
       },
     },
     {
@@ -110,7 +67,7 @@ export default function CreateProductsPostOfferDataTable({
       onClick: async (id) => {
         try {
           const updateData: Partial<Product> = {
-            creationStage: "photosEdit",
+            creationStage: "description",
           };
           await axios.patch(`/api/products/${id}`, updateData);
           showToast(

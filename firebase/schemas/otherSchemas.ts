@@ -11,3 +11,5 @@ export const ImageUrlSchema = z
   );
 
 export type ImageUrl = z.infer<typeof ImageUrlSchema>;
+
+export const SalesChannelSchema = z.enum(["AL1", "AL2", "POS", "DTC"]);

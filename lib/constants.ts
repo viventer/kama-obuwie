@@ -3,4 +3,11 @@ export const choosingSizeImageFilePath =
 
 export type SalesChannel = "AL1" | "AL2" | "POS" | "DTC";
 
-export const salesChannels: SalesChannel[] = ["AL1", "AL2", "POS", "DTC"];
+export const salesChannels: SalesChannel[] = [
+  "AL1",
+  "AL2",
+  "POS",
+  "DTC",
+] as const;
+
+export const allegroSalesChannels: SalesChannel[] = ["AL1", "AL2"] as const;

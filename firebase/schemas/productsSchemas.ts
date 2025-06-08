@@ -100,7 +100,7 @@ export const EditedPhotoWithUrlSchema = EditedPhotoSchema.extend({
   url: z.string(),
 });
 
-const ParamValueSchema = z.union([
+export const ParamValueSchema = z.union([
   z.string(),
   z.number(),
   z.boolean(),

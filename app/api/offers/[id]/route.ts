@@ -1,7 +1,5 @@
 import { NextRequest } from "next/server";
-import { Product } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
-import { updateProduct } from "@/server-actions/products/products";
 import { Offer } from "@/firebase/schemas/offersSchemas";
 import { updateOffer } from "@/server-actions/offers/offers";
 

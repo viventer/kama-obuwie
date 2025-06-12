@@ -32,7 +32,6 @@ export const ShippingRatesSchema = z.object({
 });
 
 export const AvailabilitySchema = z.object({
-  size: z.number().optional(),
   value: z.number().min(0).max(1000),
   isActive: z.boolean(),
   allegroProductIds: z.array(
@@ -47,7 +46,7 @@ export const OfferSchema = z.object({
   id: z.string(),
   title: z.string().min(3).max(75),
   productId: z.string(),
-  signature: z.string(), // manufacturer code + color variant name
+  signature: z.string(), // brand + manufacturer code + color variant name
   colorVariantName: z.string().optional(),
   sellingPrices: z.record(SalesChannelSchema, z.string()),
   initialSellingPrices: z.record(SalesChannelSchema, z.string()),
@@ -55,7 +54,7 @@ export const OfferSchema = z.object({
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
   shippingRates: z.record(SalesChannelSchema, ShippingRatesSchema),
-  availability: z.array(AvailabilitySchema).min(1),
+  availability: z.record(z.string(), AvailabilitySchema),
   allegroOffersIds: z.array(z.string()).optional(),
   offerGroupId: z.string().optional(),
   isPosted: z.object({
@@ -90,7 +89,7 @@ export const AllegroOfferDescriptionSchema = z.array(
 export const AllegroOfferParametersSchema = z.array(
   z.object({
     name: z.string(),
-    values: z.array(ParamValueSchema).nonempty(),
+    values: z.array(ParamValueSchema),
   })
 );
 
@@ -124,6 +123,7 @@ export const AllegroOfferSchema = z.object({
     }),
   }),
   description: AllegroOfferDescriptionSchema,
+  images: z.array(z.string().url()),
 });
 
 export type ShippingRate = z.infer<typeof shippingRateSchema>;

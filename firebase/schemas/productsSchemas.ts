@@ -13,7 +13,8 @@ export type DescriptionVariable =
   | "marka"
   | "kod producenta"
   | "rozmiarówka"
-  | "długość wkładki";
+  | "długość wkładki"
+  | "tytuł oferty";
 
 export const DescriptionVariables: DescriptionVariable[] = [
   "rozmiar",
@@ -22,6 +23,7 @@ export const DescriptionVariables: DescriptionVariable[] = [
   "kod producenta",
   "rozmiarówka",
   "długość wkładki",
+  "tytuł oferty",
 ];
 
 export type ProductType = "obuwie" | "akcesoria";

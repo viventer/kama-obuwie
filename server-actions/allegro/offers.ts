@@ -180,6 +180,7 @@ export async function postIndividualAllegroOffer(
     "kod producenta": product.manufacturerCode || "",
     rozmiarówka: formattedSizingTable,
     "długość wkładki": insoleLength.insoleLength.toString(),
+    "tytuł oferty": offer.title,
   };
 
   const photos = product.editedPhotos?.map((photo) => photo.filePath) || [];

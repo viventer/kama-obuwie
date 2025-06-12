@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { DataTable } from "../../global/data-table/DataTable";
 import { useProductTypeContext } from "../ProductsTypeContext";
 import { useEffect, useState } from "react";
+import { Offer } from "@/firebase/schemas/offersSchemas";
 
 export default function CreateProductsPostOfferDataTable({
   data,
@@ -55,11 +56,42 @@ export default function CreateProductsPostOfferDataTable({
   const router = useRouter();
   const { showToast } = useToast();
 
+  const handleCreateOffer = async (productId: string) => {
+    try {
+      const getOfferResponse = await axios.get(
+        "/api/offers?productId=" + productId
+      );
+      const data: Offer = Object.values(getOfferResponse.data)[0] as Offer;
+      const offerId = data?.id;
+      if (offerId) {
+        router.push("/admin-panel/offers/create/" + offerId);
+        return;
+      }
+      const createOfferResponse = await axios.post("/api/offers", {
+        productId: productId,
+      });
+      if (createOfferResponse.status === 201) {
+        const newOfferId = createOfferResponse.data.id;
+        router.push("/admin-panel/offers/create/" + newOfferId);
+        showToast("Szkic oferty został utworzony.", "success");
+      } else {
+        showToast(
+          `Nie można utworzyć szkicu oferty. Błąd: ${createOfferResponse.data}`,
+          "error"
+        );
+        return;
+      }
+    } catch (err) {
+      showToast(`Nie można wystawić oferty: ${err}`, "error");
+      return;
+    }
+  };
+
   const actions: TableAction[] = [
     {
       name: "Wystaw ofertę",
-      onClick: (id) => {
-        router.push(`/admin-panel/create-products/post-offer/${id}`);
+      onClick: async (id) => {
+        await handleCreateOffer(id as string);
       },
     },
     {

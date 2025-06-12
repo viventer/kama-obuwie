@@ -3,12 +3,12 @@
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { Offer, OfferSchema } from "@/firebase/schemas/offersSchemas";
 
-export async function createOffer(newOffer: Offer) {
-  OfferSchema.parse(newOffer);
+export async function createOffer(newOffer: Partial<Offer>) {
+  OfferSchema.partial().parse(newOffer);
 
   const offerRef = adminDB.collection("offers").doc();
 
-  await offerRef.set(newOffer);
+  await offerRef.set({ ...newOffer, id: offerRef.id });
 
   return offerRef.id;
 }

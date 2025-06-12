@@ -5,7 +5,7 @@ import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const body: Offer = await request.json();
+    const body: Partial<Offer> = await request.json();
     const id = await createOffer(body);
     return apiResponse("Oferta została utworzona.", 201, { id });
   } catch (err) {
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     return query;
   };
 
-  const data = await getDocumentsFromAdminDB("offers", queryFn);
+  const data = await getDocumentsFromAdminDB<Offer>("offers", queryFn);
   if (!data) {
     return apiResponse("Nie znaleziono ofert.", 204);
   }

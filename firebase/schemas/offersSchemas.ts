@@ -43,7 +43,7 @@ export const AvailabilitySchema = z.object({
 });
 
 export const OfferSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   title: z.string().min(3).max(75),
   productId: z.string(),
   signature: z.string(), // brand + manufacturer code + color variant name
@@ -126,6 +126,13 @@ export const AllegroOfferSchema = z.object({
   images: z.array(z.string().url()),
 });
 
+export const EditOfferFormSchema = OfferSchema.pick({
+  title: true,
+  sellingPrices: true,
+  shippingRates: true,
+  availability: true,
+});
+
 export type ShippingRate = z.infer<typeof shippingRateSchema>;
 export type ShippingRates = z.infer<typeof ShippingRatesSchema>;
 export type Availability = z.infer<typeof AvailabilitySchema>;
@@ -140,3 +147,5 @@ export type AllegroOfferDescription = z.infer<
 export type AllegroOfferParameters = z.infer<
   typeof AllegroOfferParametersSchema
 >;
+
+export type OfferWithId = Omit<Offer, "id"> & { id: string };

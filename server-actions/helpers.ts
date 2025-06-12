@@ -8,6 +8,10 @@ export function apiResponse(
   status: number,
   data?: Record<string, any>
 ): Response {
+  if (status === 204) {
+    return new NextResponse(null, { status });
+  }
+
   if (status >= 200 && status < 400) {
     return NextResponse.json({ ...data }, { status });
   }

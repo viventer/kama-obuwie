@@ -11,3 +11,24 @@ export const salesChannels: SalesChannel[] = [
 ] as const;
 
 export const allegroSalesChannels: SalesChannel[] = ["AL1", "AL2"] as const;
+
+export const availableProductCharacteristics = [
+  "lekkie",
+  "wodoodporne",
+  "oddychające",
+  "antypoślizgowe",
+  "elastyczne",
+  "szerokie",
+  "wąskie",
+  "stabilne",
+  "sztywny zapiętek",
+  "zdrowotne",
+  "z wkładką ortopedyczną",
+  "polski producent",
+  "miękkie wnętrze",
+  "miękka wkładka",
+  "ocieplane",
+  "ciepłe",
+  "na co dzień",
+  "eleganckie",
+] as const;

@@ -37,6 +37,7 @@ export default function ProductCreateForm({
       brand: oldData?.brand || "",
       manufacturerCode: oldData?.manufacturerCode || "",
       purchasePrice: oldData?.purchasePrice || 0,
+      suggestedPrice: oldData?.suggestedPrice || 0,
       colorVariants: oldData?.colorVariants || [],
       samplePhoto: oldData?.samplePhoto || "",
       creationStage: "new",
@@ -55,6 +56,7 @@ export default function ProductCreateForm({
     e.preventDefault();
     const data: Product = form.getValues();
     data.purchasePrice = Number(data.purchasePrice);
+    data.suggestedPrice = Number(data.suggestedPrice);
     data.productType = productType;
     try {
       if (oldData) {
@@ -145,6 +147,24 @@ export default function ProductCreateForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Cena zakupu</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="suggestedPrice"
+            rules={{ required: "Sugerowana cena jest wymagana." }}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Sugerowana cena sprzedaży</FormLabel>
                 <FormControl>
                   <Input
                     type="number"

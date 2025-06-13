@@ -12,7 +12,7 @@ export const salesChannels: SalesChannel[] = [
 
 export const allegroSalesChannels: SalesChannel[] = ["AL1", "AL2"] as const;
 
-export const availableProductCharacteristics = [
+export const availableProductFeatures = [
   "lekkie",
   "wodoodporne",
   "oddychające",

@@ -53,6 +53,7 @@ export default function EditProductParametersForm({
       brand: oldData.brand || "",
       manufacturerCode: oldData.manufacturerCode || "",
       purchasePrice: oldData.purchasePrice || 0,
+      suggestedPrice: oldData.suggestedPrice || 0,
       colorVariants: oldData.colorVariants || [],
       samplePhoto: oldData.samplePhoto || "",
       creationStage: oldData.creationStage || "new",
@@ -98,6 +99,7 @@ export default function EditProductParametersForm({
     e.preventDefault();
     const data = form.getValues();
     const purchasePriceNum = Number(data.purchasePrice);
+    const suggestedPriceNum = Number(data.suggestedPrice);
     const warrantyPeriodNum = Number(data.warrantyPeriod);
 
     const rangeSizesNum: RangeSize[] = (data.rangeSizes || []).map((rs) => ({
@@ -108,6 +110,7 @@ export default function EditProductParametersForm({
     const payload: Product = {
       ...data,
       purchasePrice: purchasePriceNum,
+      suggestedPrice: suggestedPriceNum,
       warrantyPeriod: warrantyPeriodNum,
       productType,
       rangeSizes: rangeSizesNum,
@@ -118,7 +121,8 @@ export default function EditProductParametersForm({
       (data.colorVariants &&
         data.colorVariants.length > 0 &&
         data.colorVariants[0]?.color !== "");
-    const purchasePriceValid = purchasePriceNum > 0;
+    const pricesValid =
+      purchasePriceNum > 0 && suggestedPriceNum > purchasePriceNum;
     const warrantyPeriodValid = warrantyPeriodNum >= 0;
 
     const isValid = await form.trigger();
@@ -126,7 +130,7 @@ export default function EditProductParametersForm({
     if (
       !isValid ||
       !hasValidColorVariants ||
-      !purchasePriceValid ||
+      !pricesValid ||
       !warrantyPeriodValid
     ) {
       showToast("W formularzu występują błędy.", "error");
@@ -218,6 +222,24 @@ export default function EditProductParametersForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Cena zakupu</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min={0}
+                  value={field.value}
+                  onChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="suggestedPrice"
+          rules={{ required: "Sugerowana cena jest wymagana." }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Sugerowana cena sprzedaży</FormLabel>
               <FormControl>
                 <Input
                   type="number"

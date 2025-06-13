@@ -132,7 +132,6 @@ export const ProductSchema = z.object({
   samplePhoto: z.string().optional(),
   rawPhotos: z.array(RawPhotoSchema).default([]).optional(),
   editedPhotos: z.array(EditedPhotoSchema).default([]).optional(),
-  shoeTypes: z.array(z.string().min(3).max(32)).default([]).optional(),
   colorVariants: z.array(ColorVariantSchema).default([]).optional(),
   warrantyPeriod: z.number().max(240).default(0).optional(),
   parameters: ProductParametersSchema.default({}),

@@ -30,6 +30,7 @@ import ImageUploader from "../../global/uploaders/ImageUploader";
 import AllegroParametersSection from "./AllegroParametersSection";
 import { DocumentDataWithRef } from "@/server-actions/helpers";
 import RangeSizesFormItem, { RangeSizeString } from "./RangeSizesFormItem";
+import MatchingCategoriesSelector from "../categories/MatchingCategoriesSelector";
 
 export default function EditProductParametersForm({
   oldData,
@@ -61,7 +62,12 @@ export default function EditProductParametersForm({
       warrantyPeriod: oldData.warrantyPeriod || 0,
       categoryId: oldData.categoryId,
       sizingTableId: oldData.sizingTableId || "",
-      parameters: oldData.parameters || {},
+      parameters: oldData?.parameters
+        ? {
+            required: oldData.parameters.required || {},
+            optional: oldData.parameters.optional || {},
+          }
+        : { required: {}, optional: {} },
       rootCategory: oldData.rootCategory,
       rangeSizes: oldData.rangeSizes
         ? oldData.rangeSizes.map((rs) => ({
@@ -69,6 +75,9 @@ export default function EditProductParametersForm({
             to: String(rs.to),
           }))
         : [{ from: "0", to: "0" }],
+      matchingCategoriesIds: oldData.matchingCategoriesIds || [],
+      features: oldData.features || [],
+      otherInfo: oldData.otherInfo || "",
     },
     mode: "onSubmit",
   });
@@ -355,6 +364,21 @@ export default function EditProductParametersForm({
               onChange={field.onChange}
               rootCategory={rootCategory}
               setAllegroCategoryId={setAllegroCategoryId}
+            />
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="matchingCategoriesIds"
+          rules={{
+            required: "Pasujące kategorie są wymagane.",
+          }}
+          render={({ field }) => (
+            <MatchingCategoriesSelector
+              value={field.value as string[]}
+              onChange={field.onChange}
+              rootCategory={rootCategory}
             />
           )}
         />

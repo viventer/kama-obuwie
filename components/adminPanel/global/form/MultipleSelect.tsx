@@ -34,7 +34,11 @@ export default function MultipleSelect({
     }
   };
 
-  const joinedValues = value.length > 0 ? value.join(", ") : "Wybierz";
+  const selectedOptions = availableOptions
+    .filter((option) => isSelected(option.value))
+    .map((option) => option.name);
+  const joinedValues =
+    selectedOptions.length > 0 ? selectedOptions.join(", ") : "Wybierz";
   const truncatedJoinedValues = truncateString(joinedValues, 42);
 
   return (

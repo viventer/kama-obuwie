@@ -95,6 +95,7 @@ export default function SizingTablesDataTable({
       const newSizingTable: SizingTable = {
         name: "Nowa tabela rozmiarów",
         insoleLengths: [],
+        sizingAccuracy: "normalna",
       };
 
       const resp = await axios.post("/api/sizing-tables", newSizingTable);

@@ -46,6 +46,12 @@ export const ProductCreationStages = [
   "done",
 ] as const;
 
+export const sizingAccuracyValues = [
+  "zaniżona",
+  "normalna",
+  "zawyżona",
+] as const;
+
 export const SizingTableSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(3).max(32),
@@ -55,6 +61,9 @@ export const SizingTableSchema = z.object({
       insoleLength: z.number(),
     })
   ),
+  sizingAccuracy: z
+    .enum(["zaniżona", "normalna", "zawyżona"])
+    .default("normalna"),
 });
 
 export const CategorySchema = z.object({

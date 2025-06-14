@@ -27,8 +27,8 @@ export default function DataTableRow<T>({
         }
       }}
     >
-      {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id}>
+      {row.getVisibleCells().map((cell, index) => (
+        <TableCell key={index}>
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>
       ))}

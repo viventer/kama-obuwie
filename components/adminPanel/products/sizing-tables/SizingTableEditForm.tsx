@@ -1,6 +1,9 @@
 "use client";
 
-import { SizingTableWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  sizingAccuracyValues,
+  SizingTableWithId,
+} from "@/firebase/schemas/productsSchemas";
 import { useForm, useFieldArray } from "react-hook-form";
 import {
   Form,
@@ -24,6 +27,7 @@ import { updateSizingTable } from "@/server-actions/products/sizingTables";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import FormWrapper from "../../global/form/FormWrapper";
+import SingleSelect from "../../global/form/SingleSelect";
 
 type FormValues = {
   name: string;
@@ -31,6 +35,7 @@ type FormValues = {
     size: string;
     insoleLength: string;
   }>;
+  sizingAccuracy: string;
 };
 
 export default function SizingTableEditForm({
@@ -49,6 +54,7 @@ export default function SizingTableEditForm({
         size: String(row.size),
         insoleLength: String(row.insoleLength),
       })),
+      sizingAccuracy: oldData.sizingAccuracy || "normalna",
     },
   });
 
@@ -103,6 +109,21 @@ export default function SizingTableEditForm({
                   <Input {...field} />
                 </FormControl>
               </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="sizingAccuracy"
+            render={({ field }) => (
+              <SingleSelect
+                label="Charakterystyka rozmiarówki"
+                value={field.value}
+                onChange={field.onChange}
+                availableOptions={sizingAccuracyValues.map((value) => ({
+                  name: value,
+                  value: value,
+                }))}
+              />
             )}
           />
 

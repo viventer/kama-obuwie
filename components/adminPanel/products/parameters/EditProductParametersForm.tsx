@@ -31,6 +31,8 @@ import AllegroParametersSection from "./AllegroParametersSection";
 import { DocumentDataWithRef } from "@/server-actions/helpers";
 import RangeSizesFormItem, { RangeSizeString } from "./RangeSizesFormItem";
 import MatchingCategoriesSelector from "../categories/MatchingCategoriesSelector";
+import MultipleSearchSelect from "../../global/form/MultipleSearchSelect";
+import { availableProductFeatures } from "@/lib/constants";
 
 export default function EditProductParametersForm({
   oldData,
@@ -379,6 +381,26 @@ export default function EditProductParametersForm({
               value={field.value as string[]}
               onChange={field.onChange}
               rootCategory={rootCategory}
+            />
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="features"
+          rules={{
+            required: "Cechy produktu są wymagane.",
+          }}
+          render={({ field }) => (
+            <MultipleSearchSelect
+              label="Cechy produktu"
+              value={field.value as string[]}
+              onChange={field.onChange}
+              options={availableProductFeatures.map((feature) => ({
+                label: feature,
+                value: feature,
+              }))}
+              placeholder="Wybierz cechy produktu"
             />
           )}
         />

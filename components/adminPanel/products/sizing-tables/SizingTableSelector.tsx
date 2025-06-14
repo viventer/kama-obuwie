@@ -1,33 +1,18 @@
-import { FormControl, FormItem, FormLabel } from "@/components/ui/form";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-} from "@/components/ui/select";
-import {
-  Command,
-  CommandInput,
-  CommandList,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-} from "@/components/ui/command";
+import { useEffect, useState } from "react";
 import { SizingTableWithId } from "@/firebase/schemas/productsSchemas";
 import { useToast } from "@/hooks/useToast";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import SingleSearchSelect from "../../global/form/SingleSearchSelect";
 
 export default function SizingTableSelector({
   onChange,
   value,
 }: {
-  onChange: (...event: any[]) => void;
+  onChange: (value: string) => void;
   value: string | undefined;
 }) {
   const { showToast } = useToast();
   const [allTables, setAllTables] = useState<SizingTableWithId[]>([]);
-  const [query, setQuery] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -42,59 +27,17 @@ export default function SizingTableSelector({
     })();
   }, []);
 
-  const filtered = allTables.filter((tbl) =>
-    tbl.name.toLowerCase().includes(query.toLowerCase())
-  );
-
-  const selectedName = allTables.find((tbl) => tbl.id === value)?.name;
+  const options = allTables.map((tbl) => ({
+    label: tbl.name,
+    value: tbl.id,
+  }));
 
   return (
-    <FormItem>
-      <FormLabel>Tabela rozmiarów</FormLabel>
-      <Select onValueChange={onChange} value={value}>
-        <FormControl>
-          <SelectTrigger className="text-base border-primary">
-            {selectedName ? (
-              <SelectValue className="text-base">{selectedName}</SelectValue>
-            ) : (
-              <SelectValue className="text-base" placeholder="Wybierz" />
-            )}
-          </SelectTrigger>
-        </FormControl>
-
-        <SelectContent>
-          <Command>
-            <CommandInput
-              placeholder="Wyszukaj tabelę…"
-              value={query}
-              onValueChange={setQuery}
-            />
-
-            <CommandList>
-              {filtered.length === 0 && (
-                <CommandEmpty>Brak wyników wyszukiwania.</CommandEmpty>
-              )}
-
-              <CommandGroup>
-                {filtered.map((tbl) => (
-                  <CommandItem
-                    key={tbl.id}
-                    onSelect={(tableName) => {
-                      const id = filtered.find(
-                        (tbl) => tbl.name === tableName
-                      )?.id;
-                      onChange(id || "");
-                      setQuery("");
-                    }}
-                  >
-                    {tbl.name}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </SelectContent>
-      </Select>
-    </FormItem>
+    <SingleSearchSelect
+      label="Tabela rozmiarów"
+      value={value}
+      onChange={onChange}
+      options={options}
+    />
   );
 }

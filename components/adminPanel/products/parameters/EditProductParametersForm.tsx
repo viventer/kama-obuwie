@@ -33,6 +33,7 @@ import RangeSizesFormItem, { RangeSizeString } from "./RangeSizesFormItem";
 import MatchingCategoriesSelector from "../categories/MatchingCategoriesSelector";
 import MultipleSearchSelect from "../../global/form/MultipleSearchSelect";
 import { availableProductFeatures } from "@/lib/constants";
+import TextEditor from "../description/TextEditor";
 
 export default function EditProductParametersForm({
   oldData,
@@ -402,6 +403,23 @@ export default function EditProductParametersForm({
               }))}
               placeholder="Wybierz cechy produktu"
             />
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="otherInfo"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Inne informacje</FormLabel>
+              <FormControl>
+                <TextEditor
+                  value={field.value as string}
+                  onChange={field.onChange}
+                  id={"1"}
+                />
+              </FormControl>
+            </FormItem>
           )}
         />
 

@@ -6,8 +6,7 @@ import DescriptionElementTypeSelector from "./DescriptionElementTypeSelector";
 import IconButton from "../../global/IconButton";
 import { ArrowDownIcon, ArrowUpIcon, XIcon } from "lucide-react";
 import DescriptionElementImageSelector from "./DescriptionElementImageSelector";
-import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import TextEditor from "./TextEditor";
 
 export default function DescriptionRow({
   index,
@@ -20,14 +19,6 @@ export default function DescriptionRow({
   moveRow: (from: number, to: number) => void;
   totalRows: number;
 }) {
-  const DynamicTextEditor = useMemo(() => {
-    return dynamic(() => import("./DescriptionTextEditor"), {
-      loading: () => <p>loading...</p>,
-
-      ssr: false,
-    });
-  }, []);
-
   const form = useFormContext();
 
   const elementsTypes = form.watch(`description.${index}.elementsTypes`);
@@ -132,7 +123,7 @@ export default function DescriptionRow({
                     value={field.value}
                   />
                 ) : (
-                  <DynamicTextEditor
+                  <TextEditor
                     id={`editor-${index}-${elemIndex}`}
                     onChange={field.onChange}
                     value={field.value}

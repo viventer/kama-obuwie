@@ -1,32 +1,35 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import ReactQuill from "react-quill-new";
+import dynamic from "next/dynamic";
+import { cn } from "@/lib/utils";
 import "react-quill-new/dist/quill.snow.css";
 
-export default function DescriptionTextEditor({
+const ReactQuill = dynamic(() => import("react-quill-new"), {
+  loading: () => <p>Loading editor...</p>,
+  ssr: false,
+});
+
+export default function TextEditor({
   value,
   onChange,
   id,
+  className,
 }: {
   value: string;
   onChange: (value: string) => void;
   id: string;
+  className?: string;
 }) {
   const toolbarId = `toolbar-${id}`;
 
-  const modules = useMemo(
-    () => ({
-      toolbar: `#${toolbarId}`,
-    }),
-    [toolbarId]
-  );
+  const modules = useMemo(() => ({ toolbar: `#${toolbarId}` }), [toolbarId]);
 
   const [currentValue, setCurrentValue] = useState(value);
 
   return (
     <div
-      className="h-fit md:w-1/2 md:min-w-1/2 w-full"
+      className={cn("h-fit md:w-1/2 md:min-w-1/2 w-full", className)}
       onBlur={() => onChange(currentValue)}
     >
       <div id={toolbarId}>
@@ -41,7 +44,6 @@ export default function DescriptionTextEditor({
             P
           </button>
         </span>
-
         <button className="ql-bold" />
         <button className="ql-list" value="ordered" />
         <button className="ql-list" value="bullet" />
@@ -50,7 +52,7 @@ export default function DescriptionTextEditor({
       <ReactQuill
         theme="snow"
         value={currentValue}
-        onChange={(value) => setCurrentValue(value)}
+        onChange={setCurrentValue}
         modules={modules}
         className="h-fit w-full min-w-full scrollbar"
       />

@@ -1,6 +1,8 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
+import LinkText from "@/components/adminPanel/global/LinkText";
 import EditOfferForm from "@/components/adminPanel/offers/EditOfferForm";
 import ShortProductInfo from "@/components/adminPanel/products/ShortProductInfo";
+import { Button } from "@/components/ui/button";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
@@ -37,6 +39,13 @@ export default async function CreateOfferPage(props: Props) {
   return (
     <FormWrapper headingText="Wystaw ofertę">
       <ShortProductInfo product={productData} />
+      <Button className="mb-4" asChild>
+        <LinkText
+          href={`/admin-panel/create-products/product-data/${productId}`}
+        >
+          Zobacz dane produktu
+        </LinkText>
+      </Button>
       <EditOfferForm oldOfferData={data} productData={productData} />
     </FormWrapper>
   );

@@ -14,7 +14,7 @@ export default function LongProductInfo({
   matchingCategories,
 }: {
   product: ProductWithId;
-  category: CategoryWithId;
+  category?: CategoryWithId;
   matchingCategories?: string[];
 }) {
   const [content, setContent] = useState<ReactNode>(null);
@@ -27,25 +27,27 @@ export default function LongProductInfo({
   }, [product.otherInfo]);
 
   const parameters = {
-    ...product.parameters.required,
-    ...product.parameters.optional,
+    ...product?.parameters?.required,
+    ...product?.parameters?.optional,
   };
 
   return (
     <section className="flex flex-col gap-4">
-      <div>
-        <h2 className="text-lg font-bold mb-2">Kategorie</h2>
-        {category?.name && (
-          <p>
-            <b>Główna:</b> {category.name}
-          </p>
-        )}
-        {matchingCategories && matchingCategories.length > 0 && (
-          <p>
-            <b>Pasujące:</b> {matchingCategories.join(", ")}
-          </p>
-        )}
-      </div>
+      {category && (
+        <div>
+          <h2 className="text-lg font-bold mb-2">Kategorie</h2>
+          {category && category?.name && (
+            <p>
+              <b>Główna:</b> {category.name}
+            </p>
+          )}
+          {matchingCategories && matchingCategories.length > 0 && (
+            <p>
+              <b>Pasujące:</b> {matchingCategories.join(", ")}
+            </p>
+          )}
+        </div>
+      )}
       {product.features && product.features.length > 0 && (
         <div>
           <h2 className="text-lg font-bold mb-2">Cechy:</h2>
@@ -68,13 +70,16 @@ export default function LongProductInfo({
         <div>
           <h2 className="text-lg font-bold mb-2">Parametry</h2>
           <ul className="list-disc pl-5">
-            {Object.entries(parameters).map(([key, value]) => (
-              <li key={key} className="mb-1">
-                <p>
-                  <b>{key}:</b> {value}
-                </p>
-              </li>
-            ))}
+            {Object.entries(parameters).map(([key, value]) => {
+              if (!key || !value) return null;
+              return (
+                <li key={key} className="mb-1">
+                  <p>
+                    <b>{key}:</b> {value}
+                  </p>
+                </li>
+              );
+            })}
           </ul>
         </div>
       )}

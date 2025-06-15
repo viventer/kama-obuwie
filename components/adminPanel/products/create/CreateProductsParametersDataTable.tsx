@@ -134,6 +134,16 @@ export default function CreateProductsParametersDataTable({
         }
       },
     },
+    {
+      name: "Zobacz dane",
+      onClick: (id) => {
+        window.open(
+          `/admin-panel/create-products/product-data/${id}`,
+          "_blank",
+          "noopener,noreferrer"
+        );
+      },
+    },
   ];
 
   return (

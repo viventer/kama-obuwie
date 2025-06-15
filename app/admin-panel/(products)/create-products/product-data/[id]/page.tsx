@@ -29,10 +29,12 @@ export default async function ProductDataPage(props: Props) {
     notFound();
   }
 
-  const category = await getDocumentFromAdminDB<CategoryWithId>(
-    "categories",
-    data.categoryId || ""
-  );
+  const category = data.categoryId
+    ? await getDocumentFromAdminDB<CategoryWithId>(
+        "categories",
+        data.categoryId || ""
+      )
+    : null;
   const allCategories = await getDocumentsFromAdminDB<CategoryWithId>(
     "categories"
   );
@@ -51,7 +53,7 @@ export default async function ProductDataPage(props: Props) {
       <ShortProductInfo product={data} />
       <LongProductInfo
         product={data}
-        category={category.data as CategoryWithId}
+        category={category?.data || undefined}
         matchingCategories={matchingCategories}
       />
     </div>

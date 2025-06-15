@@ -207,3 +207,12 @@ button {
 .ql-editor h2 {
   font-size: 1.2rem !important;
 }
+
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.no-spinner {
+  -moz-appearance: textfield;
+}

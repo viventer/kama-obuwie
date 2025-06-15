@@ -10,6 +10,7 @@ import {
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import SellingPricesField from "./SellingPricesField";
 
 export type EditOfferFormValues = Pick<
   Offer,
@@ -45,6 +46,7 @@ export default function EditOfferForm({
           </FormItem>
         )}
       />
+      <SellingPricesField />
     </Form>
   );
 }

@@ -1,6 +1,6 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import EditOfferForm from "@/components/adminPanel/offers/EditOfferForm";
-import ShortProductInfo from "@/components/adminPanel/offers/ShortProductInfo";
+import ShortProductInfo from "@/components/adminPanel/products/ShortProductInfo";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";

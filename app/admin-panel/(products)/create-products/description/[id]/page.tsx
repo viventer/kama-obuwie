@@ -1,5 +1,7 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
+import LinkText from "@/components/adminPanel/global/LinkText";
 import { EditProductDescriptionForm } from "@/components/adminPanel/products/description/EditProductDescriptionForm";
+import { Button } from "@/components/ui/button";
 import {
   EditedPhoto,
   EditedPhotoWithUrl,
@@ -45,6 +47,11 @@ export default async function ProductEditPage(props: Props) {
 
   return (
     <FormWrapper headingText="Utwórz opis produktu">
+      <Button className="mb-4" asChild>
+        <LinkText href={`/admin-panel/create-products/product-data/${data.id}`}>
+          Zobacz dane produktu
+        </LinkText>
+      </Button>
       <EditProductDescriptionForm
         oldDescription={data.description}
         oldPhotos={photosWithUrls}

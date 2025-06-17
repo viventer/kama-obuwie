@@ -39,7 +39,11 @@ export async function GET(request: NextRequest) {
     (param) => param.name === "Odcień"
   );
 
-  if (!colorParameter || !additionalColorParameter || !shadeParameter) {
+  if (
+    !colorParameter?.dictionary ||
+    !additionalColorParameter?.dictionary ||
+    !shadeParameter?.dictionary
+  ) {
     throw new Error("Nie znaleziono parametru koloru.");
   }
 
@@ -49,8 +53,10 @@ export async function GET(request: NextRequest) {
   );
   const allegroColorsWithShades: AllegroColorWithShades[] =
     colorParameter.dictionary.map((color) => {
-      const shades = shadeParameter.dictionary
-        .filter((shade) => shade.dependsOnValueIds.includes(color.id))
+      const shades = shadeParameter
+        .dictionary!.filter((shade) =>
+          shade.dependsOnValueIds.includes(color.id)
+        )
         .map((shade) => shade.value);
 
       return {

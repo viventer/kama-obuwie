@@ -9,17 +9,17 @@ import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
 const {
-  FIREBASE_PROJECT_ID,
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   FIREBASE_PRIVATE_KEY,
-  FIREBASE_CLIENT_EMAIL,
-  FIREBASE_STORAGE_BUCKET,
+  NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL,
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
 } = process.env;
 
 if (
-  !FIREBASE_PROJECT_ID ||
+  !NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
   !FIREBASE_PRIVATE_KEY ||
-  !FIREBASE_CLIENT_EMAIL ||
-  !FIREBASE_STORAGE_BUCKET
+  !NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL ||
+  !NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
 ) {
   throw new Error(
     "Brakuje jednej lub więcej zmiennych środowiskowych Firebase!"
@@ -30,15 +30,15 @@ const formattedPrivateKey = FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n");
 
 const serviceAccount = {
   type: "service_account",
-  project_id: FIREBASE_PROJECT_ID,
+  project_id: NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   private_key: formattedPrivateKey,
-  client_email: FIREBASE_CLIENT_EMAIL,
+  client_email: NEXT_PUBLIC_FIREBASE_CLIENT_EMAIL,
 } as ServiceAccount;
 
 const adminApp = !getApps().length
   ? initializeApp({
       credential: cert(serviceAccount),
-      storageBucket: FIREBASE_STORAGE_BUCKET,
+      storageBucket: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     })
   : getApps()[0];
 

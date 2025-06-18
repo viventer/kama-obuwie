@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { SalesChannelSchema } from "./otherSchemas";
-import { ParamValueSchema, ProductParametersSchema } from "./productsSchemas";
+import { ParamValueSchema } from "./productsSchemas";
 
 export const shippingRateSchema = z.object({
   name: z.string().min(3).max(64),

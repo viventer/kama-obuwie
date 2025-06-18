@@ -32,3 +32,5 @@ export const availableProductFeatures = [
   "na co dzień",
   "eleganckie",
 ] as const;
+
+export const availableUserRoles = ["UNVERIFIED", "VERIFIED", "ADMIN"];

@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Sidebar,
   SidebarContent,
@@ -9,8 +11,25 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import LinkText from "./LinkText";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/useToast";
 
 export default function AppSidebar() {
+  const router = useRouter();
+  const { showToast } = useToast();
+
+  const logout = async () => {
+    try {
+      await axios.post("/api/auth/logout");
+      router.push("/admin-panel/auth/login");
+      showToast("Pomyślnie wylogowano.", "success");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   return (
     <Sidebar className="bg-sidebar-background">
       <SidebarHeader>
@@ -107,7 +126,11 @@ export default function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter></SidebarFooter>
+      <SidebarFooter>
+        <Button onClick={logout} variant={"destructive"}>
+          Wyloguj się
+        </Button>
+      </SidebarFooter>
     </Sidebar>
   );
 }

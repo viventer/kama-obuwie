@@ -19,7 +19,7 @@ import { FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import axios from "axios";
-import { useConfirmDialog } from "../../global/ConfirmDialogProvider";
+import { useConfirmDialog } from "../../../../app/providers/ConfirmDialogProvider";
 import ImageUploader from "../../global/uploaders/ImageUploader";
 import FormWrapper from "../../global/form/FormWrapper";
 

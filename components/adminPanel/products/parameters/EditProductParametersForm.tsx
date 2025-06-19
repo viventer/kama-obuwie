@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import AddColorVariants from "../AddColorVariants";
 import { Button } from "@/components/ui/button";
-import { useConfirmDialog } from "../../global/ConfirmDialogProvider";
+import { useConfirmDialog } from "../../../../app/providers/ConfirmDialogProvider";
 import { FormEvent, useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";

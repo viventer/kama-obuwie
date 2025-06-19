@@ -1,6 +1,6 @@
 "use client";
 
-import { useConfirmDialog } from "@/components/adminPanel/global/ConfirmDialogProvider";
+import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { Button } from "@/components/ui/button";
 import { Product, ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { useToast } from "@/hooks/useToast";

@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Ubuntu, Ubuntu_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { ConfirmDialogProvider } from "@/components/adminPanel/global/ConfirmDialogProvider";
+import { ConfirmDialogProvider } from "@/app/providers/ConfirmDialogProvider";
+import { SWRConfig } from "swr";
+import { AuthProvider } from "./providers/AuthProvider";
 
 const ubuntuSans = Ubuntu({
   variable: "--font-ubuntu-sans",
@@ -32,10 +34,10 @@ export default async function RootLayout({
       className="scrollbar scrollbar-track-transparent scrollbar-thumb-primary overflow-hidden"
     >
       <body
-        className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen overflow-auto scrollbar pb-8  [scrollbar-gutter:stable]`}
+        className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen overflow-auto scrollbar  [scrollbar-gutter:stable]`}
       >
         <ConfirmDialogProvider>
-          {children}
+          <AuthProvider>{children}</AuthProvider>
           <Toaster
             toastOptions={{
               unstyled: true,

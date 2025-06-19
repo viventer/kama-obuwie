@@ -15,7 +15,7 @@ import {
 } from "@/firebase/schemas/productsSchemas";
 import DescriptionRow from "./DescriptionRow";
 import PhotosReorder from "../PhotosReorder";
-import { useConfirmDialog } from "../../global/ConfirmDialogProvider";
+import { useConfirmDialog } from "../../../../app/providers/ConfirmDialogProvider";
 import { FormEvent, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";

@@ -15,15 +15,18 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
+import { useUser } from "@/hooks/useUser";
+import MiniLoader from "./MiniLoader";
 
 export default function AppSidebar() {
   const router = useRouter();
   const { showToast } = useToast();
+  const { user, loading } = useUser();
 
   const logout = async () => {
     try {
       await axios.post("/api/auth/logout");
-      router.push("/admin-panel/auth/login");
+      router.push("/admin-auth/login");
       showToast("Pomyślnie wylogowano.", "success");
     } catch (error) {
       console.error("Logout error:", error);
@@ -127,6 +130,16 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        {!loading && user ? (
+          <div className="text-sm px-3 py-2">
+            <p className="font-medium">{user.name || user.email}</p>
+            <p className="opacity-75">
+              Rola: {user.role?.toLowerCase() || "nieznana"}
+            </p>
+          </div>
+        ) : (
+          <MiniLoader />
+        )}
         <Button onClick={logout} variant={"destructive"}>
           Wyloguj się
         </Button>

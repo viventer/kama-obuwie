@@ -5,6 +5,10 @@ export async function middleware(req: NextRequest) {
   const cookieHeader = req.headers.get("cookie") ?? "";
   const url = new URL("/api/auth/me", req.url);
 
+  if (pathname == "/admin-panel/unauthorized") {
+    return NextResponse.next();
+  }
+
   const sessionId = req.cookies.get("sessionId")?.value;
   if (pathname === "/admin-auth/login") {
     if (sessionId) {
@@ -20,8 +24,8 @@ export async function middleware(req: NextRequest) {
   });
   const data = await resp.json();
 
-  if (!data.user.role || data.user.role === "UNVERIFIED") {
-    return NextResponse.redirect(new URL("/admin-auth/login", req.url));
+  if (!data?.user?.role || data.user.role === "UNVERIFIED") {
+    return NextResponse.redirect(new URL("/admin-panel/unauthorized", req.url));
   }
 
   return NextResponse.next();

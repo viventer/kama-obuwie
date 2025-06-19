@@ -40,7 +40,7 @@ export default function AppSidebar() {
           <h1 className="text-2xl font-medium px-3 py-2">Admin Panel</h1>
         </LinkText>
       </SidebarHeader>
-      <SidebarContent className="px-3">
+      <SidebarContent className="px-3 scrollbar">
         <SidebarGroup>
           <SidebarGroupLabel>Produkty</SidebarGroupLabel>
           <SidebarMenu>
@@ -129,7 +129,7 @@ export default function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="mb-4">
         {!loading && user ? (
           <div className="text-sm px-3 py-2">
             <p className="font-medium">{user.name || user.email}</p>

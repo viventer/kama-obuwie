@@ -1,11 +1,11 @@
 "use server";
 
 import axios from "axios";
-import { getAllegroAccessToken } from "./auth";
+import { getAllegroClientAccessToken } from "./auth";
 import { ALLEGRO_API_BASE_URL, getAllegroHeaders } from "./global";
 
 export async function getAllegroShippingRates() {
-  const accessToken = await getAllegroAccessToken();
+  const accessToken = await getAllegroClientAccessToken();
   const allegroHeaders = getAllegroHeaders(accessToken);
   const url = `${ALLEGRO_API_BASE_URL}/sale/shipping-rates`;
   try {

@@ -7,7 +7,16 @@ export const UserSchema = z.object({
   createdAt: z.date().optional(),
   role: z.enum(["UNVERIFIED", "VERIFIED", "ADMIN"]).default("UNVERIFIED"),
   perms: z.record(z.string(), z.boolean()).default({}),
-  allegroRefreshToken: z.string().optional(),
+  allegro: z.object({
+    AL1: z.object({
+      refreshToken: z.string().optional(),
+    }),
+    AL2: z
+      .object({
+        refreshToken: z.string().optional(),
+      })
+      .optional(),
+  }),
 });
 
 export type UserType = z.infer<typeof UserSchema>;

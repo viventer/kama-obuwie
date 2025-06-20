@@ -45,7 +45,16 @@ export async function GET(request: Request) {
     await adminDB
       .collection("users")
       .doc(userId)
-      .set({ allegro: { refreshToken: refresh_token } }, { merge: true });
+      .set(
+        {
+          allegro: {
+            AL1: {
+              refreshToken: refresh_token,
+            },
+          },
+        },
+        { merge: true }
+      );
 
     // 5) Przekierowanie z powrotem do panelu
     const returnUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/admin-panel`;

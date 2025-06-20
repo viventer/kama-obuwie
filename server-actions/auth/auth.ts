@@ -1,5 +1,3 @@
-"use server";
-
 import { adminAuth } from "@/firebase/firebaseAdmin";
 import { redis } from "@/upstash/redis";
 import { cookies } from "next/headers";

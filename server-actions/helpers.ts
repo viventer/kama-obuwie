@@ -1,5 +1,3 @@
-"use server";
-
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { DocumentReference } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";

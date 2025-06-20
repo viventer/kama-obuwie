@@ -16,6 +16,7 @@ export async function GET(request: Request) {
 
   const firebaseIdToken = sessionHash.firebaseIdToken as string;
   const userId = sessionHash.userId as string;
+  const isAllegroConnected = Boolean(sessionHash?.allegroAccessToken);
 
   try {
     await adminAuth.verifyIdToken(firebaseIdToken);
@@ -31,6 +32,7 @@ export async function GET(request: Request) {
         createdAt: data?.createdAt?.toDate().toISOString() || null,
         perms: data?.perms || {},
         role: data?.role || null,
+        isAllegroConnected,
       },
     });
   } catch {

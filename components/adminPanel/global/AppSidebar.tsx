@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import { useUser } from "@/hooks/useUser";
 import MiniLoader from "./MiniLoader";
+import { LinkIcon } from "lucide-react";
 
 export default function AppSidebar() {
   const router = useRouter();
@@ -136,6 +137,22 @@ export default function AppSidebar() {
             <p className="opacity-75">
               Rola: {user.role?.toLowerCase() || "nieznana"}
             </p>
+            {user.isAllegroConnected ? (
+              <div className="flex items-center gap-2 mt-4">
+                <LinkIcon className="size-4 text-success" />
+                <p className="font-medium">Podłączono konto Allegro</p>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mt-4">
+                <LinkIcon className="size-4 text-destructive" />
+                <LinkText
+                  href={`/admin-auth/allegro-connect`}
+                  className="font-medium"
+                >
+                  Połącz konto Allegro
+                </LinkText>
+              </div>
+            )}
           </div>
         ) : (
           <MiniLoader />

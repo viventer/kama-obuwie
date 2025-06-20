@@ -18,11 +18,8 @@ export async function POST(request: Request) {
     // 2. Generate sessionId & store in Redis
     const sessionId = uuidv4();
     const sessionKey = `session:${sessionId}`;
-    await redis.set(
-      sessionKey,
-      JSON.stringify({ userId: uid, firebaseIdToken: idToken }),
-      { ex: 60 * 60 * 24 * 7 } // optional: expire in 7 days
-    );
+    await redis.hset(sessionKey, { userId: uid, firebaseIdToken: idToken });
+    await redis.expire(sessionKey, 60 * 60 * 24 * 7);
 
     // 3. Set HttpOnly, Secure, SameSite=Strict cookie
     const response = NextResponse.json({ success: true });

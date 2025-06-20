@@ -14,12 +14,10 @@ export async function POST(req: Request) {
 
   try {
     const { uid } = await adminAuth.verifyIdToken(idToken);
+    const key = `session:${match[1]}`;
 
-    await redis.set(
-      `session:${match[1]}`,
-      JSON.stringify({ userId: uid, firebaseIdToken: idToken }),
-      { ex: 60 * 60 * 24 * 7 }
-    );
+    await redis.hset(key, { userId: uid, firebaseIdToken: idToken });
+    await redis.expire(key, 60 * 60 * 24 * 7);
 
     return NextResponse.json({ success: true });
   } catch (e) {

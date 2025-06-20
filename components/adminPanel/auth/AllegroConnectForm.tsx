@@ -24,7 +24,7 @@ export default function AllegroConnectForm() {
       <CardContent className="my-2">
         <button
           onClick={() => {
-            router.push("/api/auth/allegro/connect-account");
+            router.push("/api/auth/allegro");
           }}
           className="text-l border-[0.1rem] border-solid border-primary flex items-center gap-2 px-3 py-2 rounded-md hover:border-accent text-text"
         >

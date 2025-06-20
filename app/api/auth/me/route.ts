@@ -7,25 +7,30 @@ export async function GET(request: Request) {
   const match = cookie.match(/sessionId=([^;]+)/);
   if (!match) return NextResponse.json({ user: null }, { status: 200 });
 
-  const sessionRaw = await redis.get(`session:${match[1]}`);
-  if (!sessionRaw) return NextResponse.json({ user: null }, { status: 200 });
+  const key = `session:${match[1]}`;
 
-  const { firebaseIdToken, userId } =
-    typeof sessionRaw === "string"
-      ? JSON.parse(sessionRaw as string)
-      : sessionRaw;
+  const sessionHash = await redis.hgetall(key);
+  if (!sessionHash || !sessionHash.firebaseIdToken || !sessionHash.userId) {
+    return NextResponse.json({ user: null }, { status: 200 });
+  }
+
+  const firebaseIdToken = sessionHash.firebaseIdToken as string;
+  const userId = sessionHash.userId as string;
+
   try {
     await adminAuth.verifyIdToken(firebaseIdToken);
+
     const userDoc = await adminDB.collection("users").doc(userId).get();
     const data = userDoc.exists ? userDoc.data() : null;
+
     return NextResponse.json({
       user: {
-        email: data?.email,
-        firstName: data?.firstName,
-        lastName: data?.lastName,
+        email: data?.email || null,
+        firstName: data?.firstName || null,
+        lastName: data?.lastName || null,
         createdAt: data?.createdAt?.toDate().toISOString() || null,
         perms: data?.perms || {},
-        role: data?.role,
+        role: data?.role || null,
       },
     });
   } catch {

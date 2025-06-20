@@ -1,3 +1,4 @@
+import { ALLEGRO_BASE_URL } from "@/server-actions/allegro/global";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -10,11 +11,11 @@ export async function GET(request: Request) {
   }
 
   const clientId = process.env.ALLEGRO_CLIENT_ID!;
-  const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/allegro/callback`;
+  const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/allegro/callback`;
   const state = encodeURIComponent(sessionId);
 
   const authUrl =
-    `https://allegro.pl.allegrosandbox.pl/auth/oauth/authorize` +
+    `${ALLEGRO_BASE_URL}/auth/oauth/authorize` +
     `?response_type=code` +
     `&client_id=${clientId}` +
     `&redirect_uri=${encodeURIComponent(redirectUri)}` +

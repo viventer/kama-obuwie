@@ -6,26 +6,30 @@ import {
   SizingTableSchema,
   SizingTableUpdateDataSchema,
 } from "@/firebase/schemas/productsSchemas";
+import { withAuth } from "../auth/auth";
 
-export async function createSizingTable(newSizingTable: SizingTable) {
+export const createSizingTable = withAuth(async function (
+  newSizingTable: SizingTable
+) {
   SizingTableSchema.parse(newSizingTable);
   const sizingTableRef = adminDB.collection("sizingTables").doc();
 
   await sizingTableRef.set(newSizingTable);
 
   return sizingTableRef.id;
-}
+});
 
-export async function updateSizingTable(
+export const updateSizingTable = withAuth(async function (
   id: string,
   updateData: Partial<SizingTable>
 ) {
   SizingTableUpdateDataSchema.parse(updateData);
   const sizingTableRef = adminDB.collection("sizingTables").doc(id);
   const sizingTableDoc = await sizingTableRef.get();
+
   if (!sizingTableDoc.exists) {
     throw new Error("Tabela rozmiarów nie istnieje.");
   }
 
   await sizingTableRef.update(updateData);
-}
+});

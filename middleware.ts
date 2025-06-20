@@ -5,7 +5,7 @@ export async function middleware(req: NextRequest) {
   const cookieHeader = req.headers.get("cookie") ?? "";
   const url = new URL("/api/auth/me", req.url);
 
-  if (pathname == "/admin-panel/unauthorized") {
+  if (pathname == "/admin-auth/unauthorized") {
     return NextResponse.next();
   }
 
@@ -25,7 +25,7 @@ export async function middleware(req: NextRequest) {
   const data = await resp.json();
 
   if (!data?.user?.role || data.user.role === "UNVERIFIED") {
-    return NextResponse.redirect(new URL("/admin-panel/unauthorized", req.url));
+    return NextResponse.redirect(new URL("/admin-auth/unauthorized", req.url));
   }
 
   return NextResponse.next();

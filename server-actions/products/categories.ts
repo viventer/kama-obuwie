@@ -6,17 +6,18 @@ import {
   CategorySchema,
   CategoryUpdateDataSchema,
 } from "@/firebase/schemas/productsSchemas";
+import { withAuth } from "../auth/auth";
 
-export async function createCategory(newCategory: Category) {
+export const createCategory = withAuth(async function (newCategory: Category) {
   CategorySchema.parse(newCategory);
   const categoryRef = adminDB.collection("categories").doc();
 
   await categoryRef.set(newCategory);
 
   return categoryRef.id;
-}
+});
 
-export async function updateCategory(
+export const updateCategory = withAuth(async function (
   id: string,
   updateData: Partial<Category>
 ) {
@@ -28,4 +29,4 @@ export async function updateCategory(
   }
 
   await categoryRef.update(updateData);
-}
+});

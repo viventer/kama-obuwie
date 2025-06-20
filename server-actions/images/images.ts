@@ -2,15 +2,15 @@
 
 import { adminStorage } from "@/firebase/firebaseAdmin";
 import { ImageUrlSchema } from "@/firebase/schemas/otherSchemas";
-import { cache } from "react";
 import { getDocumentFromAdminDB } from "../helpers";
 import {
   EditedPhoto,
   ProductWithId,
   RawPhoto,
 } from "@/firebase/schemas/productsSchemas";
+import { withAuth } from "../auth/auth";
 
-export const getImageUrl = cache(async function (
+export const getImageUrl = async function (
   filePath: string
 ): Promise<string | null> {
   const bucket = adminStorage.bucket();
@@ -24,9 +24,9 @@ export const getImageUrl = cache(async function (
   }
 
   return imageUrl;
-});
+};
 
-export const getImagesUrls = cache(async function (
+export const getImagesUrls = async function (
   filePaths: string[]
 ): Promise<string[] | null> {
   const bucket = adminStorage.bucket();
@@ -45,9 +45,9 @@ export const getImagesUrls = cache(async function (
   }
 
   return urls;
-});
+};
 
-export const uploadImageToStorage = cache(async function (
+export const uploadImageToStorage = withAuth(async function (
   bufferString: string,
   filePath: string,
   contentType: string
@@ -72,7 +72,7 @@ export type ImageFile = {
   fileType: string;
 };
 
-export const uploadImagesToStorage = cache(async function (
+export const uploadImagesToStorage = withAuth(async function (
   images: ImageFile[]
 ): Promise<string[]> {
   const bucket = adminStorage.bucket();
@@ -94,7 +94,7 @@ export const uploadImagesToStorage = cache(async function (
   return urls;
 });
 
-export const deleteImageFromStorage = cache(async function (
+export const deleteImageFromStorage = withAuth(async function (
   filePath: string
 ): Promise<void> {
   const bucket = adminStorage.bucket();
@@ -102,7 +102,7 @@ export const deleteImageFromStorage = cache(async function (
   await fileRef.delete();
 });
 
-export const deleteRawPhoto = cache(async function (
+export const deleteRawPhoto = withAuth(async function (
   filePath: string,
   productId: string
 ): Promise<void> {
@@ -122,7 +122,7 @@ export const deleteRawPhoto = cache(async function (
   await productRef.set(productData);
 });
 
-export const deleteUnusedPhotosFromStorage = cache(async function (
+export const deleteUnusedPhotosFromStorage = withAuth(async function (
   productId: string,
   storageEndpoint: "raw-photos" | "edited-photos"
 ): Promise<void> {
@@ -152,7 +152,7 @@ export const deleteUnusedPhotosFromStorage = cache(async function (
   await Promise.all(unusedFiles.map((file) => file.delete()));
 });
 
-export const makeFilePublic = cache(async function (filePath: string) {
+export const makeFilePublic = withAuth(async function (filePath: string) {
   const bucket = adminStorage.bucket();
   const fileRef = bucket.file(filePath);
   fileRef.makePublic();

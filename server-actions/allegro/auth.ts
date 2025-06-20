@@ -2,6 +2,7 @@ import axios from "axios";
 import { ALLEGRO_BASE_URL } from "./global";
 import { redis } from "@/upstash/redis";
 import { adminDB } from "@/firebase/firebaseAdmin";
+import { cookies } from "next/headers";
 
 // client access token jest używany do autoryzacji zapytań do Allegro API, które nie wymagają dostępu do danych użytkownika
 export async function getAllegroClientAccessToken() {
@@ -23,9 +24,9 @@ export async function getAllegroClientAccessToken() {
 
 const REFRESH_BUFFER = 60; // sekundy, bufor bezpieczeństwa przed wygaśnięciem tokena
 
-export async function getAllegroUserAccessToken(
-  sessionId: string
-): Promise<string> {
+export async function getAllegroUserAccessToken(): Promise<string> {
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get("sessionId")?.value;
   const key = `session:${sessionId}`;
 
   // 1. Pobierz hash sesji z Redis

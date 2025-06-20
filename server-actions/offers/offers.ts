@@ -2,8 +2,9 @@
 
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { Offer, OfferSchema } from "@/firebase/schemas/offersSchemas";
+import { withAuth } from "../auth/auth";
 
-export async function createOffer(newOffer: Partial<Offer>) {
+export const createOffer = withAuth(async function (newOffer: Partial<Offer>) {
   OfferSchema.partial().parse(newOffer);
 
   const offerRef = adminDB.collection("offers").doc();
@@ -11,9 +12,12 @@ export async function createOffer(newOffer: Partial<Offer>) {
   await offerRef.set({ ...newOffer, id: offerRef.id });
 
   return offerRef.id;
-}
+});
 
-export async function updateOffer(id: string, updateData: Partial<Offer>) {
+export const updateOffer = withAuth(async function (
+  id: string,
+  updateData: Partial<Offer>
+) {
   OfferSchema.partial().parse(updateData);
   const offerRef = adminDB.collection("offers").doc(id);
   const productDoc = await offerRef.get();
@@ -22,4 +26,4 @@ export async function updateOffer(id: string, updateData: Partial<Offer>) {
   }
 
   await offerRef.update(updateData);
-}
+});

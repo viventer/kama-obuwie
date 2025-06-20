@@ -1,7 +1,9 @@
+"use server";
+
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { DocumentReference } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
-import { cache } from "react";
+import { withAuth } from "./auth/auth";
 
 export function apiResponse(
   message: string,
@@ -23,7 +25,7 @@ export type DocumentDataWithRef<T> = {
   ref: DocumentReference;
 };
 
-export const getDocumentFromAdminDB = cache(async function <T>(
+export const getDocumentFromAdminDB = withAuth(async function <T>(
   collection: string,
   id: string
 ): Promise<DocumentDataWithRef<T>> {
@@ -36,7 +38,7 @@ export const getDocumentFromAdminDB = cache(async function <T>(
   return { data: { ...doc.data(), id: doc.id } as T, ref };
 });
 
-export const getDocumentsFromAdminDB = cache(async function <T>(
+export const getDocumentsFromAdminDB = withAuth(async function <T>(
   collection: string,
   queryFn?: (
     ref: FirebaseFirestore.CollectionReference

@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "No token" }, { status: 400 });
 
   try {
-    const { uid } = await adminAuth.verifyIdToken(idToken);
+    const { uid } = await adminAuth.verifyIdToken(idToken, true);
     const key = `session:${match[1]}`;
 
     await redis.hset(key, { userId: uid, firebaseIdToken: idToken });
@@ -21,6 +21,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (e) {
+    redis.del(`session:${match[1]}`);
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
 }

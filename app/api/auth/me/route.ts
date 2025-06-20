@@ -19,7 +19,7 @@ export async function GET(request: Request) {
   const isAllegroConnected = Boolean(sessionHash?.allegroAccessToken);
 
   try {
-    await adminAuth.verifyIdToken(firebaseIdToken);
+    await adminAuth.verifyIdToken(firebaseIdToken, true);
 
     const userDoc = await adminDB.collection("users").doc(userId).get();
     const data = userDoc.exists ? userDoc.data() : null;
@@ -36,6 +36,7 @@ export async function GET(request: Request) {
       },
     });
   } catch {
+    redis.del(key);
     return NextResponse.json({ user: null }, { status: 200 });
   }
 }

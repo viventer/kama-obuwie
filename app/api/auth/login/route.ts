@@ -12,13 +12,18 @@ export async function POST(request: Request) {
     }
 
     // 1. Verify Firebase ID token
-    const decoded = await adminAuth.verifyIdToken(idToken);
+    const decoded = await adminAuth.verifyIdToken(idToken, true);
     const { uid, name, email } = decoded;
 
     // 2. Generate sessionId & store in Redis
     const sessionId = uuidv4();
     const sessionKey = `session:${sessionId}`;
-    await redis.hset(sessionKey, { userId: uid, firebaseIdToken: idToken });
+    await redis.hset(sessionKey, {
+      userId: uid,
+      firebaseIdToken: idToken,
+      role: "UNVERIFIED",
+      perms: JSON.stringify({}),
+    });
     await redis.expire(sessionKey, 60 * 60 * 24 * 7);
 
     // 3. Set HttpOnly, Secure, SameSite=Strict cookie

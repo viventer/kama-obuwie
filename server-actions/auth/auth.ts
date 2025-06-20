@@ -16,13 +16,18 @@ export async function verifyFirebaseIdToken(): Promise<void> {
     NextResponse.redirect(
       new URL("/admin-auth/unauthorized", window.location.href)
     );
+    redis.del(key);
     return;
   }
 
-  const token = sess.firebaseIdToken as string | undefined;
-  if (!token) throw new Error("Brak firebaseIdToken w sesji");
+  const token = sess.firebaseIdToken as string;
 
-  adminAuth.verifyIdToken(token);
+  try {
+    adminAuth.verifyIdToken(token, true);
+  } catch (error) {
+    redis.del(key);
+    throw new Error("Nieprawidłowy token sesji");
+  }
 }
 
 export function withAuth<T extends (...args: any[]) => Promise<any>>(fn: T): T {

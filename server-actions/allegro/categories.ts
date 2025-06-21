@@ -6,7 +6,7 @@ import {
   getAllegroHeaders,
 } from "@/server-actions/allegro/global";
 import axios from "axios";
-import { getAllegroClientAccessToken } from "./auth";
+import { getAllegroUserAccessToken } from "./auth";
 import { RootCategory } from "@/firebase/schemas/productsSchemas";
 
 export type SerializedAllegroCategory = {
@@ -112,7 +112,7 @@ const getKidsCategories = async (
 export async function getAllegroCategoryById(
   categoryId: string
 ): Promise<string> {
-  const accessToken = await getAllegroClientAccessToken();
+  const accessToken = await getAllegroUserAccessToken();
   const url = `${ALLEGRO_API_BASE_URL}/sale/categories/${categoryId}`;
   const allegroHeaders = getAllegroHeaders(accessToken);
   const resp = await axios.get(url, {
@@ -125,7 +125,7 @@ export async function getAllegroCategoryById(
 export async function getAllegroCategories(
   rootCategory: RootCategory
 ): Promise<SerializedAllegroCategory[]> {
-  const accessToken = await getAllegroClientAccessToken();
+  const accessToken = await getAllegroUserAccessToken();
   const url = `${ALLEGRO_API_BASE_URL}/sale/categories`;
   const allegroHeaders = getAllegroHeaders(accessToken);
   const resp = await axios.get(url, {

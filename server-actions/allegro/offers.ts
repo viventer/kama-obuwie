@@ -15,7 +15,7 @@ import {
   Product,
   ProductParameters,
 } from "@/firebase/schemas/productsSchemas";
-import { getAllegroClientAccessToken } from "./auth";
+import { getAllegroUserAccessToken } from "./auth";
 import {
   ALLEGRO_API_BASE_URL,
   AllegroHeaders,
@@ -79,7 +79,7 @@ export const postAllegroOffer = withAuth(
 
     const insoleLengths = sizingTable.insoleLengths;
 
-    const accessToken = await getAllegroClientAccessToken();
+    const accessToken = await getAllegroUserAccessToken();
     const url = `${ALLEGRO_API_BASE_URL}/sale/offers`;
     const allegroHeaders = getAllegroHeaders(accessToken);
 

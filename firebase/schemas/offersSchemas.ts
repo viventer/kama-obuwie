@@ -34,12 +34,7 @@ export const ShippingRatesSchema = z.object({
 export const AvailabilitySchema = z.object({
   value: z.number().min(0).max(1000),
   isActive: z.boolean(),
-  allegroProductIds: z.array(
-    z.object({
-      value: z.string(),
-      salesChannel: z.enum(["AL1", "AL2"]),
-    })
-  ),
+  allegroOffersIds: z.record(z.enum(["AL1", "AL2"]), z.string()).optional(),
 });
 
 export const OfferSchema = z.object({

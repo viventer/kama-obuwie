@@ -14,16 +14,13 @@ async function getUserSession() {
   const sess = await redis.hgetall(key);
   if (!sess || !sess.firebaseIdToken || !sess.role) {
     await redis.del(key);
-    NextResponse.redirect(new URL("/admin-auth/login", window.location.href));
-    return;
+    throw new Error("Brak aktywnej sesji");
   }
 
   try {
     adminAuth.verifyIdToken(sess.firebaseIdToken as string, true);
   } catch (error) {
-    redis.del(key);
-    NextResponse.redirect(new URL("/admin-auth/login", window.location.href));
-    return;
+    throw new Error("Nieprawidłowy token sesji");
   }
 
   return {

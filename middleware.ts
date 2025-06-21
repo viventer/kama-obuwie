@@ -25,7 +25,7 @@ export async function middleware(req: NextRequest) {
   const data = await resp.json();
 
   if (!data?.user?.role || data.user.role === "UNVERIFIED") {
-    return NextResponse.redirect(new URL("/admin-auth/unauthorized", req.url));
+    return NextResponse.redirect(new URL("/admin-auth/login", req.url));
   }
 
   return NextResponse.next();

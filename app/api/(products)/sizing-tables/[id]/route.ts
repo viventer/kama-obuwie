@@ -1,11 +1,21 @@
 import { NextRequest } from "next/server";
-import { SizingTable } from "@/firebase/schemas/productsSchemas";
+import {
+  SizingTable,
+  SizingTableWithId,
+} from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
 import { updateSizingTable } from "@/server-actions/products/sizingTables";
 
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params;
-  const data = await getDocumentFromAdminDB(id, "sizingTables");
+  const result = await getDocumentFromAdminDB<SizingTableWithId>(
+    "sizingTables",
+    id
+  );
+  const { data } = result;
   if (!data) {
     return apiResponse("Tabela rozmiarów nie istnieje.", 404);
   }

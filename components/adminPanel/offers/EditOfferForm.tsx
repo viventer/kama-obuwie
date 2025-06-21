@@ -37,18 +37,24 @@ export default function EditOfferForm({
 
   return (
     <Form {...form}>
-      <FormField
-        control={form.control}
-        name={"title" as const}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Tytuł oferty</FormLabel>
-            <Input type="text" value={field.value} onChange={field.onChange} />
-          </FormItem>
-        )}
-      />
-      <SellingPricesField />
-      <ShippingRatesSelector />
+      <div className="flex flex-col gap-4">
+        <FormField
+          control={form.control}
+          name={"title" as const}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Tytuł oferty</FormLabel>
+              <Input
+                type="text"
+                value={field.value}
+                onChange={field.onChange}
+              />
+            </FormItem>
+          )}
+        />
+        <SellingPricesField />
+        <ShippingRatesSelector />
+      </div>
     </Form>
   );
 }

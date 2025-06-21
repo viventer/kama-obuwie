@@ -10,8 +10,8 @@ export default function SellingPricesField() {
   const { control } = useFormContext<EditOfferFormValues>();
 
   return (
-    <>
-      <h3 className="mt-4 mb-2 font-medium">Ceny sprzedaży:</h3>
+    <div>
+      <h3 className="font-medium">Ceny sprzedaży:</h3>
       <FormField
         control={control}
         name="sellingPrices"
@@ -41,6 +41,6 @@ export default function SellingPricesField() {
           </div>
         )}
       />
-    </>
+    </div>
   );
 }

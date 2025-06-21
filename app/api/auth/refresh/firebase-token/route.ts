@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   const cookie = req.headers.get("cookie") || "";
   const match = cookie.match(/sessionId=([^;]+)/);
   if (!match)
-    return NextResponse.json({ error: "No session" }, { status: 400 });
+    return NextResponse.json({ message: "No session" }, { status: 200 });
 
   const { idToken } = await req.json();
   if (!idToken)

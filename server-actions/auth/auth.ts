@@ -1,38 +1,57 @@
+import { NextResponse } from "next/server";
 import { adminAuth } from "@/firebase/firebaseAdmin";
 import { redis } from "@/upstash/redis";
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
 
-export async function verifyFirebaseIdToken(): Promise<void> {
-  // 1. Odczyt sessionId z ciasteczka HttpOnly
+type Handler<T extends any[]> = (...args: T) => Promise<any>;
+
+async function getUserSession() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get("sessionId")?.value;
   if (!sessionId) throw new Error("Brak aktywnej sesji");
 
-  // 2. Pobranie hash z Redis
   const key = `session:${sessionId}`;
   const sess = await redis.hgetall(key);
-  if (!sess || !sess.firebaseIdToken) {
-    NextResponse.redirect(
-      new URL("/admin-auth/unauthorized", window.location.href)
-    );
-    redis.del(key);
+  if (!sess || !sess.firebaseIdToken || !sess.role) {
+    await redis.del(key);
+    NextResponse.redirect(new URL("/admin-auth/login", window.location.href));
     return;
   }
 
-  const token = sess.firebaseIdToken as string;
-
   try {
-    adminAuth.verifyIdToken(token, true);
+    adminAuth.verifyIdToken(sess.firebaseIdToken as string, true);
   } catch (error) {
     redis.del(key);
-    throw new Error("Nieprawidłowy token sesji");
+    NextResponse.redirect(new URL("/admin-auth/login", window.location.href));
+    return;
   }
+
+  return {
+    uid: sess.userId as string,
+    role: sess.role as string,
+    perms: sess.perms,
+  };
 }
 
-export function withAuth<T extends (...args: any[]) => Promise<any>>(fn: T): T {
-  return (async (...args: Parameters<T>): Promise<ReturnType<T>> => {
-    await verifyFirebaseIdToken();
+export function withAuth<T extends Handler<any[]>>(fn: T): T;
+export function withAuth<T extends Handler<any[]>>(roles: string[], fn: T): T;
+export function withAuth<T extends Handler<any[]>>(
+  arg1: string[] | T,
+  arg2?: T
+): T {
+  const roles = Array.isArray(arg1) ? arg1 : null;
+  const fn = Array.isArray(arg1) ? arg2! : arg1;
+
+  return (async (...args: Parameters<T>) => {
+    const session = await getUserSession();
+
+    if (!session?.role || (roles && !roles.includes(session.role))) {
+      NextResponse.redirect(
+        new URL("/admin-auth/unauthorized", window.location.href)
+      );
+      return;
+    }
+
     return fn(...args);
   }) as T;
 }

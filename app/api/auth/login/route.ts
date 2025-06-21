@@ -18,13 +18,6 @@ export async function POST(request: Request) {
     // 2. Generate sessionId & store in Redis
     const sessionId = uuidv4();
     const sessionKey = `session:${sessionId}`;
-    await redis.hset(sessionKey, {
-      userId: uid,
-      firebaseIdToken: idToken,
-      role: "UNVERIFIED",
-      perms: JSON.stringify({}),
-    });
-    await redis.expire(sessionKey, 60 * 60 * 24 * 7);
 
     // 3. Set HttpOnly, Secure, SameSite=Strict cookie
     const response = NextResponse.json({ success: true });
@@ -39,6 +32,16 @@ export async function POST(request: Request) {
     // 4. On first login, create Firestore user document
     const userRef = adminDB.collection("users").doc(uid);
     const userDoc = await userRef.get();
+    await redis.hset(sessionKey, {
+      userId: uid,
+      firebaseIdToken: idToken,
+      role: userDoc.exists
+        ? userDoc.data()?.role || "UNVERIFIED"
+        : "UNVERIFIED",
+      perms: JSON.stringify({}),
+    });
+    await redis.expire(sessionKey, 60 * 60 * 24 * 7);
+
     if (!userDoc.exists) {
       await userRef.set({
         email: email || null,

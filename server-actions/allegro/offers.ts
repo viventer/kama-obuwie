@@ -47,6 +47,7 @@ type AllegroIndividualOffer = {
 };
 
 export const postAllegroOffer = withAuth(
+  ["ADMIN", "VERIFIED"],
   async (data: PostOfferBody): Promise<Record<string, string>> => {
     const {
       offer,

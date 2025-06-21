@@ -47,24 +47,27 @@ export const getImagesUrls = async function (
   return urls;
 };
 
-export const uploadImageToStorage = withAuth(async function (
-  bufferString: string,
-  filePath: string,
-  contentType: string
-): Promise<string> {
-  const bucket = adminStorage.bucket();
-  const fileRef = bucket.file(filePath);
+export const uploadImageToStorage = withAuth(
+  ["ADMIN", "VERIFIED"],
+  async function (
+    bufferString: string,
+    filePath: string,
+    contentType: string
+  ): Promise<string> {
+    const bucket = adminStorage.bucket();
+    const fileRef = bucket.file(filePath);
 
-  const buffer = Buffer.from(bufferString, "base64");
+    const buffer = Buffer.from(bufferString, "base64");
 
-  await fileRef.save(buffer, {
-    metadata: { contentType },
-  });
+    await fileRef.save(buffer, {
+      metadata: { contentType },
+    });
 
-  await fileRef.makePublic();
+    await fileRef.makePublic();
 
-  return fileRef.publicUrl();
-});
+    return fileRef.publicUrl();
+  }
+);
 
 export type ImageFile = {
   base64: string;
@@ -72,88 +75,101 @@ export type ImageFile = {
   fileType: string;
 };
 
-export const uploadImagesToStorage = withAuth(async function (
-  images: ImageFile[]
-): Promise<string[]> {
-  const bucket = adminStorage.bucket();
+export const uploadImagesToStorage = withAuth(
+  ["ADMIN", "VERIFIED"],
+  async function (images: ImageFile[]): Promise<string[]> {
+    const bucket = adminStorage.bucket();
 
-  const uploadPromises = images.map(async ({ base64, filePath, fileType }) => {
-    const fileRef = bucket.file(filePath);
-    const buffer = Buffer.from(base64, "base64");
+    const uploadPromises = images.map(
+      async ({ base64, filePath, fileType }) => {
+        const fileRef = bucket.file(filePath);
+        const buffer = Buffer.from(base64, "base64");
 
-    await fileRef.save(buffer, {
-      metadata: { contentType: fileType },
-    });
+        await fileRef.save(buffer, {
+          metadata: { contentType: fileType },
+        });
 
-    await fileRef.makePublic();
+        await fileRef.makePublic();
 
-    return fileRef.publicUrl();
-  });
+        return fileRef.publicUrl();
+      }
+    );
 
-  const urls = await Promise.all(uploadPromises);
-  return urls;
-});
-
-export const deleteImageFromStorage = withAuth(async function (
-  filePath: string
-): Promise<void> {
-  const bucket = adminStorage.bucket();
-  const fileRef = bucket.file(filePath);
-  await fileRef.delete();
-});
-
-export const deleteRawPhoto = withAuth(async function (
-  filePath: string,
-  productId: string
-): Promise<void> {
-  const bucket = adminStorage.bucket();
-  const fileRef = bucket.file(filePath);
-  await fileRef.delete();
-
-  const { data: productData, ref: productRef } =
-    await getDocumentFromAdminDB<ProductWithId>("products", productId);
-
-  if (!productData?.rawPhotos) return;
-
-  const filteredPhotos = productData.rawPhotos.filter(
-    (photo) => photo.filePath !== filePath
-  );
-  productData.rawPhotos = filteredPhotos;
-  await productRef.set(productData);
-});
-
-export const deleteUnusedPhotosFromStorage = withAuth(async function (
-  productId: string,
-  storageEndpoint: "raw-photos" | "edited-photos"
-): Promise<void> {
-  const bucket = adminStorage.bucket();
-
-  const { data: productData, ref: productRef } =
-    await getDocumentFromAdminDB<ProductWithId>("products", productId);
-
-  let photosPaths: string[] = [];
-  if (storageEndpoint === "raw-photos") {
-    photosPaths =
-      productData?.rawPhotos?.map((photo: RawPhoto) => photo.filePath) || [];
-  } else if (storageEndpoint === "edited-photos") {
-    photosPaths =
-      productData?.editedPhotos?.map((photo: EditedPhoto) => photo.filePath) ||
-      [];
+    const urls = await Promise.all(uploadPromises);
+    return urls;
   }
+);
 
-  const prefix = `products/${storageEndpoint}/${
-    productData?.productType || "obuwie"
-  }/${productId}/`;
+export const deleteImageFromStorage = withAuth(
+  ["ADMIN", "VERIFIED"],
+  async function (filePath: string): Promise<void> {
+    const bucket = adminStorage.bucket();
+    const fileRef = bucket.file(filePath);
+    await fileRef.delete();
+  }
+);
 
-  const [files] = await bucket.getFiles({ prefix });
+export const deleteRawPhoto = withAuth(
+  ["ADMIN", "VERIFIED"],
+  async function (filePath: string, productId: string): Promise<void> {
+    const bucket = adminStorage.bucket();
+    const fileRef = bucket.file(filePath);
+    await fileRef.delete();
 
-  const unusedFiles = files.filter((file) => !photosPaths.includes(file.name));
+    const { data: productData, ref: productRef } =
+      await getDocumentFromAdminDB<ProductWithId>("products", productId);
 
-  await Promise.all(unusedFiles.map((file) => file.delete()));
-});
+    if (!productData?.rawPhotos) return;
 
-export const makeFilePublic = withAuth(async function (filePath: string) {
-  const bucket = adminStorage.bucket();
-  const fileRef = bucket.file(filePath);
-  fileRef.makePublic();
-});
+    const filteredPhotos = productData.rawPhotos.filter(
+      (photo) => photo.filePath !== filePath
+    );
+    productData.rawPhotos = filteredPhotos;
+    await productRef.set(productData);
+  }
+);
+
+export const deleteUnusedPhotosFromStorage = withAuth(
+  ["ADMIN", "VERIFIED"],
+  async function (
+    productId: string,
+    storageEndpoint: "raw-photos" | "edited-photos"
+  ): Promise<void> {
+    const bucket = adminStorage.bucket();
+
+    const { data: productData, ref: productRef } =
+      await getDocumentFromAdminDB<ProductWithId>("products", productId);
+
+    let photosPaths: string[] = [];
+    if (storageEndpoint === "raw-photos") {
+      photosPaths =
+        productData?.rawPhotos?.map((photo: RawPhoto) => photo.filePath) || [];
+    } else if (storageEndpoint === "edited-photos") {
+      photosPaths =
+        productData?.editedPhotos?.map(
+          (photo: EditedPhoto) => photo.filePath
+        ) || [];
+    }
+
+    const prefix = `products/${storageEndpoint}/${
+      productData?.productType || "obuwie"
+    }/${productId}/`;
+
+    const [files] = await bucket.getFiles({ prefix });
+
+    const unusedFiles = files.filter(
+      (file) => !photosPaths.includes(file.name)
+    );
+
+    await Promise.all(unusedFiles.map((file) => file.delete()));
+  }
+);
+
+export const makeFilePublic = withAuth(
+  ["ADMIN", "VERIFIED"],
+  async function (filePath: string) {
+    const bucket = adminStorage.bucket();
+    const fileRef = bucket.file(filePath);
+    fileRef.makePublic();
+  }
+);

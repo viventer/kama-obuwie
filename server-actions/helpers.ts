@@ -1,7 +1,6 @@
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { DocumentReference } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
-import { withAuth } from "./auth/auth";
 
 export function apiResponse(
   message: string,
@@ -23,7 +22,7 @@ export type DocumentDataWithRef<T> = {
   ref: DocumentReference;
 };
 
-export const getDocumentFromAdminDB = withAuth(async function <T>(
+export const getDocumentFromAdminDB = async function <T>(
   collection: string,
   id: string
 ): Promise<DocumentDataWithRef<T>> {
@@ -34,9 +33,9 @@ export const getDocumentFromAdminDB = withAuth(async function <T>(
     return { data: null, ref };
   }
   return { data: { ...doc.data(), id: doc.id } as T, ref };
-});
+};
 
-export const getDocumentsFromAdminDB = withAuth(async function <T>(
+export const getDocumentsFromAdminDB = async function <T>(
   collection: string,
   queryFn?: (
     ref: FirebaseFirestore.CollectionReference
@@ -55,4 +54,4 @@ export const getDocumentsFromAdminDB = withAuth(async function <T>(
     id: doc.id,
     ...(doc.data() as T),
   }));
-});
+};

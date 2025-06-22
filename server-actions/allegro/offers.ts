@@ -24,7 +24,7 @@ import {
 import axios from "axios";
 import { choosingSizeImageFilePath } from "@/lib/constants";
 import { getImagesUrls, getImageUrl } from "../images/images";
-import { withAuth } from "../auth/auth";
+import { verifyUser } from "../auth/auth";
 
 type Primitive = string | number | boolean | string[] | number[];
 
@@ -46,64 +46,64 @@ type AllegroIndividualOffer = {
   allegroCategoryId: string;
 };
 
-export const postAllegroOffer = withAuth(
-  ["ADMIN", "VERIFIED"],
-  async (data: PostOfferBody): Promise<Record<string, string>> => {
-    const {
+export const postAllegroOffer = async (
+  data: PostOfferBody
+): Promise<Record<string, string>> => {
+  verifyUser(["ADMIN", "VERIFIED"]);
+  const {
+    offer,
+    product,
+    images,
+    allegroCategoryId,
+    sizingTable,
+    colorVariant,
+  } = data;
+
+  const allegroOfferData: Omit<
+    AllegroOffer,
+    "stock" | "description" | "productSet"
+  > = {
+    sellingMode: {
+      price: {
+        amount: offer.sellingPrices.AL1 as string,
+        currency: "PLN",
+      },
+    },
+    delivery: {
+      handlingTime: "PT24H",
+      shippingRates: {
+        id: offer.shippingRates.AL1?.allegroId as string,
+      },
+    },
+    images: images,
+  };
+
+  const insoleLengths = sizingTable.insoleLengths;
+
+  const accessToken = await getAllegroUserAccessToken();
+  const url = `${ALLEGRO_API_BASE_URL}/sale/offers`;
+  const allegroHeaders = getAllegroHeaders(accessToken);
+
+  const allegroIds: Record<string, string> = {};
+
+  for (const insoleLength of insoleLengths) {
+    const allegroId = await postIndividualAllegroOffer({
+      allegroOfferData,
+      insoleLength,
+      insoleLengths,
       offer,
       product,
-      images,
-      allegroCategoryId,
-      sizingTable,
       colorVariant,
-    } = data;
+      allegroHeaders,
+      url,
+      allegroCategoryId,
+    });
 
-    const allegroOfferData: Omit<
-      AllegroOffer,
-      "stock" | "description" | "productSet"
-    > = {
-      sellingMode: {
-        price: {
-          amount: offer.sellingPrices.AL1 as string,
-          currency: "PLN",
-        },
-      },
-      delivery: {
-        handlingTime: "PT24H",
-        shippingRates: {
-          id: offer.shippingRates.AL1?.allegroId as string,
-        },
-      },
-      images: images,
-    };
-
-    const insoleLengths = sizingTable.insoleLengths;
-
-    const accessToken = await getAllegroUserAccessToken();
-    const url = `${ALLEGRO_API_BASE_URL}/sale/offers`;
-    const allegroHeaders = getAllegroHeaders(accessToken);
-
-    const allegroIds: Record<string, string> = {};
-
-    for (const insoleLength of insoleLengths) {
-      const allegroId = await postIndividualAllegroOffer({
-        allegroOfferData,
-        insoleLength,
-        insoleLengths,
-        offer,
-        product,
-        colorVariant,
-        allegroHeaders,
-        url,
-        allegroCategoryId,
-      });
-
-      allegroIds[insoleLength.size.toString()] = allegroId;
-    }
-
-    return allegroIds;
+    allegroIds[insoleLength.size.toString()] = allegroId;
   }
-);
+
+  return allegroIds;
+};
 
 export async function postIndividualAllegroOffer(
   data: AllegroIndividualOffer

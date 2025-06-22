@@ -7,10 +7,27 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useToast } from "@/hooks/useToast";
+import { useUser } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import Loader from "../global/Loader";
 
 export default function AllegroConnectForm() {
   const router = useRouter();
+  const { user, loading: userLoading } = useUser();
+  const { showToast } = useToast();
+
+  useEffect(() => {
+    if (user?.isAllegroConnected) {
+      router.replace("/admin-panel");
+      showToast("Konto Allegro zostało już podłączone.");
+    }
+  }, [user]);
+
+  if (userLoading) {
+    return <Loader />;
+  }
 
   return (
     <Card className="w-full max-w-[600px]">

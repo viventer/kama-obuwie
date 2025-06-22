@@ -1,54 +1,37 @@
-import { NextResponse } from "next/server";
+"use server";
+
 import { adminAuth } from "@/firebase/firebaseAdmin";
 import { redis } from "@/upstash/redis";
+import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
-type Handler<T extends any[]> = (...args: T) => Promise<any>;
+export type AuthorizationError = {
+  code: "UNAUTHORIZED" | "FORBIDDEN";
+  message: string;
+};
 
-async function getUserSession() {
+export async function verifyUser(roles?: string[]) {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get("sessionId")?.value;
-  if (!sessionId) throw new Error("Brak aktywnej sesji");
+  if (!sessionId) return redirect("/admin-auth/login");
 
   const key = `session:${sessionId}`;
   const sess = await redis.hgetall(key);
   if (!sess || !sess.firebaseIdToken || !sess.role) {
     await redis.del(key);
-    throw new Error("Brak aktywnej sesji");
+    cookieStore.delete("sessionId");
+    redirect("/admin-auth/login");
   }
 
   try {
-    adminAuth.verifyIdToken(sess.firebaseIdToken as string, true);
+    adminAuth.verifyIdToken(sess?.firebaseIdToken as string, true);
   } catch (error) {
-    throw new Error("Nieprawidłowy token sesji");
+    redirect("/admin-auth/login");
   }
 
-  return {
-    uid: sess.userId as string,
-    role: sess.role as string,
-    perms: sess.perms,
-  };
-}
+  if (!roles) return;
 
-export function withAuth<T extends Handler<any[]>>(fn: T): T;
-export function withAuth<T extends Handler<any[]>>(roles: string[], fn: T): T;
-export function withAuth<T extends Handler<any[]>>(
-  arg1: string[] | T,
-  arg2?: T
-): T {
-  const roles = Array.isArray(arg1) ? arg1 : null;
-  const fn = Array.isArray(arg1) ? arg2! : arg1;
-
-  return (async (...args: Parameters<T>) => {
-    const session = await getUserSession();
-
-    if (!session?.role || (roles && !roles.includes(session.role))) {
-      NextResponse.redirect(
-        new URL("/admin-auth/unauthorized", window.location.href)
-      );
-      return;
-    }
-
-    return fn(...args);
-  }) as T;
+  if (roles.length > 0 && !roles.includes(sess?.role as string)) {
+    redirect("/admin-auth/unauthorized");
+  }
 }

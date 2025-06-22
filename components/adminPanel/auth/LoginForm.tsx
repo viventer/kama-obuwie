@@ -11,16 +11,26 @@ import { useToast } from "@/hooks/useToast";
 import { auth, googleAuthProvider } from "@/firebase/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Loader from "../global/Loader";
 import axios from "axios";
 import GoogleIcon from "@/components/icons/GoogleIcon";
+import { useUser } from "@/hooks/useUser";
 
 export default function LoginForm() {
   const { showToast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { user, loading: userLoading } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/admin-panel");
+      showToast("Jesteś już zalogowany.");
+    }
+  }, [user]);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -47,7 +57,7 @@ export default function LoginForm() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading || userLoading) {
     return <Loader />;
   }
 

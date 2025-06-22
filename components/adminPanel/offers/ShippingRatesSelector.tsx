@@ -7,6 +7,7 @@ import axios from "axios";
 import { FormField } from "@/components/ui/form";
 import SingleSelect from "../global/form/SingleSelect";
 import MiniLoader from "../global/MiniLoader";
+import { redirect } from "next/navigation";
 
 export type ShippingRate = {
   id: string;
@@ -30,7 +31,7 @@ export default function ShippingRatesSelector() {
     })();
   }, []);
 
-  return availableShippingRates.length > 0 ? (
+  return availableShippingRates && availableShippingRates.length > 0 ? (
     <FormField
       control={control}
       name="shippingRates.AL1.allegroId"

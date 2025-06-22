@@ -11,12 +11,19 @@ export async function GET(request: Request) {
 
   const sessionHash = await redis.hgetall(key);
   if (!sessionHash || !sessionHash.firebaseIdToken || !sessionHash.userId) {
-    return NextResponse.json({ user: null }, { status: 200 });
+    return NextResponse.json({ message: "Brak sesji" }, { status: 401 });
   }
 
   const firebaseIdToken = sessionHash.firebaseIdToken as string;
   const userId = sessionHash.userId as string;
   const isAllegroConnected = Boolean(sessionHash?.allegroAccessToken);
+
+  if (!isAllegroConnected) {
+    return NextResponse.json(
+      { message: "Nie podłączono Allegro" },
+      { status: 403 }
+    );
+  }
 
   try {
     await adminAuth.verifyIdToken(firebaseIdToken, true);
@@ -37,6 +44,6 @@ export async function GET(request: Request) {
     });
   } catch {
     redis.del(key);
-    return NextResponse.json({ user: null }, { status: 200 });
+    return NextResponse.json({ message: "Brak sesji" }, { status: 401 });
   }
 }

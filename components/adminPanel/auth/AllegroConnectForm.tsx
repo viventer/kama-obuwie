@@ -32,7 +32,7 @@ export default function AllegroConnectForm() {
   return (
     <Card className="w-full max-w-[600px]">
       <CardHeader>
-        <CardTitle className="text-text">Zaloguj się</CardTitle>
+        <CardTitle className="text-text">Podłącz konto Allegro</CardTitle>
         <CardDescription>
           Podłączenie konta Allegro jest wymagane, aby uzyskać dostęp do funkcji
           związanych z Allegro w panelu administracyjnym.
@@ -45,7 +45,7 @@ export default function AllegroConnectForm() {
           }}
           className="text-l border-[0.1rem] border-solid border-primary flex items-center gap-2 px-3 py-2 rounded-md hover:border-accent text-text"
         >
-          Podłącz konto Allegro
+          Podłącz
         </button>
       </CardContent>
     </Card>

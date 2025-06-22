@@ -3,7 +3,6 @@ import { Ubuntu, Ubuntu_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ConfirmDialogProvider } from "@/app/providers/ConfirmDialogProvider";
-import { SWRConfig } from "swr";
 import { AuthProvider } from "./providers/AuthProvider";
 
 const ubuntuSans = Ubuntu({

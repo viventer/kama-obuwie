@@ -3,31 +3,11 @@
 import { useFormContext } from "react-hook-form";
 import { EditOfferFormValues } from "./EditOfferForm";
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { salesChannels } from "@/lib/constants";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { SizingTableWithId } from "@/firebase/schemas/productsSchemas";
 import MiniLoader from "../global/MiniLoader";
 
-export default function AvailabilityField({
-  sizingTableId,
-}: {
-  sizingTableId: string;
-}) {
-  const [sizes, setSizes] = useState<string[]>([]);
+export default function AvailabilityField({ sizes }: { sizes: string[] }) {
   const { control } = useFormContext<EditOfferFormValues>();
-
-  useEffect(() => {
-    (async () => {
-      console.log(sizingTableId);
-      const { data }: { data: SizingTableWithId } = await axios.get(
-        `/api/sizing-tables/${sizingTableId}`
-      );
-      const respSizes = data.insoleLengths.map((item) => item.size.toString());
-      setSizes(respSizes);
-    })();
-  }, []);
 
   return (
     <div>
@@ -52,7 +32,6 @@ export default function AvailabilityField({
                     onChange={field.onChange}
                     min={0}
                     max={10000}
-                    className="no-spinner"
                   />
                 </FormItem>
               )}

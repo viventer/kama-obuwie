@@ -7,12 +7,17 @@ import {
   Offer,
   OfferWithId,
 } from "@/firebase/schemas/offersSchemas";
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  ProductWithId,
+  SizingTableWithId,
+} from "@/firebase/schemas/productsSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import SellingPricesField from "./SellingPricesField";
 import ShippingRatesSelector from "./ShippingRatesSelector";
 import AvailabilityField from "./AvailabilityField";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 export type EditOfferFormValues = Pick<
   Offer,
@@ -26,6 +31,25 @@ export default function EditOfferForm({
   oldOfferData: OfferWithId;
   productData: ProductWithId;
 }) {
+  const [sizes, setSizes] = useState<string[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const { data }: { data: SizingTableWithId } = await axios.get(
+        `/api/sizing-tables/${productData.sizingTableId}`
+      );
+      const respSizes = data.insoleLengths.map((item) => item.size.toString());
+      setSizes(respSizes);
+
+      respSizes.forEach((size) => {
+        const current = form.getValues(`availability.${size}.value`);
+        if (current == null) {
+          form.setValue(`availability.${size}.value`, 1);
+        }
+      });
+    })();
+  }, [productData.sizingTableId]);
+
   const form = useForm<EditOfferFormValues>({
     resolver: zodResolver(EditOfferFormSchema),
     defaultValues: {
@@ -55,9 +79,7 @@ export default function EditOfferForm({
         />
         <SellingPricesField />
         <ShippingRatesSelector />
-        <AvailabilityField
-          sizingTableId={productData.sizingTableId as string}
-        />
+        <AvailabilityField sizes={sizes} />
       </div>
     </Form>
   );

@@ -2,7 +2,6 @@ import { Offer } from "@/firebase/schemas/offersSchemas";
 import {
   ColorVariant,
   Product,
-  ProductParameters,
   SizingTable,
 } from "@/firebase/schemas/productsSchemas";
 import { postAllegroOffer } from "@/server-actions/allegro/offers";

@@ -18,6 +18,7 @@ export default function AvailabilityField({ sizes }: { sizes: string[] }) {
         ) : (
           sizes.map((size) => (
             <FormField
+              rules={{ required: "Wartość dostępności jest wymagana." }}
               key={size}
               control={control}
               name={`availability.${size}.value`}

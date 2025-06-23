@@ -12,7 +12,7 @@ import {
   uploadImageToStorage,
 } from "@/server-actions/images/images";
 import { cn } from "@/lib/utils";
-import { getNewFileName } from "../helpers/files";
+import { getNewFileName } from "../../../../helpers/files";
 import IconButton from "../IconButton";
 
 interface ImageUploaderProps {

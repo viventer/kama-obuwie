@@ -3,7 +3,7 @@
 import { PostOfferBody } from "@/app/api/allegro/offers/route";
 import {
   AllegroOffer,
-  AllegroOfferDescriptionSectionSchema,
+  AllegroDescriptionSectionSchema,
   AllegroOfferParameters,
   Offer,
 } from "@/firebase/schemas/offersSchemas";
@@ -21,7 +21,7 @@ import {
   AllegroHeaders,
   getAllegroHeaders,
 } from "./global";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { choosingSizeImageFilePath } from "@/lib/constants";
 import { getImagesUrls, getImageUrl } from "../images/images";
 import { verifyUser } from "../auth/auth";
@@ -44,6 +44,7 @@ type AllegroIndividualOffer = {
   allegroHeaders: AllegroHeaders;
   url: string;
   allegroCategoryId: string;
+  images: string[];
 };
 
 export const postAllegroOffer = async (
@@ -81,7 +82,7 @@ export const postAllegroOffer = async (
   const insoleLengths = sizingTable.insoleLengths;
 
   const accessToken = await getAllegroUserAccessToken();
-  const url = `${ALLEGRO_API_BASE_URL}/sale/offers`;
+  const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers`;
   const allegroHeaders = getAllegroHeaders(accessToken);
 
   const allegroIds: Record<string, string> = {};
@@ -97,6 +98,7 @@ export const postAllegroOffer = async (
       allegroHeaders,
       url,
       allegroCategoryId,
+      images,
     });
 
     allegroIds[insoleLength.size.toString()] = allegroId;
@@ -109,6 +111,7 @@ export async function postIndividualAllegroOffer(
   data: AllegroIndividualOffer
 ): Promise<string> {
   const {
+    images,
     allegroOfferData,
     insoleLength,
     insoleLengths,
@@ -143,32 +146,35 @@ export async function postIndividualAllegroOffer(
       values: [colorVariant.color],
     },
     {
-      name: "Odcień",
-      values: [shadeValue],
-    },
-    {
-      name: "Kolor dodatkowy",
-      values: [additionalColorValue],
-    },
-    {
       name: "Kod producenta",
       values: [formattedManufacturerCode],
     },
   ];
 
-  const images = await getImagesUrls(
-    product.editedPhotos?.map((image) => image.filePath) || []
-  );
+  if (shadeValue) {
+    allegroProductParameters.push({
+      name: "Odcień",
+      values: [shadeValue],
+    });
+  }
+
+  if (additionalColorValue) {
+    allegroProductParameters.push({
+      name: "Kolor dodatkowy",
+      values: [additionalColorValue],
+    });
+  }
 
   const productSet = [
     {
+      marketedBeforeGPSRObligation: true,
       product: {
         name: offer.title,
         category: {
           id: allegroCategoryId,
         },
         parameters: allegroProductParameters,
-        images: images as string[],
+        images: images,
       },
     },
   ];
@@ -198,46 +204,89 @@ export async function postIndividualAllegroOffer(
     description,
     productSet,
     stock: {
-      available: offer.availability[insoleLength.size].value,
+      available: Number(offer.availability[insoleLength.size].value),
     },
   };
 
-  const resp = await axios.post(url, allegroOffer, {
-    headers: allegroHeaders,
-  });
+  try {
+    const resp = await axios.post(url, allegroOffer, {
+      headers: allegroHeaders,
+    });
+    return resp.data.id! as string;
+  } catch (err) {
+    const error = err as AxiosError<{
+      errors: Array<{
+        code: string;
+        details: string;
+        message: string;
+        path: string;
+        userMessage: string;
+        metadata: Record<string, any>;
+      }>;
+    }>;
 
-  if (resp.status !== 201 && resp.status !== 202) {
+    if (error.response) {
+      console.error("Status:", error.response.status);
+      console.error("Body:", JSON.stringify(error.response.data, null, 2));
+      error.response.data.errors.forEach((e, idx) => {
+        console.error(`Error #${idx + 1}`);
+        console.error("  code       :", e.code);
+        console.error("  message    :", e.message);
+        console.error("  details    :", e.details);
+        console.error("  userMessage:", e.userMessage);
+        console.error("  path       :", e.path);
+        console.error("  metadata   :", JSON.stringify(e.metadata));
+      });
+    } else if (error.request) {
+      console.error("No response received:", error.request);
+    } else {
+      // Błąd w konfiguracji Axios lub inny
+      console.error("Unexpected error:", error.message);
+    }
     throw new Error(
-      `Błąd podczas tworzenia oferty na Allegro: ${resp.status} - ${resp.statusText}`
+      `Błąd podczas publikacji oferty na Allegro: ${error.message}`
     );
   }
-
-  return resp.data.id;
 }
 
-export const formatAllegroProductParameters = (
+function formatAllegroProductParameters(
   productParameters: ProductParameters
-): AllegroOfferParameters => {
-  const entries: [string, Primitive][] = [
+): AllegroOfferParameters {
+  const result: AllegroOfferParameters = [];
+
+  // 1. Scalamy wszystkie required + optional
+  const allEntries: [string, Primitive | Primitive[]][] = [
     ...Object.entries(productParameters.required),
     ...Object.entries(productParameters.optional),
   ];
 
-  return entries.map(([name, value]) => {
-    let valuesArray: [Primitive, ...Primitive[]];
-
-    if (Array.isArray(value)) {
-      if (value.length === 0) {
-        throw new Error(`Parameter "${name}" has an empty array of values.`);
+  for (const [name, rawValue] of allEntries) {
+    // 2. Usuń puste stringi
+    if (Array.isArray(rawValue)) {
+      // Tablica → przefiltruj
+      const cleaned = rawValue.filter((v) => v !== "");
+      if (cleaned.length === 0) {
+        // cała tablica była pusta → pomiń parametr
+        continue;
       }
-      valuesArray = [value[0], ...value.slice(1)];
+      // wyciągnij pierwszą i resztę
+      const values: [Primitive, ...Primitive[]] = [
+        cleaned[0],
+        ...cleaned.slice(1),
+      ];
+      result.push({ name, values });
     } else {
-      valuesArray = [value];
+      // Pojedyncza wartość
+      if (rawValue === "") {
+        // pusty string → pomiń parametr
+        continue;
+      }
+      result.push({ name, values: [rawValue] });
     }
+  }
 
-    return { name, values: valuesArray };
-  });
-};
+  return result;
+}
 
 function replaceDescriptionVariables(
   text: string,
@@ -272,42 +321,50 @@ function getFormattedSizingTable(
 export async function convertToAllegroDescription(
   description: Description,
   editedPhotos: string[],
-  variableValues: Record<DescriptionVariable, string>
-) {
-  const sections = await Promise.all(
-    description.map(async (row) => {
-      const items = await Promise.all(
-        row.elementsTypes.map(async (type, idx) => {
-          const element = row.elements[idx];
+  variableValues: Record<string, string>
+): Promise<{
+  sections: Array<{
+    items: Array<{ type: "TEXT" | "IMAGE"; content?: string; url?: string }>;
+  }>;
+}> {
+  const sections: Array<{
+    items: Array<{ type: "TEXT" | "IMAGE"; content?: string; url?: string }>;
+  }> = [];
 
-          if (type === "text") {
-            const content = element.content
-              ? replaceDescriptionVariables(element.content, variableValues)
-              : undefined;
-            return { type: "text", content };
-          }
+  for (const row of description) {
+    const items: Array<{
+      type: "TEXT" | "IMAGE";
+      content?: string;
+      url?: string;
+    }> = [];
 
-          if (type === "image") {
-            const key = element.image!;
-            let url: string;
+    for (let idx = 0; idx < row.elementsTypes.length; idx++) {
+      const type = row.elementsTypes[idx];
+      const element = row.elements[idx];
 
-            if (key === "rozmiarówka") {
-              url = (await getImageUrl(choosingSizeImageFilePath)) as string;
-            } else {
-              const index = parseInt(key, 10);
-              url = (await getImageUrl(editedPhotos[index])) as string;
-            }
+      if (type === "text") {
+        const raw = element.content ?? "";
+        const content = replaceDescriptionVariables(raw, variableValues);
+        if (content) {
+          items.push({ type: "TEXT", content });
+        }
+      } else if (type === "image") {
+        const key = element.image!;
+        let url: string;
 
-            return { type: "image", url };
-          }
+        if (key === "rozmiarówka") {
+          url = (await getImageUrl("path/to/size-chart.png")) as string;
+        } else {
+          const index = parseInt(key, 10);
+          url = (await getImageUrl(editedPhotos[index])) as string;
+        }
 
-          return { type, content: undefined };
-        })
-      );
+        items.push({ type: "IMAGE", url });
+      }
+    }
 
-      return AllegroOfferDescriptionSectionSchema.parse({ items });
-    })
-  );
+    sections.push({ items });
+  }
 
-  return sections;
+  return { sections };
 }

@@ -24,7 +24,7 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import SortableImage from "./SortableImage";
-import { getNewFileName } from "../helpers/files";
+import { getNewFileName } from "../../../../helpers/files";
 
 interface MultipleImageUploaderProps {
   setFilePaths: (filePaths: string[]) => void;

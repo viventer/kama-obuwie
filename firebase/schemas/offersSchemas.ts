@@ -27,13 +27,12 @@ export const shippingRateSchema = z.object({
 });
 
 export const ShippingRatesSchema = z.object({
-  allegroId: z.string().optional(),
-  rates: z.array(shippingRateSchema),
+  allegroId: z.string(),
+  rates: z.array(shippingRateSchema).optional(),
 });
 
 export const AvailabilitySchema = z.object({
-  value: z.number().min(0).max(1000),
-  isActive: z.boolean(),
+  value: z.string(),
   allegroOffersIds: z.record(z.enum(["AL1", "AL2"]), z.string()).optional(),
 });
 
@@ -67,19 +66,19 @@ export const OfferSchema = z.object({
     .optional(),
 });
 
-export const AllegroOfferDescriptionSectionSchema = z.object({
-  items: z.array(
-    z.object({
-      type: z.enum(["text", "image"]),
-      content: z.string().optional(),
-      url: z.string().url().optional(),
-    })
-  ),
+export const AllegroDescriptionItemSchema = z.object({
+  type: z.enum(["TEXT", "IMAGE"]),
+  content: z.string().optional(),
+  url: z.string().url().optional(),
 });
 
-export const AllegroOfferDescriptionSchema = z.array(
-  AllegroOfferDescriptionSectionSchema
-);
+export const AllegroDescriptionSectionSchema = z.object({
+  items: z.array(AllegroDescriptionItemSchema).min(1),
+});
+
+export const AllegroOfferDescriptionSchema = z.object({
+  sections: z.array(AllegroDescriptionSectionSchema).min(1),
+});
 
 export const AllegroOfferParametersSchema = z.array(
   z.object({
@@ -133,8 +132,8 @@ export type ShippingRates = z.infer<typeof ShippingRatesSchema>;
 export type Availability = z.infer<typeof AvailabilitySchema>;
 export type Offer = z.infer<typeof OfferSchema>;
 export type AllegroOffer = z.infer<typeof AllegroOfferSchema>;
-export type AllegroOfferDescriptionSection = z.infer<
-  typeof AllegroOfferDescriptionSectionSchema
+export type AllegroDescriptionSection = z.infer<
+  typeof AllegroDescriptionSectionSchema
 >;
 export type AllegroOfferDescription = z.infer<
   typeof AllegroOfferDescriptionSchema

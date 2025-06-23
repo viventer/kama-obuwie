@@ -33,6 +33,7 @@ export default function ShippingRatesSelector() {
 
   return availableShippingRates && availableShippingRates.length > 0 ? (
     <FormField
+      rules={{ required: "Cennik dostaw jest wymagany." }}
       control={control}
       name="shippingRates.AL1.allegroId"
       render={({ field }) => (

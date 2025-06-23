@@ -13,6 +13,7 @@ export default function SellingPricesField() {
     <div>
       <h3 className="font-medium">Ceny sprzedaży:</h3>
       <FormField
+        rules={{ required: "Ceny sprzedaży są wymagane." }}
         control={control}
         name="sellingPrices"
         render={({ field }) => (

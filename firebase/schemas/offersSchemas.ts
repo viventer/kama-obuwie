@@ -38,7 +38,7 @@ export const AvailabilitySchema = z.object({
 
 export const OfferSchema = z.object({
   id: z.string().optional(),
-  title: z.string().min(3).max(75),
+  title: z.string().min(3).max(72),
   productId: z.string(),
   signature: z.string(), // brand + manufacturer code + color variant name
   colorVariantName: z.string().optional(),

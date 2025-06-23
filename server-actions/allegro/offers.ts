@@ -3,7 +3,6 @@
 import { PostOfferBody } from "@/app/api/allegro/offers/route";
 import {
   AllegroOffer,
-  AllegroDescriptionSectionSchema,
   AllegroOfferParameters,
   Offer,
 } from "@/firebase/schemas/offersSchemas";
@@ -22,8 +21,7 @@ import {
   getAllegroHeaders,
 } from "./global";
 import axios, { AxiosError } from "axios";
-import { choosingSizeImageFilePath } from "@/lib/constants";
-import { getImagesUrls, getImageUrl } from "../images/images";
+import { getImageUrl } from "../images/images";
 import { verifyUser } from "../auth/auth";
 
 type Primitive = string | number | boolean | string[] | number[];
@@ -169,7 +167,7 @@ export async function postIndividualAllegroOffer(
     {
       marketedBeforeGPSRObligation: true,
       product: {
-        name: offer.title,
+        name: `${offer.title} ${insoleLength.size}`,
         category: {
           id: allegroCategoryId,
         },

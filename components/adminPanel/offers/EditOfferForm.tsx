@@ -190,6 +190,7 @@ export default function EditOfferForm({
                 type="text"
                 value={field.value}
                 onChange={field.onChange}
+                maxLength={72}
               />
             </FormItem>
           )}

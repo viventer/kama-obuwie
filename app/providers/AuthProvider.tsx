@@ -13,7 +13,7 @@ export function AuthProvider({ children }: Props) {
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
       if (user) {
         try {
-          const freshToken = await user.getIdToken();
+          const freshToken = await user.getIdToken(true);
           await axios.post("/api/auth/refresh/firebase-token", {
             idToken: freshToken,
           });
@@ -23,7 +23,27 @@ export function AuthProvider({ children }: Props) {
       }
     });
 
-    return () => unsubscribe();
+    const interval = setInterval(async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const freshToken = await user.getIdToken(true);
+          await axios.post("/api/auth/refresh/firebase-token", {
+            idToken: freshToken,
+          });
+        } catch (err) {
+          console.error(
+            "Automatyczne odświeżanie tokena nie powiodło się:",
+            err
+          );
+        }
+      }
+    }, 50 * 60 * 1000); // 50 minut
+
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   return (

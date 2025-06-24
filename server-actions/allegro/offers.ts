@@ -209,6 +209,8 @@ export async function postIndividualAllegroOffer(
     },
   };
 
+  console.log(allegroOffer.productSet[0].product);
+
   try {
     const resp = await axios.post(url, allegroOffer, {
       headers: allegroHeaders,
@@ -293,10 +295,14 @@ function replaceDescriptionVariables(
   text: string,
   values: Record<DescriptionVariable, string>
 ): string {
-  return DescriptionVariables.reduce((result, variable) => {
+  let result = stripWrapperParagraphs(text);
+
+  for (const variable of DescriptionVariables) {
     const regex = new RegExp(`{${variable}}`, "g");
-    return result.replace(regex, values[variable] ?? "");
-  }, text);
+    result = result.replace(regex, values[variable] ?? "");
+  }
+
+  return result;
 }
 
 function getFormattedSizingTable(
@@ -345,7 +351,11 @@ export async function convertToAllegroDescription(
 
       if (type === "text") {
         const raw = element.content ?? "";
-        const content = replaceDescriptionVariables(raw, variableValues);
+        let content = replaceDescriptionVariables(raw, variableValues);
+        content = content
+          .replace(/<strong>/g, "<b>")
+          .replace(/<\/strong>/g, "</b>");
+
         if (content) {
           items.push({ type: "TEXT", content });
         }
@@ -368,4 +378,8 @@ export async function convertToAllegroDescription(
   }
 
   return { sections };
+}
+
+function stripWrapperParagraphs(text: string): string {
+  return text.replace(/<p>\s*{rozmiarówka}\s*<\/p>/g, "{rozmiarówka}");
 }

@@ -20,7 +20,7 @@ export type PostOfferBody = {
 export async function POST(request: NextRequest) {
   try {
     const body: PostOfferBody = await request.json();
-    const allegroIds = postAllegroOffer(body);
+    const allegroIds = await postAllegroOffer(body);
 
     return apiResponse("Oferta została utworzona.", 201, { allegroIds });
   } catch (err) {

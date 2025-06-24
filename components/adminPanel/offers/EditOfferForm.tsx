@@ -97,6 +97,7 @@ export default function EditOfferForm({
     const signatureWithoutColorVariant = `${
       productData.brand ? productData.brand : ""
     } ${productData.manufacturerCode}`;
+    const offersIds = [oldOfferData.id];
     try {
       await updateMainOffer({
         ...oldOfferData,
@@ -110,13 +111,14 @@ export default function EditOfferForm({
         if (colorVariantName === colorVariantsNames[0]) {
           return;
         }
-        await createOffersForDifferentVariants({
+        const id = await createOfferForDifferentVariant({
           ...oldOfferData,
           ...formData,
           colorVariantName,
           signature:
             signatureWithoutColorVariant.trim() + ` ${colorVariantName}`,
         });
+        offersIds.push(id);
       });
 
       const postAllegroOfferBody: Omit<
@@ -129,7 +131,7 @@ export default function EditOfferForm({
         sizingTable,
       });
 
-      productData.colorVariants.forEach(async (variant) => {
+      productData.colorVariants.forEach(async (variant, index) => {
         if (!productData.editedPhotos) {
           showToast("Brak zdjęć produktu", "error");
           return;
@@ -143,12 +145,22 @@ export default function EditOfferForm({
 
         const imagesUrls = await getImagesUrls(imagesPaths);
 
-        await axios.post("/api/allegro/offers", {
+        const { data: allegroIds } = await axios.post("/api/allegro/offers", {
           ...postAllegroOfferBody,
           colorVariant: variant,
           images: imagesUrls,
         });
+
+        const formattedAllegroIds = {
+          AL1: allegroIds,
+        };
+
+        axios.patch(`/api/offers/${offersIds[index]}`, {
+          allegroOffersIds: formattedAllegroIds,
+        });
       });
+
+      showToast("Oferta została wystawiona.", "success");
     } catch (err) {
       showToast(`Nie udało się wystawić oferty: ${err}`, "error");
       return;
@@ -173,11 +185,14 @@ export default function EditOfferForm({
     }
   };
 
-  const createOffersForDifferentVariants = async (offerData: Offer) => {
+  const createOfferForDifferentVariant = async (
+    offerData: Offer
+  ): Promise<string> => {
     try {
-      await axios.post("/api/offers", {
+      const { data: offerId } = await axios.post("/api/offers", {
         ...offerData,
       });
+      return offerId;
     } catch (err) {
       throw new Error(`Nie można utworzyć oferty dla wariantu: ${err}`);
     }

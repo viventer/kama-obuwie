@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SalesChannelSchema } from "./otherSchemas";
 
 export type RootCategory =
   | "akcesoria"
@@ -157,6 +158,15 @@ export const ProductSchema = z.object({
   sizingTableId: z.string().optional(),
   accessoriesGroupId: z.string().optional(),
   brandInfoId: z.string().optional(),
+  offersIds: z
+    .record(
+      SalesChannelSchema,
+      z.object({
+        value: z.string(),
+        colorVariantName: z.string().optional(),
+      })
+    )
+    .optional(),
 });
 
 export const ProductPartialSchema = ProductSchema.partial();

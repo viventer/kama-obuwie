@@ -24,6 +24,8 @@ import { PostOfferBody } from "@/app/api/allegro/offers/route";
 import { getPostOfferBody } from "@/server-actions/offers/offers";
 import { getColorVariantName } from "../products/helpers/productsHelpers";
 import { getImagesUrls } from "@/server-actions/images/images";
+import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
+import { useRouter } from "next/navigation";
 
 export type EditOfferFormValues = Pick<
   Offer,
@@ -92,11 +94,16 @@ export default function EditOfferForm({
     const colorVariantsNames = productData.colorVariants?.map((variant) =>
       getColorVariantName(variant)
     );
+    const signatureWithoutColorVariant = `${
+      productData.brand ? productData.brand : ""
+    } ${productData.manufacturerCode}`;
     try {
       await updateMainOffer({
         ...oldOfferData,
         ...formData,
         colorVariantName: colorVariantsNames[0],
+        signature:
+          signatureWithoutColorVariant.trim() + ` ${colorVariantsNames[0]}`,
       });
 
       colorVariantsNames.forEach(async (colorVariantName) => {
@@ -107,6 +114,8 @@ export default function EditOfferForm({
           ...oldOfferData,
           ...formData,
           colorVariantName,
+          signature:
+            signatureWithoutColorVariant.trim() + ` ${colorVariantName}`,
         });
       });
 
@@ -174,7 +183,20 @@ export default function EditOfferForm({
     }
   };
 
-  const handleReject = async (e: FormEvent) => {};
+  const { showDialog } = useConfirmDialog();
+  const router = useRouter();
+  const handleReject = async (e: FormEvent) => {
+    e.preventDefault();
+
+    showDialog({
+      message: "Czy na pewno chcesz odrzucić zmiany?",
+      description: "Ta operacja jest nieodwracalna.",
+      onConfirm: async () => {
+        router.back();
+        showToast("Zmiany zostały odrzucone.", "default");
+      },
+    });
+  };
 
   return (
     <Form {...form}>

@@ -13,7 +13,6 @@ import {
   SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
-import { getImagesUrls } from "../images/images";
 
 export const createOffer = async function (newOffer: Partial<Offer>) {
   verifyUser(["ADMIN", "VERIFIED"]);

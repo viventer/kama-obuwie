@@ -204,6 +204,9 @@ export async function postIndividualAllegroOffer(
     stock: {
       available: Number(offer.availability[insoleLength.size].value),
     },
+    external: {
+      id: offer.signature,
+    },
   };
 
   try {

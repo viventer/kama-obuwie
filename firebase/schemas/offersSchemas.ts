@@ -49,7 +49,9 @@ export const OfferSchema = z.object({
   updatedAt: z.date().optional(),
   shippingRates: z.record(SalesChannelSchema, ShippingRatesSchema),
   availability: z.record(z.string(), AvailabilitySchema),
-  allegroOffersIds: z.array(z.string()).optional(),
+  allegroOffersIds: z
+    .record(z.enum(["AL1", "AL2"]), z.record(z.string(), z.string()))
+    .optional(), // { AL1: { 41: "offerId1" }, AL2: { 42: "offerId2" } }
   offerGroupId: z.string().optional(),
   isPosted: z.object({
     salesChannel: SalesChannelSchema,
@@ -98,6 +100,7 @@ export const AllegroOfferSchema = z.object({
         parameters: AllegroOfferParametersSchema,
         images: z.array(z.string().url()),
       }),
+      marketedBeforeGPSRObligation: z.boolean().optional(),
     })
   ),
   sellingMode: z.object({
@@ -117,6 +120,11 @@ export const AllegroOfferSchema = z.object({
     }),
   }),
   description: AllegroOfferDescriptionSchema,
+  external: z
+    .object({
+      id: z.string(),
+    })
+    .optional(),
   images: z.array(z.string().url()),
 });
 

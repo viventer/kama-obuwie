@@ -134,6 +134,18 @@ export const rangeSizeSchema = z.object({
 
 export type RangeSize = z.infer<typeof rangeSizeSchema>;
 
+export const OffersIdsSchema = z.record(
+  SalesChannelSchema,
+  z.array(
+    z.object({
+      value: z.string(),
+      colorVariantName: z.string().optional(),
+    })
+  )
+);
+
+export type OffersIds = z.infer<typeof OffersIdsSchema>;
+
 export const ProductSchema = z.object({
   id: z.string().optional(),
   brand: z.string().max(32).optional(),
@@ -158,15 +170,7 @@ export const ProductSchema = z.object({
   sizingTableId: z.string().optional(),
   accessoriesGroupId: z.string().optional(),
   brandInfoId: z.string().optional(),
-  offersIds: z
-    .record(
-      SalesChannelSchema,
-      z.object({
-        value: z.string(),
-        colorVariantName: z.string().optional(),
-      })
-    )
-    .optional(),
+  offersIds: OffersIdsSchema.optional(),
 });
 
 export const ProductPartialSchema = ProductSchema.partial();

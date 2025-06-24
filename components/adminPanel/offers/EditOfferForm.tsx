@@ -8,6 +8,7 @@ import {
   OfferWithId,
 } from "@/firebase/schemas/offersSchemas";
 import {
+  OffersIds,
   ProductWithId,
   SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
@@ -97,7 +98,14 @@ export default function EditOfferForm({
     const signatureWithoutColorVariant = `${
       productData.brand ? productData.brand : ""
     } ${productData.manufacturerCode}`;
-    const offersIds = [oldOfferData.id];
+    const offersIds: OffersIds = {
+      AL1: [
+        {
+          value: oldOfferData.id,
+          colorVariantName: colorVariantsNames[0],
+        },
+      ],
+    };
     try {
       await updateMainOffer({
         ...oldOfferData,
@@ -118,7 +126,10 @@ export default function EditOfferForm({
           signature:
             signatureWithoutColorVariant.trim() + ` ${colorVariantName}`,
         });
-        offersIds.push(id);
+        offersIds?.AL1?.push({
+          value: id,
+          colorVariantName,
+        });
       });
 
       const postAllegroOfferBody: Omit<
@@ -137,8 +148,10 @@ export default function EditOfferForm({
           return;
         }
 
+        const colorVariantName = getColorVariantName(variant);
+
         const imagesOfVariant = productData.editedPhotos.filter(
-          (image) => image.colorVariantName === getColorVariantName(variant)
+          (image) => image.colorVariantName === colorVariantName
         );
 
         const imagesPaths = imagesOfVariant.map((image) => image.filePath);
@@ -155,8 +168,17 @@ export default function EditOfferForm({
           AL1: allegroIds,
         };
 
-        axios.patch(`/api/offers/${offersIds[index]}`, {
+        const offerId = offersIds?.AL1?.find(
+          (offer) => offer.colorVariantName === colorVariantName
+        )?.value;
+
+        await axios.patch(`/api/offers/${offerId}`, {
           allegroOffersIds: formattedAllegroIds,
+        });
+
+        await axios.patch(`/api/products/${productData.id}`, {
+          offersIds,
+          creationStage: "done",
         });
       });
 

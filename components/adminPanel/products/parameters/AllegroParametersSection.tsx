@@ -16,6 +16,8 @@ import { Controller, useFormContext } from "react-hook-form";
 
 export const allegroParametersToSkip = [
   "Rozmiar",
+  "Rozmiar (new)",
+  "Długość wkładki wew.",
   "Kod producenta",
   "Długość wkładki",
   "Kolor",

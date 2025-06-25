@@ -28,10 +28,7 @@ import { choosingSizeImageFilePath } from "@/lib/constants";
 type Primitive = string | number | boolean | string[] | number[];
 
 type AllegroIndividualOffer = {
-  allegroOfferData: Omit<
-    AllegroOffer,
-    "stock" | "description" | "productSet" | "images"
-  >;
+  allegroOfferData: Omit<AllegroOffer, "stock" | "description" | "productSet">;
   insoleLength: {
     size: number;
     insoleLength: number;
@@ -62,9 +59,12 @@ export const postAllegroOffer = async (
     colorVariant,
   } = data;
 
+  const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
+  images.push(choosingSizeImageUrl as string);
+
   const allegroOfferData: Omit<
     AllegroOffer,
-    "stock" | "description" | "productSet" | "images"
+    "stock" | "description" | "productSet"
   > = {
     sellingMode: {
       price: {
@@ -78,6 +78,7 @@ export const postAllegroOffer = async (
         id: offer.shippingRates.AL1?.allegroId as string,
       },
     },
+    images,
   };
 
   const insoleLengths = sizingTable.insoleLengths;
@@ -132,14 +133,22 @@ export async function postIndividualAllegroOffer(
   const shadeValue = colorVariant.shade ?? "";
   const additionalColorValue = colorVariant.additionalColor ?? "brak";
 
+  const sizeParameterName =
+    product.rootCategory === "obuwie dziecięce" ? "Rozmiar (new)" : "Rozmiar";
+
+  const insoleLengthParameterName =
+    product.rootCategory === "obuwie dziecięce"
+      ? "Długość wkładki wew."
+      : "Długość wkładki";
+
   const allegroProductParameters: AllegroOfferParameters = [
     ...formattedProductParameters,
     {
-      name: "Rozmiar",
+      name: sizeParameterName,
       values: [insoleLength.size.toString()],
     },
     {
-      name: "Długość wkładki",
+      name: insoleLengthParameterName,
       values: [insoleLength.insoleLength.toString()],
     },
     {
@@ -370,7 +379,7 @@ export async function convertToAllegroDescription(
         let url: string;
 
         if (key === "rozmiarówka") {
-          url = (await getImageUrl(choosingSizeImageFilePath)) as string;
+          url = imagesUrls[imagesUrls.length - 1];
         } else {
           const index = parseInt(key, 10);
           url = imagesUrls[index - 1];

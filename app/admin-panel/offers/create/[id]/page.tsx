@@ -1,6 +1,6 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import LinkText from "@/components/adminPanel/global/LinkText";
-import EditOfferForm from "@/components/adminPanel/offers/EditOfferForm";
+import PostOfferForm from "@/components/adminPanel/offers/PostOfferForm";
 import ShortProductInfo from "@/components/adminPanel/products/ShortProductInfo";
 import { Button } from "@/components/ui/button";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
@@ -46,7 +46,7 @@ export default async function CreateOfferPage(props: Props) {
           Zobacz dane produktu
         </LinkText>
       </Button>
-      <EditOfferForm oldOfferData={data} productData={productData} />
+      <PostOfferForm oldOfferData={data} productData={productData} />
     </FormWrapper>
   );
 }

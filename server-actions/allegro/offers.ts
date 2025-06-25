@@ -219,13 +219,6 @@ export async function postIndividualAllegroOffer(
     },
   };
 
-  console.log(
-    "Wystawiany kolor: ",
-    allegroOffer.productSet[0].product.parameters.find(
-      (p) => p.name === "Kolor"
-    )?.values
-  );
-
   try {
     const resp = await axios.post(url, allegroOffer, {
       headers: allegroHeaders,

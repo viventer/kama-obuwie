@@ -4,7 +4,7 @@ import { adminDB } from "@/firebase/firebaseAdmin";
 import { Offer, OfferSchema } from "@/firebase/schemas/offersSchemas";
 import { verifyUser } from "../auth/auth";
 import { PostOfferBody } from "@/app/api/allegro/offers/route";
-import { EditOfferFormValues } from "@/components/adminPanel/offers/EditOfferForm";
+import { PostOfferFormValues } from "@/components/adminPanel/offers/PostOfferForm";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import {
   CategoryWithId,
@@ -45,7 +45,7 @@ export const getPostOfferBody = async ({
   oldOfferData,
   sizingTable,
 }: {
-  formData: EditOfferFormValues;
+  formData: PostOfferFormValues;
   productData: ProductWithId;
   oldOfferData: OfferWithId;
   sizingTable: SizingTableWithId;

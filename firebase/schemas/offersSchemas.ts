@@ -128,7 +128,7 @@ export const AllegroOfferSchema = z.object({
   images: z.array(z.string().url()).optional(),
 });
 
-export const EditOfferFormSchema = OfferSchema.pick({
+export const PostOfferFormSchema = OfferSchema.pick({
   title: true,
   sellingPrices: true,
   shippingRates: true,

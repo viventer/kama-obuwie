@@ -34,7 +34,6 @@ export default function ImportProductDescription({
     );
     if (selectedProduct && selectedProduct.description) {
       setDescription(selectedProduct.description);
-      console.log("Zaimportowano opis produktu:", selectedProduct.description);
     } else {
       showToast("Nie wybrano produktu lub brak opisu", "error");
     }

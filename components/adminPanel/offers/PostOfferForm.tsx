@@ -3,7 +3,7 @@
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  EditOfferFormSchema,
+  PostOfferFormSchema,
   Offer,
   OfferWithId,
 } from "@/firebase/schemas/offersSchemas";
@@ -27,13 +27,15 @@ import { getColorVariantName } from "../products/helpers/productsHelpers";
 import { getImagesUrls } from "@/server-actions/images/images";
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { useRouter } from "next/navigation";
+import Loader from "../global/Loader";
+import MiniLoader from "../global/MiniLoader";
 
-export type EditOfferFormValues = Pick<
+export type PostOfferFormValues = Pick<
   Offer,
   "title" | "sellingPrices" | "shippingRates" | "availability"
 >;
 
-export default function EditOfferForm({
+export default function PostOfferForm({
   oldOfferData,
   productData,
 }: {
@@ -44,6 +46,7 @@ export default function EditOfferForm({
   const [sizingTable, setSizingTable] = useState<SizingTableWithId | null>(
     null
   );
+  const [isPosting, setIsPosting] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -63,8 +66,8 @@ export default function EditOfferForm({
     })();
   }, [productData.sizingTableId]);
 
-  const form = useForm<EditOfferFormValues>({
-    resolver: zodResolver(EditOfferFormSchema),
+  const form = useForm<PostOfferFormValues>({
+    resolver: zodResolver(PostOfferFormSchema),
     defaultValues: {
       title: oldOfferData.title || "",
       sellingPrices: oldOfferData.sellingPrices || {},
@@ -77,18 +80,22 @@ export default function EditOfferForm({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setIsPosting(true);
     const formData = form.getValues();
     const isValid = await validateForm();
     if (!isValid) {
+      setIsPosting(false);
       return;
     }
     if (!sizingTable) {
       showToast("Tabela rozmiarów nie została załadowana", "error");
+      setIsPosting(false);
       return false;
     }
 
     if (!productData.colorVariants || productData.colorVariants.length === 0) {
       showToast("Produkt nie ma wariantów kolorystycznych", "error");
+      setIsPosting(false);
       return;
     }
 
@@ -106,6 +113,7 @@ export default function EditOfferForm({
         },
       ],
     };
+
     try {
       await updateMainOffer({
         ...oldOfferData,
@@ -164,8 +172,6 @@ export default function EditOfferForm({
           images: imagesUrls,
         });
 
-        console.log("AllegroIds:", data.allegroIds);
-
         const formattedAllegroIds = {
           AL1: data.allegroIds,
         };
@@ -184,9 +190,12 @@ export default function EditOfferForm({
         });
       }
 
+      setIsPosting(false);
       showToast("Oferta została wystawiona.", "success");
+      router.replace("/admin-panel/create-products/post-offer");
     } catch (err) {
       showToast(`Nie udało się wystawić oferty: ${err}`, "error");
+      setIsPosting(false);
       return;
     }
   };
@@ -236,6 +245,10 @@ export default function EditOfferForm({
       },
     });
   };
+
+  if (isPosting) {
+    return <MiniLoader />;
+  }
 
   return (
     <Form {...form}>

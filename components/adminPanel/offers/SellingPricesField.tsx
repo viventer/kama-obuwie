@@ -1,13 +1,13 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { EditOfferFormValues } from "./EditOfferForm";
+import { PostOfferFormValues } from "./PostOfferForm";
 import { FormField, FormLabel } from "@/components/ui/form";
 import { salesChannels } from "@/lib/constants";
 import { Input } from "@/components/ui/input";
 
 export default function SellingPricesField() {
-  const { control } = useFormContext<EditOfferFormValues>();
+  const { control } = useFormContext<PostOfferFormValues>();
 
   return (
     <div>

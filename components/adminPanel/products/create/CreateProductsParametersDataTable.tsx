@@ -58,7 +58,6 @@ export default function CreateProductsParametersDataTable({
           }
         );
         if (!allRequiredFilled) {
-          console.log(requiredParameters);
           return { ...product, isReady: false };
         }
       }

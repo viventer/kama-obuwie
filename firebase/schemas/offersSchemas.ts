@@ -125,7 +125,7 @@ export const AllegroOfferSchema = z.object({
       id: z.string(),
     })
     .optional(),
-  images: z.array(z.string().url()),
+  // images: z.array(z.string().url()),
 });
 
 export const EditOfferFormSchema = OfferSchema.pick({

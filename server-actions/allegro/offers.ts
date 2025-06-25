@@ -23,11 +23,15 @@ import {
 import axios, { AxiosError } from "axios";
 import { getImageUrl } from "../images/images";
 import { verifyUser } from "../auth/auth";
+import { choosingSizeImageFilePath } from "@/lib/constants";
 
 type Primitive = string | number | boolean | string[] | number[];
 
 type AllegroIndividualOffer = {
-  allegroOfferData: Omit<AllegroOffer, "stock" | "description" | "productSet">;
+  allegroOfferData: Omit<
+    AllegroOffer,
+    "stock" | "description" | "productSet" | "images"
+  >;
   insoleLength: {
     size: number;
     insoleLength: number;
@@ -60,7 +64,7 @@ export const postAllegroOffer = async (
 
   const allegroOfferData: Omit<
     AllegroOffer,
-    "stock" | "description" | "productSet"
+    "stock" | "description" | "productSet" | "images"
   > = {
     sellingMode: {
       price: {
@@ -74,7 +78,6 @@ export const postAllegroOffer = async (
         id: offer.shippingRates.AL1?.allegroId as string,
       },
     },
-    images: images,
   };
 
   const insoleLengths = sizingTable.insoleLengths;
@@ -189,11 +192,9 @@ export async function postIndividualAllegroOffer(
     "tytuł oferty": offer.title,
   };
 
-  const photos = product.editedPhotos?.map((photo) => photo.filePath) || [];
-
   const description = await convertToAllegroDescription(
     product.description as Description,
-    photos,
+    images,
     descriptionVariableValues
   );
 
@@ -209,7 +210,12 @@ export async function postIndividualAllegroOffer(
     },
   };
 
-  console.log(allegroOffer.productSet[0].product);
+  console.log(
+    "Wystawiany kolor: ",
+    allegroOffer.productSet[0].product.parameters.find(
+      (p) => p.name === "Kolor"
+    )?.values
+  );
 
   try {
     const resp = await axios.post(url, allegroOffer, {
@@ -327,7 +333,7 @@ function getFormattedSizingTable(
 
 export async function convertToAllegroDescription(
   description: Description,
-  editedPhotos: string[],
+  imagesUrls: string[],
   variableValues: Record<string, string>
 ): Promise<{
   sections: Array<{
@@ -364,10 +370,10 @@ export async function convertToAllegroDescription(
         let url: string;
 
         if (key === "rozmiarówka") {
-          url = (await getImageUrl("path/to/size-chart.png")) as string;
+          url = (await getImageUrl(choosingSizeImageFilePath)) as string;
         } else {
           const index = parseInt(key, 10);
-          url = (await getImageUrl(editedPhotos[index])) as string;
+          url = imagesUrls[index - 1];
         }
 
         items.push({ type: "IMAGE", url });

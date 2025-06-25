@@ -115,9 +115,9 @@ export default function EditOfferForm({
           signatureWithoutColorVariant.trim() + ` ${colorVariantsNames[0]}`,
       });
 
-      colorVariantsNames.forEach(async (colorVariantName) => {
+      for (const colorVariantName of colorVariantsNames) {
         if (colorVariantName === colorVariantsNames[0]) {
-          return;
+          continue;
         }
         const id = await createOfferForDifferentVariant({
           ...oldOfferData,
@@ -130,7 +130,7 @@ export default function EditOfferForm({
           value: id,
           colorVariantName,
         });
-      });
+      }
 
       const postAllegroOfferBody: Omit<
         PostOfferBody,
@@ -142,10 +142,10 @@ export default function EditOfferForm({
         sizingTable,
       });
 
-      productData.colorVariants.forEach(async (variant, index) => {
+      for (const variant of productData.colorVariants) {
         if (!productData.editedPhotos) {
           showToast("Brak zdjęć produktu", "error");
-          return;
+          continue;
         }
 
         const colorVariantName = getColorVariantName(variant);
@@ -158,14 +158,16 @@ export default function EditOfferForm({
 
         const imagesUrls = await getImagesUrls(imagesPaths);
 
-        const { data: allegroIds } = await axios.post("/api/allegro/offers", {
+        const { data } = await axios.post("/api/allegro/offers", {
           ...postAllegroOfferBody,
           colorVariant: variant,
           images: imagesUrls,
         });
 
+        console.log("AllegroIds:", data.allegroIds);
+
         const formattedAllegroIds = {
-          AL1: allegroIds,
+          AL1: data.allegroIds,
         };
 
         const offerId = offersIds?.AL1?.find(
@@ -180,7 +182,7 @@ export default function EditOfferForm({
           offersIds,
           creationStage: "done",
         });
-      });
+      }
 
       showToast("Oferta została wystawiona.", "success");
     } catch (err) {
@@ -211,10 +213,10 @@ export default function EditOfferForm({
     offerData: Offer
   ): Promise<string> => {
     try {
-      const { data: offerId } = await axios.post("/api/offers", {
+      const { data } = await axios.post("/api/offers", {
         ...offerData,
       });
-      return offerId;
+      return data.id;
     } catch (err) {
       throw new Error(`Nie można utworzyć oferty dla wariantu: ${err}`);
     }

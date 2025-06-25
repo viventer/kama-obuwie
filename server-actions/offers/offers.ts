@@ -8,7 +8,6 @@ import { EditOfferFormValues } from "@/components/adminPanel/offers/EditOfferFor
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import {
   CategoryWithId,
-  EditedPhoto,
   ProductWithId,
   SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";

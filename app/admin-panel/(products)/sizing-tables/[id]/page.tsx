@@ -8,7 +8,7 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export async function generateMetadata(props: Props) {
+export async function generateMetadata() {
   return {
     title: `Edytuj tabelę rozmiarów`,
   };
@@ -20,7 +20,7 @@ export default async function SizingTableEditPage(props: Props) {
     "sizingTables",
     id
   );
-  const { data, ref } = result;
+  const { data } = result;
   if (!data) {
     notFound();
   }

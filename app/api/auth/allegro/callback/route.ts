@@ -59,7 +59,7 @@ export async function GET(request: Request) {
     // 5) Przekierowanie z powrotem do panelu
     const returnUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/admin-panel`;
     return NextResponse.redirect(returnUrl);
-  } catch (error: any) {
+  } catch (error) {
     console.error("Allegro exchange error:", error);
     return NextResponse.json(
       { error: "Błąd podczas wymiany tokenów Allegro" },

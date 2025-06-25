@@ -23,7 +23,7 @@ export default function AllegroConnectForm() {
       router.replace("/admin-panel");
       showToast("Konto Allegro zostało już podłączone.");
     }
-  }, [user]);
+  }, [user, router, showToast]);
 
   if (userLoading) {
     return <Loader />;

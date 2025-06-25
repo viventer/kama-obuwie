@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
   const newSizingTable: SizingTable = {
     name,
     insoleLengths,
+    sizingAccuracy: "normalna",
   };
 
   try {

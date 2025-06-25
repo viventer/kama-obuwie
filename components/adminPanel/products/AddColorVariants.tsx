@@ -59,7 +59,7 @@ export default function AddColorVariants({
 
       setLoading(false);
     })();
-  }, []);
+  }, [showToast]);
 
   const addEmpty = () => {
     onChange([...value, { color: "", additionalColor: "", shade: "" }]);

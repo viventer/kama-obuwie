@@ -3,7 +3,6 @@ import LinkText from "@/components/adminPanel/global/LinkText";
 import { EditProductDescriptionForm } from "@/components/adminPanel/products/description/EditProductDescriptionForm";
 import { Button } from "@/components/ui/button";
 import {
-  EditedPhoto,
   EditedPhotoWithUrl,
   ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
@@ -16,7 +15,7 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export async function generateMetadata(props: Props) {
+export async function generateMetadata() {
   return {
     title: `Utwórz opis produktu`,
   };

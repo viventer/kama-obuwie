@@ -65,11 +65,11 @@ export default function MultipleImageUploader({
 
       setImages(loaded);
     })();
-  }, []);
+  }, [filePaths]);
 
   useEffect(() => {
     setFilePaths(images.map((img) => img.filePath));
-  }, [images]);
+  }, [images, setFilePaths]);
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {

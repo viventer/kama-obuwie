@@ -16,7 +16,6 @@ import {
 } from "@dnd-kit/sortable";
 import SortableImage from "../global/uploaders/SortableImage";
 import { useEffect, useState } from "react";
-import { FormLabel } from "@/components/ui/form";
 
 export default function PhotosReorder({
   photos,

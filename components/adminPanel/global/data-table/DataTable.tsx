@@ -44,7 +44,6 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import DataTableRow from "./DataTableRow";
 import DataTableRowWithImage from "./DataTableRowWithImage";
-import IndeterminateCheckbox from "./IndeterminateCheckbox";
 
 export function DataTable<T extends { id: string }>({
   data,

@@ -1,5 +1,4 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
-import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import CreateProductsPhotosForm from "@/components/adminPanel/products/create/CreateProductsPhotosForm";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
@@ -12,7 +11,7 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export async function generateMetadata(props: Props) {
+export async function generateMetadata() {
   return {
     title: `Dodaj zdjęcia produktu`,
   };

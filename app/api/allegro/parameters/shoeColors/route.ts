@@ -4,7 +4,6 @@ import {
 } from "@/server-actions/allegro/categories";
 import { getProductParameters } from "@/server-actions/allegro/products";
 import { apiResponse } from "@/server-actions/helpers";
-import { NextRequest } from "next/server";
 
 export type AllegroColorWithShades = {
   color: string;
@@ -17,7 +16,7 @@ export type AllegroColorWithShadesResponse = {
   colorsWithShades: AllegroColorWithShades[];
 };
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const rootCategory: SerializedAllegroCategory[] = await getAllegroCategories(
     "obuwie męskie"
   );

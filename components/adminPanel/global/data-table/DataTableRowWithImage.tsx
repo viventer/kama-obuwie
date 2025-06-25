@@ -37,7 +37,7 @@ export default function DataTableRowWithImage<T>({
         setImageUrl(url);
       }
     })();
-  }, [row.original, imageAttribute, imageFolderPath]);
+  }, [row.original, imageAttribute, imageFolderPath, isReadyAttribute]);
 
   const checkboxCell = row
     .getVisibleCells()

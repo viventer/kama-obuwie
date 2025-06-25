@@ -27,7 +27,6 @@ import { getColorVariantName } from "../products/helpers/productsHelpers";
 import { getImagesUrls } from "@/server-actions/images/images";
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { useRouter } from "next/navigation";
-import Loader from "../global/Loader";
 import MiniLoader from "../global/MiniLoader";
 
 export type PostOfferFormValues = Pick<

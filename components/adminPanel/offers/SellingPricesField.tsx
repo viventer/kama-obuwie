@@ -16,7 +16,7 @@ export default function SellingPricesField() {
         rules={{ required: "Ceny sprzedaży są wymagane." }}
         control={control}
         name="sellingPrices"
-        render={({ field }) => (
+        render={() => (
           <div className="flex gap-4 flex-wrap">
             {salesChannels.map((channel) => (
               <div key={channel} className="w-[100px]">

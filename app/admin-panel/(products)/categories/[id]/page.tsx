@@ -8,7 +8,7 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export async function generateMetadata(props: Props) {
+export async function generateMetadata() {
   return {
     title: `Edytuj kategorię`,
   };
@@ -17,7 +17,7 @@ export async function generateMetadata(props: Props) {
 export default async function CategoryEditPage(props: Props) {
   const { id } = await props.params;
   const result = await getDocumentFromAdminDB<CategoryWithId>("categories", id);
-  const { data, ref } = result;
+  const { data } = result;
   if (!data) {
     notFound();
   }

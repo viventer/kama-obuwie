@@ -80,7 +80,7 @@ export default function ImageUploader({
         }
       })();
     },
-    [filePath, showToast]
+    [filePath, showToast, folderPath, setFilePath]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

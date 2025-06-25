@@ -9,8 +9,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ColorVariant } from "@/firebase/schemas/productsSchemas";
-import { DeleteIcon, TrashIcon } from "lucide-react";
-import { Fragment, useEffect, useState } from "react";
+import { TrashIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function ColorVariantValuesSelector({
   value,
@@ -43,7 +43,7 @@ export default function ColorVariantValuesSelector({
         setAvailableShades([]);
       }
     }
-  }, [value]);
+  }, [value, colorsWithShades, index]);
 
   const updateAt = (index: number, patch: Partial<ColorVariant>) => {
     const newArr = value.map((v, i) => (i === index ? { ...v, ...patch } : v));

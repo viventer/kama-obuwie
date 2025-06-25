@@ -54,8 +54,8 @@ export async function POST(request: Request) {
     }
 
     return response;
-  } catch (error: any) {
+  } catch (error) {
     console.error("Auth error:", error);
-    return NextResponse.json({ error: error.message }, { status: 401 });
+    return NextResponse.json({ error: error }, { status: 401 });
   }
 }

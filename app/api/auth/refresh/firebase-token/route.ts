@@ -20,8 +20,11 @@ export async function POST(req: Request) {
     await redis.expire(key, 60 * 60 * 24 * 7);
 
     return NextResponse.json({ success: true });
-  } catch (e) {
+  } catch (err) {
     redis.del(`session:${match[1]}`);
-    return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    return NextResponse.json(
+      { error: `Invalid token: ${err}` },
+      { status: 401 }
+    );
   }
 }

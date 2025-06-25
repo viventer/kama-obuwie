@@ -16,6 +16,6 @@ export async function GET(
     const categories = await getAllegroCategories(rootCategoryName);
     return apiResponse("Pobrano kategorie.", 200, categories);
   } catch (err) {
-    return apiResponse("Błąd pobierania kategorii.", 400);
+    return apiResponse(`Błąd pobierania kategorii: ${err}`, 400);
   }
 }

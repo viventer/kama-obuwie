@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   const state = encodeURIComponent(sessionId);
 
   const authUrl =
-    `${process.env.ALLEGRO_BASE_URL}/auth/oauth/authorize` +
+    `${process.env.NEXT_PUBLIC_ALLEGRO_BASE_URL}/auth/oauth/authorize` +
     `?response_type=code` +
     `&client_id=${clientId}` +
     `&redirect_uri=${encodeURIComponent(redirectUri)}` +

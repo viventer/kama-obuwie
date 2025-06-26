@@ -8,7 +8,7 @@ import axios from "axios";
 import { getAllegroUserAccessToken } from "./auth";
 import { RootCategory } from "@/firebase/schemas/productsSchemas";
 
-const ALLEGRO_API_BASE_URL = process.env.ALLEGRO_API_BASE_URL!;
+const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
 export type SerializedAllegroCategory = {
   id: string;

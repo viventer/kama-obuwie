@@ -2,7 +2,7 @@ import axios from "axios";
 import { getAllegroUserAccessToken } from "./auth";
 import { getAllegroHeaders } from "./global";
 
-const ALLEGRO_API_BASE_URL = process.env.ALLEGRO_API_BASE_URL!;
+const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
 type DictionaryValue = {
   id: string;

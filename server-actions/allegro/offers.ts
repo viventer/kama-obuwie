@@ -21,7 +21,7 @@ import { getImageUrl } from "../images/images";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath } from "@/lib/constants";
 
-const ALLEGRO_API_BASE_URL = process.env.ALLEGRO_API_BASE_URL!;
+const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
 type Primitive = string | number | boolean | string[] | number[];
 

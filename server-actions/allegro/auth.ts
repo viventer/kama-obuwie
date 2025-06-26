@@ -4,7 +4,7 @@ import { adminDB } from "@/firebase/firebaseAdmin";
 import { cookies } from "next/headers";
 
 // client access token jest używany do autoryzacji zapytań do Allegro API, które nie wymagają dostępu do danych użytkownika
-const ALLEGRO_BASE_URL = process.env.ALLEGRO_BASE_URL!;
+const ALLEGRO_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_BASE_URL!;
 
 export async function getAllegroClientAccessToken() {
   const clientId = process.env.ALLEGRO_CLIENT_ID!;

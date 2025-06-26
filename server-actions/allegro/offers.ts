@@ -15,15 +15,13 @@ import {
   ProductParameters,
 } from "@/firebase/schemas/productsSchemas";
 import { getAllegroUserAccessToken } from "./auth";
-import {
-  ALLEGRO_API_BASE_URL,
-  AllegroHeaders,
-  getAllegroHeaders,
-} from "./global";
+import { AllegroHeaders, getAllegroHeaders } from "./global";
 import axios, { AxiosError } from "axios";
 import { getImageUrl } from "../images/images";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath } from "@/lib/constants";
+
+const ALLEGRO_API_BASE_URL = process.env.ALLEGRO_API_BASE_URL!;
 
 type Primitive = string | number | boolean | string[] | number[];
 

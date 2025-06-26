@@ -2,7 +2,9 @@
 
 import axios from "axios";
 import { getAllegroUserAccessToken } from "./auth";
-import { ALLEGRO_API_BASE_URL, getAllegroHeaders } from "./global";
+import { getAllegroHeaders } from "./global";
+
+const ALLEGRO_API_BASE_URL = process.env.ALLEGRO_API_BASE_URL!;
 
 export async function getAllegroShippingRates() {
   const accessToken = await getAllegroUserAccessToken();

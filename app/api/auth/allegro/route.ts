@@ -1,4 +1,3 @@
-import { ALLEGRO_BASE_URL } from "@/server-actions/allegro/global";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -15,7 +14,7 @@ export async function GET(request: Request) {
   const state = encodeURIComponent(sessionId);
 
   const authUrl =
-    `${ALLEGRO_BASE_URL}/auth/oauth/authorize` +
+    `${process.env.ALLEGRO_BASE_URL}/auth/oauth/authorize` +
     `?response_type=code` +
     `&client_id=${clientId}` +
     `&redirect_uri=${encodeURIComponent(redirectUri)}` +

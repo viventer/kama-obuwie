@@ -1,11 +1,11 @@
 import axios from "axios";
-import { ALLEGRO_BASE_URL } from "./global";
 import { redis } from "@/upstash/redis";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 // client access token jest używany do autoryzacji zapytań do Allegro API, które nie wymagają dostępu do danych użytkownika
+const ALLEGRO_BASE_URL = process.env.ALLEGRO_BASE_URL!;
+
 export async function getAllegroClientAccessToken() {
   const clientId = process.env.ALLEGRO_CLIENT_ID!;
   const clientSecret = process.env.ALLEGRO_CLIENT_SECRET!;

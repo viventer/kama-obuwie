@@ -1,6 +1,5 @@
 import useSWR from "swr";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 type User = {
   uid: string;

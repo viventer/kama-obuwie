@@ -22,11 +22,7 @@ export async function PATCH(
   const body = await request.json();
 
   const updateData = body;
-  try {
-    await updateCategory(id, updateData);
-  } catch (err) {
-    return apiResponse(`Błąd aktualizacji kategorii: ${err}`, 400);
-  }
+  await updateCategory(id, updateData);
 
   return apiResponse("Kategoria została zaktualizowana.", 200);
 }

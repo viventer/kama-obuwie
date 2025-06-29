@@ -28,7 +28,7 @@ export default function LoginForm() {
       router.replace("/admin-panel");
       showToast("Jesteś już zalogowany.");
     }
-  }, [user, router, showToast]);
+  }, [user]);
 
   const [isLoading, setIsLoading] = useState(false);
 

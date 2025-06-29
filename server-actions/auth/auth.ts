@@ -2,8 +2,8 @@
 
 import { adminAuth } from "@/firebase/firebaseAdmin";
 import { redis } from "@/upstash/redis";
-import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export type AuthorizationError = {
   code: "UNAUTHORIZED" | "FORBIDDEN";
@@ -13,7 +13,7 @@ export type AuthorizationError = {
 export async function verifyUser(roles?: string[]) {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get("sessionId")?.value;
-  if (!sessionId) return redirect("/admin-auth/login");
+  if (!sessionId) return false;
 
   const key = `session:${sessionId}`;
   const sess = await redis.hgetall(key);
@@ -26,12 +26,16 @@ export async function verifyUser(roles?: string[]) {
   try {
     adminAuth.verifyIdToken(sess?.firebaseIdToken as string, true);
   } catch (error) {
+    await redis.del(key);
+    cookieStore.delete("sessionId");
     redirect("/admin-auth/login");
   }
 
-  if (!roles) return;
+  if (!roles) return true;
 
   if (roles.length > 0 && !roles.includes(sess?.role as string)) {
     redirect("/admin-auth/unauthorized");
   }
+
+  return true;
 }

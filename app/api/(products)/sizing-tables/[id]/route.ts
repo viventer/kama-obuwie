@@ -29,11 +29,7 @@ export async function PATCH(
   const { id } = await params;
   const body: Partial<SizingTable> = await request.json();
 
-  try {
-    await updateSizingTable(id, body);
-  } catch (err) {
-    return apiResponse(`Błąd aktualizacji tabeli rozmiarów: ${err}`, 400);
-  }
+  await updateSizingTable(id, body);
 
   return apiResponse("Tabela rozmiarów została zaktualizowana.", 200);
 }

@@ -22,11 +22,7 @@ export async function PATCH(
   const { id } = await params;
   const body: Partial<Product> = await request.json();
 
-  try {
-    await updateProduct(id, body);
-  } catch (err) {
-    return apiResponse(`Błąd aktualizacji produktu: ${err}`, 400);
-  }
+  await updateProduct(id, body);
 
   return apiResponse("Produkt został zaktualizowany.", 200);
 }

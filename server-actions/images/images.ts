@@ -9,6 +9,7 @@ import {
   RawPhoto,
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
+import { redirect } from "next/navigation";
 
 export const getImageUrl = async function (
   filePath: string
@@ -52,7 +53,8 @@ export const uploadImageToStorage = async function (
   filePath: string,
   contentType: string
 ): Promise<string> {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   const bucket = adminStorage.bucket();
   const fileRef = bucket.file(filePath);
 
@@ -76,7 +78,8 @@ export type ImageFile = {
 export const uploadImagesToStorage = async function (
   images: ImageFile[]
 ): Promise<string[]> {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   const bucket = adminStorage.bucket();
 
   const uploadPromises = images.map(async ({ base64, filePath, fileType }) => {
@@ -99,7 +102,8 @@ export const uploadImagesToStorage = async function (
 export const deleteImageFromStorage = async function (
   filePath: string
 ): Promise<void> {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   const bucket = adminStorage.bucket();
   const fileRef = bucket.file(filePath);
   await fileRef.delete();
@@ -109,7 +113,8 @@ export const deleteRawPhoto = async function (
   filePath: string,
   productId: string
 ): Promise<void> {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   const bucket = adminStorage.bucket();
   const fileRef = bucket.file(filePath);
   await fileRef.delete();
@@ -130,7 +135,8 @@ export const deleteUnusedPhotosFromStorage = async function (
   productId: string,
   storageEndpoint: "raw-photos" | "edited-photos"
 ): Promise<void> {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   const bucket = adminStorage.bucket();
 
   const { data: productData, ref: productRef } =
@@ -158,7 +164,8 @@ export const deleteUnusedPhotosFromStorage = async function (
 };
 
 export const makeFilePublic = async function (filePath: string) {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   const bucket = adminStorage.bucket();
   const fileRef = bucket.file(filePath);
   await fileRef.makePublic();

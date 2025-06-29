@@ -4,13 +4,9 @@ import { createProduct } from "@/server-actions/products/products";
 import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
-  try {
-    const body: Product = await request.json();
-    const id = await createProduct(body);
-    return apiResponse("Produkt został dodany.", 201, { id });
-  } catch (err) {
-    return apiResponse(`Błąd dodawania produktu: ${err}`, 400);
-  }
+  const body: Product = await request.json();
+  const id = await createProduct(body);
+  return apiResponse("Produkt został dodany.", 201, { id });
 }
 
 export async function GET(request: NextRequest) {

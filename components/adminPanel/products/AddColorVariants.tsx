@@ -33,6 +33,7 @@ export default function AddColorVariants({
   const { showToast } = useToast();
 
   useEffect(() => {
+    console.log("pętla");
     (async function () {
       const { data } = await axios.get<AllegroColorWithShadesResponse>(
         `/api/allegro/parameters/shoeColors`
@@ -59,7 +60,7 @@ export default function AddColorVariants({
 
       setLoading(false);
     })();
-  }, [showToast]);
+  }, []);
 
   const addEmpty = () => {
     onChange([...value, { color: "", additionalColor: "", shade: "" }]);

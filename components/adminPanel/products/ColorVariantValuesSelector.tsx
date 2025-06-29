@@ -43,7 +43,7 @@ export default function ColorVariantValuesSelector({
         setAvailableShades([]);
       }
     }
-  }, [value, colorsWithShades, index]);
+  }, [value]);
 
   const updateAt = (index: number, patch: Partial<ColorVariant>) => {
     const newArr = value.map((v, i) => (i === index ? { ...v, ...patch } : v));

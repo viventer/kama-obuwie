@@ -7,9 +7,11 @@ import {
   CategoryUpdateDataSchema,
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
+import { redirect } from "next/navigation";
 
 export const createCategory = async function (newCategory: Category) {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   CategorySchema.parse(newCategory);
   const categoryRef = adminDB.collection("categories").doc();
 
@@ -22,7 +24,8 @@ export const updateCategory = async function (
   id: string,
   updateData: Partial<Category>
 ) {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   CategoryUpdateDataSchema.parse(updateData);
   const categoryRef = adminDB.collection("categories").doc(id);
   const categoryDoc = await categoryRef.get();

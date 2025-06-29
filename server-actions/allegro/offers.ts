@@ -18,8 +18,9 @@ import { getAllegroUserAccessToken } from "./auth";
 import { AllegroHeaders, getAllegroHeaders } from "./global";
 import axios, { AxiosError } from "axios";
 import { getImageUrl } from "../images/images";
-import { verifyUser } from "../auth/auth";
+import { AuthorizationError, verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath } from "@/lib/constants";
+import { redirect } from "next/navigation";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -47,7 +48,7 @@ type AllegroIndividualOffer = {
 export const postAllegroOffer = async (
   data: PostOfferBody
 ): Promise<Record<string, string>> => {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
   const {
     offer,
     product,

@@ -4,13 +4,9 @@ import { createOffer } from "@/server-actions/offers/offers";
 import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
-  try {
-    const body: Partial<Offer> = await request.json();
-    const id = await createOffer(body);
-    return apiResponse("Oferta została utworzona.", 201, { id });
-  } catch (err) {
-    return apiResponse(`Błąd tworzenia oferty: ${err}`, 400);
-  }
+  const body: Partial<Offer> = await request.json();
+  const id = await createOffer(body);
+  return apiResponse("Oferta została utworzona.", 201, { id });
 }
 
 export async function GET(request: NextRequest) {

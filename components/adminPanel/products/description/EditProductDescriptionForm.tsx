@@ -16,7 +16,7 @@ import {
 import DescriptionRow from "./DescriptionRow";
 import PhotosReorder from "../PhotosReorder";
 import { useConfirmDialog } from "../../../../app/providers/ConfirmDialogProvider";
-import { FormEvent, useEffect } from "react";
+import { FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import axios from "axios";

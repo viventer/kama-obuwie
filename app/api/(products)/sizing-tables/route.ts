@@ -12,14 +12,10 @@ export async function POST(request: NextRequest) {
     sizingAccuracy: "normalna",
   };
 
-  try {
-    const id = await createSizingTable(newSizingTable);
-    return apiResponse("Tabela rozmiarów została dodana.", 201, {
-      id,
-    });
-  } catch (err) {
-    return apiResponse(`Błąd tworzenia tabeli rozmiarów: ${err}`, 400);
-  }
+  const id = await createSizingTable(newSizingTable);
+  return apiResponse("Tabela rozmiarów została dodana.", 201, {
+    id,
+  });
 }
 
 export async function GET() {

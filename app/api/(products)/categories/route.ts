@@ -14,12 +14,8 @@ export async function POST(request: NextRequest) {
     rootCategory,
   };
 
-  try {
-    const id = await createCategory(newCategory);
-    return apiResponse("Kategoria została dodana.", 201, { id });
-  } catch (err) {
-    return apiResponse(`Błąd dodawania kategorii: ${err}`, 400);
-  }
+  const id = await createCategory(newCategory);
+  return apiResponse("Kategoria została dodana.", 201, { id });
 }
 
 export async function GET() {

@@ -7,9 +7,11 @@ import {
   SizingTableUpdateDataSchema,
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
+import { redirect } from "next/navigation";
 
 export const createSizingTable = async function (newSizingTable: SizingTable) {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   SizingTableSchema.parse(newSizingTable);
   const sizingTableRef = adminDB.collection("sizingTables").doc();
 
@@ -22,7 +24,8 @@ export const updateSizingTable = async function (
   id: string,
   updateData: Partial<SizingTable>
 ) {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   SizingTableUpdateDataSchema.parse(updateData);
   const sizingTableRef = adminDB.collection("sizingTables").doc(id);
   const sizingTableDoc = await sizingTableRef.get();

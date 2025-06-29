@@ -11,11 +11,7 @@ export async function GET(
     params: Promise<{ rootCategoryName: RootCategory }>;
   }
 ) {
-  try {
-    const { rootCategoryName } = await params;
-    const categories = await getAllegroCategories(rootCategoryName);
-    return apiResponse("Pobrano kategorie.", 200, categories);
-  } catch (err) {
-    return apiResponse(`Błąd pobierania kategorii: ${err}`, 400);
-  }
+  const { rootCategoryName } = await params;
+  const categories = await getAllegroCategories(rootCategoryName);
+  return apiResponse("Pobrano kategorie.", 200, categories);
 }

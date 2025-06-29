@@ -2,7 +2,7 @@
 
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { Offer, OfferSchema } from "@/firebase/schemas/offersSchemas";
-import { verifyUser } from "../auth/auth";
+import { AuthorizationError, verifyUser } from "../auth/auth";
 import { PostOfferBody } from "@/app/api/allegro/offers/route";
 import { PostOfferFormValues } from "@/components/adminPanel/offers/PostOfferForm";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
@@ -12,9 +12,11 @@ import {
   SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/server-actions/helpers";
+import { redirect } from "next/navigation";
 
 export const createOffer = async function (newOffer: Partial<Offer>) {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   OfferSchema.partial().parse(newOffer);
 
   const offerRef = adminDB.collection("offers").doc();
@@ -28,7 +30,8 @@ export const updateOffer = async function (
   id: string,
   updateData: Partial<Offer>
 ) {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   OfferSchema.partial().parse(updateData);
   const offerRef = adminDB.collection("offers").doc(id);
   const productDoc = await offerRef.get();

@@ -7,9 +7,11 @@ import {
   ProductSchema,
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
+import { redirect } from "next/navigation";
 
 export const createProduct = async function (newProduct: Product) {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   ProductSchema.parse(newProduct);
 
   const productRef = adminDB.collection("products").doc();
@@ -23,7 +25,8 @@ export const updateProduct = async function (
   id: string,
   updateData: Partial<Product>
 ) {
-  verifyUser(["ADMIN", "VERIFIED"]);
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
   ProductPartialSchema.parse(updateData);
   const productRef = adminDB.collection("products").doc(id);
   const productDoc = await productRef.get();

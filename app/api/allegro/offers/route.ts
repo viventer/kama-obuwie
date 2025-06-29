@@ -18,12 +18,8 @@ export type PostOfferBody = {
 };
 
 export async function POST(request: NextRequest) {
-  try {
-    const body: PostOfferBody = await request.json();
-    const allegroIds = await postAllegroOffer(body);
+  const body: PostOfferBody = await request.json();
+  const allegroIds = await postAllegroOffer(body);
 
-    return apiResponse("Oferta została utworzona.", 201, { allegroIds });
-  } catch (err) {
-    return apiResponse(`Błąd tworzenia oferty: ${err}`, 400);
-  }
+  return apiResponse("Oferta została utworzona.", 201, { allegroIds });
 }

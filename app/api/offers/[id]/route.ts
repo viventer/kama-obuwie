@@ -22,11 +22,7 @@ export async function PATCH(
   const { id } = await params;
   const body: Partial<Offer> = await request.json();
 
-  try {
-    await updateOffer(id, body);
-  } catch (err) {
-    return apiResponse(`Błąd aktualizacji oferty: ${err}`, 400);
-  }
+  await updateOffer(id, body);
 
   return apiResponse("Oferta została zaaktualizowana.", 200);
 }

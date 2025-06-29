@@ -24,7 +24,7 @@ export default function LoginForm() {
   const { user, loading: userLoading } = useUser();
 
   useEffect(() => {
-    if (user) {
+    if (!userLoading && user) {
       router.replace("/admin-panel");
       showToast("Jesteś już zalogowany.");
     }

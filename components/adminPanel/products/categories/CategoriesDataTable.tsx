@@ -15,7 +15,7 @@ import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 export default function CategoriesDataTable({
   data,
 }: {
-  data: CategoryWithAllegroCategoryName[];
+  data: CategoryWithAllegroCategoryName[] | null;
 }) {
   const columnNames: ColumnName<CategoryWithAllegroCategoryName>[] = [
     { attributeName: "name", displayName: "Nazwa" },
@@ -100,7 +100,7 @@ export default function CategoriesDataTable({
     <>
       <Button onClick={handleCreateCategory}>Utwórz nową</Button>
       <DataTable
-        data={data}
+        data={data || []}
         columnNames={columnNames}
         actions={actions}
         renderRowSubComponent={renderRowSubComponent}

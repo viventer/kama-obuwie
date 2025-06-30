@@ -33,11 +33,7 @@ export default async function CategoriesPage() {
     <>
       <SubpageHeading text="Kategorie produktów" />
 
-      {categoriesWithAllegroCategoryName ? (
-        <CategoriesDataTable data={categoriesWithAllegroCategoryName} />
-      ) : (
-        <p>Brak kategorii</p>
-      )}
+      <CategoriesDataTable data={categoriesWithAllegroCategoryName} />
     </>
   );
 }

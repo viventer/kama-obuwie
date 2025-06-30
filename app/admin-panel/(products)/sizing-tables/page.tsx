@@ -12,11 +12,7 @@ export default async function SizingTablesPage() {
     <>
       <SubpageHeading text="Tabele rozmiarów" />
 
-      {sizingTables ? (
-        <SizingTablesDataTable data={sizingTables} />
-      ) : (
-        <p>Brak tabel rozmiarów</p>
-      )}
+      <SizingTablesDataTable data={sizingTables} />
     </>
   );
 }

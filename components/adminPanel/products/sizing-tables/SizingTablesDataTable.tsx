@@ -23,7 +23,7 @@ import { DataTable } from "../../global/data-table/DataTable";
 export default function SizingTablesDataTable({
   data,
 }: {
-  data: SizingTableWithId[];
+  data: SizingTableWithId[] | null;
 }) {
   const columnNames: ColumnName<SizingTableWithId>[] = [
     { attributeName: "name", displayName: "Nazwa" },
@@ -112,7 +112,7 @@ export default function SizingTablesDataTable({
     <>
       <Button onClick={handleCreateSizingTable}>Utwórz nową</Button>
       <DataTable
-        data={data}
+        data={data || []}
         columnNames={columnNames}
         actions={actions}
         renderRowSubComponent={renderRowSubComponent}

@@ -3,6 +3,8 @@ import CreateProductsPhotosDataTable from "@/components/adminPanel/products/crea
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentsFromAdminDB } from "@/server-actions/helpers";
 
+export const revalidate = 0;
+
 export default async function CreateProductsPhotosPage() {
   const products = await getDocumentsFromAdminDB<ProductWithId>(
     "products",

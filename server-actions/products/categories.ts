@@ -7,7 +7,6 @@ import {
   CategoryUpdateDataSchema,
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 export const createCategory = async function (newCategory: Category) {

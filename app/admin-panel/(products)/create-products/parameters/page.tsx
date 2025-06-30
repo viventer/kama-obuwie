@@ -3,6 +3,8 @@ import CreateProductsParametersDataTable from "@/components/adminPanel/products/
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentsFromAdminDB } from "@/server-actions/helpers";
 
+export const revalidate = 0;
+
 export default async function CreateProductsNewPage() {
   const products = await getDocumentsFromAdminDB<ProductWithId>(
     "products",

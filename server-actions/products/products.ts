@@ -7,7 +7,7 @@ import {
   ProductSchema,
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
-import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export const createProduct = async function (newProduct: Product) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -18,6 +18,7 @@ export const createProduct = async function (newProduct: Product) {
 
   await productRef.set(newProduct);
 
+  revalidatePath("/admin-panel/create-products/new");
   return productRef.id;
 };
 
@@ -35,4 +36,5 @@ export const updateProduct = async function (
   }
 
   await productRef.update(updateData);
+  revalidatePath("/admin-panel/create-products", "layout");
 };

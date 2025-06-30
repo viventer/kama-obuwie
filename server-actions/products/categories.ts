@@ -8,6 +8,7 @@ import {
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export const createCategory = async function (newCategory: Category) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -17,6 +18,7 @@ export const createCategory = async function (newCategory: Category) {
 
   await categoryRef.set(newCategory);
 
+  revalidatePath("/admin-panel/categories");
   return categoryRef.id;
 };
 
@@ -34,4 +36,5 @@ export const updateCategory = async function (
   }
 
   await categoryRef.update(updateData);
+  revalidatePath("/admin-panel/categories");
 };

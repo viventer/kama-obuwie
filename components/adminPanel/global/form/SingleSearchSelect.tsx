@@ -36,6 +36,7 @@ export default function SingleSearchSelect({
   placeholder = "Wybierz",
 }: SingleSearchSelectProps) {
   const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
 
   const filtered = options.filter((opt) =>
     opt.label.toLowerCase().includes(query.toLowerCase())
@@ -46,7 +47,12 @@ export default function SingleSearchSelect({
   return (
     <FormItem>
       <FormLabel>{label}</FormLabel>
-      <Select onValueChange={onChange} value={value}>
+      <Select
+        onValueChange={onChange}
+        value={value}
+        open={open}
+        onOpenChange={setOpen}
+      >
         <FormControl>
           <SelectTrigger className="text-base border-primary">
             {selectedLabel ? (
@@ -75,6 +81,7 @@ export default function SingleSearchSelect({
                     onSelect={() => {
                       onChange(opt.value);
                       setQuery("");
+                      setOpen(false);
                     }}
                   >
                     {opt.label}

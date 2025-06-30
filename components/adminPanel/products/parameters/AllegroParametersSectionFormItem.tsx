@@ -1,7 +1,7 @@
 import { AllegroProductParameter } from "@/server-actions/allegro/products";
-import MultipleSelect from "../../global/form/MultipleSelect";
-import SingleSelect from "../../global/form/SingleSelect";
 import InputFormItem from "../../global/form/InputFormItem";
+import MultipleSearchSelect from "../../global/form/MultipleSearchSelect";
+import SingleSearchSelect from "../../global/form/SingleSearchSelect";
 
 export default function AllegroParametersSectionFormItem({
   parameter,
@@ -17,13 +17,13 @@ export default function AllegroParametersSectionFormItem({
     parameter.restrictions?.multipleChoices
   ) {
     return (
-      <MultipleSelect
+      <MultipleSearchSelect
         label={parameter.name}
         value={value as string[]}
         onChange={onChange}
-        availableOptions={
+        options={
           parameter.dictionary?.map((el) => ({
-            name: el.value,
+            label: el.value,
             value: el.value,
           })) || []
         }
@@ -33,13 +33,13 @@ export default function AllegroParametersSectionFormItem({
 
   if (parameter.type === "dictionary") {
     return (
-      <SingleSelect
+      <SingleSearchSelect
         label={parameter.name}
         value={value as string}
         onChange={onChange}
-        availableOptions={
+        options={
           parameter.dictionary?.map((el) => ({
-            name: el.value,
+            label: el.value,
             value: el.value,
           })) || []
         }

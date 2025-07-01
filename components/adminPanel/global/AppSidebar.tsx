@@ -60,15 +60,15 @@ export default function AppSidebar() {
                 Tabele rozmiarów
               </LinkText>
             </SidebarMenuItem>
-            <SidebarMenuItem>
+            {/* <SidebarMenuItem>
               <LinkText href="/admin-panel/brands">Marki</LinkText>
-            </SidebarMenuItem>
+            </SidebarMenuItem> */}
             <SidebarMenuItem>
               <LinkText href="/admin-panel/categories">Kategorie</LinkText>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
-        <SidebarGroup>
+        {/* <SidebarGroup>
           <SidebarGroupLabel>Sprzedaż</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -78,8 +78,8 @@ export default function AppSidebar() {
               <LinkText href="/admin-panel/returns">Zwroty</LinkText>
             </SidebarMenuItem>
           </SidebarMenu>
-        </SidebarGroup>
-        <SidebarGroup>
+        </SidebarGroup> */}
+        {/* <SidebarGroup>
           <SidebarGroupLabel>Szablony</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -128,7 +128,7 @@ export default function AppSidebar() {
               </LinkText>
             </SidebarMenuItem>
           </SidebarMenu>
-        </SidebarGroup>
+        </SidebarGroup> */}
       </SidebarContent>
       <SidebarFooter className="mb-4">
         {!loading && user ? (

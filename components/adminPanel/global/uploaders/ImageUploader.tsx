@@ -44,7 +44,7 @@ export default function ImageUploader({
 
   const onDropRejected = useCallback(() => {
     showToast("Plik jest za duży! Maksymalny rozmiar to 10 MB.", "error");
-  }, [showToast]);
+  }, []);
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -80,7 +80,7 @@ export default function ImageUploader({
         }
       })();
     },
-    [filePath, showToast, folderPath, setFilePath]
+    [filePath, showToast]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

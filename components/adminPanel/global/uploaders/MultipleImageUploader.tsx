@@ -65,7 +65,7 @@ export default function MultipleImageUploader({
 
       setImages(loaded);
     })();
-  }, [filePaths]);
+  }, []);
 
   useEffect(() => {
     setFilePaths(images.map((img) => img.filePath));

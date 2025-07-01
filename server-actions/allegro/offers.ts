@@ -361,7 +361,8 @@ export async function convertToAllegroDescription(
         let content = replaceDescriptionVariables(raw, variableValues);
         content = content
           .replace(/<strong>/g, "<b>")
-          .replace(/<\/strong>/g, "</b>");
+          .replace(/<\/strong>/g, "</b>")
+          .replace(/<br\s*\/?>/gi, "<br />");
 
         if (content) {
           items.push({ type: "TEXT", content });

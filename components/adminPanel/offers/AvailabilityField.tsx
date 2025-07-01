@@ -31,7 +31,7 @@ export default function AvailabilityField({ sizes }: { sizes: string[] }) {
                     type="number"
                     value={field.value || ""}
                     onChange={field.onChange}
-                    min={0}
+                    min={1}
                     max={10000}
                   />
                 </FormItem>

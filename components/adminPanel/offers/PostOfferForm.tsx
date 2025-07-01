@@ -82,10 +82,12 @@ export default function PostOfferForm({
     setIsPosting(true);
     const formData = form.getValues();
     const isValid = await validateForm();
+    console.log("isValid", isValid);
     if (!isValid) {
       setIsPosting(false);
       return;
     }
+
     if (!sizingTable) {
       showToast("Tabela rozmiarów nie została załadowana", "error");
       setIsPosting(false);
@@ -204,6 +206,14 @@ export default function PostOfferForm({
     if (!isValid) {
       showToast("Formularz zawiera błędy", "error");
       return false;
+    }
+
+    const availability = form.getValues("availability");
+    for (const sizeAvailability of Object.values(availability)) {
+      if (sizeAvailability.value === "" || sizeAvailability.value === "0") {
+        showToast("Minimalna dostępność produktu wynosi 1.", "error");
+        return false;
+      }
     }
 
     return true;

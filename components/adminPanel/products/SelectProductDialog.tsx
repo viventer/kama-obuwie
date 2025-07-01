@@ -41,7 +41,7 @@ export default function SelectProductDialog({
       <DialogTrigger className="px-3 py-2 bg-transparent border-primary border-solid border-1 rounded-sm hover:border-accent hover:cursor-pointer">
         {triggerText}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[90svh]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}

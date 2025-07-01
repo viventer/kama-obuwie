@@ -2,11 +2,10 @@ import {
   CategoryWithId,
   RootCategory,
 } from "@/firebase/schemas/productsSchemas";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/useToast";
-import SingleSelect from "../../global/form/SingleSelect";
-import MultipleSelect from "../../global/form/MultipleSelect";
+import MultipleSearchSelect from "../../global/form/MultipleSearchSelect";
 
 export default function MatchingCategoriesSelector({
   value,
@@ -41,12 +40,12 @@ export default function MatchingCategoriesSelector({
 
   return (
     <div className={`${categories.length > 0 ? "block" : "hidden"}`}>
-      <MultipleSelect
+      <MultipleSearchSelect
         label="Pasujące kategorie"
         onChange={onChange}
         value={value}
-        availableOptions={categories.map((category) => ({
-          name: category.name,
+        options={categories.map((category) => ({
+          label: category.name,
           value: category.id,
         }))}
       />

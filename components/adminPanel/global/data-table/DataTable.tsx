@@ -186,7 +186,7 @@ export function DataTable<T extends { id: string }>({
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full max-h-[70svh]">
       <div className="flex items-center py-4 gap-4">
         <Input
           placeholder={searchPlaceholder}
@@ -223,7 +223,7 @@ export function DataTable<T extends { id: string }>({
         </DropdownMenu>
       </div>
 
-      <div className="rounded-md border">
+      <div className="rounded-md border max-h-[45svh] overflow-auto scrollbar">
         <Table>
           {!hasImages && (
             <TableHeader>

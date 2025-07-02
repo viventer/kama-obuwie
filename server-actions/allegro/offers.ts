@@ -21,6 +21,7 @@ import { getImageUrl } from "../images/images";
 import { AuthorizationError, verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath } from "@/lib/constants";
 import { redirect } from "next/navigation";
+import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -206,6 +207,10 @@ export async function postIndividualAllegroOffer(
     descriptionVariableValues
   );
 
+  const signature = `${product.brand ? product.brand : ""} ${
+    product.manufacturerCode
+  } ${getColorVariantName(colorVariant)}`;
+
   const allegroOffer: AllegroOffer = {
     ...allegroOfferData,
     description,
@@ -214,11 +219,9 @@ export async function postIndividualAllegroOffer(
       available: Number(offer.availability[insoleLength.size].value),
     },
     external: {
-      id: offer.signature,
+      id: signature,
     },
   };
-
-  console.log(JSON.stringify(description));
 
   try {
     const resp = await axios.post(url, allegroOffer, {

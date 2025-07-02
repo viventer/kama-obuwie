@@ -48,6 +48,9 @@ export const OfferSchema = z.object({
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
   shippingRates: z.record(SalesChannelSchema, ShippingRatesSchema),
+  returnPolicy: z.record(SalesChannelSchema, z.string()).optional(),
+  warranty: z.record(SalesChannelSchema, z.string()).optional(),
+  impliedWarranty: z.record(SalesChannelSchema, z.string()).optional(),
   availability: z.record(z.string(), AvailabilitySchema),
   allegroOffersIds: z
     .record(z.enum(["AL1", "AL2"]), z.record(z.string(), z.string()))
@@ -126,6 +129,24 @@ export const AllegroOfferSchema = z.object({
     })
     .optional(),
   images: z.array(z.string().url()).optional(),
+  afterSalesServices: z.object({
+    warranty: z
+      .object({
+        // gwarancja
+        id: z.string(),
+        name: z.string().optional(),
+      })
+      .optional(),
+    impliedWarranty: z.object({
+      // warunki reklamacji
+      id: z.string(),
+      name: z.string().optional(),
+    }),
+    returnPolicy: z.object({
+      id: z.string(),
+      name: z.string().optional(),
+    }),
+  }),
 });
 
 export const PostOfferFormSchema = OfferSchema.pick({
@@ -133,6 +154,9 @@ export const PostOfferFormSchema = OfferSchema.pick({
   sellingPrices: true,
   shippingRates: true,
   availability: true,
+  returnPolicy: true,
+  warranty: true,
+  impliedWarranty: true,
 });
 
 export type ShippingRate = z.infer<typeof shippingRateSchema>;

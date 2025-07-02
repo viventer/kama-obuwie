@@ -28,10 +28,19 @@ import { getImagesUrls } from "@/server-actions/images/images";
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { useRouter } from "next/navigation";
 import MiniLoader from "../global/MiniLoader";
+import ReturnPolicySelector from "./ReturnPolicySelector";
+import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
+import WarrantySelector from "./WarrantySelector";
 
 export type PostOfferFormValues = Pick<
   Offer,
-  "title" | "sellingPrices" | "shippingRates" | "availability"
+  | "title"
+  | "sellingPrices"
+  | "shippingRates"
+  | "availability"
+  | "returnPolicy"
+  | "warranty"
+  | "impliedWarranty"
 >;
 
 export default function PostOfferForm({
@@ -72,6 +81,9 @@ export default function PostOfferForm({
       sellingPrices: oldOfferData.sellingPrices || {},
       shippingRates: oldOfferData.shippingRates || {},
       availability: oldOfferData.availability || {},
+      returnPolicy: oldOfferData.returnPolicy || {},
+      warranty: oldOfferData.warranty || {},
+      impliedWarranty: oldOfferData.impliedWarranty || {},
     },
   });
 
@@ -280,6 +292,9 @@ export default function PostOfferForm({
         />
         <SellingPricesField />
         <ShippingRatesSelector />
+        <ReturnPolicySelector />
+        <ImpliedWarrantySelector />
+        <WarrantySelector />
         <AvailabilityField sizes={sizes} />
       </div>
       <div className="flex mt-8 gap-4">

@@ -218,6 +218,8 @@ export async function postIndividualAllegroOffer(
     },
   };
 
+  console.log(JSON.stringify(description));
+
   try {
     const resp = await axios.post(url, allegroOffer, {
       headers: allegroHeaders,
@@ -362,7 +364,7 @@ export async function convertToAllegroDescription(
         content = content
           .replace(/<strong>/g, "<b>")
           .replace(/<\/strong>/g, "</b>")
-          .replace(/<br\s*\/?>/gi, "<br />");
+          .replace(/<br\s*\/?>/gi, "");
 
         if (content) {
           items.push({ type: "TEXT", content });

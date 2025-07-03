@@ -13,11 +13,13 @@ export default function DescriptionRow({
   onDeleteRow,
   moveRow,
   totalRows,
+  rowId,
 }: {
   onDeleteRow: () => void;
   index: number;
   moveRow: (from: number, to: number) => void;
   totalRows: number;
+  rowId: string;
 }) {
   const form = useFormContext();
 
@@ -124,7 +126,7 @@ export default function DescriptionRow({
                   />
                 ) : (
                   <TextEditor
-                    id={`editor-${index}-${elemIndex}`}
+                    id={`editor-${rowId}`}
                     onChange={field.onChange}
                     value={field.value}
                   />

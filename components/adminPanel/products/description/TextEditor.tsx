@@ -22,9 +22,7 @@ export default function TextEditor({
   id: string;
   className?: string;
 }) {
-  const toolbarId = `toolbar-${id}`;
-
-  const modules = useMemo(() => ({ toolbar: `#${toolbarId}` }), [toolbarId]);
+  const modules = useMemo(() => ({ toolbar: `#${id}` }), [id]);
 
   const [currentValue, setCurrentValue] = useState(value);
 
@@ -33,7 +31,7 @@ export default function TextEditor({
       className={cn("h-fit md:w-1/2 md:min-w-1/2 w-full", className)}
       onBlur={() => onChange(currentValue)}
     >
-      <div id={toolbarId}>
+      <div id={id}>
         <span className="ql-formats">
           <button className="ql-header" value="1">
             H1

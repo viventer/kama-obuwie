@@ -49,7 +49,7 @@ export const OfferSchema = z.object({
   updatedAt: z.date().optional(),
   shippingRates: z.record(SalesChannelSchema, ShippingRatesSchema),
   returnPolicy: z.record(SalesChannelSchema, z.string()).optional(),
-  warranty: z.record(SalesChannelSchema, z.string()).optional(),
+  warranty: z.record(SalesChannelSchema, z.string().optional()).optional(),
   impliedWarranty: z.record(SalesChannelSchema, z.string()).optional(),
   availability: z.record(z.string(), AvailabilitySchema),
   allegroOffersIds: z

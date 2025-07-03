@@ -79,6 +79,17 @@ export const postAllegroOffer = async (
       },
     },
     images,
+    afterSalesServices: {
+      returnPolicy: {
+        id: offer.returnPolicy!.AL1 as string,
+      },
+      impliedWarranty: {
+        id: offer.impliedWarranty!.AL1 as string,
+      },
+      warranty: {
+        id: offer.warranty?.AL1 || "",
+      },
+    },
   };
 
   const insoleLengths = sizingTable.insoleLengths;

@@ -143,7 +143,6 @@ export const EditProductDescriptionForm = ({
         <DescriptionRow
           key={row.id}
           index={rowIndex}
-          rowId={row.id}
           onDeleteRow={() => descriptionRows.remove(rowIndex)}
           moveRow={(from, to) => descriptionRows.move(from, to)}
           totalRows={descriptionRows.fields.length}

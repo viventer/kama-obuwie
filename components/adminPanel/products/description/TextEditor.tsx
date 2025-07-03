@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useId, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { cn } from "@/lib/utils";
 
@@ -14,15 +14,16 @@ const ReactQuill = dynamic(() => import("react-quill-new"), {
 export default function TextEditor({
   value,
   onChange,
-  id,
   className,
 }: {
   value: string;
   onChange: (value: string) => void;
-  id: string;
   className?: string;
 }) {
-  const modules = useMemo(() => ({ toolbar: `#${id}` }), [id]);
+  const id = useId();
+  const toolbarId = `toolbar-${id}`;
+
+  const modules = useMemo(() => ({ toolbar: `#${toolbarId}` }), [toolbarId]);
 
   const [currentValue, setCurrentValue] = useState(value);
 
@@ -31,7 +32,7 @@ export default function TextEditor({
       className={cn("h-fit md:w-1/2 md:min-w-1/2 w-full", className)}
       onBlur={() => onChange(currentValue)}
     >
-      <div id={id}>
+      <div id={toolbarId}>
         <span className="ql-formats">
           <button className="ql-header" value="1">
             H1

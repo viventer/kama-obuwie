@@ -416,7 +416,6 @@ export default function EditProductParametersForm({
                 <TextEditor
                   value={field.value as string}
                   onChange={field.onChange}
-                  id={"1"}
                   className="md:w-full"
                 />
               </FormControl>

@@ -114,6 +114,7 @@ export const AllegroOfferSchema = z.object({
   }),
   stock: z.object({
     available: z.number().min(0).max(1000),
+    unit: z.enum(["UNIT", "PAIR", "SET"]),
   }),
   delivery: z.object({
     handlingTime: z.enum(["PT24H", "P2D", "P3D", "PT0S"]).optional(),

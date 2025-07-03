@@ -15,7 +15,7 @@ export default async function CategoriesPage() {
   let categoriesWithAllegroCategoryName:
     | CategoryWithAllegroCategoryName[]
     | null = null;
-  if (categories?.length) {
+  if (categories !== null && categories.length) {
     const promises = categories.map(async (category) => {
       const allegroCategoryName = await getAllegroCategoryById(
         category.allegroCategoryId

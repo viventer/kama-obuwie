@@ -1,7 +1,10 @@
 "use client";
 
 import {
+  AllegroSizingTable,
+  sizingAccuracyType,
   sizingAccuracyValues,
+  SizingTable,
   SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { useForm, useFieldArray } from "react-hook-form";
@@ -28,6 +31,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import FormWrapper from "../../global/form/FormWrapper";
 import SingleSelect from "../../global/form/SingleSelect";
+import { createAllegroSizingTable } from "@/server-actions/allegro/sizingTables";
+import axios from "axios";
 
 type FormValues = {
   name: string;
@@ -84,15 +89,55 @@ export default function SizingTableEditForm({
         size: Number(row.size),
         insoleLength: Number(row.insoleLength),
       })),
+      sizingAccuracy: data.sizingAccuracy as sizingAccuracyType,
     };
 
     try {
       await updateSizingTable(id, payload);
+      await postChangesToAllegro(payload);
       showToast("Tabela rozmiarów została zaktualizowana.", "success");
       router.push("/admin-panel/sizing-tables");
     } catch (err) {
       showToast(`Błąd aktualizacji tabeli rozmiarów: ${err}`, "error");
     }
+  };
+
+  const postChangesToAllegro = async (payload: SizingTable) => {
+    const allegroSizingTable = getFormattedAllegroSizingTable(payload);
+
+    try {
+      if (!oldData.allegroId) {
+        const resp = await axios.post(
+          "/api/allegro/sizing-tables",
+          allegroSizingTable
+        );
+        await updateSizingTable(id, {
+          allegroId: resp.data.id,
+        });
+      } else {
+        await axios.put(`/api/allegro/sizing-tables/${oldData.allegroId}`, {
+          id: oldData.allegroId,
+          ...allegroSizingTable,
+        });
+      }
+    } catch (err) {
+      showToast(
+        `Błąd podczas aktualizacji tabeli rozmiarów na Allegro: ${err}`,
+        "error"
+      );
+    }
+  };
+
+  const getFormattedAllegroSizingTable = (
+    payload: SizingTable
+  ): Omit<AllegroSizingTable, "template"> => {
+    return {
+      name: payload.name,
+      headers: [{ name: "długość wkładki (cm)" }, { name: "rozmiar EU" }],
+      values: payload.insoleLengths.map(({ size, insoleLength }) => ({
+        cells: [insoleLength.toString(), size.toString()],
+      })),
+    };
   };
 
   return (

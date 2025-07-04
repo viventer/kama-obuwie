@@ -53,6 +53,8 @@ export const sizingAccuracyValues = [
   "zawyżona",
 ] as const;
 
+export type sizingAccuracyType = "zaniżona" | "normalna" | "zawyżona";
+
 export const SizingTableSchema = z.object({
   id: z.string().optional(),
   name: z.string().min(3).max(32),
@@ -65,6 +67,7 @@ export const SizingTableSchema = z.object({
   sizingAccuracy: z
     .enum(["zaniżona", "normalna", "zawyżona"])
     .default("normalna"),
+  allegroId: z.string().optional(),
 });
 
 export const CategorySchema = z.object({
@@ -191,6 +194,23 @@ export const BrandInfoSchema = z.object({
   brandLogo: z.string().optional(),
 });
 
+export const AllegroSizingTableSchema = z.object({
+  name: z.string(),
+  template: z.object({
+    id: z.string(),
+  }),
+  headers: z.array(
+    z.object({
+      name: z.string(),
+    })
+  ),
+  values: z.array(
+    z.object({
+      cells: z.array(z.string()), // np. ["46", "29.5"]
+    })
+  ),
+});
+
 export type SizingTable = z.infer<typeof SizingTableSchema>;
 export type Category = z.infer<typeof CategorySchema>;
 export type Product = z.infer<typeof ProductSchema>;
@@ -222,6 +242,8 @@ export type ProductCreationStage = z.infer<typeof ProductCreationStageSchema>;
 export type RawPhoto = z.infer<typeof RawPhotoSchema>;
 export type EditedPhoto = z.infer<typeof EditedPhotoSchema>;
 export type EditedPhotoWithUrl = z.infer<typeof EditedPhotoWithUrlSchema>;
+
+export type AllegroSizingTable = z.infer<typeof AllegroSizingTableSchema>;
 
 export type ProductWithStatus = ProductWithId & { isReady: boolean };
 

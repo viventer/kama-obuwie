@@ -6,7 +6,7 @@ import {
   EditedPhotoWithUrl,
   ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
-import { getDocumentFromAdminDB } from "@/server-actions/helpers";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { getImagesUrls } from "@/server-actions/images/images";
 import { notFound } from "next/navigation";
 

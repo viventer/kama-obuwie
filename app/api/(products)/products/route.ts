@@ -1,7 +1,8 @@
 import { Product } from "@/firebase/schemas/productsSchemas";
-import { apiResponse, getDocumentsFromAdminDB } from "@/server-actions/helpers";
+import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { createProduct } from "@/server-actions/products/products";
 import { NextRequest } from "next/server";
+import { apiResponse } from "@/server-actions/helpers";
 
 export async function POST(request: NextRequest) {
   const body: Product = await request.json();
@@ -12,6 +13,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get("type");
   const creationStageParam = request.nextUrl.searchParams.get("creationStage");
+  const sizingTableId = request.nextUrl.searchParams.get("sizingTableId");
   const stages = creationStageParam ? creationStageParam.split(",") : null;
 
   const queryFn = (ref: FirebaseFirestore.CollectionReference) => {
@@ -19,6 +21,10 @@ export async function GET(request: NextRequest) {
 
     if (type === "obuwie" || type === "akcesoria") {
       query = query.where("productType", "==", type);
+    }
+
+    if (sizingTableId) {
+      query = query.where("sizingTableId", "==", sizingTableId);
     }
 
     if (stages && stages.length > 0) {

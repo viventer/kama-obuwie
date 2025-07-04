@@ -1,6 +1,6 @@
 import CategoryEditForm from "@/components/adminPanel/products/categories/CategoryEditForm";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { CategoryWithId } from "@/firebase/schemas/productsSchemas";
-import { getDocumentFromAdminDB } from "@/server-actions/helpers";
 import { notFound } from "next/navigation";
 
 type Props = {

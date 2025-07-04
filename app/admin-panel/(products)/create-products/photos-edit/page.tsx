@@ -1,7 +1,7 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import CreateProductsPhotosDataTable from "@/components/adminPanel/products/create/CreateProductsPhotosDataTable";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
-import { getDocumentsFromAdminDB } from "@/server-actions/helpers";
+import { getDocumentsFromAdminDB } from "@/firebase/getters";
 
 export const revalidate = 0;
 

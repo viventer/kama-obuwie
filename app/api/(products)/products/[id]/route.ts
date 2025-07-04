@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
 import { Product } from "@/firebase/schemas/productsSchemas";
-import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { updateProduct } from "@/server-actions/products/products";
+import { apiResponse } from "@/server-actions/helpers";
 
 export async function GET(
   request: NextRequest,

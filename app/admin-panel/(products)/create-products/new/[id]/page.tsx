@@ -1,6 +1,6 @@
 import ProductCreateForm from "@/components/adminPanel/products/create/ProductCreateForm";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
-import { getDocumentFromAdminDB } from "@/server-actions/helpers";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { notFound } from "next/navigation";
 
 type Props = {

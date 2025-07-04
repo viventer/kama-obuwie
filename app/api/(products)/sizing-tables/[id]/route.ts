@@ -3,8 +3,9 @@ import {
   SizingTable,
   SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
-import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { updateSizingTable } from "@/server-actions/products/sizingTables";
+import { apiResponse } from "@/server-actions/helpers";
 
 export async function GET(
   request: NextRequest,

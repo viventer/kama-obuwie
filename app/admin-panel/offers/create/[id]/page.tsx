@@ -5,7 +5,7 @@ import ShortProductInfo from "@/components/adminPanel/products/ShortProductInfo"
 import { Button } from "@/components/ui/button";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
-import { getDocumentFromAdminDB } from "@/server-actions/helpers";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { notFound } from "next/navigation";
 
 type Props = {

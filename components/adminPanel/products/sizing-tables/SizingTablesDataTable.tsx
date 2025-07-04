@@ -2,6 +2,7 @@
 
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
 import {
+  ProductWithId,
   SizingTable,
   SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
@@ -19,6 +20,7 @@ import axios from "axios";
 import { useToast } from "@/hooks/useToast";
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { DataTable } from "../../global/data-table/DataTable";
+import { getDocumentsFromAdminDB } from "@/firebase/getters";
 
 export default function SizingTablesDataTable({
   data,
@@ -54,6 +56,17 @@ export default function SizingTablesDataTable({
   const { showDialog } = useConfirmDialog();
 
   const handleDeleteSizingTable = async (id: string) => {
+    const resp = await axios.get(`/api/products?sizingTableId=${id}`);
+    const connectedProducts: ProductWithId[] | null = Object.values(resp.data);
+
+    if (connectedProducts && connectedProducts.length > 0) {
+      showToast(
+        "Nie można usunąć tabeli rozmiarów, ponieważ jest podłączona do produktów.",
+        "error"
+      );
+      return;
+    }
+
     showDialog({
       message: "Czy na pewno chcesz usunąć tę tabelę rozmiarów?",
       description: "Ta operacja jest nieodwracalna.",

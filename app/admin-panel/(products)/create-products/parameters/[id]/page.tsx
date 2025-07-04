@@ -1,7 +1,7 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import EditProductParametersForm from "@/components/adminPanel/products/parameters/EditProductParametersForm";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
-import { getDocumentFromAdminDB } from "@/server-actions/helpers";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { notFound } from "next/navigation";
 
 type Props = {

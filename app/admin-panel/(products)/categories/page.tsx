@@ -5,7 +5,7 @@ import {
   CategoryWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { getAllegroCategoryById } from "@/server-actions/allegro/categories";
-import { getDocumentsFromAdminDB } from "@/server-actions/helpers";
+import { getDocumentsFromAdminDB } from "@/firebase/getters";
 
 export default async function CategoriesPage() {
   const categories = await getDocumentsFromAdminDB<CategoryWithId>(

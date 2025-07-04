@@ -7,7 +7,7 @@ import {
 import {
   getDocumentFromAdminDB,
   getDocumentsFromAdminDB,
-} from "@/server-actions/helpers";
+} from "@/firebase/getters";
 import { notFound } from "next/navigation";
 
 type Props = {

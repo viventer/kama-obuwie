@@ -1,5 +1,5 @@
 import { Offer } from "@/firebase/schemas/offersSchemas";
-import { apiResponse, getDocumentsFromAdminDB } from "@/server-actions/helpers";
+import { apiResponse, getDocumentsFromAdminDB } from "@/firebase/getters";
 import { createOffer } from "@/server-actions/offers/offers";
 import { NextRequest } from "next/server";
 

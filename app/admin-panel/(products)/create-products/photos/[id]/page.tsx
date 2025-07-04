@@ -1,7 +1,7 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import CreateProductsPhotosForm from "@/components/adminPanel/products/create/CreateProductsPhotosForm";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
-import { getDocumentFromAdminDB } from "@/server-actions/helpers";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { getImageUrl } from "@/server-actions/images/images";
 import Image from "next/image";
 import { notFound } from "next/navigation";

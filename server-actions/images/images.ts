@@ -2,14 +2,13 @@
 
 import { adminStorage } from "@/firebase/firebaseAdmin";
 import { ImageUrlSchema } from "@/firebase/schemas/otherSchemas";
-import { getDocumentFromAdminDB } from "../helpers";
 import {
   EditedPhoto,
   ProductWithId,
   RawPhoto,
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
-import { redirect } from "next/navigation";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 
 export const getImageUrl = async function (
   filePath: string

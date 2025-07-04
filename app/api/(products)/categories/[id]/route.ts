@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
-import { getDocumentFromAdminDB, apiResponse } from "@/server-actions/helpers";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { updateCategory } from "@/server-actions/products/categories";
+import { apiResponse } from "@/server-actions/helpers";
 
 export async function GET(
   request: NextRequest,

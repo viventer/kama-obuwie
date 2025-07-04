@@ -1,6 +1,6 @@
 import SizingTableEditForm from "@/components/adminPanel/products/sizing-tables/SizingTableEditForm";
 import { SizingTableWithId } from "@/firebase/schemas/productsSchemas";
-import { getDocumentFromAdminDB } from "@/server-actions/helpers";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { notFound } from "next/navigation";
 
 type Props = {

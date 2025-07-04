@@ -12,7 +12,6 @@ import {
   SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
-import { redirect } from "next/navigation";
 
 export const createOffer = async function (newOffer: Partial<Offer>) {
   await verifyUser(["ADMIN", "VERIFIED"]);

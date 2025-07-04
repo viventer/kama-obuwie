@@ -18,9 +18,8 @@ import { getAllegroUserAccessToken } from "./auth";
 import { AllegroHeaders, getAllegroHeaders } from "./global";
 import axios, { AxiosError } from "axios";
 import { getImageUrl } from "../images/images";
-import { AuthorizationError, verifyUser } from "../auth/auth";
+import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath } from "@/lib/constants";
-import { redirect } from "next/navigation";
 import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
@@ -89,6 +88,9 @@ export const postAllegroOffer = async (
       warranty: {
         id: offer.warranty?.AL1 || "",
       },
+    },
+    sizeTable: {
+      id: sizingTable.allegroId || "",
     },
   };
 

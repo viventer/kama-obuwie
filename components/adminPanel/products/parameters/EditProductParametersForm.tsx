@@ -128,6 +128,20 @@ export default function EditProductParametersForm({
       rangeSizes: rangeSizesNum,
     };
 
+    const allegroBrandParameter = payload.parameters?.required?.["Marka"];
+
+    if (
+      !payload.brand &&
+      (allegroBrandParameter === "inna" ||
+        allegroBrandParameter === "Inna marka")
+    ) {
+      showToast(
+        "Nazwa marki jest wymagana, jeśli wybrano 'inna' w parametrach Allegro.",
+        "error"
+      );
+      return;
+    }
+
     const hasValidColorVariants =
       productType !== "obuwie" ||
       (data.colorVariants &&

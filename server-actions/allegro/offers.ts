@@ -21,6 +21,7 @@ import { getImageUrl } from "../images/images";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";
+import { getAllegroCategories } from "./categories";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -85,14 +86,18 @@ export const postAllegroOffer = async (
       impliedWarranty: {
         id: offer.impliedWarranty!.AL1 as string,
       },
-      warranty: {
-        id: offer.warranty?.AL1 || "",
-      },
-    },
-    sizeTable: {
-      id: sizingTable.allegroId || "",
     },
   };
+
+  if (sizingTable.allegroId) {
+    allegroOfferData.sizeTable = { id: sizingTable.allegroId };
+  }
+
+  if (offer.warranty?.AL1) {
+    allegroOfferData.afterSalesServices.warranty = {
+      id: offer.warranty.AL1,
+    };
+  }
 
   const insoleLengths = sizingTable.insoleLengths;
 
@@ -138,8 +143,10 @@ export async function postIndividualAllegroOffer(
     allegroCategoryId,
   } = data;
 
-  const formattedProductParameters = formatAllegroProductParameters(
-    product.parameters
+  const formattedProductParameters = await formatAllegroProductParameters(
+    product.parameters,
+    allegroCategoryId,
+    product.brand
   );
   const formattedManufacturerCode = `${product.manufacturerCode} ${colorVariant.color}`;
 
@@ -278,9 +285,11 @@ export async function postIndividualAllegroOffer(
   }
 }
 
-function formatAllegroProductParameters(
-  productParameters: ProductParameters
-): AllegroOfferParameters {
+async function formatAllegroProductParameters(
+  productParameters: ProductParameters,
+  allegroCategoryId: string,
+  productBrand?: string
+): Promise<AllegroOfferParameters> {
   const result: AllegroOfferParameters = [];
 
   // 1. Scalamy wszystkie required + optional
@@ -310,11 +319,64 @@ function formatAllegroProductParameters(
         // pusty string → pomiń parametr
         continue;
       }
+
+      if (
+        name === "Marka" &&
+        (rawValue === "inna" || rawValue === "Inna marka")
+      ) {
+        if (!productBrand) {
+          throw new Error(
+            "Brak marki produktu, ale marka 'inna' została wybrana."
+          );
+        }
+
+        const { ambiguousValueId, parameterId } =
+          await getAllegroBrandAmbiguousValueId(allegroCategoryId);
+
+        result.push({
+          name: "Marka",
+          valuesIds: [ambiguousValueId],
+          values: [productBrand],
+        });
+
+        continue;
+      }
+
       result.push({ name, values: [rawValue] });
     }
   }
 
   return result;
+}
+
+async function getAllegroBrandAmbiguousValueId(categoryId: string): Promise<{
+  ambiguousValueId: string;
+  parameterId: string;
+}> {
+  const accessToken = await getAllegroUserAccessToken();
+  const headers = getAllegroHeaders(accessToken);
+
+  const url = `${ALLEGRO_API_BASE_URL}/sale/categories/${categoryId}/parameters`;
+
+  const resp = await axios.get(url, {
+    headers,
+  });
+  const parameters = resp.data.parameters;
+
+  const brandParameter = parameters.find(
+    (p: { name: string }) => p.name === "Marka"
+  );
+
+  if (!brandParameter) {
+    throw new Error("Nie znaleziono parametru 'Marka' w kategorii.");
+  }
+
+  const ambiguousValueId = brandParameter.options.ambiguousValueId;
+
+  return {
+    ambiguousValueId,
+    parameterId: brandParameter.id,
+  };
 }
 
 function replaceDescriptionVariables(

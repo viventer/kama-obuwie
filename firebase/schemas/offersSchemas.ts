@@ -89,6 +89,7 @@ export const AllegroOfferParametersSchema = z.array(
   z.object({
     name: z.string(),
     values: z.array(ParamValueSchema),
+    valuesIds: z.array(z.string()).optional(),
   })
 );
 

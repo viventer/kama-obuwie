@@ -90,6 +90,9 @@ export const postAllegroOffer = async (
         id: offer.warranty?.AL1 || "",
       },
     },
+    sizeTable: {
+      id: sizingTable.id!,
+    },
   };
 
   const insoleLengths = sizingTable.insoleLengths;

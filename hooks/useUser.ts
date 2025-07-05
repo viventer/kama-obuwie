@@ -7,7 +7,10 @@ type User = {
   email?: string;
   name?: string;
   role?: string;
-  isAllegroConnected?: boolean;
+  connectedAccounts: {
+    AL1: boolean;
+    AL2: boolean;
+  };
 } | null;
 
 export function useUser() {
@@ -24,11 +27,16 @@ export function useUser() {
       router.push("/admin-auth/login");
       return { user: null };
     }
-    if (res.status === 403 && path.startsWith("/admin-panel")) {
-      router.push("/admin-auth/allegro-connect");
-      return { user: null };
-    }
+
     const userData = await res.json();
+    if (
+      (!userData.user.connectedAccounts.AL1 ||
+        !userData.user.connectedAccounts.AL2) &&
+      path.startsWith("/admin-panel")
+    ) {
+      router.push("/admin-auth/allegro-connect");
+      return userData;
+    }
     if (
       path.startsWith("/admin-panel/") &&
       userData.user?.role === "UNVERIFIED"

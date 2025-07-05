@@ -21,7 +21,6 @@ import { getImageUrl } from "../images/images";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";
-import { getAllegroCategories } from "./categories";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 

@@ -31,7 +31,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import FormWrapper from "../../global/form/FormWrapper";
 import SingleSelect from "../../global/form/SingleSelect";
-import { createAllegroSizingTable } from "@/server-actions/allegro/sizingTables";
 import axios from "axios";
 
 type FormValues = {

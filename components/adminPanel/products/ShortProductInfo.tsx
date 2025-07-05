@@ -38,7 +38,7 @@ export default async function ShortProductInfo({
         </p>
         {product.suggestedPrice && (
           <p>
-            <b>Cena sugerowana:</b> {product.brand}
+            <b>Cena sugerowana:</b> {product.suggestedPrice}
           </p>
         )}
         {colorVariantsNames && (

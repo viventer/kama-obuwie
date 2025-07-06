@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/useToast";
 import { useUser } from "@/hooks/useUser";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import Loader from "../global/Loader";
 
@@ -18,6 +18,13 @@ export default function AllegroConnectForm() {
   const { user, loading: userLoading } = useUser();
   const connectedAccounts = user?.connectedAccounts;
   const { showToast } = useToast();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("error") === "incorrect_account") {
+      showToast("Podłącz prawidłowe konto Allegro.", "error");
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user && !userLoading) {

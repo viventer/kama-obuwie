@@ -1,5 +1,8 @@
 import { adminDB } from "@/firebase/firebaseAdmin";
-import { exchangeCodeForTokens } from "@/server-actions/allegro/auth";
+import {
+  checkAccountInfo,
+  exchangeCodeForTokens,
+} from "@/server-actions/allegro/auth";
 import { redis } from "@/upstash/redis";
 import { NextResponse } from "next/server";
 
@@ -34,8 +37,17 @@ export async function GET(request: Request) {
     const { access_token, refresh_token, expires_in } =
       await exchangeCodeForTokens(
         code,
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/allegro/callback?account=${account}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/allegro/callback?account=${account}`,
+        account
       );
+
+    const isCorrectAccount = await checkAccountInfo(access_token, account);
+
+    if (!isCorrectAccount) {
+      return NextResponse.redirect(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/admin-auth/allegro-connect?error=incorrect_account`
+      );
+    }
 
     // 3) Aktualizacja sesji w Redis (dodanie tokenu Allegro)
     const expiryTs = Math.floor(Date.now() / 1000) + expires_in;

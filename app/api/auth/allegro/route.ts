@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   }
 
   const clientId =
-    account === "AL1" ? process.env.AL_CLIENT_ID! : process.env.AL2_CLIENT_ID!;
+    account === "AL1" ? process.env.AL1_CLIENT_ID! : process.env.AL2_CLIENT_ID!;
   const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/allegro/callback?account=${account}`;
   const state = encodeURIComponent(sessionId);
 

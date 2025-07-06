@@ -137,10 +137,10 @@ export default function AppSidebar() {
             <p className="opacity-75">
               Rola: {user.role?.toLowerCase() || "nieznana"}
             </p>
-            {user.isAllegroConnected ? (
+            {user.connectedAccounts.AL1 && user.connectedAccounts.AL2 ? (
               <div className="flex items-center gap-2 mt-4">
                 <LinkIcon className="size-4 text-success" />
-                <p className="font-medium">Podłączono konto Allegro</p>
+                <p className="font-medium">Podłączono konta Allegro</p>
               </div>
             ) : (
               <div className="flex items-center gap-2 mt-4">
@@ -149,7 +149,7 @@ export default function AppSidebar() {
                   href={`/admin-auth/allegro-connect`}
                   className="font-medium"
                 >
-                  Połącz konto Allegro
+                  Połącz konta Allegro
                 </LinkText>
               </div>
             )}

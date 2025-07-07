@@ -273,7 +273,7 @@ export default function PostOfferForm({
 
   return (
     <Form {...form}>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-6">
         <FormField
           rules={{ required: "Tytuł oferty jest wymagany." }}
           control={form.control}

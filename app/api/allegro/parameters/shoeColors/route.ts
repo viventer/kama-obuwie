@@ -1,4 +1,5 @@
 import {
+  AllegroLeafCategory,
   getAllegroCategories,
   SerializedAllegroCategory,
 } from "@/server-actions/allegro/categories";
@@ -17,7 +18,7 @@ export type AllegroColorWithShadesResponse = {
 };
 
 export async function GET() {
-  const rootCategory: SerializedAllegroCategory[] = await getAllegroCategories(
+  const rootCategory: AllegroLeafCategory[] = await getAllegroCategories(
     "obuwie męskie"
   );
   const categoryId = rootCategory[0].id;

@@ -185,9 +185,8 @@ export default function PostOfferForm({
           images: imagesUrls,
         });
 
-        const formattedAllegroIds = {
-          AL1: data.allegroIds,
-        };
+        // Data teraz zawiera { allegroIds: { AL1: {...}, AL2: {...} } }
+        const formattedAllegroIds = data.allegroIds;
 
         const offerId = offersIds?.AL1?.find(
           (offer) => offer.colorVariantName === colorVariantName

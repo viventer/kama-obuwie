@@ -3,6 +3,7 @@ import { redis } from "@/upstash/redis";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { cookies } from "next/headers";
 import { getAllegroHeaders, getSingleAllegroHeaders } from "./global";
+import { redirect } from "next/navigation";
 
 // client access token jest używany do autoryzacji zapytań do Allegro API, które nie wymagają dostępu do danych użytkownika
 const ALLEGRO_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_BASE_URL!;
@@ -37,9 +38,7 @@ export async function getAllegroUserAccessTokens(): Promise<{
   // 1. Pobierz hash sesji z Redis
   const sess = await redis.hgetall(key);
   if (!sess || !sess.userId || !sess.AL1AccessToken || !sess.AL2AccessToken) {
-    throw new Error(
-      "Brak sesji lub access tokena Allegro w Redis. Użytkownik nie jest zalogowany."
-    );
+    redirect("/admin-auth/login");
   }
 
   const now = Math.floor(Date.now() / 1000);

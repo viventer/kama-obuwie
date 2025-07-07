@@ -20,11 +20,9 @@ export default function AllegroConnectForm() {
   const { showToast } = useToast();
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    if (searchParams.get("error") === "incorrect_account") {
-      showToast("Podłącz prawidłowe konto Allegro.", "error");
-    }
-  }, [searchParams]);
+  if (searchParams.get("error") === "incorrect_account") {
+    showToast("Podłącz prawidłowe konto Allegro.", "error");
+  }
 
   useEffect(() => {
     if (!user && !userLoading) {

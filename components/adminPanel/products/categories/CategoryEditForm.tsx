@@ -22,8 +22,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  AllegroLeafCategory,
   getAllegroCategories,
-  SerializedAllegroCategory,
 } from "@/server-actions/allegro/categories";
 import { Button } from "@/components/ui/button";
 import RootCategorySelector from "./RootCategorySelector";
@@ -35,7 +35,7 @@ export default function CategoryEditForm({
   oldData: CategoryWithId;
 }) {
   const [allegroCategories, setAllegroCategories] = useState<
-    SerializedAllegroCategory[]
+    AllegroLeafCategory[]
   >([]);
 
   const form = useForm<CategoryWithId>({

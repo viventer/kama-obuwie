@@ -14,101 +14,135 @@ export type SerializedAllegroCategory = {
   id: string;
   name: string;
   parentId: string | null;
+  leaf: boolean;
+  children?: SerializedAllegroCategory[];
+};
+
+export type AllegroLeafCategory = {
+  id: string;
+  name: string;
 };
 
 export type AllegroCategory = {
   id: string;
   leaf: boolean;
   name: string;
-  parent: {
-    id: string;
-  };
+  parent: { id: string };
 };
 
 const serializeCategories = (
   categories: AllegroCategory[]
-): SerializedAllegroCategory[] => {
-  return categories.map((category) => ({
-    id: category.id,
-    name: category.name,
-    parentId: category?.parent?.id || null,
+): SerializedAllegroCategory[] =>
+  categories.map((c) => ({
+    id: c.id,
+    name: c.name,
+    parentId: c.parent?.id || null,
+    leaf: c.leaf,
   }));
-};
 
-const findCategoryByName = (
+async function getAllegroChildrenCategories(
+  parentCategoryId: string,
+  allegroHeaders: AllegroHeaders,
+  url: string
+): Promise<SerializedAllegroCategory[]> {
+  const resp = await axios.get(url, {
+    headers: allegroHeaders,
+    params: { "parent.id": parentCategoryId },
+  });
+  return serializeCategories(resp.data.categories as AllegroCategory[]);
+}
+
+function extractLeafCategories(
   categories: SerializedAllegroCategory[],
-  name: string
-): SerializedAllegroCategory | null => {
-  return categories.find((category) => category.name === name) || null;
-};
+  parentName: string = ""
+): AllegroLeafCategory[] {
+  const leaves: AllegroLeafCategory[] = [];
+  categories.forEach((cat) => {
+    const fullName = parentName ? `${parentName} ${cat.name}` : cat.name;
+    if (cat.leaf) {
+      leaves.push({ id: cat.id, name: fullName });
+    } else if (cat.children) {
+      leaves.push(...extractLeafCategories(cat.children, cat.name));
+    }
+  });
+  return leaves;
+}
 
-const getAdultCategories = async (
+async function enrichWithChildren(
+  categories: SerializedAllegroCategory[],
+  allegroHeaders: AllegroHeaders,
+  url: string,
+  depth = 1
+): Promise<SerializedAllegroCategory[]> {
+  if (depth < 1) return categories;
+
+  return await Promise.all(
+    categories.map(async (cat) => {
+      if (cat.leaf) return cat;
+      const children = await getAllegroChildrenCategories(
+        cat.id,
+        allegroHeaders,
+        url
+      );
+      cat.children = children;
+      if (depth > 1) {
+        cat.children = await enrichWithChildren(
+          children,
+          allegroHeaders,
+          url,
+          depth - 1
+        );
+      }
+      return cat;
+    })
+  );
+}
+
+async function getAdultCategories(
   rootCategories: SerializedAllegroCategory[],
   allegroHeaders: AllegroHeaders,
   url: string
-): Promise<SerializedAllegroCategory[]> => {
-  const moda = findCategoryByName(
-    rootCategories,
-    "Moda"
-  ) as SerializedAllegroCategory;
+): Promise<SerializedAllegroCategory[]> {
+  const moda = rootCategories.find((c) => c.name === "Moda");
+  if (!moda) return [];
 
   const modaChildren = await getAllegroChildrenCategories(
     moda.id,
     allegroHeaders,
     url
   );
+  const ood = modaChildren.find((c) => c.name === "Odzież, Obuwie, Dodatki");
+  if (!ood) return [];
 
-  const clothesFootwearAccessories = findCategoryByName(
-    modaChildren,
-    "Odzież, Obuwie, Dodatki"
-  ) as SerializedAllegroCategory;
-
-  const clothesFootwearAccessoriesChildren = await getAllegroChildrenCategories(
-    clothesFootwearAccessories.id,
+  const oodChildren = await getAllegroChildrenCategories(
+    ood.id,
     allegroHeaders,
     url
   );
+  const footwear = oodChildren.find((c) => c.name === "Obuwie");
+  if (!footwear) return [];
 
-  const footwear = findCategoryByName(
-    clothesFootwearAccessoriesChildren,
-    "Obuwie"
-  ) as SerializedAllegroCategory;
-  const footwearChildren = await getAllegroChildrenCategories(
-    footwear.id,
-    allegroHeaders,
-    url
-  );
+  return getAllegroChildrenCategories(footwear.id, allegroHeaders, url);
+}
 
-  return footwearChildren;
-};
-
-const getKidsCategories = async (
+async function getKidsCategories(
   rootCategories: SerializedAllegroCategory[],
   allegroHeaders: AllegroHeaders,
   url: string
-): Promise<SerializedAllegroCategory[]> => {
-  const kids = findCategoryByName(
-    rootCategories,
-    "Dziecko"
-  ) as SerializedAllegroCategory;
+): Promise<SerializedAllegroCategory[]> {
+  const kids = rootCategories.find((c) => c.name === "Dziecko");
+  if (!kids) return [];
+
   const kidsChildren = await getAllegroChildrenCategories(
     kids.id,
     allegroHeaders,
     url
   );
+  const footwear = kidsChildren.find((c) => c.name === "Obuwie");
+  if (!footwear) return [];
 
-  const footwear = findCategoryByName(
-    kidsChildren,
-    "Obuwie"
-  ) as SerializedAllegroCategory;
-  const footwearChildren = await getAllegroChildrenCategories(
-    footwear.id,
-    allegroHeaders,
-    url
-  );
-
-  return footwearChildren;
-};
+  return getAllegroChildrenCategories(footwear.id, allegroHeaders, url);
+}
 
 export async function getAllegroCategoryById(
   categoryId: string
@@ -116,112 +150,68 @@ export async function getAllegroCategoryById(
   const accessToken = await getAllegroUserAccessToken();
   const url = `${ALLEGRO_API_BASE_URL}/sale/categories/${categoryId}`;
   const allegroHeaders = getAllegroHeaders(accessToken);
-  const resp = await axios.get(url, {
-    headers: allegroHeaders,
-  });
-
+  const resp = await axios.get(url, { headers: allegroHeaders });
   return resp.data.name;
 }
 
 export async function getAllegroCategories(
   rootCategory: RootCategory
-): Promise<SerializedAllegroCategory[]> {
+): Promise<AllegroLeafCategory[]> {
   const accessToken = await getAllegroUserAccessToken();
   const url = `${ALLEGRO_API_BASE_URL}/sale/categories`;
   const allegroHeaders = getAllegroHeaders(accessToken);
-  const resp = await axios.get(url, {
-    headers: allegroHeaders,
-  });
 
-  const data = resp.data.categories as AllegroCategory[];
-  const allegroCategories = serializeCategories(data);
+  const resp = await axios.get(url, { headers: allegroHeaders });
+  const allCats = serializeCategories(
+    resp.data.categories as AllegroCategory[]
+  );
 
+  let base: SerializedAllegroCategory[] = [];
   if (
     rootCategory === "obuwie dziecięce" ||
     rootCategory === "akcesoria dziecięce"
   ) {
-    const kidsCategories = await getKidsCategories(
-      allegroCategories,
-      allegroHeaders,
-      url
-    );
-    const withoutAccessories = kidsCategories.filter(
-      (category) => category.name !== "Dodatki do obuwia"
-    );
-    const accessories = findCategoryByName(
-      kidsCategories,
-      "Dodatki do obuwia"
-    ) as SerializedAllegroCategory;
-    const accessoriesCategoriesChildren = await getAllegroChildrenCategories(
-      accessories.id,
-      allegroHeaders,
-      url
-    );
-
-    return rootCategory === "akcesoria dziecięce"
-      ? accessoriesCategoriesChildren
-      : withoutAccessories;
+    const kidsCats = await getKidsCategories(allCats, allegroHeaders, url);
+    if (rootCategory === "akcesoria dziecięce") {
+      const acc = kidsCats.find((c) => c.name === "Dodatki do obuwia");
+      base = acc
+        ? await getAllegroChildrenCategories(acc.id, allegroHeaders, url)
+        : [];
+    } else {
+      base = kidsCats.filter((c) => c.name !== "Dodatki do obuwia");
+    }
   } else {
-    const adultCategories = await getAdultCategories(
-      allegroCategories,
-      allegroHeaders,
-      url
-    );
-    const male = findCategoryByName(
-      adultCategories,
-      "Męskie"
-    ) as SerializedAllegroCategory;
-    const maleCategoriesChildren = await getAllegroChildrenCategories(
-      male.id,
-      allegroHeaders,
-      url
-    );
+    const adultCats = await getAdultCategories(allCats, allegroHeaders, url);
+    const male = adultCats.find((c) => c.name === "Męskie");
+    const female = adultCats.find((c) => c.name === "Damskie");
+    const accessories = adultCats.find((c) => c.name === "Akcesoria");
 
-    const female = findCategoryByName(
-      adultCategories,
-      "Damskie"
-    ) as SerializedAllegroCategory;
-    const femaleCategoriesChildren = await getAllegroChildrenCategories(
-      female.id,
-      allegroHeaders,
-      url
-    );
-
-    const accessories = findCategoryByName(
-      adultCategories,
-      "Akcesoria"
-    ) as SerializedAllegroCategory;
-    const accessoriesCategoriesChildren = await getAllegroChildrenCategories(
-      accessories.id,
-      allegroHeaders,
-      url
-    );
-
-    const category =
-      rootCategory === "obuwie męskie"
-        ? maleCategoriesChildren
-        : rootCategory === "obuwie damskie"
-        ? femaleCategoriesChildren
-        : accessoriesCategoriesChildren;
-
-    return category;
+    switch (rootCategory) {
+      case "obuwie męskie":
+        base = male
+          ? await getAllegroChildrenCategories(male.id, allegroHeaders, url)
+          : [];
+        break;
+      case "obuwie damskie":
+        base = female
+          ? await getAllegroChildrenCategories(female.id, allegroHeaders, url)
+          : [];
+        break;
+      case "akcesoria":
+        base = accessories
+          ? await getAllegroChildrenCategories(
+              accessories.id,
+              allegroHeaders,
+              url
+            )
+          : [];
+        break;
+      default:
+        base = [];
+    }
   }
-}
 
-export async function getAllegroChildrenCategories(
-  parentCategoryId: string,
-  allegroHeaders: AllegroHeaders,
-  url: string
-): Promise<SerializedAllegroCategory[]> {
-  const resp = await axios.get(url, {
-    headers: allegroHeaders,
-    params: {
-      "parent.id": parentCategoryId,
-    },
-  });
+  const enriched = await enrichWithChildren(base, allegroHeaders, url, 1);
 
-  const data = resp.data.categories as AllegroCategory[];
-  const allegroCategories = serializeCategories(data);
-
-  return allegroCategories;
+  return extractLeafCategories(enriched);
 }

@@ -6,6 +6,7 @@ import {
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { updateSizingTable } from "@/server-actions/products/sizingTables";
 import { apiResponse } from "@/server-actions/helpers";
+import { revalidatePath } from "next/cache";
 
 export async function GET(
   request: NextRequest,
@@ -46,5 +47,6 @@ export async function DELETE(
   }
 
   await ref.delete();
+  revalidatePath("/admin-panel/sizing-tables");
   return apiResponse("Tabela rozmiarów została usunięta.", 200);
 }

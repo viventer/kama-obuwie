@@ -2,7 +2,7 @@ import axios from "axios";
 import { redis } from "@/upstash/redis";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { cookies } from "next/headers";
-import { getAllegroHeaders } from "./global";
+import { getAllegroHeaders, getSingleAllegroHeaders } from "./global";
 
 // client access token jest używany do autoryzacji zapytań do Allegro API, które nie wymagają dostępu do danych użytkownika
 const ALLEGRO_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_BASE_URL!;
@@ -173,7 +173,7 @@ export async function checkAccountInfo(
   accessToken: string,
   correctAccount: string
 ): Promise<boolean> {
-  const headers = getAllegroHeaders(accessToken);
+  const headers = getSingleAllegroHeaders(accessToken);
 
   try {
     const response = await axios.get(

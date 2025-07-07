@@ -14,21 +14,29 @@ export type ReturnPolicy = {
   name: string;
 };
 
+export type ReturnPoliciesResponse = {
+  AL1: ReturnPolicy[];
+  AL2: ReturnPolicy[];
+};
+
 export default function ReturnPolicySelector() {
-  const [availableReturnPolicies, setAvailableReturnPolicies] = useState<
-    ReturnPolicy[]
-  >([]);
+  const [availableReturnPolicies, setAvailableReturnPolicies] =
+    useState<ReturnPoliciesResponse>();
 
   const { control } = useFormContext<PostOfferFormValues>();
 
   useEffect(() => {
     (async () => {
-      const resp = await axios.get("/api/allegro/return-policies");
-      setAvailableReturnPolicies(Object.values(resp.data));
+      const { data }: { data: ReturnPoliciesResponse } = await axios.get(
+        "/api/allegro/return-policies"
+      );
+      setAvailableReturnPolicies(data);
     })();
   }, []);
 
-  return availableReturnPolicies && availableReturnPolicies.length > 0 ? (
+  return availableReturnPolicies &&
+    availableReturnPolicies.AL1.length &&
+    availableReturnPolicies.AL2.length > 0 ? (
     <div>
       <h3 className="font-medium">Polityki zwrotów</h3>
       {allegroSalesChannels.map((channel) => (
@@ -46,10 +54,12 @@ export default function ReturnPolicySelector() {
               <SingleSelect
                 onChange={field.onChange}
                 value={field.value}
-                availableOptions={availableReturnPolicies.map((policy) => ({
-                  name: policy.name,
-                  value: policy.id,
-                }))}
+                availableOptions={availableReturnPolicies[channel].map(
+                  (policy) => ({
+                    name: policy.name,
+                    value: policy.id,
+                  })
+                )}
               />
             )}
           />

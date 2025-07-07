@@ -13,5 +13,8 @@ export async function GET(
   const { categoryId } = await params;
 
   const productParameters = await getProductParameters(categoryId);
+  if (!productParameters || !productParameters.AL1 || !productParameters.AL2) {
+    return apiResponse("Nie znaleziono parametrów.", 204);
+  }
   return apiResponse("Pobrano parametry.", 200, productParameters);
 }

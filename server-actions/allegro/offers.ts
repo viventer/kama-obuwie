@@ -15,7 +15,7 @@ import {
   ProductParameters,
 } from "@/firebase/schemas/productsSchemas";
 import { getAllegroUserAccessToken } from "./auth";
-import { AllegroHeaders, getAllegroHeaders } from "./global";
+import { AllegroHeaders, getSingleAllegroHeaders } from "./global";
 import axios, { AxiosError } from "axios";
 import { getImageUrl } from "../images/images";
 import { verifyUser } from "../auth/auth";
@@ -102,7 +102,7 @@ export const postAllegroOffer = async (
 
   const accessToken = await getAllegroUserAccessToken();
   const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers`;
-  const allegroHeaders = getAllegroHeaders(accessToken);
+  const allegroHeaders = getSingleAllegroHeaders(accessToken);
 
   const allegroIds: Record<string, string> = {};
 
@@ -353,7 +353,7 @@ async function getAllegroBrandAmbiguousValueId(categoryId: string): Promise<{
   parameterId: string;
 }> {
   const accessToken = await getAllegroUserAccessToken();
-  const headers = getAllegroHeaders(accessToken);
+  const headers = getSingleAllegroHeaders(accessToken);
 
   const url = `${ALLEGRO_API_BASE_URL}/sale/categories/${categoryId}/parameters`;
 

@@ -3,7 +3,7 @@ import { apiResponse } from "@/server-actions/helpers";
 
 export async function GET() {
   const data = await getAllegroWarranties();
-  if (!data) {
+  if (!data || !data.AL1 || !data.AL2) {
     return apiResponse("Nie znaleziono warunków gwarancji.", 204);
   }
 

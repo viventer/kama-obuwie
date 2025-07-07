@@ -15,21 +15,29 @@ export type ShippingRate = {
   marketplaces: object;
 };
 
+export type ShippingRatesResponse = {
+  AL1: { shippingRates: ShippingRate[] };
+  AL2: { shippingRates: ShippingRate[] };
+};
+
 export default function ShippingRatesSelector() {
-  const [availableShippingRates, setAvailableShippingRates] = useState<
-    ShippingRate[]
-  >([]);
+  const [availableShippingRates, setAvailableShippingRates] =
+    useState<ShippingRatesResponse>();
 
   const { control } = useFormContext<PostOfferFormValues>();
 
   useEffect(() => {
     (async () => {
-      const resp = await axios.get("/api/allegro/shipping-rates");
-      setAvailableShippingRates(resp.data.shippingRates);
+      const { data }: { data: ShippingRatesResponse } = await axios.get(
+        "/api/allegro/shipping-rates"
+      );
+      setAvailableShippingRates(data);
     })();
   }, []);
 
-  return availableShippingRates && availableShippingRates.length > 0 ? (
+  return availableShippingRates &&
+    availableShippingRates.AL1?.shippingRates?.length > 0 &&
+    availableShippingRates.AL2?.shippingRates?.length > 0 ? (
     <div>
       <h3 className="font-medium">Cenniki dostaw</h3>
       {allegroSalesChannels.map((channel) => (
@@ -45,7 +53,9 @@ export default function ShippingRatesSelector() {
               <SingleSelect
                 onChange={field.onChange}
                 value={field.value}
-                availableOptions={availableShippingRates.map((rate) => ({
+                availableOptions={availableShippingRates[
+                  channel
+                ].shippingRates.map((rate) => ({
                   name: rate.name,
                   value: rate.id,
                 }))}

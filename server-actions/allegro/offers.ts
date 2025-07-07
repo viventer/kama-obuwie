@@ -212,7 +212,7 @@ export async function postIndividualAllegroOffer(
   const formattedSizingTable = getFormattedSizingTable(insoleLengths);
 
   const descriptionVariableValues: Record<DescriptionVariable, string> = {
-    rozmiar: insoleLength.size.toString(),
+    rozmiar: `${insoleLength.size.toString().replace(".", ",")} cm`,
     kolor: colorVariant.color,
     marka: product.brand || "",
     "kod producenta": product.manufacturerCode || "",

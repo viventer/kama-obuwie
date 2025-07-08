@@ -185,9 +185,8 @@ export default function PostOfferForm({
           images: imagesUrls,
         });
 
-        const formattedAllegroIds = {
-          AL1: data.allegroIds,
-        };
+        // Data teraz zawiera { allegroIds: { AL1: {...}, AL2: {...} } }
+        const formattedAllegroIds = data.allegroIds;
 
         const offerId = offersIds?.AL1?.find(
           (offer) => offer.colorVariantName === colorVariantName
@@ -273,7 +272,7 @@ export default function PostOfferForm({
 
   return (
     <Form {...form}>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-6">
         <FormField
           rules={{ required: "Tytuł oferty jest wymagany." }}
           control={form.control}

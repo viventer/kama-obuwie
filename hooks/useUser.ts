@@ -8,7 +8,10 @@ type User = {
   email?: string;
   name?: string;
   role?: string;
-  isAllegroConnected?: boolean;
+  connectedAccounts: {
+    AL1: boolean;
+    AL2: boolean;
+  };
 } | null;
 
 export function useUser() {
@@ -69,6 +72,7 @@ export function useUser() {
     ) {
       router.push("/admin-auth/unauthorized");
     }
+
     return userData;
   };
 

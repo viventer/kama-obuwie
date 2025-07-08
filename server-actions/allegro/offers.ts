@@ -14,14 +14,17 @@ import {
   Product,
   ProductParameters,
 } from "@/firebase/schemas/productsSchemas";
-import { getAllegroUserAccessToken } from "./auth";
-import { AllegroHeaders, getAllegroHeaders } from "./global";
+import { getAllegroUserAccessTokens, getAllegroUserAccessToken } from "./auth";
+import {
+  AllegroHeaders,
+  getAllegroHeaders,
+  getSingleAllegroHeaders,
+} from "./global";
 import axios, { AxiosError } from "axios";
 import { getImageUrl } from "../images/images";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";
-import { getAllegroCategories } from "./categories";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -44,11 +47,12 @@ type AllegroIndividualOffer = {
   url: string;
   allegroCategoryId: string;
   images: string[];
+  channel: "AL1" | "AL2";
 };
 
 export const postAllegroOffer = async (
   data: PostOfferBody
-): Promise<Record<string, string>> => {
+): Promise<{ AL1: Record<string, string>; AL2: Record<string, string> }> => {
   await verifyUser(["ADMIN", "VERIFIED"]);
   const {
     offer,
@@ -62,69 +66,89 @@ export const postAllegroOffer = async (
   const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
   images.push(choosingSizeImageUrl as string);
 
-  const allegroOfferData: Omit<
-    AllegroOffer,
-    "stock" | "description" | "productSet"
-  > = {
-    sellingMode: {
-      price: {
-        amount: offer.sellingPrices.AL1 as string,
-        currency: "PLN",
-      },
-    },
-    delivery: {
-      handlingTime: "PT24H",
-      shippingRates: {
-        id: offer.shippingRates.AL1?.allegroId as string,
-      },
-    },
-    images,
-    afterSalesServices: {
-      returnPolicy: {
-        id: offer.returnPolicy!.AL1 as string,
-      },
-      impliedWarranty: {
-        id: offer.impliedWarranty!.AL1 as string,
-      },
-    },
-  };
+  // Pobierz tokeny dla obu kont
+  const { AL1: AL1AccessToken, AL2: AL2AccessToken } =
+    await getAllegroUserAccessTokens();
+  const allegroHeaders = getAllegroHeaders(AL1AccessToken, AL2AccessToken);
 
-  if (sizingTable.allegroId) {
-    allegroOfferData.sizeTable = { id: sizingTable.allegroId };
-  }
-
-  if (offer.warranty?.AL1) {
-    allegroOfferData.afterSalesServices.warranty = {
-      id: offer.warranty.AL1,
-    };
-  }
-
+  const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers`;
   const insoleLengths = sizingTable.insoleLengths;
 
-  const accessToken = await getAllegroUserAccessToken();
-  const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers`;
-  const allegroHeaders = getAllegroHeaders(accessToken);
+  const results = { AL1: {}, AL2: {} } as {
+    AL1: Record<string, string>;
+    AL2: Record<string, string>;
+  };
 
-  const allegroIds: Record<string, string> = {};
-
-  for (const insoleLength of insoleLengths) {
-    const allegroId = await postIndividualAllegroOffer({
-      allegroOfferData,
-      insoleLength,
-      insoleLengths,
-      offer,
-      product,
-      colorVariant,
-      allegroHeaders,
-      url,
-      allegroCategoryId,
+  // Przetwórz oba konta równolegle
+  const channelPromises = (["AL1", "AL2"] as const).map(async (channel) => {
+    const allegroOfferData: Omit<
+      AllegroOffer,
+      "stock" | "description" | "productSet"
+    > = {
+      sellingMode: {
+        price: {
+          amount: offer.sellingPrices[channel] as string,
+          currency: "PLN",
+        },
+      },
+      delivery: {
+        handlingTime: "PT24H",
+        shippingRates: {
+          id: offer.shippingRates[channel]?.allegroId as string,
+        },
+      },
       images,
-    });
+      afterSalesServices: {
+        returnPolicy: {
+          id: offer.returnPolicy![channel] as string,
+        },
+        impliedWarranty: {
+          id: offer.impliedWarranty![channel] as string,
+        },
+      },
+    };
 
-    allegroIds[insoleLength.size.toString()] = allegroId;
-  }
+    // Dodaj tabele rozmiarów tylko dla AL1
+    if (channel === "AL1" && sizingTable.allegroId) {
+      allegroOfferData.sizeTable = { id: sizingTable.allegroId };
+    }
 
-  return allegroIds;
+    if (offer.warranty?.[channel]) {
+      allegroOfferData.afterSalesServices.warranty = {
+        id: offer.warranty[channel],
+      };
+    }
+
+    const channelResults: Record<string, string> = {};
+
+    for (const insoleLength of insoleLengths) {
+      const allegroId = await postIndividualAllegroOffer({
+        allegroOfferData,
+        insoleLength,
+        insoleLengths,
+        offer,
+        product,
+        colorVariant,
+        allegroHeaders: allegroHeaders[channel],
+        url,
+        allegroCategoryId,
+        images,
+        channel,
+      });
+
+      channelResults[insoleLength.size.toString()] = allegroId;
+    }
+
+    return { channel, results: channelResults };
+  });
+
+  const channelResults = await Promise.all(channelPromises);
+
+  channelResults.forEach(({ channel, results: channelResultsData }) => {
+    results[channel] = channelResultsData;
+  });
+
+  return results;
 };
 
 export async function postIndividualAllegroOffer(
@@ -141,6 +165,7 @@ export async function postIndividualAllegroOffer(
     allegroHeaders,
     url,
     allegroCategoryId,
+    channel,
   } = data;
 
   const formattedProductParameters = await formatAllegroProductParameters(
@@ -231,6 +256,9 @@ export async function postIndividualAllegroOffer(
     product.manufacturerCode
   } ${getColorVariantName(colorVariant)}`;
 
+  // Dodaj unikalny identyfikator z kanałem i rozmiarem
+  const externalId = `${signature} ${channel}r${insoleLength.size}`;
+
   const allegroOffer: AllegroOffer = {
     ...allegroOfferData,
     description,
@@ -240,7 +268,7 @@ export async function postIndividualAllegroOffer(
       unit: "PAIR",
     },
     external: {
-      id: signature,
+      id: externalId,
     },
   };
 
@@ -354,7 +382,7 @@ async function getAllegroBrandAmbiguousValueId(categoryId: string): Promise<{
   parameterId: string;
 }> {
   const accessToken = await getAllegroUserAccessToken();
-  const headers = getAllegroHeaders(accessToken);
+  const headers = getSingleAllegroHeaders(accessToken);
 
   const url = `${ALLEGRO_API_BASE_URL}/sale/categories/${categoryId}/parameters`;
 

@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const account = request.nextUrl.searchParams.get("account");
+
   const cookieHeader = request.headers.get("cookie") || "";
   const match = cookieHeader.match(/sessionId=([^;]+)/);
   const sessionId = match ? match[1] : null;
@@ -9,8 +11,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Brak sesji" }, { status: 401 });
   }
 
-  const clientId = process.env.ALLEGRO_CLIENT_ID!;
-  const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/allegro/callback`;
+  const clientId =
+    account === "AL1" ? process.env.AL1_CLIENT_ID! : process.env.AL2_CLIENT_ID!;
+  const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/allegro/callback?account=${account}`;
   const state = encodeURIComponent(sessionId);
 
   const authUrl =

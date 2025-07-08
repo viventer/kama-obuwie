@@ -12,7 +12,7 @@ export async function GET() {
     return apiResponse("Nie znaleziono cenników dostaw.", 204);
   }
 
-  return apiResponse("Cenniki dostaw zostały pobrane.", 200, data);
+  return apiResponse("Tabele rozmiarów zostały pobrane.", 200, data);
 }
 
 export async function POST(request: NextRequest) {

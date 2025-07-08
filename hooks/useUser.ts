@@ -8,7 +8,10 @@ type User = {
   email?: string;
   name?: string;
   role?: string;
-  isAllegroConnected?: boolean;
+  connectedAccounts: {
+    AL1: boolean;
+    AL2: boolean;
+  };
 } | null;
 
 export function useUser() {
@@ -45,7 +48,33 @@ export function useUser() {
             return { user: null };
           }
 
-          return await retryRes.json();
+          if (retryRes.status === 403) {
+            router.push("/admin-auth/allegro-connect");
+            return { user: null };
+          }
+
+          const retryData = await retryRes.json();
+
+          // Sprawdź połączone konta Allegro po ponownym żądaniu
+          if (
+            retryData.user &&
+            (!retryData.user.connectedAccounts?.AL1 ||
+              !retryData.user.connectedAccounts?.AL2) &&
+            path.startsWith("/admin-panel")
+          ) {
+            router.push("/admin-auth/allegro-connect");
+            return retryData;
+          }
+
+          // Sprawdź status weryfikacji użytkownika po ponownym żądaniu
+          if (
+            path.startsWith("/admin-panel/") &&
+            retryData.user?.role === "UNVERIFIED"
+          ) {
+            router.push("/admin-auth/unauthorized");
+          }
+
+          return retryData;
         } catch (error) {
           console.error("Token refresh failed:", error);
           router.push("/admin-auth/login");
@@ -63,12 +92,26 @@ export function useUser() {
     }
 
     const userData = await res.json();
+
+    // Sprawdź połączone konta Allegro
+    if (
+      userData.user &&
+      (!userData.user.connectedAccounts?.AL1 ||
+        !userData.user.connectedAccounts?.AL2) &&
+      path.startsWith("/admin-panel")
+    ) {
+      router.push("/admin-auth/allegro-connect");
+      return userData;
+    }
+
+    // Sprawdź status weryfikacji użytkownika
     if (
       path.startsWith("/admin-panel/") &&
       userData.user?.role === "UNVERIFIED"
     ) {
       router.push("/admin-auth/unauthorized");
     }
+
     return userData;
   };
 

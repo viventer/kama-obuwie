@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { getAllegroUserAccessToken } from "./auth";
-import { getAllegroHeaders } from "./global";
+import { getSingleAllegroHeaders } from "./global";
 import {
   AllegroSizingTable,
   AllegroSizingTableSchema,
@@ -15,7 +15,7 @@ const url = `${ALLEGRO_API_BASE_URL}/sale/size-tables`;
 
 export async function getAllegroSizingTables() {
   const accessToken = await getAllegroUserAccessToken();
-  const allegroHeaders = getAllegroHeaders(accessToken);
+  const allegroHeaders = getSingleAllegroHeaders(accessToken);
 
   try {
     const response = await axios.get(url, {
@@ -33,7 +33,7 @@ export async function createAllegroSizingTable(
   await verifyUser(["ADMIN", "VERIFIED"]);
 
   const accessToken = await getAllegroUserAccessToken();
-  const allegroHeaders = getAllegroHeaders(accessToken);
+  const allegroHeaders = getSingleAllegroHeaders(accessToken);
 
   AllegroSizingTableSchema.partial().parse(allegroSizingTable);
 
@@ -78,7 +78,7 @@ export async function updateAllegroSizingTable(
   AllegroSizingTableSchema.partial().parse(updateData);
 
   const accessToken = await getAllegroUserAccessToken();
-  const allegroHeaders = getAllegroHeaders(accessToken);
+  const allegroHeaders = getSingleAllegroHeaders(accessToken);
 
   try {
     const response = await axios.put(`${url}/${id}`, updateData, {

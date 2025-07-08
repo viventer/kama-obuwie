@@ -3,7 +3,7 @@ import { apiResponse } from "@/server-actions/helpers";
 
 export async function GET() {
   const data = await getAllegroImpliedWarranties();
-  if (!data) {
+  if (!data || !data.AL1 || !data.AL2) {
     return apiResponse("Nie znaleziono warunków reklamacji.", 204);
   }
 

@@ -1,5 +1,8 @@
 import { adminDB } from "@/firebase/firebaseAdmin";
-import { exchangeCodeForTokens } from "@/server-actions/allegro/auth";
+import {
+  checkAccountInfo,
+  exchangeCodeForTokens,
+} from "@/server-actions/allegro/auth";
 import { redis } from "@/upstash/redis";
 import { NextResponse } from "next/server";
 
@@ -7,10 +10,14 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const encodedState = searchParams.get("state"); // tu trafia Twój sessionId
+  const account = searchParams.get("account");
   const state = encodedState ? decodeURIComponent(encodedState) : null;
 
-  if (!code || !state) {
-    return NextResponse.json({ error: "Brak code lub state" }, { status: 400 });
+  if (!code || !state || !account) {
+    return NextResponse.json(
+      { error: "Brak code, state lub account" },
+      { status: 400 }
+    );
   }
 
   const key = `session:${state}`;
@@ -30,15 +37,32 @@ export async function GET(request: Request) {
     const { access_token, refresh_token, expires_in } =
       await exchangeCodeForTokens(
         code,
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/allegro/callback`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/allegro/callback?account=${account}`,
+        account
       );
+
+    const isCorrectAccount = await checkAccountInfo(access_token, account);
+
+    if (!isCorrectAccount) {
+      return NextResponse.redirect(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/admin-auth/allegro-connect?error=incorrect_account`
+      );
+    }
 
     // 3) Aktualizacja sesji w Redis (dodanie tokenu Allegro)
     const expiryTs = Math.floor(Date.now() / 1000) + expires_in;
-    await redis.hset(key, {
-      allegroAccessToken: access_token,
-      allegroAccessTokenExpiry: expiryTs.toString(),
-    });
+
+    if (account === "AL1") {
+      await redis.hset(key, {
+        AL1AccessToken: access_token,
+        AL1TokenExpiry: expiryTs.toString(),
+      });
+    } else {
+      await redis.hset(key, {
+        AL2AccessToken: access_token,
+        AL2TokenExpiry: expiryTs.toString(),
+      });
+    }
     await redis.expire(key, 60 * 60 * 24 * 7);
 
     // 4) Zapis refreshToken w Firestore pod users/<uid>.allegro.refreshToken
@@ -48,7 +72,7 @@ export async function GET(request: Request) {
       .set(
         {
           allegro: {
-            AL1: {
+            [account]: {
               refreshToken: refresh_token,
             },
           },

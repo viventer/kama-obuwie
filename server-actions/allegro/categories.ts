@@ -2,7 +2,7 @@
 
 import {
   AllegroHeaders,
-  getAllegroHeaders,
+  getSingleAllegroHeaders,
 } from "@/server-actions/allegro/global";
 import axios from "axios";
 import { getAllegroUserAccessToken } from "./auth";
@@ -149,7 +149,7 @@ export async function getAllegroCategoryById(
 ): Promise<string> {
   const accessToken = await getAllegroUserAccessToken();
   const url = `${ALLEGRO_API_BASE_URL}/sale/categories/${categoryId}`;
-  const allegroHeaders = getAllegroHeaders(accessToken);
+  const allegroHeaders = getSingleAllegroHeaders(accessToken);
   const resp = await axios.get(url, { headers: allegroHeaders });
   return resp.data.name;
 }
@@ -159,7 +159,7 @@ export async function getAllegroCategories(
 ): Promise<AllegroLeafCategory[]> {
   const accessToken = await getAllegroUserAccessToken();
   const url = `${ALLEGRO_API_BASE_URL}/sale/categories`;
-  const allegroHeaders = getAllegroHeaders(accessToken);
+  const allegroHeaders = getSingleAllegroHeaders(accessToken);
 
   const resp = await axios.get(url, { headers: allegroHeaders });
   const allCats = serializeCategories(

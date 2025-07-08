@@ -27,6 +27,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       user: {
+        uid: userId,
         email: data?.email || null,
         firstName: data?.firstName || null,
         lastName: data?.lastName || null,
@@ -39,8 +40,31 @@ export async function GET(request: Request) {
         },
       },
     });
-  } catch {
-    redis.del(key);
-    return NextResponse.json({ message: "Brak sesji" }, { status: 401 });
+  } catch (error) {
+    const ttl = await redis.ttl(key);
+
+    if (ttl <= 0) {
+      redis.del(key);
+      return NextResponse.json({ message: "Sesja wygasła" }, { status: 401 });
+    }
+
+    const userDoc = await adminDB.collection("users").doc(userId).get();
+    const data = userDoc.exists ? userDoc.data() : null;
+
+    return NextResponse.json({
+      user: {
+        uid: userId,
+        email: data?.email || null,
+        firstName: data?.firstName || null,
+        lastName: data?.lastName || null,
+        createdAt: data?.createdAt?.toDate().toISOString() || null,
+        perms: data?.perms || {},
+        role: data?.role || null,
+        connectedAccounts: {
+          AL1: isAL1Connected,
+          AL2: isAL2Connected,
+        },
+      },
+    });
   }
 }

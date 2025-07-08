@@ -16,11 +16,13 @@ export default function ProductImagesUploader({
   oldPhotos,
   folderPath,
   setNewPhotos,
+  setIsUploading,
 }: {
   variant?: ColorVariant;
   oldPhotos: RawPhoto[] | EditedPhoto[];
   folderPath: string;
   setNewPhotos: Dispatch<React.SetStateAction<RawPhoto[]>>;
+  setIsUploading?: (isUploading: boolean) => void;
 }) {
   const params = useParams();
   const { id } = params as { id: string };
@@ -61,6 +63,7 @@ export default function ProductImagesUploader({
         setFilePaths={setFilePaths}
         filePaths={filePaths}
         folderPath={folderPath}
+        setIsUploading={setIsUploading}
         onImageDelete={async (filePath) => {
           await deleteRawPhoto(filePath, id);
         }}

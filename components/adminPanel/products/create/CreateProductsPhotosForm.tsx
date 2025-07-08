@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { deleteUnusedPhotosFromStorage } from "@/server-actions/images/images";
 import { useProductTypeContext } from "../ProductsTypeContext";
+import MiniLoader from "../../global/MiniLoader";
 
 export default function CreateProductsPhotosForm({
   productData,
@@ -38,8 +39,20 @@ export default function CreateProductsPhotosForm({
   const [newEditedPhotos, setNewEditedPhotos] = useState<EditedPhoto[]>(
     editedPhotos || []
   );
+  const [isUploading, setIsUploading] = useState(false);
+  const [activeUploads, setActiveUploads] = useState<number>(0);
 
   const { showToast } = useToast();
+
+  // Funkcja do śledzenia aktywnych uploadów
+  const handleUploadChange = (isStarting: boolean) => {
+    setActiveUploads((prev) => {
+      const newCount = isStarting ? prev + 1 : prev - 1;
+      // Ustaw stan isUploading na podstawie liczby aktywnych uploadów
+      setIsUploading(newCount > 0);
+      return newCount >= 0 ? newCount : 0;
+    });
+  };
 
   useEffect(() => {
     setProductType(productData.productType);
@@ -95,6 +108,7 @@ export default function CreateProductsPhotosForm({
               oldPhotos={oldPhotos || []}
               folderPath={`${folderPath}/${getColorVariantName(variant)}`}
               setNewPhotos={setNewPhotos}
+              setIsUploading={(isStarting) => handleUploadChange(isStarting)}
             />
           </Fragment>
         ))
@@ -103,10 +117,20 @@ export default function CreateProductsPhotosForm({
           oldPhotos={oldPhotos || []}
           setNewPhotos={setNewPhotos}
           folderPath={folderPath}
+          setIsUploading={(isStarting) => handleUploadChange(isStarting)}
         />
       )}
+
+      {isUploading && (
+        <div className="my-4 w-full max-w-md">
+          <MiniLoader />
+        </div>
+      )}
+
       <div className="flex gap-4">
-        <Button onClick={handleSubmit}>Zapisz</Button>
+        <Button onClick={handleSubmit} disabled={isUploading}>
+          Zapisz
+        </Button>
         <Button onClick={handleReject} variant={"destructive"}>
           Odrzuć
         </Button>

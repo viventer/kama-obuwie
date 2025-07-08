@@ -31,6 +31,7 @@ interface MultipleImageUploaderProps {
   filePaths: string[];
   folderPath: string;
   className?: string;
+  setIsUploading?: (isUploading: boolean) => void;
   onImageDelete?: (filePath: string) => Promise<void>;
 }
 
@@ -45,6 +46,7 @@ export default function MultipleImageUploader({
   setFilePaths,
   folderPath,
   onImageDelete,
+  setIsUploading,
 }: MultipleImageUploaderProps) {
   const [images, setImages] = useState<ImageItem[]>([]);
   const { showToast } = useToast();
@@ -73,24 +75,41 @@ export default function MultipleImageUploader({
 
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      acceptedFiles.forEach(async (file) => {
+      // Powiadom formularz o rozpoczęciu uploadu
+      if (setIsUploading) setIsUploading(true);
+
+      const uploadPromises = acceptedFiles.map(async (file) => {
         try {
           const buffer = Buffer.from(await file.arrayBuffer());
           const newName = getNewFileName(file.name);
           const base64 = buffer.toString("base64");
           const filePath = `${folderPath}/${newName}`;
           const url = await uploadImageToStorage(base64, filePath, file.type);
-          setImages((prev) => {
-            const updated = [...prev, { filePath, url }];
-            return updated;
-          });
+          return { filePath, url };
         } catch (err) {
           console.error(err);
           showToast("Błąd przesyłania zdjęcia.", "error");
+          return null;
         }
       });
+
+      Promise.all(uploadPromises)
+        .then((results) => {
+          const validResults = results.filter(
+            (result): result is ImageItem => result !== null
+          );
+
+          setImages((prev) => [...prev, ...validResults]);
+
+          // Powiadom formularz o zakończeniu uploadu
+          if (setIsUploading) setIsUploading(false);
+        })
+        .catch(() => {
+          // W przypadku błędu, również oznaczamy upload jako zakończony
+          if (setIsUploading) setIsUploading(false);
+        });
     },
-    [folderPath, showToast]
+    [folderPath, showToast, setIsUploading]
   );
 
   const onDropRejected = useCallback(() => {

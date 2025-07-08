@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export async function POST(request: Request) {
   try {
-    const { idToken } = await request.json();
+    const { idToken, refreshToken } = await request.json();
     if (!idToken) {
       return NextResponse.json({ error: "Missing idToken" }, { status: 400 });
     }
@@ -35,6 +35,7 @@ export async function POST(request: Request) {
     await redis.hset(sessionKey, {
       userId: uid,
       firebaseIdToken: idToken,
+      refreshToken: refreshToken || "", // Dodaj refresh token
       role: userDoc.exists
         ? userDoc.data()?.role || "UNVERIFIED"
         : "UNVERIFIED",

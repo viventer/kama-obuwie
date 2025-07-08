@@ -10,6 +10,8 @@ type Props = { children: ReactNode };
 
 export function AuthProvider({ children }: Props) {
   useEffect(() => {
+    let refreshInterval: NodeJS.Timeout | null = null;
+
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
       if (user) {
         try {
@@ -17,32 +19,43 @@ export function AuthProvider({ children }: Props) {
           await axios.post("/api/auth/refresh/firebase-token", {
             idToken: freshToken,
           });
+
+          // Ustaw interval odświeżania tokenu co 50 minut
+          if (refreshInterval) {
+            clearInterval(refreshInterval);
+          }
+
+          refreshInterval = setInterval(async () => {
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+              try {
+                const freshToken = await currentUser.getIdToken(true);
+                await axios.post("/api/auth/refresh/firebase-token", {
+                  idToken: freshToken,
+                });
+                console.log("Token refreshed successfully");
+              } catch (err) {
+                console.error("Auto token refresh failed:", err);
+              }
+            }
+          }, 50 * 60 * 1000); // 50 minut
         } catch (err) {
           console.error("Nie udało się odświeżyć sesji na serwerze:", err);
+        }
+      } else {
+        // Użytkownik się wylogował, wyczyść interval
+        if (refreshInterval) {
+          clearInterval(refreshInterval);
+          refreshInterval = null;
         }
       }
     });
 
-    const interval = setInterval(async () => {
-      const user = auth.currentUser;
-      if (user) {
-        try {
-          const freshToken = await user.getIdToken(true);
-          await axios.post("/api/auth/refresh/firebase-token", {
-            idToken: freshToken,
-          });
-        } catch (err) {
-          console.error(
-            "Automatyczne odświeżanie tokena nie powiodło się:",
-            err
-          );
-        }
-      }
-    }, 50 * 60 * 1000); // 50 minut
-
     return () => {
       unsubscribe();
-      clearInterval(interval);
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
     };
   }, []);
 

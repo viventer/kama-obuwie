@@ -24,11 +24,16 @@ export async function verifyUser(roles?: string[]) {
   }
 
   try {
-    adminAuth.verifyIdToken(sess?.firebaseIdToken as string, true);
+    await adminAuth.verifyIdToken(sess?.firebaseIdToken as string, true);
   } catch (error) {
-    await redis.del(key);
-    cookieStore.delete("sessionId");
-    redirect("/admin-auth/login");
+    const ttl = await redis.ttl(key);
+
+    if (ttl <= 0) {
+      // Sesja wygasła
+      await redis.del(key);
+      cookieStore.delete("sessionId");
+      redirect("/admin-auth/login");
+    }
   }
 
   if (!roles) return true;

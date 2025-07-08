@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import useSWR from "swr";
 import { usePathname, useRouter } from "next/navigation";
+import { auth } from "@/firebase/firebase";
 
 type User = {
   uid: string;
@@ -20,14 +21,47 @@ export function useUser() {
       redirect: "manual",
     });
 
-    if (res.status === 401 && path.startsWith("/admin-panel")) {
-      router.push("/admin-auth/login");
-      return { user: null };
+    if (res.status === 401) {
+      // Spróbuj odświeżyć token przed przekierowaniem
+      const currentUser = auth.currentUser;
+      if (currentUser && path.startsWith("/admin-panel")) {
+        try {
+          const freshToken = await currentUser.getIdToken(true);
+          await fetch("/api/auth/refresh/firebase-token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ idToken: freshToken }),
+            credentials: "include",
+          });
+
+          // Spróbuj ponownie po odświeżeniu
+          const retryRes = await fetch(url, {
+            credentials: "include",
+            redirect: "manual",
+          });
+
+          if (retryRes.status === 401) {
+            router.push("/admin-auth/login");
+            return { user: null };
+          }
+
+          return await retryRes.json();
+        } catch (error) {
+          console.error("Token refresh failed:", error);
+          router.push("/admin-auth/login");
+          return { user: null };
+        }
+      } else if (path.startsWith("/admin-panel")) {
+        router.push("/admin-auth/login");
+        return { user: null };
+      }
     }
+
     if (res.status === 403 && path.startsWith("/admin-panel")) {
       router.push("/admin-auth/allegro-connect");
       return { user: null };
     }
+
     const userData = await res.json();
     if (
       path.startsWith("/admin-panel/") &&

@@ -40,7 +40,13 @@ export default function LoginForm() {
       if (!user) throw new Error("Brak użytkownika po logowaniu");
 
       const token = await user.getIdToken(true);
-      const resp = await axios.post("/api/auth/login", { idToken: token });
+      const refreshToken = user.refreshToken;
+
+      const resp = await axios.post("/api/auth/login", {
+        idToken: token,
+        refreshToken: refreshToken,
+      });
+
       if (resp.status === 401) {
         showToast("Błąd autoryzacji. Spróbuj ponownie.", "error");
         setIsLoading(false);

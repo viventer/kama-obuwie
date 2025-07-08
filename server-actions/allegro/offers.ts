@@ -212,12 +212,13 @@ export async function postIndividualAllegroOffer(
   const formattedSizingTable = getFormattedSizingTable(insoleLengths);
 
   const descriptionVariableValues: Record<DescriptionVariable, string> = {
-    rozmiar: `${insoleLength.size.toString().replace(".", ",")} cm`,
+    rozmiar: insoleLength.size.toString(),
     kolor: colorVariant.color,
     marka: product.brand || "",
     "kod producenta": product.manufacturerCode || "",
     rozmiarówka: formattedSizingTable,
-    "długość wkładki": insoleLength.insoleLength.toString(),
+    "długość wkładki":
+      insoleLength.insoleLength.toString().replace(".", ",") + " cm",
     "tytuł oferty": offer.title,
   };
 

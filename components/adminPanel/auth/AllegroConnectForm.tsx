@@ -10,10 +10,10 @@ import {
 import { useToast } from "@/hooks/useToast";
 import { useUser } from "@/hooks/useUser";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import Loader from "../global/Loader";
 
-export default function AllegroConnectForm() {
+function AllegroConnectContent() {
   const router = useRouter();
   const { user, loading: userLoading } = useUser();
   const connectedAccounts = user?.connectedAccounts;
@@ -72,5 +72,13 @@ export default function AllegroConnectForm() {
         })}
       </CardContent>
     </Card>
+  );
+}
+
+export default function AllegroConnectForm() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <AllegroConnectContent />
+    </Suspense>
   );
 }

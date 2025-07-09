@@ -43,3 +43,21 @@ env:
 
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     secret: NEXT_PUBLIC_FIREBASE_API_KEY
+
+  - variable: AL1_CLIENT_ID
+    secret: AL1_CLIENT_ID
+
+  - variable: AL1_CLIENT_SECRET
+    secret: AL1_CLIENT_SECRET
+
+  - variable: AL1_LOGIN
+    secret: AL1_LOGIN
+
+  - variable: AL2_CLIENT_ID
+    secret: AL1_CLIENT_ID
+
+  - variable: AL2_CLIENT_SECRET
+    secret: AL2_CLIENT_SECRET
+
+  - variable: AL2_LOGIN
+    secret: AL2_LOGIN

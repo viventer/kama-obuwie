@@ -12,6 +12,7 @@ import { useUser } from "@/hooks/useUser";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, Suspense } from "react";
 import Loader from "../global/Loader";
+import { allegroSalesChannels } from "@/lib/constants";
 
 function AllegroConnectContent() {
   const router = useRouter();
@@ -50,7 +51,7 @@ function AllegroConnectContent() {
         </CardDescription>
       </CardHeader>
       <CardContent className="my-2 flex gap-4">
-        {Object.keys(user.connectedAccounts).map((key) => {
+        {allegroSalesChannels.map((key) => {
           const isConnected =
             user.connectedAccounts[key as keyof typeof user.connectedAccounts];
           return (

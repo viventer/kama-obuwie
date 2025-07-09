@@ -182,6 +182,8 @@ export async function checkAccountInfo(
       }
     );
     const login = response.data.login;
+    console.log("Sprawdzanie konta Allegro:", login);
+    console.log("Oczekiwane konto:", correctAccount);
     if (correctAccount === "AL1") {
       return login === process.env.AL1_LOGIN;
     } else if (correctAccount === "AL2") {

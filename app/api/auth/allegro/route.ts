@@ -16,6 +16,8 @@ export async function GET(request: NextRequest) {
   const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/allegro/callback?account=${account}`;
   const state = encodeURIComponent(sessionId);
 
+  console.log("Przekierowanie do Allegro z clientId:", clientId);
+
   const authUrl =
     `${process.env.NEXT_PUBLIC_ALLEGRO_BASE_URL}/auth/oauth/authorize` +
     `?response_type=code` +

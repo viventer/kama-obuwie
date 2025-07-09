@@ -50,11 +50,11 @@ export default function AppSidebar() {
                 Tworzenie produktów
               </LinkText>
             </SidebarMenuItem>
-            <SidebarMenuItem>
+            {/* <SidebarMenuItem>
               <LinkText href="/admin-panel/assortment">
                 Zarządzanie asortymentem
               </LinkText>
-            </SidebarMenuItem>
+            </SidebarMenuItem> */}
             <SidebarMenuItem>
               <LinkText href="/admin-panel/sizing-tables">
                 Tabele rozmiarów

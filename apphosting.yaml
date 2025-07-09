@@ -54,7 +54,7 @@ env:
     secret: AL1_LOGIN
 
   - variable: AL2_CLIENT_ID
-    secret: AL1_CLIENT_ID
+    secret: AL2_CLIENT_ID
 
   - variable: AL2_CLIENT_SECRET
     secret: AL2_CLIENT_SECRET

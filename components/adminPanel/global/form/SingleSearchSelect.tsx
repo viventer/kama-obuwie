@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/command";
 import { FormControl, FormItem, FormLabel } from "@/components/ui/form";
 import { useState } from "react";
+import IconButton from "../IconButton";
+import { XIcon } from "lucide-react";
 
 type Option = {
   label: string;
@@ -47,51 +49,56 @@ export default function SingleSearchSelect({
   return (
     <FormItem>
       <FormLabel>{label}</FormLabel>
-      <Select
-        onValueChange={onChange}
-        value={value}
-        open={open}
-        onOpenChange={setOpen}
-      >
-        <FormControl>
-          <SelectTrigger className="text-base border-primary">
-            {selectedLabel ? (
-              <SelectValue className="text-base">{selectedLabel}</SelectValue>
-            ) : (
-              <SelectValue className="text-base" placeholder={placeholder} />
-            )}
-          </SelectTrigger>
-        </FormControl>
-
-        <SelectContent>
-          <Command>
-            <CommandInput
-              placeholder="Szukaj…"
-              value={query}
-              onValueChange={setQuery}
-            />
-            <CommandList>
-              {filtered.length === 0 && (
-                <CommandEmpty>Brak wyników wyszukiwania.</CommandEmpty>
+      <div className="flex items-center gap-2">
+        <Select
+          onValueChange={onChange}
+          value={value}
+          open={open}
+          onOpenChange={setOpen}
+        >
+          <FormControl>
+            <SelectTrigger className="text-base border-primary">
+              {selectedLabel ? (
+                <SelectValue className="text-base">{selectedLabel}</SelectValue>
+              ) : (
+                <SelectValue className="text-base" placeholder={placeholder} />
               )}
-              <CommandGroup>
-                {filtered.map((opt) => (
-                  <CommandItem
-                    key={opt.value}
-                    onSelect={() => {
-                      onChange(opt.value);
-                      setQuery("");
-                      setOpen(false);
-                    }}
-                  >
-                    {opt.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </SelectContent>
-      </Select>
+            </SelectTrigger>
+          </FormControl>
+
+          <SelectContent>
+            <Command>
+              <CommandInput
+                placeholder="Szukaj…"
+                value={query}
+                onValueChange={setQuery}
+              />
+              <CommandList>
+                {filtered.length === 0 && (
+                  <CommandEmpty>Brak wyników wyszukiwania.</CommandEmpty>
+                )}
+                <CommandGroup>
+                  {filtered.map((opt) => (
+                    <CommandItem
+                      key={opt.value}
+                      onSelect={() => {
+                        onChange(opt.value);
+                        setQuery("");
+                        setOpen(false);
+                      }}
+                    >
+                      {opt.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </SelectContent>
+        </Select>
+        <IconButton onClick={() => onChange("")} className="text-primary">
+          <XIcon className="size-6" />
+        </IconButton>
+      </div>
     </FormItem>
   );
 }

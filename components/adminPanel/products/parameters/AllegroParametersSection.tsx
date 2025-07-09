@@ -60,6 +60,7 @@ export default function AllegroParametersSection({
         const { data } = await axios.get(
           `/api/allegro/parameters/${allegroCategoryId}`
         );
+
         const listData: AllegroProductParameter[] = Object.values(data);
         const optional = listData.filter(
           (p) =>

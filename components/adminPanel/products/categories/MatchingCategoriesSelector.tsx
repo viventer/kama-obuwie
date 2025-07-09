@@ -11,10 +11,12 @@ export default function MatchingCategoriesSelector({
   value,
   onChange,
   rootCategory,
+  mainCategoryId,
 }: {
   value: string[];
   onChange: (value: string[]) => void;
   rootCategory: RootCategory | undefined;
+  mainCategoryId: string | undefined;
 }) {
   const { showToast } = useToast();
   const [categories, setCategories] = useState<CategoryWithId[]>([]);
@@ -31,12 +33,15 @@ export default function MatchingCategoriesSelector({
       }
 
       const filteredCategories = Object.values(data)?.filter((category) => {
-        return category.rootCategory === rootCategory;
+        return (
+          category.rootCategory === rootCategory &&
+          category.id !== mainCategoryId
+        );
       });
 
       setCategories(filteredCategories);
     })();
-  }, [rootCategory]);
+  }, [rootCategory, mainCategoryId]);
 
   return (
     <div className={`${categories.length > 0 ? "block" : "hidden"}`}>

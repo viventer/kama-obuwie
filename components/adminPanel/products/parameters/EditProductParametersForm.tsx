@@ -388,14 +388,12 @@ export default function EditProductParametersForm({
         <FormField
           control={form.control}
           name="matchingCategoriesIds"
-          rules={{
-            required: "Pasujące kategorie są wymagane.",
-          }}
           render={({ field }) => (
             <MatchingCategoriesSelector
               value={field.value as string[]}
               onChange={field.onChange}
               rootCategory={rootCategory}
+              mainCategoryId={categoryId}
             />
           )}
         />

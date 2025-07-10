@@ -60,7 +60,7 @@ export const SizingTableSchema = z.object({
   name: z.string().min(3).max(32),
   insoleLengths: z.array(
     z.object({
-      size: z.number(),
+      size: z.string(),
       insoleLength: z.number(),
     })
   ),

@@ -55,7 +55,7 @@ export default function SizingTableEditForm({
     defaultValues: {
       name: oldData.name,
       insoleLengths: oldData.insoleLengths.map((row) => ({
-        size: String(row.size),
+        size: row.size,
         insoleLength: String(row.insoleLength),
       })),
       sizingAccuracy: oldData.sizingAccuracy || "normalna",
@@ -71,10 +71,17 @@ export default function SizingTableEditForm({
     e.preventDefault();
     const values = form.getValues("insoleLengths");
     const lastRow = values[values.length - 1];
-    const lastSize = lastRow ? Number(lastRow.size) : 0;
+    const lastSize = lastRow ? String(lastRow.size) : "0";
+    let newSize;
+    if (lastSize.includes("-")) {
+      const lastSizeNumbers = lastSize.split("-").map(Number);
+      newSize = `${lastSizeNumbers[0] + 2}-${lastSizeNumbers[1] + 2}`;
+    } else {
+      newSize = String(Number(lastSize) + 1);
+    }
     const lastInsole = lastRow ? Number(lastRow.insoleLength) : 0;
     append({
-      size: String(lastSize + 1),
+      size: newSize,
       insoleLength: String((lastInsole + 0.5).toFixed(2)),
     });
   };
@@ -82,10 +89,26 @@ export default function SizingTableEditForm({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const data = form.getValues();
+
+    const sizeFormatRegex = /^(\d{2}|\d{2}-\d{2})$/;
+    const invalidSizes = data.insoleLengths.filter(
+      (row) => !sizeFormatRegex.test(row.size)
+    );
+
+    if (invalidSizes.length > 0) {
+      showToast(
+        `Nieprawidłowy format rozmiarów: ${invalidSizes
+          .map((row) => row.size)
+          .join(", ")}. Użyj formatu "42" lub "31-32".`,
+        "error"
+      );
+      return;
+    }
+
     const payload = {
       name: data.name,
       insoleLengths: data.insoleLengths.map((row) => ({
-        size: Number(row.size),
+        size: String(row.size),
         insoleLength: Number(row.insoleLength),
       })),
       sizingAccuracy: data.sizingAccuracy as sizingAccuracyType,
@@ -190,7 +213,7 @@ export default function SizingTableEditForm({
                         <FormItem>
                           <FormControl>
                             <Input
-                              type="number"
+                              type="text"
                               {...field}
                               onChange={(e) => field.onChange(e.target.value)}
                               className="border-none"

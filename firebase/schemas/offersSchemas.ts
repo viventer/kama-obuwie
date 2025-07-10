@@ -65,7 +65,7 @@ export const OfferSchema = z.object({
       z.object({
         value: z.string(),
         salesChannel: z.enum(["AL1", "AL2"]),
-        size: z.number(),
+        size: z.string(),
       })
     )
     .optional(),

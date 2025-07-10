@@ -33,11 +33,11 @@ type Primitive = string | number | boolean | string[] | number[];
 type AllegroIndividualOffer = {
   allegroOfferData: Omit<AllegroOffer, "stock" | "description" | "productSet">;
   insoleLength: {
-    size: number;
+    size: string;
     insoleLength: number;
   };
   insoleLengths: {
-    size: number;
+    size: string;
     insoleLength: number;
   }[];
   offer: Offer;
@@ -423,7 +423,7 @@ function replaceDescriptionVariables(
 }
 
 function getFormattedSizingTable(
-  insoleLengths: { size: number; insoleLength: number }[]
+  insoleLengths: { size: string; insoleLength: number }[]
 ): string {
   const header = `
 <h2>Jak dobrać rozmiar?</h2>

@@ -33,7 +33,6 @@ export function AuthProvider({ children }: Props) {
                 await axios.post("/api/auth/refresh/firebase-token", {
                   idToken: freshToken,
                 });
-                console.log("Token refreshed successfully");
               } catch (err) {
                 console.error("Auto token refresh failed:", err);
               }

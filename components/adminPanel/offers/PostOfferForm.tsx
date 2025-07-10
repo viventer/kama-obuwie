@@ -94,7 +94,6 @@ export default function PostOfferForm({
     setIsPosting(true);
     const formData = form.getValues();
     const isValid = await validateForm();
-    console.log("isValid", isValid);
     if (!isValid) {
       setIsPosting(false);
       return;

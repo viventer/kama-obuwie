@@ -50,6 +50,8 @@ export type PaymentType = z.infer<typeof PaymentTypeSchema>;
 export type PaymentProvider = z.infer<typeof PaymentProviderSchema>;
 export type AllegroOrderStatus = z.infer<typeof AllegroOrderStatusSchema>;
 export type FulfillmentStatus = z.infer<typeof FulfillmentStatusSchema>;
+export type Order = z.infer<typeof OrderSchema>;
+export type AllegroOrder = z.infer<typeof AllegroOrderSchema>;
 
 export const PriceSchema = z.object({
   amount: z.string(),
@@ -153,6 +155,7 @@ export const OrderItemSchema = z.object({
     signature: z.string(),
   }),
   quantity: z.number().min(1),
+  originalPrice: PriceSchema,
   price: PriceSchema,
   reconcilation: z.object({
     value: PriceSchema,
@@ -164,6 +167,7 @@ export const OrderItemSchema = z.object({
 
 export const OrderSchema = z.object({
   id: z.string().optional(),
+  allegroId: z.string().optional(), // checkout form id
   messageToSeller: z.string().optional(),
   buyer: BuyerSchema,
   payment: PaymentSchema.optional(),
@@ -182,4 +186,47 @@ export const OrderSchema = z.object({
   }),
   updatedAt: z.string().optional(),
   salesChannel: SalesChannelSchema,
+});
+
+export const AllegroOrderItemSchema = z.object({
+  id: z.string(),
+  offer: z.object({
+    id: z.string(),
+    name: z.string().optional(),
+    external: z
+      .object({
+        id: z.string().optional(),
+      })
+      .optional(),
+  }),
+  quantity: z.number().min(1),
+  originalPrice: PriceSchema,
+  price: PriceSchema,
+  reconcilation: z.object({
+    value: PriceSchema,
+    type: z.enum(["BILLING", "WALLET"]),
+    quantity: z.number().optional(),
+  }),
+  discount: z.array(DiscountSchema).optional(),
+});
+
+export const AllegroOrderSchema = z.object({
+  id: z.string(), // checkout form id
+  messageToSeller: z.string().optional(),
+  buyer: BuyerSchema,
+  payment: PaymentSchema.optional(),
+  status: FulfillmentStatusSchema,
+  fulfillment: z
+    .object({
+      status: FulfillmentStatusSchema,
+    })
+    .optional(),
+  delivery: OrderDeliveryDataSchema.optional(),
+  invoce: InvoiceInfoSchema.optional(),
+  lineItems: z.array(AllegroOrderItemSchema).min(1),
+  surcharges: z.array(PaymentSchema),
+  summary: z.object({
+    totalToPay: PriceSchema,
+  }),
+  updatedAt: z.string().optional(),
 });

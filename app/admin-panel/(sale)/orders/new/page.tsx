@@ -1,15 +1,11 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
-import { getDocumentsFromAdminDB } from "@/firebase/getters";
+import { getAllegroOrderEvents } from "@/server-actions/allegro/orders";
 
 export const revalidate = 180;
 
 export default async function OrdersNewPage() {
-  const products = await getDocumentsFromAdminDB<ProductWithId>(
-    "products",
-    (ref) => ref.where("creationStage", "==", "new")
-  );
+  const orderEvents = await getAllegroOrderEvents();
+  console.log("Order Events:", orderEvents);
 
   return (
     <>

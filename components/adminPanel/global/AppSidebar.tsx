@@ -68,17 +68,17 @@ export default function AppSidebar() {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
-        {/* <SidebarGroup>
+        <SidebarGroup>
           <SidebarGroupLabel>Sprzedaż</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <LinkText href="/admin-panel/orders">Zamówienia</LinkText>
+              <LinkText href="/admin-panel/orders/new">Zamówienia</LinkText>
             </SidebarMenuItem>
-            <SidebarMenuItem>
+            {/* <SidebarMenuItem>
               <LinkText href="/admin-panel/returns">Zwroty</LinkText>
-            </SidebarMenuItem>
+            </SidebarMenuItem> */}
           </SidebarMenu>
-        </SidebarGroup> */}
+        </SidebarGroup>
         {/* <SidebarGroup>
           <SidebarGroupLabel>Szablony</SidebarGroupLabel>
           <SidebarMenu>

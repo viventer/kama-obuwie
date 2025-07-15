@@ -10,6 +10,7 @@ import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { Offer } from "@/firebase/schemas/offersSchemas";
 import { AllegroSalesChanell } from "@/lib/constants";
+import { getAllegroOffer } from "./offers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -185,7 +186,8 @@ async function processExistingOrders(events: any[], existingOrders: Order[]) {
         return updateExistingOrder(
           checkoutFormId,
           existingOrder.id,
-          event.salesChannel
+          event.salesChannel,
+          existingOrder
         );
       }
       return Promise.resolve();
@@ -207,7 +209,10 @@ async function createNewOrder(
     if (!allegroOrderData) return;
 
     // Przekształć dane z Allegro na format Order
-    const orderData = transformAllegroToOrder(allegroOrderData, salesChannel);
+    const orderData = await transformAllegroToOrder(
+      allegroOrderData,
+      salesChannel
+    );
 
     await createOrder(orderData);
     console.log(`Created new order for checkoutFormId: ${checkoutFormId}`);
@@ -219,7 +224,8 @@ async function createNewOrder(
 async function updateExistingOrder(
   checkoutFormId: string,
   orderId: string,
-  salesChannel: "AL1" | "AL2"
+  salesChannel: "AL1" | "AL2",
+  existingOrder: Order
 ) {
   try {
     const allegroOrderData = await getAllegroOrderDetails(
@@ -229,7 +235,10 @@ async function updateExistingOrder(
     if (!allegroOrderData) return;
 
     // Przekształć dane z Allegro na format aktualizacji Order
-    const updateData = transformAllegroToOrderUpdate(allegroOrderData);
+    const updateData = transformAllegroToOrderUpdate(
+      allegroOrderData,
+      existingOrder
+    );
 
     await updateOrder(orderId, updateData);
     console.log(
@@ -255,22 +264,22 @@ async function executeInBatches<T>(
   return results;
 }
 
-function transformAllegroToOrder(
+async function transformAllegroToOrder(
   allegroOrder: AllegroOrder,
   salesChannel: "AL1" | "AL2"
-): Order {
-  return {
-    allegroId: allegroOrder.id,
-    messageToSeller: allegroOrder.messageToSeller,
-    buyer: allegroOrder.buyer,
-    payment: allegroOrder.payment,
-    allegroStatus: allegroOrder.status,
-    fulfillment: allegroOrder.fulfillment,
-    delivery: allegroOrder.delivery,
-    invoce: allegroOrder.invoce || null,
-    lineItems: allegroOrder.lineItems.map((item) => ({
+): Promise<Order> {
+  // Pobierz wszystkie oferty równolegle
+  const lineItemsPromises = allegroOrder.lineItems.map(async (item) => {
+    const offer = await getAllegroOffer(item.offer.id, salesChannel);
+    if (!offer || !offer.images || offer.images.length === 0) {
+      throw new Error(`Offer not found for ID: ${item.offer.id}`);
+    }
+    const offerThumbnail = offer?.images[0];
+
+    return {
       id: item.id,
       offer: {
+        thumbnail: offerThumbnail,
         id: "",
         signature: item.offer.external?.id || "",
         name: item.offer.name,
@@ -281,7 +290,21 @@ function transformAllegroToOrder(
       price: item.price,
       reconcilation: item.reconcilation || null,
       discount: item.discount || null,
-    })),
+    };
+  });
+
+  const lineItems = await Promise.all(lineItemsPromises);
+
+  return {
+    allegroId: allegroOrder.id,
+    messageToSeller: allegroOrder.messageToSeller,
+    buyer: allegroOrder.buyer,
+    payment: allegroOrder.payment,
+    allegroStatus: allegroOrder.status,
+    fulfillment: allegroOrder.fulfillment,
+    delivery: allegroOrder.delivery,
+    invoce: allegroOrder.invoce || null,
+    lineItems: lineItems,
     surcharges: allegroOrder.surcharges,
     summary: allegroOrder.summary,
     createdAt: new Date().toISOString(),
@@ -292,7 +315,8 @@ function transformAllegroToOrder(
 }
 
 function transformAllegroToOrderUpdate(
-  allegroOrder: AllegroOrder
+  allegroOrder: AllegroOrder,
+  existingOrder: Order
 ): Partial<Order> {
   return {
     messageToSeller: allegroOrder.messageToSeller,
@@ -302,10 +326,15 @@ function transformAllegroToOrderUpdate(
     delivery: allegroOrder.delivery,
     invoce: allegroOrder.invoce || null,
     lineItems: allegroOrder.lineItems.map((item) => {
+      const existingLineItem = existingOrder.lineItems.find(
+        (existingItem) => existingItem.id === item.id
+      );
+
       return {
         id: item.id,
         offer: {
-          id: item.offer.id,
+          thumbnail: existingLineItem?.offer?.thumbnail || "", // Zachowaj istniejącą miniaturkę
+          id: existingLineItem?.offer?.id || "",
           signature: item.offer.external?.id || "",
           name: item.offer.name,
           allegroId: item.offer.id,

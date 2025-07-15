@@ -150,6 +150,7 @@ export const InvoiceInfoSchema = z.object({
 export const OrderItemSchema = z.object({
   id: z.string(),
   offer: z.object({
+    thumbnail: z.string().url(),
     id: z.string(),
     allegroId: z.string().nullable(),
     name: z.string().nullable(),

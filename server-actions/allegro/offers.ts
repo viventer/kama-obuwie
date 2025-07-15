@@ -50,6 +50,27 @@ type AllegroIndividualOffer = {
   channel: "AL1" | "AL2";
 };
 
+export const getAllegroOffer = async (
+  id: string,
+  channel: "AL1" | "AL2"
+): Promise<AllegroOffer> => {
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
+  const accessToken = await getAllegroUserAccessToken(channel);
+  const headers = getSingleAllegroHeaders(accessToken);
+
+  const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers/${id}`;
+
+  const response = await axios.get(url, { headers });
+  const data = response.data;
+
+  if (!data) {
+    throw new Error("Nie znaleziono oferty na Allegro.");
+  }
+
+  return data as AllegroOffer;
+};
+
 export const postAllegroOffer = async (
   data: PostOfferBody
 ): Promise<{ AL1: Record<string, string>; AL2: Record<string, string> }> => {

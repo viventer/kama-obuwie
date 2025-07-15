@@ -36,6 +36,14 @@ export const FulfillmentStatusSchema = z.enum([
   "RETURNED", // status that can't be set by the seller
 ]);
 
+export const OrderPhaseSchema = z.enum([
+  "new",
+  "processing",
+  "readyForShipment",
+  "sent",
+  "cancelled",
+]);
+
 export const DiscountSchema = z.enum([
   "BUNDLE",
   "UNIT_PERCENTAGE_DISCOUNT",
@@ -46,13 +54,6 @@ export const DiscountSchema = z.enum([
   "CAMPAIGN",
 ]);
 
-export type PaymentType = z.infer<typeof PaymentTypeSchema>;
-export type PaymentProvider = z.infer<typeof PaymentProviderSchema>;
-export type AllegroOrderStatus = z.infer<typeof AllegroOrderStatusSchema>;
-export type FulfillmentStatus = z.infer<typeof FulfillmentStatusSchema>;
-export type Order = z.infer<typeof OrderSchema>;
-export type AllegroOrder = z.infer<typeof AllegroOrderSchema>;
-
 export const PriceSchema = z.object({
   amount: z.string(),
   currency: z.enum(["PLN"]),
@@ -62,23 +63,23 @@ export const BuyerSchema = z.object({
   id: z.string(),
   email: z.string().email(),
   login: z.string(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  phoneNumber: z.string().optional(),
-  companyName: z.string().optional(),
+  firstName: z.string().nullable(),
+  lastName: z.string().nullable(),
+  phoneNumber: z.string().nullable(),
+  companyName: z.string().nullable(),
   guest: z.boolean(),
   preferences: z.object({
-    language: z.string().optional(),
+    language: z.string().nullable(),
   }),
 });
 
 export const PaymentSchema = z.object({
   id: z.string(),
   type: PaymentTypeSchema,
-  provider: PaymentProviderSchema,
-  finishedAt: z.string().optional(),
-  paidAmount: PriceSchema,
-  reconcilation: PriceSchema.optional(),
+  provider: PaymentProviderSchema.nullable().optional(),
+  finishedAt: z.string().nullable(),
+  paidAmount: PriceSchema.nullable(),
+  reconcilation: PriceSchema.nullable().optional(),
 });
 
 export const AddressSchema = z.object({
@@ -88,8 +89,8 @@ export const AddressSchema = z.object({
   city: z.string(),
   zipCode: z.string(), // postal code
   countryCode: z.string().length(2), // ISO 3166-1 alpha-2
-  companyName: z.string().optional(),
-  phoneNumber: z.string().optional(),
+  companyName: z.string().nullable(),
+  phoneNumber: z.string().nullable(),
 });
 
 export const OrderDeliveryDataSchema = z.object({
@@ -99,12 +100,12 @@ export const OrderDeliveryDataSchema = z.object({
       id: z.string(),
       name: z.string(),
     })
-    .optional(),
+    .nullable(),
   pickupPoint: z
     .object({
       id: z.string(),
       name: z.string(),
-      description: z.string().optional(),
+      description: z.string().nullable(),
       address: z.object({
         street: z.string(),
         city: z.string(),
@@ -112,10 +113,10 @@ export const OrderDeliveryDataSchema = z.object({
         countryCode: z.string().length(2),
       }),
     })
-    .optional(),
-  cost: PriceSchema.optional(),
-  smart: z.boolean().optional(),
-  calculatedNumberOfPackages: z.number().optional(),
+    .nullable(),
+  cost: PriceSchema.nullable(),
+  smart: z.boolean().nullable(),
+  calculatedNumberOfPackages: z.number().nullable(),
 });
 
 export const InvoiceInfoSchema = z.object({
@@ -134,7 +135,7 @@ export const InvoiceInfoSchema = z.object({
             value: z.string(),
           })
         )
-        .optional(),
+        .nullable(),
       vatPayerStatus: z.enum(["ACTIVE", "NON_ACTIVE", "NOT_APPLICABLE"]),
     }),
     naturalPerson: z
@@ -142,7 +143,7 @@ export const InvoiceInfoSchema = z.object({
         firstName: z.string(),
         lastName: z.string(),
       })
-      .optional(),
+      .nullable(),
   }),
 });
 
@@ -150,83 +151,100 @@ export const OrderItemSchema = z.object({
   id: z.string(),
   offer: z.object({
     id: z.string(),
-    allegroId: z.string().optional(),
-    name: z.string().optional(),
+    allegroId: z.string().nullable(),
+    name: z.string().nullable(),
     signature: z.string(),
   }),
   quantity: z.number().min(1),
   originalPrice: PriceSchema,
   price: PriceSchema,
-  reconcilation: z.object({
-    value: PriceSchema,
-    type: z.enum(["BILLING", "WALLET"]),
-    quantity: z.number().optional(), // quantity of reconciled items
-  }),
-  discount: z.array(DiscountSchema).optional(),
+  reconcilation: z
+    .object({
+      value: PriceSchema,
+      type: z.enum(["BILLING", "WALLET"]),
+      quantity: z.number().nullable(),
+    })
+    .nullable(),
+  discount: z.array(DiscountSchema).nullable(),
 });
 
 export const OrderSchema = z.object({
   id: z.string().optional(),
-  allegroId: z.string().optional(), // checkout form id
-  messageToSeller: z.string().optional(),
+  number: z.string(),
+  allegroId: z.string().nullable(), // checkout form id
+  messageToSeller: z.string().nullable(),
   buyer: BuyerSchema,
-  payment: PaymentSchema.optional(),
+  payment: PaymentSchema.nullable(),
   allegroStatus: AllegroOrderStatusSchema,
   fulfillment: z
     .object({
       status: FulfillmentStatusSchema,
     })
-    .optional(),
-  delivery: OrderDeliveryDataSchema.optional(),
-  invoce: InvoiceInfoSchema.optional(),
+    .nullable(),
+  delivery: OrderDeliveryDataSchema.nullable(),
+  invoce: InvoiceInfoSchema.nullable(),
   lineItems: z.array(OrderItemSchema).min(1),
   surcharges: z.array(PaymentSchema),
   summary: z.object({
     totalToPay: PriceSchema,
   }),
-  updatedAt: z.string().optional(),
+  updatedAt: z.string().nullable(),
+  createdAt: z.string(),
   salesChannel: SalesChannelSchema,
+  percelNumbers: z.array(z.string()).optional(),
 });
 
 export const AllegroOrderItemSchema = z.object({
   id: z.string(),
   offer: z.object({
     id: z.string(),
-    name: z.string().optional(),
+    name: z.string().nullable(),
     external: z
       .object({
-        id: z.string().optional(),
+        id: z.string().nullable(),
       })
-      .optional(),
+      .nullable(),
   }),
   quantity: z.number().min(1),
   originalPrice: PriceSchema,
   price: PriceSchema,
-  reconcilation: z.object({
-    value: PriceSchema,
-    type: z.enum(["BILLING", "WALLET"]),
-    quantity: z.number().optional(),
-  }),
-  discount: z.array(DiscountSchema).optional(),
+  reconcilation: z
+    .object({
+      value: PriceSchema,
+      type: z.enum(["BILLING", "WALLET"]),
+      quantity: z.number().nullable(),
+    })
+    .nullable()
+    .optional(),
+  discount: z.array(DiscountSchema).nullable().optional(),
 });
 
 export const AllegroOrderSchema = z.object({
   id: z.string(), // checkout form id
-  messageToSeller: z.string().optional(),
+  messageToSeller: z.string().nullable(),
   buyer: BuyerSchema,
-  payment: PaymentSchema.optional(),
-  status: FulfillmentStatusSchema,
+  payment: PaymentSchema.nullable(),
+  status: AllegroOrderStatusSchema,
   fulfillment: z
     .object({
       status: FulfillmentStatusSchema,
     })
-    .optional(),
-  delivery: OrderDeliveryDataSchema.optional(),
-  invoce: InvoiceInfoSchema.optional(),
+    .nullable(),
+  delivery: OrderDeliveryDataSchema.nullable(),
+  invoce: InvoiceInfoSchema.nullable().optional(),
   lineItems: z.array(AllegroOrderItemSchema).min(1),
   surcharges: z.array(PaymentSchema),
   summary: z.object({
     totalToPay: PriceSchema,
   }),
-  updatedAt: z.string().optional(),
+  updatedAt: z.string().nullable(),
 });
+
+export type PaymentType = z.infer<typeof PaymentTypeSchema>;
+export type PaymentProvider = z.infer<typeof PaymentProviderSchema>;
+export type AllegroOrderStatus = z.infer<typeof AllegroOrderStatusSchema>;
+export type FulfillmentStatus = z.infer<typeof FulfillmentStatusSchema>;
+export type Order = z.infer<typeof OrderSchema>;
+export type OrderWithId = Order & { id: string };
+export type AllegroOrder = z.infer<typeof AllegroOrderSchema>;
+export type OrderPhase = z.infer<typeof OrderPhaseSchema>;

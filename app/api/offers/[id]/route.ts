@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const data = await getDocumentFromAdminDB(id, "offers");
+  const data = await getDocumentFromAdminDB("offers", id);
   if (!data) {
     return apiResponse("Oferta nie istnieje.", 404);
   }

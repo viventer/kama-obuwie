@@ -126,6 +126,15 @@ export default function PostOfferForm({
       ],
     };
 
+    if (!productData.editedPhotos) {
+      showToast("Brak zdjęć produktu", "error");
+      return;
+    }
+
+    const mainOfferThumbnail = productData.editedPhotos.find(
+      (photo) => photo.colorVariantName === colorVariantsNames[0]
+    )?.filePath;
+
     try {
       await updateMainOffer({
         ...oldOfferData,
@@ -133,18 +142,23 @@ export default function PostOfferForm({
         colorVariantName: colorVariantsNames[0],
         signature:
           signatureWithoutColorVariant.trim() + ` ${colorVariantsNames[0]}`,
+        thumbnail: mainOfferThumbnail,
       });
 
       for (const colorVariantName of colorVariantsNames) {
         if (colorVariantName === colorVariantsNames[0]) {
           continue;
         }
+        const offerThumbnail = productData.editedPhotos.find(
+          (photo) => photo.colorVariantName === colorVariantName
+        )?.filePath;
         const id = await createOfferForDifferentVariant({
           ...oldOfferData,
           ...formData,
           colorVariantName,
           signature:
             signatureWithoutColorVariant.trim() + ` ${colorVariantName}`,
+          thumbnail: offerThumbnail,
         });
         offersIds?.AL1?.push({
           value: id,

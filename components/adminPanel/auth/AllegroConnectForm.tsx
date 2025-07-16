@@ -64,7 +64,7 @@ function AllegroConnectContent() {
                 isConnected ? "success" : "primary"
               } flex items-center gap-2 px-3 py-2 rounded-md ${
                 isConnected ? "" : "hover:border-accent hover:cursor-pointer"
-              } ${isConnected ? "text-white/75" : "text-white"}`}
+              } ${isConnected ? "text-primary" : "text-text"}`}
               disabled={isConnected}
             >
               {isConnected ? `Konto ${key} podłączone` : `Podłącz konto ${key}`}

@@ -158,7 +158,9 @@ export function DataTable<T extends { id: string }>({
     size: 40,
   };
 
-  const allColumns = disableSelection ? basicColumns : [selectionColumn, ...basicColumns];
+  const allColumns = disableSelection
+    ? basicColumns
+    : [selectionColumn, ...basicColumns];
 
   const table = useReactTable({
     data,
@@ -205,7 +207,7 @@ export function DataTable<T extends { id: string }>({
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
-              .filter((column) => column.getCanHide())
+              .filter((column) => column.getCanHide() && column.id !== "select")
               .map((column) => {
                 const title = column.columnDef.header as string;
                 return (

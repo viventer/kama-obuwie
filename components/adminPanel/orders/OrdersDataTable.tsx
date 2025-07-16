@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -41,52 +41,19 @@ export default function OrdersDataTable({
   orders,
   orderPhase,
 }: OrdersDataTableProps) {
+  const [pagination, setPagination] = useState<{
+    pageIndex: number;
+    pageSize: number;
+  }>({
+    pageIndex: 0,
+    pageSize: 3,
+  });
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState({});
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [globalFilter, setGlobalFilter] = useState("");
-
-  // Kolumny do przeszukiwania - tak jak w DataTable.tsx
-  const searchColumns = [
-    "number",
-    "buyer.firstName",
-    "buyer.lastName",
-    "buyer.phoneNumber",
-  ];
-
-  // Funkcja filtrowania - wzorowana na DataTable.tsx
-  const globalFilterFn = (
-    row: Row<Order>,
-    columnId: string,
-    filterValue: string
-  ) => {
-    const order = row.original;
-    const searchValue = filterValue.toLowerCase();
-
-    // Przeszukuj podstawowe kolumny
-    const searchInBasicColumns = searchColumns.some((colKey) => {
-      const keys = colKey.split(".");
-      let value: any = order;
-
-      for (const key of keys) {
-        value = value?.[key];
-      }
-
-      if (value == null) return false;
-      return String(value).toLowerCase().includes(searchValue);
-    });
-
-    if (searchInBasicColumns) return true;
-
-    // Przeszukuj sygnatury produktów
-    const searchInSignatures = order.lineItems.some((item) =>
-      item.offer.signature?.toLowerCase().includes(searchValue)
-    );
-
-    return searchInSignatures;
-  };
 
   const columns: ColumnDef<Order>[] = [
     {
@@ -108,9 +75,70 @@ export default function OrdersDataTable({
       enableSorting: false,
       enableHiding: false,
     },
+    // Ukryte kolumny dla wyszukiwania
+    {
+      accessorKey: "number",
+      header: "Numer",
+      cell: () => null,
+      enableSorting: false,
+      enableColumnFilter: false,
+      size: 0,
+      meta: { hidden: true },
+    },
+    {
+      accessorFn: (row) => row.buyer.firstName,
+      id: "buyerFirstName",
+      header: "Imię",
+      cell: () => null,
+      enableSorting: false,
+      enableColumnFilter: false,
+      size: 0,
+      meta: { hidden: true },
+    },
+    {
+      accessorFn: (row) => row.buyer.lastName,
+      id: "buyerLastName",
+      header: "Nazwisko",
+      cell: () => null,
+      enableSorting: false,
+      enableColumnFilter: false,
+      size: 0,
+      meta: { hidden: true },
+    },
+    {
+      accessorFn: (row) => row.buyer.phoneNumber,
+      id: "buyerPhone",
+      header: "Telefon",
+      cell: () => null,
+      enableSorting: false,
+      enableColumnFilter: false,
+      size: 0,
+      meta: { hidden: true },
+    },
+    {
+      accessorFn: (row) => row.buyer.login,
+      id: "buyerLogin",
+      header: "Login",
+      cell: () => null,
+      enableSorting: false,
+      enableColumnFilter: false,
+      size: 0,
+      meta: { hidden: true },
+    },
+    {
+      accessorFn: (row) =>
+        row.lineItems.map((item) => item.offer.signature).join(" "),
+      id: "signatures",
+      header: "Sygnatury",
+      cell: () => null,
+      enableSorting: false,
+      enableColumnFilter: false,
+      size: 0,
+      meta: { hidden: true },
+    },
     {
       id: "orderInfo",
-      header: "Informacje o zamówieniu",
+      header: "Informacje",
       cell: ({ row }) => <OrderInfoDisplay order={row.original} />,
       enableSorting: false,
     },
@@ -145,42 +173,53 @@ export default function OrdersDataTable({
   const table = useReactTable({
     data: orders,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
+    getRowId: (row) => row.id || row.number,
+    state: {
+      globalFilter,
+      sorting,
+      columnFilters,
+      columnVisibility: {
+        ...columnVisibility,
+        // Ukryj kolumny pomocnicze
+        number: false,
+        buyerFirstName: false,
+        buyerLastName: false,
+        buyerPhone: false,
+        buyerLogin: false,
+        signatures: false,
+      },
+      rowSelection,
+      expanded,
+      pagination,
+    },
+    onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onExpandedChange: setExpanded,
-    globalFilterFn,
-    onGlobalFilterChange: setGlobalFilter,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-      expanded,
-      globalFilter,
-    },
+    onPaginationChange: setPagination,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
   });
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full max-h-[70svh] max-w-[1024px]">
       {/* Pole wyszukiwania */}
       <div className="flex items-center py-4">
         <Input
-          placeholder="Szukaj zamówień (numer, sygnatura, imię, nazwisko, telefon)..."
+          placeholder="Szukaj zamówień"
           value={globalFilter}
           onChange={(event) => setGlobalFilter(event.target.value)}
-          className="max-w-sm"
+          className="max-w-xs"
         />
       </div>
 
       {/* Tabela */}
-      <div className="rounded-md border">
+      <div className="rounded-md border max-h-[60svh] overflow-auto scrollbar">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -255,13 +294,12 @@ export default function OrdersDataTable({
         </Table>
       </div>
 
-      {/* Paginacja */}
-      <div className="flex items-center justify-between space-x-2 py-4">
-        <div className="text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} z{" "}
-          {table.getFilteredRowModel().rows.length} wierszy zaznaczonych.
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          wybrano {table.getSelectedRowModel().rows.length} z{" "}
+          {table.getFilteredRowModel().rows.length} rzędów.
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
@@ -269,7 +307,6 @@ export default function OrdersDataTable({
             disabled={!table.getCanPreviousPage()}
           >
             <ChevronLeft className="h-4 w-4" />
-            Poprzednia
           </Button>
           <Button
             variant="outline"
@@ -277,7 +314,6 @@ export default function OrdersDataTable({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Następna
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

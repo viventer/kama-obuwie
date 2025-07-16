@@ -1,4 +1,5 @@
 import { Order } from "@/firebase/schemas/ordersSchemas";
+import { PhoneIcon, UserIcon } from "lucide-react";
 
 interface OrderInfoDisplayProps {
   order: Order;
@@ -23,8 +24,25 @@ export function OrderInfoDisplay({ order }: OrderInfoDisplayProps) {
         </span>
       </div>
       <div className="font-mono text-sm font-medium">#{order.number}</div>
+
+      <div className="text-sm">
+        <div className="font-medium">
+          {order.buyer.firstName && order.buyer.lastName
+            ? `${order.buyer.firstName} ${order.buyer.lastName}`
+            : order.buyer.companyName || "Brak nazwy"}
+        </div>
+        {order.buyer.phoneNumber && (
+          <div className="text-xs text-white/75 flex items-center gap-1">
+            <PhoneIcon className="size-3" /> {order.buyer.phoneNumber}
+          </div>
+        )}
+        <div className="text-xs text-white/75 flex items-center gap-1">
+          <UserIcon className="size-3" /> {order.buyer.login}
+        </div>
+      </div>
+
       <div className="font-medium text-sm">
-        <span className="font-light">Całkowita wpłata:</span>{" "}
+        <span className="font-light">Suma:</span>{" "}
         {order.summary.totalToPay.amount} {order.summary.totalToPay.currency}
       </div>
     </div>

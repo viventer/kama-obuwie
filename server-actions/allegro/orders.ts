@@ -29,12 +29,12 @@ export async function getAllegroOrderEvents() {
   const lastEventId: lastEventId | null = await redis.hgetall(
     "allegro:lastEventId"
   );
-  // if (lastEventId?.AL1) {
-  //   urlAL1 += `&from=${lastEventId.AL1}`;
-  // }
-  // if (lastEventId?.AL2) {
-  //   urlAL2 += `&from=${lastEventId.AL2}`;
-  // }
+  if (lastEventId?.AL1) {
+    urlAL1 += `&from=${lastEventId.AL1}`;
+  }
+  if (lastEventId?.AL2) {
+    urlAL2 += `&from=${lastEventId.AL2}`;
+  }
 
   try {
     const [AL1Response, AL2Response] = await Promise.all([

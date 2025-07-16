@@ -158,13 +158,14 @@ export const AllegroOfferSchema = z.object({
 });
 
 export const PostOfferFormSchema = OfferSchema.pick({
-  title: true,
   sellingPrices: true,
   shippingRates: true,
   availability: true,
   returnPolicy: true,
   warranty: true,
   impliedWarranty: true,
+}).extend({
+  title: z.record(z.string(), z.string().min(12).max(72)),
 });
 
 export type ShippingRate = z.infer<typeof shippingRateSchema>;

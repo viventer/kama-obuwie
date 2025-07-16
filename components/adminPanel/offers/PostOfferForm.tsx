@@ -31,17 +31,19 @@ import MiniLoader from "../global/MiniLoader";
 import ReturnPolicySelector from "./ReturnPolicySelector";
 import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
 import WarrantySelector from "./WarrantySelector";
+import TitlesField from "./TitlesField";
 
 export type PostOfferFormValues = Pick<
   Offer,
-  | "title"
   | "sellingPrices"
   | "shippingRates"
   | "availability"
   | "returnPolicy"
   | "warranty"
   | "impliedWarranty"
->;
+> & {
+  title: Record<string, string>; // { colorVariantName: title }
+};
 
 export default function PostOfferForm({
   oldOfferData,
@@ -77,7 +79,7 @@ export default function PostOfferForm({
   const form = useForm<PostOfferFormValues>({
     resolver: zodResolver(PostOfferFormSchema),
     defaultValues: {
-      title: oldOfferData.title || "",
+      title: {},
       sellingPrices: oldOfferData.sellingPrices || {},
       shippingRates: oldOfferData.shippingRates || {},
       availability: oldOfferData.availability || {},
@@ -126,10 +128,16 @@ export default function PostOfferForm({
       ],
     };
 
+    const formDataWithoutTitles = {
+      ...formData,
+      title: "",
+    };
+
     try {
       await updateMainOffer({
         ...oldOfferData,
-        ...formData,
+        ...formDataWithoutTitles,
+        title: formData.title[colorVariantsNames[0]],
         colorVariantName: colorVariantsNames[0],
         signature:
           signatureWithoutColorVariant.trim() + ` ${colorVariantsNames[0]}`,
@@ -141,7 +149,8 @@ export default function PostOfferForm({
         }
         const id = await createOfferForDifferentVariant({
           ...oldOfferData,
-          ...formData,
+          ...formDataWithoutTitles,
+          title: formData.title[colorVariantName],
           colorVariantName,
           signature:
             signatureWithoutColorVariant.trim() + ` ${colorVariantName}`,
@@ -156,7 +165,7 @@ export default function PostOfferForm({
         PostOfferBody,
         "colorVariant" | "images"
       > = await getPostOfferBody({
-        formData,
+        formDataWithoutTitles,
         productData,
         oldOfferData,
         sizingTable,
@@ -177,6 +186,8 @@ export default function PostOfferForm({
         const imagesPaths = imagesOfVariant.map((image) => image.filePath);
 
         const imagesUrls = await getImagesUrls(imagesPaths);
+
+        postAllegroOfferBody.offer.title = formData.title[colorVariantName];
 
         const { data } = await axios.post("/api/allegro/offers", {
           ...postAllegroOfferBody,
@@ -272,21 +283,12 @@ export default function PostOfferForm({
   return (
     <Form {...form}>
       <div className="flex flex-col gap-6">
-        <FormField
-          rules={{ required: "Tytuł oferty jest wymagany." }}
-          control={form.control}
-          name={"title" as const}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tytuł oferty</FormLabel>
-              <Input
-                type="text"
-                value={field.value}
-                onChange={field.onChange}
-                maxLength={72}
-              />
-            </FormItem>
-          )}
+        <TitlesField
+          colorVariants={
+            productData.colorVariants?.map((variant) =>
+              getColorVariantName(variant)
+            ) || []
+          }
         />
         <SellingPricesField />
         <ShippingRatesSelector />

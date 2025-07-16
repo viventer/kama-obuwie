@@ -234,6 +234,8 @@ export async function postIndividualAllegroOffer(
     },
   ];
 
+  console.log("Tytuł oferty:", offer.title);
+
   const formattedSizingTable = getFormattedSizingTable(insoleLengths);
 
   const descriptionVariableValues: Record<DescriptionVariable, string> = {

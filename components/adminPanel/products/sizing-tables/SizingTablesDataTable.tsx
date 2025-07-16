@@ -20,7 +20,6 @@ import axios from "axios";
 import { useToast } from "@/hooks/useToast";
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { DataTable } from "../../global/data-table/DataTable";
-import { getDocumentsFromAdminDB } from "@/firebase/getters";
 
 export default function SizingTablesDataTable({
   data,
@@ -131,6 +130,7 @@ export default function SizingTablesDataTable({
         renderRowSubComponent={renderRowSubComponent}
         searchPlaceholder="Szukaj tabeli"
         searchColumns={["name"]}
+        disableSelection={true}
       />
     </>
   );

@@ -74,7 +74,7 @@ export function getDataTableColumns<T extends { id: string }>(
   const dataColumns = getDataColumns<T>(columnNames);
 
   if (!tableActions || tableActions.length === 0) {
-    return [getSelectAllColumn<T>(), ...dataColumns];
+    return [...dataColumns];
   }
 
   const actionColumn: ColumnDef<T, unknown> = {
@@ -102,5 +102,5 @@ export function getDataTableColumns<T extends { id: string }>(
     ),
   };
 
-  return [getSelectAllColumn<T>(), ...dataColumns, actionColumn];
+  return [...dataColumns, actionColumn];
 }

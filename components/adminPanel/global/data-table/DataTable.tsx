@@ -59,6 +59,7 @@ export function DataTable<T extends { id: string }>({
   onRowClick,
   maxSelectable,
   onSelectionChange,
+  disableSelection = false,
 }: {
   data: T[];
   columnNames: ColumnName<T>[];
@@ -73,6 +74,7 @@ export function DataTable<T extends { id: string }>({
   onRowClick?: (row: T) => void;
   maxSelectable?: number;
   onSelectionChange?: (selected: T[]) => void;
+  disableSelection?: boolean;
 }) {
   const [pagination, setPagination] = useState<{
     pageIndex: number;
@@ -156,7 +158,7 @@ export function DataTable<T extends { id: string }>({
     size: 40,
   };
 
-  const allColumns = [selectionColumn, ...basicColumns];
+  const allColumns = disableSelection ? basicColumns : [selectionColumn, ...basicColumns];
 
   const table = useReactTable({
     data,
@@ -287,10 +289,12 @@ export function DataTable<T extends { id: string }>({
       </div>
 
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          wybrano {table.getSelectedRowModel().rows.length} z{" "}
-          {table.getFilteredRowModel().rows.length} rzędów.
-        </div>
+        {!disableSelection && (
+          <div className="flex-1 text-sm text-muted-foreground">
+            wybrano {table.getSelectedRowModel().rows.length} z{" "}
+            {table.getFilteredRowModel().rows.length} rzędów.
+          </div>
+        )}
         <div className="space-x-2">
           <Button
             variant="outline"

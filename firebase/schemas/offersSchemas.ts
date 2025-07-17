@@ -105,6 +105,12 @@ export const AllegroOfferSchema = z.object({
         images: z.array(z.string().url()),
       }),
       marketedBeforeGPSRObligation: z.boolean().optional(),
+      responsiblePerson: z
+        .object({
+          name: z.string(),
+          id: z.string().optional(),
+        })
+        .optional(),
     })
   ),
   sellingMode: z.object({

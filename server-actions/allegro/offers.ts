@@ -223,6 +223,9 @@ export async function postIndividualAllegroOffer(
   const productSet = [
     {
       marketedBeforeGPSRObligation: true,
+      responsiblePerson: {
+        name: process.env.RESPONSIBLE_PERSON_NAME!,
+      },
       product: {
         name: `${offer.title} ${insoleLength.size}`,
         category: {
@@ -233,8 +236,6 @@ export async function postIndividualAllegroOffer(
       },
     },
   ];
-
-  console.log("Tytuł oferty:", offer.title);
 
   const formattedSizingTable = getFormattedSizingTable(insoleLengths);
 

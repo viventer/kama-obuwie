@@ -51,10 +51,16 @@ export async function getAllegroOrderEvents() {
       salesChannel: "AL2",
     }));
 
-    await redis.hset("allegro:lastEventId", {
-      AL1: AL1Events[AL1Events.length - 1]?.id || "",
-      AL2: AL2Events[AL2Events.length - 1]?.id || "",
-    });
+    if (AL1Events.length !== 0) {
+      await redis.hset("allegro:lastEventId", {
+        AL1: AL1Events[AL1Events.length - 1].id,
+      });
+    }
+    if (AL2Events.length !== 0) {
+      await redis.hset("allegro:lastEventId", {
+        AL2: AL2Events[AL2Events.length - 1].id,
+      });
+    }
 
     return {
       AL1: AL1Events,

@@ -13,7 +13,6 @@ import {
   ColumnDef,
   ColumnFiltersState,
   ExpandedState,
-  Row,
   RowSelectionState,
   SortingState,
   flexRender,
@@ -27,13 +26,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  MoreVertical,
-  ChevronLeft,
-  ChevronRight,
-  Mail,
-  MoreHorizontal,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Mail, MoreHorizontal } from "lucide-react";
 import { Order, OrderPhase } from "@/firebase/schemas/ordersSchemas";
 import { OrderLineItemDisplay } from "./OrderLineItemDisplay";
 import { OrderInfoDisplay } from "./OrderInfoDisplay";
@@ -88,6 +81,7 @@ export default function OrdersDataTable({
           await axios.patch(`/api/orders/${id}`, updateData);
           showToast("Zamówienie zatwierdzone", "success");
           router.refresh();
+          // server action do utworzenia przesyłki
         } catch (err) {
           showToast(`Błąd podczas zatwierdzania zamówienia: ${err}`, "error");
         }

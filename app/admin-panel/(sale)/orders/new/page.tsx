@@ -7,10 +7,12 @@ import { syncAllegroOrders } from "@/server-actions/allegro/orders";
 export const revalidate = 180;
 
 export default async function OrdersNewPage() {
-  console.log("pętla");
   await syncAllegroOrders();
   const orders = await getDocumentsFromAdminDB<Order>("orders", (ref) =>
-    ref.orderBy("createdAt", "desc").limit(60)
+    ref
+      .where("fulfillment.status", "==", "NEW")
+      .orderBy("createdAt", "desc")
+      .limit(60)
   );
 
   return (

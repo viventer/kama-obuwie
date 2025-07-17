@@ -61,3 +61,6 @@ env:
 
   - variable: AL2_LOGIN
     secret: AL2_LOGIN
+
+  - variable: RESPONSIBLE_PERSON_NAME
+    secret: RESPONSIBLE_PERSON_NAME

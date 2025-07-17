@@ -59,7 +59,7 @@ export default async function ProductEditPage(props: Props) {
       <Button className="mb-8" asChild>
         <Link
           href={`/api/products/downloadPhotos?${params.toString()}`}
-          className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="inline-block px-4 py-2 text-foreground rounded"
         >
           Pobierz surowe zdjęcia (ZIP)
         </Link>

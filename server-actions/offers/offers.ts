@@ -42,12 +42,12 @@ export const updateOffer = async function (
 };
 
 export const getPostOfferBody = async ({
-  formData,
+  formDataWithoutTitles,
   productData,
   oldOfferData,
   sizingTable,
 }: {
-  formData: PostOfferFormValues;
+  formDataWithoutTitles: Omit<PostOfferFormValues, "title">;
   productData: ProductWithId;
   oldOfferData: OfferWithId;
   sizingTable: SizingTableWithId;
@@ -62,7 +62,7 @@ export const getPostOfferBody = async ({
   return {
     offer: {
       ...oldOfferData,
-      ...formData,
+      ...formDataWithoutTitles,
     },
     product: productData,
     allegroCategoryId,

@@ -106,6 +106,7 @@ export default function CategoriesDataTable({
         renderRowSubComponent={renderRowSubComponent}
         searchPlaceholder="Szukaj kategorii"
         searchColumns={["name"]}
+        disableSelection={true}
       />
     </>
   );

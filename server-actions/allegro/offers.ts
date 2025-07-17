@@ -244,6 +244,9 @@ export async function postIndividualAllegroOffer(
   const productSet = [
     {
       marketedBeforeGPSRObligation: true,
+      responsiblePerson: {
+        name: process.env.RESPONSIBLE_PERSON_NAME!,
+      },
       product: {
         name: `${offer.title} ${insoleLength.size}`,
         category: {
@@ -279,7 +282,7 @@ export async function postIndividualAllegroOffer(
   } ${getColorVariantName(colorVariant)}`;
 
   // Dodaj unikalny identyfikator z kanałem i rozmiarem
-  const externalId = `${signature} ${channel}r${insoleLength.size}`;
+  const externalId = `${signature} r${insoleLength.size}`;
 
   const allegroOffer: AllegroOffer = {
     ...allegroOfferData,

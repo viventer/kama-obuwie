@@ -106,6 +106,12 @@ export const AllegroOfferSchema = z.object({
         images: z.array(z.string().url()),
       }),
       marketedBeforeGPSRObligation: z.boolean().optional(),
+      responsiblePerson: z
+        .object({
+          name: z.string(),
+          id: z.string().optional(),
+        })
+        .optional(),
     })
   ),
   sellingMode: z.object({
@@ -159,13 +165,14 @@ export const AllegroOfferSchema = z.object({
 });
 
 export const PostOfferFormSchema = OfferSchema.pick({
-  title: true,
   sellingPrices: true,
   shippingRates: true,
   availability: true,
   returnPolicy: true,
   warranty: true,
   impliedWarranty: true,
+}).extend({
+  title: z.record(z.string(), z.string().min(12).max(72)),
 });
 
 export type ShippingRate = z.infer<typeof shippingRateSchema>;

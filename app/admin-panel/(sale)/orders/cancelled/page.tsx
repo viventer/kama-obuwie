@@ -16,7 +16,7 @@ export default async function OrdersCancelledPage() {
   return (
     <>
       <SubpageHeading text="Zamówienia anulowane" />
-      <OrdersDataTable orders={orders || []} orderPhase="cancelled" />
+      <OrdersDataTable orders={orders || []} phase="cancelled" />
     </>
   );
 }

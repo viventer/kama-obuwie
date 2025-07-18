@@ -18,7 +18,7 @@ export default async function OrdersNewPage() {
   return (
     <>
       <SubpageHeading text="Nowe zamówienia" />
-      <OrdersDataTable orders={orders || []} />
+      <OrdersDataTable orders={orders || []} phase="new" />
     </>
   );
 }

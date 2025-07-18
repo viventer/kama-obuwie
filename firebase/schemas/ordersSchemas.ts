@@ -39,7 +39,7 @@ export const FulfillmentStatusSchema = z.enum([
 export const OrderPhaseSchema = z.enum([
   "new",
   "processing",
-  "readyForShipment",
+  "ready_for_shipment",
   "sent",
   "cancelled",
 ]);

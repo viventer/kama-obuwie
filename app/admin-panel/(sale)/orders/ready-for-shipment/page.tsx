@@ -16,7 +16,7 @@ export default async function OrdersReadyForShipmentPage() {
   return (
     <>
       <SubpageHeading text="Zamówienia gotowe do wysyłki" />
-      <OrdersDataTable orders={orders || []} orderPhase="readyForShipment" />
+      <OrdersDataTable orders={orders || []} phase="ready_for_shipment" />
     </>
   );
 }

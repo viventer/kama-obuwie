@@ -7,6 +7,7 @@ import {
   getDocumentsFromAdminDB,
   getDocumentFromAdminDB,
 } from "@/firebase/getters";
+import { revalidatePath } from "next/cache";
 
 export const createOrder = async function (newOrder: Order) {
   await verifyUser(["ADMIN", "VERIFIED"]);

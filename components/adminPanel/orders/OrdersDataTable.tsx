@@ -37,19 +37,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { TableAction } from "@/lib/dataTableColumns";
-import axios from "axios";
-import { useToast } from "@/hooks/useToast";
-import { useRouter } from "next/navigation";
+import { useOrderActions } from "@/hooks/useOrderActions";
 
 interface OrdersDataTableProps {
   orders: Order[];
-  orderPhase?: OrderPhase;
+  phase: OrderPhase;
 }
 
 export default function OrdersDataTable({
   orders,
-  orderPhase,
+  phase,
 }: OrdersDataTableProps) {
   const [pagination, setPagination] = useState<{
     pageIndex: number;
@@ -65,53 +62,7 @@ export default function OrdersDataTable({
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const { showToast } = useToast();
-  const router = useRouter();
-
-  const actions: TableAction[] = [
-    {
-      name: "Zatwierdź",
-      onClick: async (id) => {
-        try {
-          const updateData: Partial<Order> = {
-            fulfillment: {
-              status: "PROCESSING",
-            },
-          };
-          await axios.patch(`/api/orders/${id}`, updateData);
-          showToast("Zamówienie zatwierdzone", "success");
-          router.refresh();
-          // server action do utworzenia przesyłki
-        } catch (err) {
-          showToast(`Błąd podczas zatwierdzania zamówienia: ${err}`, "error");
-        }
-      },
-    },
-    {
-      name: "Odrzuć",
-      onClick: async (id) => {
-        try {
-          const updateData: Partial<Order> = {
-            fulfillment: {
-              status: "CANCELLED",
-            },
-          };
-          await axios.patch(`/api/orders/${id}`, updateData);
-          showToast("Zamówienie odrzucone", "default");
-          router.push(`/admin-panel/send-refund/${id}`);
-        } catch (err) {
-          showToast(`Błąd podczas odrzucania zamówienia: ${err}`, "error");
-        }
-      },
-    },
-    {
-      name: "Zwróć część wpłaty",
-      onClick: async (id) => {
-        showToast("Zwróć część wpłaty", "default");
-        router.push(`/admin-panel/send-refund/${id}`);
-      },
-    },
-  ];
+  const actions = useOrderActions(phase);
 
   const columns: ColumnDef<Order>[] = [
     {

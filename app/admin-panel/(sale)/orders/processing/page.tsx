@@ -16,7 +16,7 @@ export default async function OrdersProcessingPage() {
   return (
     <>
       <SubpageHeading text="Zamówienia w realizacji" />
-      <OrdersDataTable orders={orders || []} orderPhase="processing" />
+      <OrdersDataTable orders={orders || []} phase="processing" />
     </>
   );
 }

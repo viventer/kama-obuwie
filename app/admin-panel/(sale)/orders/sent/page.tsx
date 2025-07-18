@@ -16,7 +16,7 @@ export default async function OrdersSentPage() {
   return (
     <>
       <SubpageHeading text="Zamówienia wysłane" />
-      <OrdersDataTable orders={orders || []} orderPhase="sent" />
+      <OrdersDataTable orders={orders || []} phase="sent" />
     </>
   );
 }

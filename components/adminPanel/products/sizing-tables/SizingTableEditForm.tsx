@@ -105,6 +105,14 @@ export default function SizingTableEditForm({
       return;
     }
 
+    if (data.name.length < 3) {
+      showToast(
+        "Nazwa tabeli rozmiarów musi zawierać co najmniej 3 znaki.",
+        "error"
+      );
+      return;
+    }
+
     const payload = {
       name: data.name,
       insoleLengths: data.insoleLengths.map((row) => ({

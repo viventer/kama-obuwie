@@ -26,6 +26,8 @@ export default function SizingTablesDataTable({
 }: {
   data: SizingTableWithId[] | null;
 }) {
+  const filteredData = data?.filter((table) => table.name !== "");
+
   const columnNames: ColumnName<SizingTableWithId>[] = [
     { attributeName: "name", displayName: "Nazwa" },
   ];
@@ -105,7 +107,7 @@ export default function SizingTablesDataTable({
   const handleCreateSizingTable = async () => {
     try {
       const newSizingTable: SizingTable = {
-        name: "Nowa tabela rozmiarów",
+        name: "",
         insoleLengths: [],
         sizingAccuracy: "normalna",
       };
@@ -113,7 +115,6 @@ export default function SizingTablesDataTable({
       const resp = await axios.post("/api/sizing-tables", newSizingTable);
       const id = resp.data.id;
       router.push(`/admin-panel/sizing-tables/${id}`);
-      showToast("Tabela rozmiarów została utworzona", "success");
     } catch (err) {
       showToast(`Nie udało się utworzyć tabeli rozmiarów: ${err}`, "error");
       return;
@@ -124,7 +125,7 @@ export default function SizingTablesDataTable({
     <>
       <Button onClick={handleCreateSizingTable}>Utwórz nową</Button>
       <DataTable
-        data={data || []}
+        data={filteredData || []}
         columnNames={columnNames}
         actions={actions}
         renderRowSubComponent={renderRowSubComponent}

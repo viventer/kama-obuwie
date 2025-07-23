@@ -57,7 +57,7 @@ export type sizingAccuracyType = "zaniżona" | "normalna" | "zawyżona";
 
 export const SizingTableSchema = z.object({
   id: z.string().optional(),
-  name: z.string().min(3).max(32),
+  name: z.string().max(32),
   insoleLengths: z.array(
     z.object({
       size: z.string(),

@@ -309,7 +309,7 @@ async function transformAllegroToOrder(
     allegroStatus: allegroOrder.status,
     fulfillment: allegroOrder.fulfillment,
     delivery: allegroOrder.delivery,
-    invoce: allegroOrder.invoce || null,
+    invoice: allegroOrder.invoice || null,
     lineItems: lineItems,
     surcharges: allegroOrder.surcharges,
     summary: allegroOrder.summary,
@@ -330,7 +330,7 @@ function transformAllegroToOrderUpdate(
     allegroStatus: allegroOrder.status,
     fulfillment: allegroOrder.fulfillment,
     delivery: allegroOrder.delivery,
-    invoce: allegroOrder.invoce || null,
+    invoice: allegroOrder.invoice || null,
     lineItems: allegroOrder.lineItems.map((item) => {
       const existingLineItem = existingOrder.lineItems.find(
         (existingItem) => existingItem.id === item.id

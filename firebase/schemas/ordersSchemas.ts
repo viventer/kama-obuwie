@@ -183,7 +183,7 @@ export const OrderSchema = z.object({
     })
     .nullable(),
   delivery: OrderDeliveryDataSchema.nullable(),
-  invoce: InvoiceInfoSchema.nullable(),
+  invoice: InvoiceInfoSchema.nullable(),
   lineItems: z.array(OrderItemSchema).min(1),
   surcharges: z.array(PaymentSchema),
   summary: z.object({
@@ -232,7 +232,7 @@ export const AllegroOrderSchema = z.object({
     })
     .nullable(),
   delivery: OrderDeliveryDataSchema.nullable(),
-  invoce: InvoiceInfoSchema.nullable().optional(),
+  invoice: InvoiceInfoSchema.nullable().optional(),
   lineItems: z.array(AllegroOrderItemSchema).min(1),
   surcharges: z.array(PaymentSchema),
   summary: z.object({

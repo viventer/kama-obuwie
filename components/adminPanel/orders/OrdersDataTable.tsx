@@ -26,7 +26,13 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, ChevronRight, Mail, MoreHorizontal } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  FilePlus2Icon,
+  Mail,
+  MoreHorizontal,
+} from "lucide-react";
 import { Order, OrderPhase } from "@/firebase/schemas/ordersSchemas";
 import { OrderLineItemDisplay } from "./OrderLineItemDisplay";
 import { OrderInfoDisplay } from "./OrderInfoDisplay";
@@ -169,6 +175,11 @@ export default function OrdersDataTable({
               <Mail className="size-4" />
             </IconButton>
           )}
+          {row.original?.invoice?.required && (
+            <IconButton className="text-destructive hover:text-primary">
+              <FilePlus2Icon className="size-4" />
+            </IconButton>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -272,9 +283,10 @@ export default function OrdersDataTable({
                     onClick={(e) => {
                       const target = e.target as HTMLElement;
                       if (
-                        target.closest("button") ||
                         target.closest("[role='checkbox']") ||
-                        target.closest("[data-ignore-row-click]")
+                        target.closest("[data-ignore-row-click]") ||
+                        target.closest("[data-radix-popper-content-wrapper]") ||
+                        target.closest("[role='menuitem']")
                       ) {
                         return;
                       }

@@ -173,7 +173,9 @@ export async function postIndividualAllegroOffer(
     allegroCategoryId,
     product.brand
   );
-  const formattedManufacturerCode = `${product.manufacturerCode} ${colorVariant.color}`;
+  const formattedManufacturerCode = `${
+    product.manufacturerCode
+  } ${getColorVariantName(colorVariant)}`;
 
   const shadeValue = colorVariant.shade ?? "";
   const additionalColorValue = colorVariant.additionalColor ?? "brak";

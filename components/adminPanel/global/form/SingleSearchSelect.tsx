@@ -1,10 +1,4 @@
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-} from "@/components/ui/select";
-import {
   Command,
   CommandInput,
   CommandList,
@@ -12,10 +6,16 @@ import {
   CommandGroup,
   CommandItem,
 } from "@/components/ui/command";
-import { FormControl, FormItem, FormLabel } from "@/components/ui/form";
+import { FormItem, FormLabel } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useState } from "react";
 import IconButton from "../IconButton";
-import { XIcon } from "lucide-react";
+import { XIcon, ChevronsUpDown } from "lucide-react";
 
 type Option = {
   label: string;
@@ -50,52 +50,52 @@ export default function SingleSearchSelect({
     <FormItem>
       <FormLabel>{label}</FormLabel>
       <div className="flex items-center gap-2">
-        <Select
-          onValueChange={onChange}
-          value={value}
-          open={open}
-          onOpenChange={setOpen}
+        <div className="flex-1">
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                className="justify-between w-full text-base bg-transparent border-primary focus-visible:border-secondary border hover:bg-primary/15 hover:cursor-pointer font-normal"
+              >
+                <span>{selectedLabel || placeholder}</span>
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] max-h-60 p-0 overflow-hidden">
+              <Command className="max-h-60">
+                <CommandInput
+                  placeholder="Szukaj…"
+                  value={query}
+                  onValueChange={setQuery}
+                />
+                <CommandList className="scrollbar overflow-auto">
+                  {filtered.length === 0 && (
+                    <CommandEmpty>Brak wyników wyszukiwania.</CommandEmpty>
+                  )}
+                  <CommandGroup>
+                    {filtered.map((opt) => (
+                      <CommandItem
+                        key={opt.value}
+                        onSelect={() => {
+                          onChange(opt.value);
+                          setQuery("");
+                          setOpen(false);
+                        }}
+                      >
+                        {opt.label}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </div>
+        <IconButton
+          onClick={() => onChange("")}
+          className="text-primary flex-shrink-0"
         >
-          <FormControl>
-            <SelectTrigger className="text-base border-primary">
-              {selectedLabel ? (
-                <SelectValue className="text-base">{selectedLabel}</SelectValue>
-              ) : (
-                <SelectValue className="text-base" placeholder={placeholder} />
-              )}
-            </SelectTrigger>
-          </FormControl>
-
-          <SelectContent>
-            <Command>
-              <CommandInput
-                placeholder="Szukaj…"
-                value={query}
-                onValueChange={setQuery}
-              />
-              <CommandList>
-                {filtered.length === 0 && (
-                  <CommandEmpty>Brak wyników wyszukiwania.</CommandEmpty>
-                )}
-                <CommandGroup>
-                  {filtered.map((opt) => (
-                    <CommandItem
-                      key={opt.value}
-                      onSelect={() => {
-                        onChange(opt.value);
-                        setQuery("");
-                        setOpen(false);
-                      }}
-                    >
-                      {opt.label}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </Command>
-          </SelectContent>
-        </Select>
-        <IconButton onClick={() => onChange("")} className="text-primary">
           <XIcon className="size-6" />
         </IconButton>
       </div>

@@ -152,7 +152,7 @@ export type OffersIds = z.infer<typeof OffersIdsSchema>;
 export const ProductSchema = z.object({
   id: z.string().optional(),
   brand: z.string().max(32).optional(),
-  manufacturerCode: z.string().min(3).max(32),
+  manufacturerCode: z.string().max(32),
   productType: z.enum(["obuwie", "akcesoria"]),
   samplePhoto: z.string().optional(),
   rawPhotos: z.array(RawPhotoSchema).default([]).optional(),

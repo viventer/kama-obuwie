@@ -2,7 +2,12 @@
 
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { Button } from "@/components/ui/button";
-import { Product, ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  Product,
+  ProductSchema,
+  ProductWithId,
+  ProductWithStatus,
+} from "@/firebase/schemas/productsSchemas";
 import { useToast } from "@/hooks/useToast";
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
 import axios from "axios";
@@ -10,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { DataTable } from "../../global/data-table/DataTable";
 import { useProductTypeContext } from "../ProductsTypeContext";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 
 export default function CreateProductsNewDataTable({
   data,
@@ -17,7 +23,7 @@ export default function CreateProductsNewDataTable({
   data: ProductWithId[] | null;
 }) {
   const { productType } = useProductTypeContext();
-  const [filteredData, setFilteredData] = useState<ProductWithId[] | null>(
+  const [filteredData, setFilteredData] = useState<ProductWithStatus[] | null>(
     null
   );
 
@@ -30,9 +36,9 @@ export default function CreateProductsNewDataTable({
     ...elementaryColumnNames,
     { attributeName: "colorVariants", displayName: "Warianty" },
   ];
-  const [columnNames, setColumnNames] = useState<ColumnName<ProductWithId>[]>(
-    elementaryColumnNames
-  );
+  const [columnNames, setColumnNames] = useState<
+    ColumnName<ProductWithStatus>[]
+  >(elementaryColumnNames);
 
   useEffect(() => {
     if (!data) {
@@ -42,7 +48,21 @@ export default function CreateProductsNewDataTable({
     const newData = data.filter(
       (product) => product.productType === productType
     );
-    setFilteredData(newData);
+    const newDataWithStatus: ProductWithStatus[] = newData.map((product) => {
+      const areColorVariantsValid =
+        !!product.colorVariants &&
+        product.colorVariants.length > 0 &&
+        product.colorVariants[0]?.color !== "";
+
+      const isValid =
+        product.manufacturerCode.length >= 3 &&
+        (productType === "akcesoria" || areColorVariantsValid) &&
+        product.purchasePrice > 0 &&
+        product.suggestedPrice > 0;
+
+      return { ...product, isReady: isValid };
+    });
+    setFilteredData(newDataWithStatus);
 
     if (
       productType === "obuwie" &&
@@ -79,6 +99,17 @@ export default function CreateProductsNewDataTable({
       name: "Przenieś dalej",
       onClick: async (id) => {
         try {
+          const productData = filteredData?.find(
+            (product) => product.id === id
+          );
+          if (!productData || !productData.isReady) {
+            showToast(
+              "Nie można przenieść produktu. Uzupełnij wszystkie wymagane parametry.",
+              "error"
+            );
+            return;
+          }
+
           const updateData: Partial<Product> = {
             creationStage: "photos",
           };
@@ -127,6 +158,7 @@ export default function CreateProductsNewDataTable({
         hasImages={true}
         imageAttribute="samplePhoto"
         imageFolderPath={`products/sample-photos/${productType}`}
+        isReadyAttribute="isReady"
       />
     </>
   );

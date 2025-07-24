@@ -91,9 +91,6 @@ export default function ProductCreateForm({
     });
   };
 
-  const areColorVariantsValid =
-    colorVariants && colorVariants.length > 0 && colorVariants[0]?.color !== "";
-
   return (
     <FormWrapper headingText="Utwórz produkt">
       <div className="flex flex-col gap-4">
@@ -193,15 +190,7 @@ export default function ProductCreateForm({
             />
           ) : null}
           <div className="flex mt-8 gap-4">
-            <Button
-              onClick={(e) => handleSubmit(e)}
-              className="w-fit"
-              disabled={
-                !form.formState.isValid ||
-                (productType === "obuwie" && !areColorVariantsValid) ||
-                purchasePrice <= 0
-              }
-            >
+            <Button onClick={(e) => handleSubmit(e)} className="w-fit">
               Zapisz
             </Button>
             <Button

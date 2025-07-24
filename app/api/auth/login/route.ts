@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 365 * 24 * 60 * 60, // 1 year in seconds - practically "forever"
     });
 
     // 4. On first login, create Firestore user document
@@ -41,7 +41,6 @@ export async function POST(request: Request) {
         : "UNVERIFIED",
       perms: JSON.stringify({}),
     });
-    await redis.expire(sessionKey, 60 * 60 * 24 * 7);
 
     if (!userDoc.exists) {
       await userRef.set({

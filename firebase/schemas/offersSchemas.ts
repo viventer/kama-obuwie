@@ -69,6 +69,7 @@ export const OfferSchema = z.object({
       })
     )
     .optional(),
+  EAN: z.record(z.string(), z.string()).optional(), // { "31": "1234567890123", "32": "9876543210987" }
 });
 
 export const AllegroDescriptionItemSchema = z.object({
@@ -172,6 +173,7 @@ export const PostOfferFormSchema = OfferSchema.pick({
   impliedWarranty: true,
 }).extend({
   title: z.record(z.string(), z.string().min(12).max(72)),
+  EAN: z.record(z.string(), z.record(z.string(), z.string().length(13))),
 });
 
 export type ShippingRate = z.infer<typeof shippingRateSchema>;

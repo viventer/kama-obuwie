@@ -32,6 +32,7 @@ import ReturnPolicySelector from "./ReturnPolicySelector";
 import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
 import WarrantySelector from "./WarrantySelector";
 import TitlesField from "./TitlesField";
+import EANsField from "./EANsField";
 
 export type PostOfferFormValues = Pick<
   Offer,
@@ -43,6 +44,7 @@ export type PostOfferFormValues = Pick<
   | "impliedWarranty"
 > & {
   title: Record<string, string>; // { colorVariantName: title }
+  EAN: Record<string, Record<string, string>>; // { colorVariantName: { size: EAN } }
 };
 
 export default function PostOfferForm({
@@ -86,6 +88,7 @@ export default function PostOfferForm({
       returnPolicy: oldOfferData.returnPolicy || {},
       warranty: oldOfferData.warranty || {},
       impliedWarranty: oldOfferData.impliedWarranty || {},
+      EAN: {},
     },
   });
 
@@ -296,6 +299,14 @@ export default function PostOfferForm({
         <ImpliedWarrantySelector />
         <WarrantySelector />
         <AvailabilityField sizes={sizes} />
+        <EANsField
+          colorVariants={
+            productData.colorVariants?.map((variant) =>
+              getColorVariantName(variant)
+            ) || []
+          }
+          sizes={sizes}
+        />
       </div>
       <div className="flex mt-8 gap-4">
         <Button onClick={(e) => handleSubmit(e)} className="w-fit">

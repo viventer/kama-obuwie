@@ -44,7 +44,7 @@ export type PostOfferFormValues = Pick<
   | "impliedWarranty"
 > & {
   title: Record<string, string>; // { colorVariantName: title }
-  EAN: Record<string, Record<string, string>>; // { colorVariantName: { size: EAN } }
+  EAN?: Record<string, Record<string, string>>; // { colorVariantName: { size: EAN } }
 };
 
 export default function PostOfferForm({
@@ -131,16 +131,18 @@ export default function PostOfferForm({
       ],
     };
 
-    const formDataWithoutTitles = {
+    const formDataWithoutTitlesAndEAN = {
       ...formData,
       title: "",
+      EAN: {},
     };
 
     try {
       await updateMainOffer({
         ...oldOfferData,
-        ...formDataWithoutTitles,
+        ...formDataWithoutTitlesAndEAN,
         title: formData.title[colorVariantsNames[0]],
+        EAN: formData.EAN?.[colorVariantsNames[0]] || {},
         colorVariantName: colorVariantsNames[0],
         signature:
           signatureWithoutColorVariant.trim() + ` ${colorVariantsNames[0]}`,
@@ -152,8 +154,9 @@ export default function PostOfferForm({
         }
         const id = await createOfferForDifferentVariant({
           ...oldOfferData,
-          ...formDataWithoutTitles,
+          ...formDataWithoutTitlesAndEAN,
           title: formData.title[colorVariantName],
+          EAN: formData.EAN?.[colorVariantName] || {},
           colorVariantName,
           signature:
             signatureWithoutColorVariant.trim() + ` ${colorVariantName}`,
@@ -168,7 +171,7 @@ export default function PostOfferForm({
         PostOfferBody,
         "colorVariant" | "images"
       > = await getPostOfferBody({
-        formDataWithoutTitles,
+        formDataWithoutTitlesAndEAN,
         productData,
         oldOfferData,
         sizingTable,
@@ -227,6 +230,7 @@ export default function PostOfferForm({
 
   const validateForm = async (): Promise<boolean> => {
     const isValid = await form.trigger();
+    console.log(form.getValues());
     if (!isValid) {
       showToast("Formularz zawiera błędy", "error");
       return false;
@@ -299,14 +303,16 @@ export default function PostOfferForm({
         <ImpliedWarrantySelector />
         <WarrantySelector />
         <AvailabilityField sizes={sizes} />
-        <EANsField
-          colorVariants={
-            productData.colorVariants?.map((variant) =>
-              getColorVariantName(variant)
-            ) || []
-          }
-          sizes={sizes}
-        />
+        {productData.rootCategory === "obuwie dziecięce" && (
+          <EANsField
+            colorVariants={
+              productData.colorVariants?.map((variant) =>
+                getColorVariantName(variant)
+              ) || []
+            }
+            sizes={sizes}
+          />
+        )}
       </div>
       <div className="flex mt-8 gap-4">
         <Button onClick={(e) => handleSubmit(e)} className="w-fit">

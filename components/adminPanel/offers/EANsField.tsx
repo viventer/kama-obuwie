@@ -23,7 +23,7 @@ export default function EANsField({
   return (
     <div>
       <h3 className="font-medium">EAN</h3>
-      <div className="mt-2 flex gap-3 flex-wrap max-w-md">
+      <div className="mt-2 flex gap-8 flex-wrap max-w-md">
         {colorVariants.map((colorVariant) => (
           <div key={colorVariant}>
             <FormLabel className="font-normal">{colorVariant}</FormLabel>
@@ -34,7 +34,7 @@ export default function EANsField({
                 control={control}
                 name={`EAN.${colorVariant}.${size}`}
                 render={({ field }) => (
-                  <FormItem className="w-[150px]">
+                  <FormItem className="w-[150px] gap-0">
                     <FormLabel className="text-sm opacity-85 font-normal">
                       r. {size}
                     </FormLabel>
@@ -44,6 +44,7 @@ export default function EANsField({
                       maxLength={13}
                       value={field.value || ""}
                       onChange={field.onChange}
+                      className="mb-4"
                     />
                   </FormItem>
                 )}

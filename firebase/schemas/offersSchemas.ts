@@ -173,7 +173,9 @@ export const PostOfferFormSchema = OfferSchema.pick({
   impliedWarranty: true,
 }).extend({
   title: z.record(z.string(), z.string().min(12).max(72)),
-  EAN: z.record(z.string(), z.record(z.string(), z.string().length(13))),
+  EAN: z
+    .record(z.string(), z.record(z.string(), z.string().length(13)))
+    .optional(),
 });
 
 export type ShippingRate = z.infer<typeof shippingRateSchema>;

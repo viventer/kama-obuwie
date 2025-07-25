@@ -24,6 +24,8 @@ export const allegroParametersToSkip = [
   "Odcień",
   "Kolor dodatkowy",
   "Rozmiar zakresowy",
+  "EAN (GTIN)",
+  "EAN",
 ];
 
 export default function AllegroParametersSection({

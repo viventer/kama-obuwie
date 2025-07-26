@@ -59,6 +59,14 @@ export default function AppSidebar() {
                 Tworzenie produktów
               </LinkText>
             </SidebarMenuItem>
+            <SidebarMenuItem>
+              <LinkText
+                href="/admin-panel/create-products/done"
+                onClick={handleLinkClick}
+              >
+                Wystawione produkty
+              </LinkText>
+            </SidebarMenuItem>
             {/* <SidebarMenuItem>
               <LinkText href="/admin-panel/assortment">
                 Zarządzanie asortymentem

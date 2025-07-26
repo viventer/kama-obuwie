@@ -44,7 +44,7 @@ export type PostOfferFormValues = Pick<
   | "impliedWarranty"
 > & {
   title: Record<string, string>; // { colorVariantName: title }
-  EAN?: Record<string, Record<string, string>>; // { colorVariantName: { size: EAN } }
+  EAN?: Record<string, Record<string, string | undefined>>; // { colorVariantName: { size: EAN } }
 };
 
 export default function PostOfferForm({
@@ -230,7 +230,7 @@ export default function PostOfferForm({
 
   const validateForm = async (): Promise<boolean> => {
     const isValid = await form.trigger();
-    console.log(form.getValues());
+    console.log(form.formState.errors);
     if (!isValid) {
       showToast("Formularz zawiera błędy", "error");
       return false;

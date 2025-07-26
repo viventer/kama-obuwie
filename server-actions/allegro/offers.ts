@@ -222,6 +222,15 @@ export async function postIndividualAllegroOffer(
     });
   }
 
+  const EAN = offer.EAN?.[`r${insoleLength.size}`];
+
+  if (EAN) {
+    allegroProductParameters.push({
+      name: "EAN (GTIN)",
+      values: [EAN],
+    });
+  }
+
   const productSet = [
     {
       marketedBeforeGPSRObligation: true,

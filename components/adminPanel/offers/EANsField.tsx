@@ -30,9 +30,9 @@ export default function EANsField({
             {sizes.map((size) => (
               <FormField
                 key={size}
-                rules={{ required: "EAN jest wymagany dla każdego rozmiaru." }}
+                // rules={{ required: "EAN jest wymagany dla każdego rozmiaru." }}
                 control={control}
-                name={`EAN.${colorVariant}.${size}`}
+                name={`EAN.${colorVariant}.r${size}`}
                 render={({ field }) => (
                   <FormItem className="w-[150px] gap-0">
                     <FormLabel className="text-sm opacity-85 font-normal">

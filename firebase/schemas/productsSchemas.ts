@@ -174,6 +174,7 @@ export const ProductSchema = z.object({
   accessoriesGroupId: z.string().optional(),
   brandInfoId: z.string().optional(),
   offersIds: OffersIdsSchema.optional(),
+  responsibleProducer: z.record(SalesChannelSchema, z.string()).optional(),
 });
 
 export const ProductPartialSchema = ProductSchema.partial();

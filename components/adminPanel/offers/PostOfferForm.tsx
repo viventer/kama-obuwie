@@ -1,7 +1,6 @@
 "use client";
 
-import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import {
   PostOfferFormSchema,
   Offer,

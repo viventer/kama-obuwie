@@ -14,11 +14,11 @@ export default function EANsField({
   colorVariants: string[];
   sizes: string[];
 }) {
+  const { control } = useFormContext<PostOfferFormValues>();
+
   if (colorVariants.length === 0 || sizes.length === 0) {
     return <MiniLoader />;
   }
-
-  const { control } = useFormContext<PostOfferFormValues>();
 
   return (
     <div>

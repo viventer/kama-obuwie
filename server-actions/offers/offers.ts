@@ -18,6 +18,18 @@ export const createOffer = async function (newOffer: Partial<Offer>) {
 
   OfferSchema.partial().parse(newOffer);
 
+  if (newOffer?.signature) {
+    const existingOfferQuery = await adminDB
+      .collection("offers")
+      .where("signature", "==", newOffer.signature)
+      .limit(1)
+      .get();
+
+    if (!existingOfferQuery.empty) {
+      return existingOfferQuery.docs[0].id;
+    }
+  }
+
   const offerRef = adminDB.collection("offers").doc();
 
   await offerRef.set({ ...newOffer, id: offerRef.id });

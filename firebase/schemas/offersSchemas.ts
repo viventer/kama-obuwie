@@ -112,6 +112,18 @@ export const AllegroOfferSchema = z.object({
           id: z.string().optional(),
         })
         .optional(),
+      responsibleProducer: z
+        .object({
+          type: z.literal("NAME"),
+          name: z.string(),
+        })
+        .optional(),
+      safetyInformation: z
+        .object({
+          type: z.literal("TEXT"),
+          description: z.string().max(5000),
+        })
+        .optional(),
     })
   ),
   sellingMode: z.object({

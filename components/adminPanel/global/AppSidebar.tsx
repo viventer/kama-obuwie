@@ -9,6 +9,7 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import LinkText from "./LinkText";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,11 @@ export default function AppSidebar() {
   const router = useRouter();
   const { showToast } = useToast();
   const { user, loading } = useUser();
+  const { setOpen } = useSidebar();
+
+  const handleLinkClick = () => {
+    setOpen(false);
+  };
 
   const logout = async () => {
     try {
@@ -37,7 +43,7 @@ export default function AppSidebar() {
   return (
     <Sidebar className="bg-sidebar-background">
       <SidebarHeader>
-        <LinkText href="/admin-panel/">
+        <LinkText href="/admin-panel/" onClick={handleLinkClick}>
           <h1 className="text-2xl font-medium px-3 py-2">Admin Panel</h1>
         </LinkText>
       </SidebarHeader>
@@ -46,7 +52,10 @@ export default function AppSidebar() {
           <SidebarGroupLabel>Produkty</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
-              <LinkText href="/admin-panel/create-products/new">
+              <LinkText
+                href="/admin-panel/create-products/new"
+                onClick={handleLinkClick}
+              >
                 Tworzenie produktów
               </LinkText>
             </SidebarMenuItem>
@@ -56,7 +65,10 @@ export default function AppSidebar() {
               </LinkText>
             </SidebarMenuItem> */}
             <SidebarMenuItem>
-              <LinkText href="/admin-panel/sizing-tables">
+              <LinkText
+                href="/admin-panel/sizing-tables"
+                onClick={handleLinkClick}
+              >
                 Tabele rozmiarów
               </LinkText>
             </SidebarMenuItem>
@@ -64,7 +76,12 @@ export default function AppSidebar() {
               <LinkText href="/admin-panel/brands">Marki</LinkText>
             </SidebarMenuItem> */}
             <SidebarMenuItem>
-              <LinkText href="/admin-panel/categories">Kategorie</LinkText>
+              <LinkText
+                href="/admin-panel/categories"
+                onClick={handleLinkClick}
+              >
+                Kategorie
+              </LinkText>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
@@ -148,6 +165,7 @@ export default function AppSidebar() {
                 <LinkText
                   href={`/admin-auth/allegro-connect`}
                   className="font-medium"
+                  onClick={handleLinkClick}
                 >
                   Połącz konta Allegro
                 </LinkText>

@@ -23,7 +23,7 @@ import {
 import axios, { AxiosError } from "axios";
 import { getImageUrl } from "../images/images";
 import { verifyUser } from "../auth/auth";
-import { choosingSizeImageFilePath } from "@/lib/constants";
+import { choosingSizeImageFilePath, safetyInformation } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
@@ -194,7 +194,9 @@ export async function postIndividualAllegroOffer(
     allegroCategoryId,
     product.brand
   );
-  const formattedManufacturerCode = `${product.manufacturerCode} ${colorVariant.color}`;
+  const formattedManufacturerCode = `${
+    product.manufacturerCode
+  } ${getColorVariantName(colorVariant)}`;
 
   const shadeValue = colorVariant.shade ?? "";
   const additionalColorValue = colorVariant.additionalColor ?? "brak";
@@ -241,9 +243,29 @@ export async function postIndividualAllegroOffer(
     });
   }
 
+  const EAN = offer.EAN?.[`r${insoleLength.size}`];
+
+  if (EAN) {
+    allegroProductParameters.push({
+      name: "EAN (GTIN)",
+      values: [EAN],
+    });
+  }
+
+  if (!product?.responsibleProducer?.[channel]) {
+    throw new Error(`Brak producenta odpowiedzialnego dla kanału ${channel}.`);
+  }
+
   const productSet = [
     {
-      marketedBeforeGPSRObligation: true,
+      responsibleProducer: {
+        type: "NAME" as const,
+        name: product.responsibleProducer[channel],
+      },
+      safetyInformation: {
+        type: "TEXT" as const,
+        description: safetyInformation,
+      },
       responsiblePerson: {
         name: process.env.RESPONSIBLE_PERSON_NAME!,
       },

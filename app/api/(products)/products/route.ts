@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
   const type = request.nextUrl.searchParams.get("type");
   const creationStageParam = request.nextUrl.searchParams.get("creationStage");
   const sizingTableId = request.nextUrl.searchParams.get("sizingTableId");
+  const categoryId = request.nextUrl.searchParams.get("categoryId");
   const stages = creationStageParam ? creationStageParam.split(",") : null;
 
   const queryFn = (ref: FirebaseFirestore.CollectionReference) => {
@@ -29,6 +30,10 @@ export async function GET(request: NextRequest) {
 
     if (stages && stages.length > 0) {
       query = query.where("creationStage", "in", stages);
+    }
+
+    if (categoryId) {
+      query = query.where("categoryId", "==", categoryId);
     }
 
     return query;

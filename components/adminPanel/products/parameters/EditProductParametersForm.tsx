@@ -34,6 +34,11 @@ import MatchingCategoriesSelector from "../categories/MatchingCategoriesSelector
 import MultipleSearchSelect from "../../global/form/MultipleSearchSelect";
 import { availableProductFeatures } from "@/lib/constants";
 import TextEditor from "../description/TextEditor";
+import ResponsibleProducerSelector from "./ResponsibleProducerSelector";
+
+export type ProductParametersFormData = Omit<Product, "rangeSizes"> & {
+  rangeSizes: RangeSizeString[];
+};
 
 export default function EditProductParametersForm({
   oldData,
@@ -44,15 +49,11 @@ export default function EditProductParametersForm({
   const { showToast } = useToast();
   const router = useRouter();
 
-  type FormData = Omit<Product, "rangeSizes"> & {
-    rangeSizes: RangeSizeString[];
-  };
-
   useEffect(() => {
     setProductType(oldData.productType);
   }, [oldData]);
 
-  const form = useForm<FormData>({
+  const form = useForm<ProductParametersFormData>({
     defaultValues: {
       brand: oldData.brand || "",
       manufacturerCode: oldData.manufacturerCode || "",
@@ -81,6 +82,7 @@ export default function EditProductParametersForm({
       matchingCategoriesIds: oldData.matchingCategoriesIds || [],
       features: oldData.features || [],
       otherInfo: oldData.otherInfo || "",
+      responsibleProducer: oldData.responsibleProducer || {},
     },
     mode: "onSubmit",
   });
@@ -228,6 +230,7 @@ export default function EditProductParametersForm({
             </FormItem>
           )}
         />
+        <ResponsibleProducerSelector />
         <FormField
           control={form.control}
           rules={{ required: "Kod producenta jest wymagany." }}

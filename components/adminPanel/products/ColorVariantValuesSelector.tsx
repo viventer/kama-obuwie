@@ -1,13 +1,6 @@
 import { AllegroColorWithShades } from "@/app/api/allegro/parameters/shoeColors/route";
 import IconButton from "@/components/adminPanel/global/IconButton";
-import { FormControl, FormLabel } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import SingleSearchSelect from "@/components/adminPanel/global/form/SingleSearchSelect";
 import { ColorVariant } from "@/firebase/schemas/productsSchemas";
 import { TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -68,78 +61,35 @@ export default function ColorVariantValuesSelector({
           </IconButton>
         ) : null}
       </div>
-      <FormLabel className="font-normal text-sm">Kolor główny</FormLabel>
-      <FormControl>
-        <Select
-          value={value[index].color}
-          onValueChange={(value) => updateAt(index, { color: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Wybierz kolor główny" />
-            <SelectContent className="bg-card border-primary">
-              {colorOptions.map((color, i) => (
-                <SelectItem
-                  key={i}
-                  value={color}
-                  className="text-base z-50 focus:bg-secondary focus:text-background dark:focus:text-text hover:cursor-pointer"
-                >
-                  {color}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </SelectTrigger>
-        </Select>
-      </FormControl>
+      <SingleSearchSelect
+        label="Kolor główny"
+        value={value[index].color}
+        options={colorOptions.map((color) => ({ label: color, value: color }))}
+        onChange={(value) => updateAt(index, { color: value })}
+        placeholder="Wybierz kolor główny"
+      />
       {availableShades.length > 0 ? (
-        <>
-          <FormLabel className="font-normal text-sm">Odcień</FormLabel>
-          <FormControl>
-            <Select
-              value={value[index].shade}
-              onValueChange={(value) => updateAt(index, { shade: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Wybierz odcień" />
-                <SelectContent className="bg-card border-primary">
-                  {availableShades.map((shade, i) => {
-                    return (
-                      <SelectItem
-                        key={i}
-                        value={shade}
-                        className="text-base z-50 focus:bg-secondary focus:text-background dark:focus:text-text hover:cursor-pointer"
-                      >
-                        {shade}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </SelectTrigger>
-            </Select>
-          </FormControl>
-        </>
+        <SingleSearchSelect
+          label="Odcień"
+          value={value[index].shade}
+          options={availableShades.map((shade) => ({
+            label: shade,
+            value: shade,
+          }))}
+          onChange={(value) => updateAt(index, { shade: value })}
+          placeholder="Wybierz odcień"
+        />
       ) : null}
-      <FormLabel className="font-normal text-sm">Kolor dodatkowy</FormLabel>
-      <FormControl>
-        <Select
-          value={value[index].additionalColor}
-          onValueChange={(value) => updateAt(index, { additionalColor: value })}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Wybierz kolor dodatkowy" />
-            <SelectContent className="bg-card border-primary">
-              {additionalColorOptions.map((color, i) => (
-                <SelectItem
-                  key={i}
-                  value={color}
-                  className="text-base z-50 focus:bg-secondary focus:text-background dark:focus:text-text hover:cursor-pointer"
-                >
-                  {color}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </SelectTrigger>
-        </Select>
-      </FormControl>
+      <SingleSearchSelect
+        label="Kolor dodatkowy"
+        value={value[index].additionalColor}
+        options={additionalColorOptions.map((color) => ({
+          label: color,
+          value: color,
+        }))}
+        onChange={(value) => updateAt(index, { additionalColor: value })}
+        placeholder="Wybierz kolor dodatkowy"
+      />
     </div>
   );
 }

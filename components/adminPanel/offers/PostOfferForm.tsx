@@ -1,7 +1,6 @@
 "use client";
 
-import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import {
   PostOfferFormSchema,
   Offer,
@@ -32,6 +31,7 @@ import ReturnPolicySelector from "./ReturnPolicySelector";
 import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
 import WarrantySelector from "./WarrantySelector";
 import TitlesField from "./TitlesField";
+import EANsField from "./EANsField";
 
 export type PostOfferFormValues = Pick<
   Offer,
@@ -43,6 +43,7 @@ export type PostOfferFormValues = Pick<
   | "impliedWarranty"
 > & {
   title: Record<string, string>; // { colorVariantName: title }
+  EAN?: Record<string, Record<string, string | undefined>>; // { colorVariantName: { size: EAN } }
 };
 
 export default function PostOfferForm({
@@ -86,6 +87,7 @@ export default function PostOfferForm({
       returnPolicy: oldOfferData.returnPolicy || {},
       warranty: oldOfferData.warranty || {},
       impliedWarranty: oldOfferData.impliedWarranty || {},
+      EAN: {},
     },
   });
 
@@ -137,16 +139,18 @@ export default function PostOfferForm({
       (photo) => photo.colorVariantName === colorVariantsNames[0]
     )?.filePath;
 
-    const formDataWithoutTitles = {
+    const formDataWithoutTitlesAndEAN = {
       ...formData,
       title: "",
+      EAN: {},
     };
 
     try {
       await updateMainOffer({
         ...oldOfferData,
-        ...formDataWithoutTitles,
+        ...formDataWithoutTitlesAndEAN,
         title: formData.title[colorVariantsNames[0]],
+        EAN: formData.EAN?.[colorVariantsNames[0]] || {},
         colorVariantName: colorVariantsNames[0],
         signature:
           signatureWithoutColorVariant.trim() + ` ${colorVariantsNames[0]}`,
@@ -162,8 +166,9 @@ export default function PostOfferForm({
         )?.filePath;
         const id = await createOfferForDifferentVariant({
           ...oldOfferData,
-          ...formDataWithoutTitles,
+          ...formDataWithoutTitlesAndEAN,
           title: formData.title[colorVariantName],
+          EAN: formData.EAN?.[colorVariantName] || {},
           colorVariantName,
           signature:
             signatureWithoutColorVariant.trim() + ` ${colorVariantName}`,
@@ -179,7 +184,7 @@ export default function PostOfferForm({
         PostOfferBody,
         "colorVariant" | "images"
       > = await getPostOfferBody({
-        formDataWithoutTitles,
+        formDataWithoutTitlesAndEAN,
         productData,
         oldOfferData,
         sizingTable,
@@ -238,6 +243,7 @@ export default function PostOfferForm({
 
   const validateForm = async (): Promise<boolean> => {
     const isValid = await form.trigger();
+    console.log(form.formState.errors);
     if (!isValid) {
       showToast("Formularz zawiera błędy", "error");
       return false;
@@ -310,6 +316,16 @@ export default function PostOfferForm({
         <ImpliedWarrantySelector />
         <WarrantySelector />
         <AvailabilityField sizes={sizes} />
+        {productData.rootCategory === "obuwie dziecięce" && (
+          <EANsField
+            colorVariants={
+              productData.colorVariants?.map((variant) =>
+                getColorVariantName(variant)
+              ) || []
+            }
+            sizes={sizes}
+          />
+        )}
       </div>
       <div className="flex mt-8 gap-4">
         <Button onClick={(e) => handleSubmit(e)} className="w-fit">

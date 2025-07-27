@@ -11,7 +11,7 @@ import { verifyUser } from "../auth/auth";
 export const createProduct = async function (newProduct: Product) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
-  ProductSchema.parse(newProduct);
+  ProductSchema.partial().parse(newProduct);
 
   const productRef = adminDB.collection("products").doc();
 

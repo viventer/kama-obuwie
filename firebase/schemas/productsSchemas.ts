@@ -57,7 +57,7 @@ export type sizingAccuracyType = "zaniżona" | "normalna" | "zawyżona";
 
 export const SizingTableSchema = z.object({
   id: z.string().optional(),
-  name: z.string().min(3).max(32),
+  name: z.string().max(32),
   insoleLengths: z.array(
     z.object({
       size: z.string(),
@@ -152,7 +152,7 @@ export type OffersIds = z.infer<typeof OffersIdsSchema>;
 export const ProductSchema = z.object({
   id: z.string().optional(),
   brand: z.string().max(32).optional(),
-  manufacturerCode: z.string().min(3).max(32),
+  manufacturerCode: z.string().max(32),
   productType: z.enum(["obuwie", "akcesoria"]),
   samplePhoto: z.string().optional(),
   rawPhotos: z.array(RawPhotoSchema).default([]).optional(),
@@ -174,6 +174,7 @@ export const ProductSchema = z.object({
   accessoriesGroupId: z.string().optional(),
   brandInfoId: z.string().optional(),
   offersIds: OffersIdsSchema.optional(),
+  responsibleProducer: z.record(SalesChannelSchema, z.string()).optional(),
 });
 
 export const ProductPartialSchema = ProductSchema.partial();

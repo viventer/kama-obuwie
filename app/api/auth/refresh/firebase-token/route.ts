@@ -17,7 +17,6 @@ export async function POST(req: Request) {
     const key = `session:${match[1]}`;
 
     await redis.hset(key, { userId: uid, firebaseIdToken: idToken });
-    await redis.expire(key, 60 * 60 * 24 * 7);
 
     return NextResponse.json({ success: true });
   } catch (err) {

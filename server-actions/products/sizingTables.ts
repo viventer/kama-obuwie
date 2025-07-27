@@ -7,7 +7,6 @@ import {
   SizingTableUpdateDataSchema,
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
-import { revalidatePath } from "next/cache";
 
 export const createSizingTable = async function (newSizingTable: SizingTable) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -17,7 +16,6 @@ export const createSizingTable = async function (newSizingTable: SizingTable) {
 
   await sizingTableRef.set(newSizingTable);
 
-  revalidatePath("/admin-panel/sizing-tables");
   return sizingTableRef.id;
 };
 
@@ -36,5 +34,4 @@ export const updateSizingTable = async function (
   }
 
   await sizingTableRef.update(updateData);
-  revalidatePath("/admin-panel/sizing-tables");
 };

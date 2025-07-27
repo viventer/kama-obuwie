@@ -5,6 +5,7 @@ import { DataTable } from "../../global/data-table/DataTable";
 import {
   Category,
   CategoryWithAllegroCategoryName,
+  ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -47,6 +48,17 @@ export default function CategoriesDataTable({
   const { showDialog } = useConfirmDialog();
 
   const handleDeleteCategory = async (id: string) => {
+    const resp = await axios.get(`/api/products?categoryId=${id}`);
+    const connectedProducts: ProductWithId[] | null = Object.values(resp.data);
+
+    if (connectedProducts && connectedProducts.length > 0) {
+      showToast(
+        "Nie można usunąć kategorii, ponieważ jest podłączona do produktów.",
+        "error"
+      );
+      return;
+    }
+
     showDialog({
       message: "Czy na pewno chcesz usunąć tę kategorię?",
       description: "Ta operacja jest nieodwracalna.",

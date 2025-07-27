@@ -18,6 +18,18 @@ export const createOffer = async function (newOffer: Partial<Offer>) {
 
   OfferSchema.partial().parse(newOffer);
 
+  if (newOffer?.signature) {
+    const existingOfferQuery = await adminDB
+      .collection("offers")
+      .where("signature", "==", newOffer.signature)
+      .limit(1)
+      .get();
+
+    if (!existingOfferQuery.empty) {
+      return existingOfferQuery.docs[0].id;
+    }
+  }
+
   const offerRef = adminDB.collection("offers").doc();
 
   await offerRef.set({ ...newOffer, id: offerRef.id });
@@ -42,12 +54,12 @@ export const updateOffer = async function (
 };
 
 export const getPostOfferBody = async ({
-  formDataWithoutTitles,
+  formDataWithoutTitlesAndEAN,
   productData,
   oldOfferData,
   sizingTable,
 }: {
-  formDataWithoutTitles: Omit<PostOfferFormValues, "title">;
+  formDataWithoutTitlesAndEAN: Omit<PostOfferFormValues, "title" | "EAN">;
   productData: ProductWithId;
   oldOfferData: OfferWithId;
   sizingTable: SizingTableWithId;
@@ -62,7 +74,7 @@ export const getPostOfferBody = async ({
   return {
     offer: {
       ...oldOfferData,
-      ...formDataWithoutTitles,
+      ...formDataWithoutTitlesAndEAN,
     },
     product: productData,
     allegroCategoryId,

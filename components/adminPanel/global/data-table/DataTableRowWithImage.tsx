@@ -53,26 +53,36 @@ export default function DataTableRowWithImage<T>({
   return (
     <TableRow
       data-state={row.getIsExpanded() ? "expanded" : undefined}
-      className="cursor-pointer flex items-center gap-2 "
+      className="flex items-center gap-2 hover:bg-muted/50 transition-colors"
       onClick={(e) => {
         const target = e.target as HTMLElement;
+
+        // Sprawdź czy użytkownik zaznacza tekst
+        const selection = window.getSelection();
+        if (selection && selection.toString().length > 0) {
+          return;
+        }
+
+        // Sprawdź czy kliknięto na elementy, które nie powinny wywołać akcji wiersza
         if (
           target.closest("button") ||
           target.closest("[role='menu']") ||
-          target.closest("[data-ignore-row-click]")
+          target.closest("[data-ignore-row-click]") ||
+          target.closest("[data-selectable-text]")
         ) {
           return;
         }
+
         row.toggleExpanded();
         if (onRowClick) {
           onRowClick(row);
         }
       }}
     >
-      <TableCell>
+      <TableCell className="cursor-pointer">
         {flexRender(checkboxCellColumnDef, checkboxCellContext)}
       </TableCell>
-      <TableCell className="flex items-center gap-4 min-w-[200px] ">
+      <TableCell className="flex items-center gap-4 min-w-[200px] cursor-pointer">
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -90,22 +100,24 @@ export default function DataTableRowWithImage<T>({
         ) : (
           <ImageIcon className="min-w-16 h-16 sm:min-w-32 sm:h-32" />
         )}
-        <section className="w-full pr-12">
+        <section className="w-full pr-12" data-selectable-text>
           {row.getVisibleCells().map((cell) => {
             const parameterName = cell.column.columnDef.header as string;
             if (typeof parameterName !== "string") {
               return null;
             }
             return (
-              <p key={cell.id}>
+              <p key={cell.id} className="select-text cursor-text">
                 <b className="max-[400px]:hidden">{parameterName}: </b>
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                <span className="select-text">
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </span>
               </p>
             );
           })}
         </section>
       </TableCell>
-      <TableCell className="block">
+      <TableCell className="block cursor-pointer">
         {flexRender(actionsCellColumnDef, actionsCellContext)}
       </TableCell>
     </TableRow>

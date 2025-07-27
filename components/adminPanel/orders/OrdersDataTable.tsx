@@ -32,6 +32,7 @@ import {
   FilePlus2Icon,
   Mail,
   MoreHorizontal,
+  PackageIcon,
 } from "lucide-react";
 import { Order, OrderPhase } from "@/firebase/schemas/ordersSchemas";
 import { OrderLineItemDisplay } from "./OrderLineItemDisplay";
@@ -180,6 +181,18 @@ export default function OrdersDataTable({
               <FilePlus2Icon className="size-4" />
             </IconButton>
           )}
+          {row.original.fulfillment?.status !== "NEW" &&
+            row.original.fulfillment?.status !== "CANCELLED" && (
+              <IconButton
+                className={`${
+                  row.original.percelNumbers?.length
+                    ? "text-success"
+                    : "text-destructive"
+                } hover:text-primary`}
+              >
+                <PackageIcon className="size-4" />
+              </IconButton>
+            )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -286,6 +299,7 @@ export default function OrdersDataTable({
                         target.closest("[role='checkbox']") ||
                         target.closest("[data-ignore-row-click]") ||
                         target.closest("[data-radix-popper-content-wrapper]") ||
+                        target.closest("button") ||
                         target.closest("[role='menuitem']")
                       ) {
                         return;

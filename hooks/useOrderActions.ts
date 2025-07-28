@@ -37,7 +37,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     name: "Zwróć część wpłaty",
     onClick: async (id) => {
       showToast("Zwróć część wpłaty", "default");
-      router.push(`/admin-panel/send-refund/${id}`);
+      router.push(`/admin-panel/orders/send-refund/${id}`);
     },
   };
 
@@ -52,7 +52,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
         };
         await axios.patch(`/api/orders/${id}`, updateData);
         showToast("Zamówienie odrzucone", "default");
-        router.push(`/admin-panel/send-refund/${id}`);
+        router.push(`/admin-panel/orders/send-refund/${id}`);
       } catch (err) {
         showToast(`Błąd podczas odrzucania zamówienia: ${err}`, "error");
       }

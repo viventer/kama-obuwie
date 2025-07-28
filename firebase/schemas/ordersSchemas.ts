@@ -54,6 +54,16 @@ export const DiscountSchema = z.enum([
   "CAMPAIGN",
 ]);
 
+const RefundReasonSchema = z.enum([
+  "REFUND",
+  "COMPLAINT",
+  "PRODUCT_NOT_AVAILABLE",
+  "PAID_VALUE_TOO_LOW",
+  "OVERPAID",
+  "CANCELLED_BY_BUYER",
+  "NOT_COLLECTED",
+]);
+
 export const PriceSchema = z.object({
   amount: z.string(),
   currency: z.enum(["PLN"]),
@@ -169,10 +179,26 @@ export const OrderItemSchema = z.object({
   discount: z.array(DiscountSchema).nullable(),
 });
 
+export const RefundItemSchema = z.object({
+  id: z.string(), // line item id
+  type: z.enum(["AMOUNT", "QUANTITY"]),
+  quantity: z.number().optional(), // required if type is "QUANTITY"
+  value: PriceSchema.optional(), // required if type is "AMOUNT"
+});
+
+export const RefundSchema = z.object({
+  type: z.enum(["PARTIAL", "FULL", "NONE"]),
+  amount: PriceSchema.optional(),
+  reason: RefundReasonSchema.optional(),
+  lineItems: z.array(RefundItemSchema).min(1).optional(),
+  delivery: PriceSchema.optional(),
+  sellerComment: z.string().max(250).optional(),
+});
+
 export const OrderSchema = z.object({
   id: z.string().optional(),
   number: z.string(),
-  allegroId: z.string().nullable(), // checkout form id
+  allegroId: z.string().nullable(), // order id in Allegro
   messageToSeller: z.string().nullable(),
   buyer: BuyerSchema,
   payment: PaymentSchema.nullable(),
@@ -192,6 +218,7 @@ export const OrderSchema = z.object({
   updatedAt: z.string().nullable(),
   createdAt: z.string(),
   salesChannel: SalesChannelSchema,
+  refund: RefundSchema.optional(),
   percelNumbers: z.array(z.string()).optional(),
 });
 
@@ -221,7 +248,7 @@ export const AllegroOrderItemSchema = z.object({
 });
 
 export const AllegroOrderSchema = z.object({
-  id: z.string(), // checkout form id
+  id: z.string(), // order id, not checkout form id
   messageToSeller: z.string().nullable(),
   buyer: BuyerSchema,
   payment: PaymentSchema.nullable(),
@@ -249,3 +276,5 @@ export type Order = z.infer<typeof OrderSchema>;
 export type OrderWithId = Order & { id: string };
 export type AllegroOrder = z.infer<typeof AllegroOrderSchema>;
 export type OrderPhase = z.infer<typeof OrderPhaseSchema>;
+export type Refund = z.infer<typeof RefundSchema>;
+export type RefundReason = z.infer<typeof RefundReasonSchema>;

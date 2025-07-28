@@ -4,14 +4,19 @@ import Image from "next/image";
 import { ImageIcon } from "lucide-react";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { extractSizeFromTitle } from "../../../helpers/extractSizeFromTitle";
+import { cn } from "@/lib/utils";
 
 interface OrderLineItemDisplayProps {
   lineItems: Order["lineItems"];
+  className?: string;
 }
 
-export function OrderLineItemDisplay({ lineItems }: OrderLineItemDisplayProps) {
+export function OrderLineItemDisplay({
+  lineItems,
+  className,
+}: OrderLineItemDisplayProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn("flex flex-col gap-2", className)}>
       {lineItems.map((item, index) => {
         const size = extractSizeFromTitle(item.offer.name || "");
 

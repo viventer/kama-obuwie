@@ -42,7 +42,6 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
         return;
       }
 
-      showToast("Zwróć część wpłaty", "default");
       router.push(`/admin-panel/orders/send-refund/${id}`);
     },
   };

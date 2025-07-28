@@ -10,6 +10,7 @@ import {
 import { Order, Refund } from "@/firebase/schemas/ordersSchemas";
 import { useForm } from "react-hook-form";
 import SingleSelect from "../../global/form/SingleSelect";
+import ItemsToRefundList from "./ItemsToRefundList";
 
 export const refundReasons = [
   { name: "zwrot produktu", value: "REFUND" },
@@ -63,6 +64,7 @@ export default function SendRefundForm({
             </FormItem>
           )}
         />
+        <ItemsToRefundList lineItems={lineItems} />
       </div>
     </Form>
   );

@@ -190,7 +190,7 @@ export const RefundSchema = z.object({
   type: z.enum(["PARTIAL", "FULL", "NONE"]),
   amount: PriceSchema.optional(),
   reason: RefundReasonSchema.optional(),
-  lineItems: z.array(RefundItemSchema).min(1).optional(),
+  lineItems: z.array(RefundItemSchema).optional(),
   delivery: PriceSchema.optional(),
   sellerComment: z.string().max(250).optional(),
 });

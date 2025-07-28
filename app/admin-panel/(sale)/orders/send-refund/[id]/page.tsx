@@ -1,8 +1,6 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import SendRefundForm from "@/components/adminPanel/orders/forms/SendRefundForm";
 import OrderDataWidget from "@/components/adminPanel/orders/OrderDataWidget";
-import { OrderInfoDisplay } from "@/components/adminPanel/orders/OrderInfoDisplay";
-import { OrderLineItemDisplay } from "@/components/adminPanel/orders/OrderLineItemDisplay";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";
 import { notFound } from "next/navigation";
@@ -26,10 +24,18 @@ export default async function SendRefundPage(props: Props) {
     return notFound();
   }
 
+  if (!data.payment?.paidAmount || !data.payment?.id) {
+    return notFound();
+  }
+
   return (
     <FormWrapper headingText="Zwróć wpłatę">
       <OrderDataWidget data={data as OrderWithId} />
-      <SendRefundForm order={data as OrderWithId} />
+      <SendRefundForm
+        refund={data?.refund}
+        paymentId={data.payment?.id}
+        lineItems={data.lineItems}
+      />
     </FormWrapper>
   );
 }

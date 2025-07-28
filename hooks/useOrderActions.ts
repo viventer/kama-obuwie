@@ -36,6 +36,12 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
   const refundAction: TableAction = {
     name: "Zwróć część wpłaty",
     onClick: async (id) => {
+      const { data } = await axios.get(`/api/orders/${id}`);
+      if (!data.payment?.paidAmount || !data.payment?.id) {
+        showToast("Brak wpłaty do zwrotu", "error");
+        return;
+      }
+
       showToast("Zwróć część wpłaty", "default");
       router.push(`/admin-panel/orders/send-refund/${id}`);
     },

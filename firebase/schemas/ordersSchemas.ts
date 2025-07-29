@@ -195,6 +195,21 @@ export const RefundSchema = z.object({
   sellerComment: z.string().max(250).optional(),
 });
 
+export const AllegroRefundSchema = z.object({
+  payment: z.object({
+    id: z.string(),
+  }),
+  order: z
+    .object({
+      id: z.string(),
+    })
+    .optional(),
+  reason: RefundReasonSchema,
+  lineItems: z.array(RefundItemSchema).optional(),
+  delivery: PriceSchema.optional(),
+  sellerComment: z.string().max(250).optional(),
+});
+
 export const OrderSchema = z.object({
   id: z.string().optional(),
   number: z.string(),
@@ -278,3 +293,4 @@ export type AllegroOrder = z.infer<typeof AllegroOrderSchema>;
 export type OrderPhase = z.infer<typeof OrderPhaseSchema>;
 export type Refund = z.infer<typeof RefundSchema>;
 export type RefundReason = z.infer<typeof RefundReasonSchema>;
+export type AllegroRefund = z.infer<typeof AllegroRefundSchema>;

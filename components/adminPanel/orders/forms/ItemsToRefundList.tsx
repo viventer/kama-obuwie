@@ -4,16 +4,13 @@ import OrderItemFromList from "../OrderItemFromList";
 import { useFormContext } from "react-hook-form";
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
 
 export default function ItemsToRefundList({
   lineItems,
 }: {
   lineItems: Order["lineItems"];
 }) {
-  const { control, watch } = useFormContext<Refund>();
-
-  const lineItemsValue = watch("lineItems");
+  const { control, watch, setValue } = useFormContext<Refund>();
 
   return (
     <div>
@@ -38,7 +35,21 @@ export default function ItemsToRefundList({
                       <Input
                         type="number"
                         value={field.value || ""}
-                        onChange={field.onChange}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          const quantity = Number(e.target.value);
+                          const unitPrice = Number(
+                            lineItems[index].price.amount
+                          );
+                          const refundAmount = (
+                            quantity * unitPrice
+                          ).toString();
+
+                          setValue(
+                            `lineItems.${index}.value.amount`,
+                            refundAmount || ""
+                          );
+                        }}
                         max={item.quantity}
                         className="w-[70px]"
                       />
@@ -61,14 +72,7 @@ export default function ItemsToRefundList({
                     <div className="flex gap-2 items-end">
                       <Input
                         type="number"
-                        value={
-                          field.value ||
-                          Number(item.price.amount) *
-                            (lineItemsValue?.[index]?.quantity &&
-                            lineItemsValue?.[index]?.quantity > 0
-                              ? lineItemsValue?.[index]?.quantity
-                              : 0)
-                        }
+                        value={field.value || ""}
                         onChange={field.onChange}
                         max={item.quantity}
                         className="w-[90px] no-spinner"

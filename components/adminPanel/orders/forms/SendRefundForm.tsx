@@ -12,7 +12,11 @@ import { useForm } from "react-hook-form";
 import SingleSelect from "../../global/form/SingleSelect";
 import ItemsToRefundList from "./ItemsToRefundList";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect } from "react";
+import { FormEvent, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
+import { useToast } from "@/hooks/useToast";
+import { useParams, useRouter } from "next/navigation";
 
 export const refundReasons = [
   { name: "zwrot produktu", value: "REFUND" },
@@ -46,6 +50,58 @@ export default function SendRefundForm({
       sellerComment: refund?.sellerComment || "",
     },
   });
+
+  const { showDialog } = useConfirmDialog();
+  const { showToast } = useToast();
+  const router = useRouter();
+  const handleReject = async (e: FormEvent) => {
+    e.preventDefault();
+
+    showDialog({
+      message: "Czy na pewno chcesz odrzucić zmiany?",
+      description: "Ta operacja jest nieodwracalna.",
+      onConfirm: async () => {
+        router.back();
+        showToast("Zmiany zostały odrzucone.", "default");
+      },
+    });
+  };
+
+  const { id } = useParams();
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    const isValid = await form.trigger();
+    if (!isValid) {
+      showToast("Formularz zawiera błędy.", "error");
+      return;
+    }
+
+    // Oblicz sumę wartości wszystkich zwracanych produktów
+    const lineItemsData = form.getValues("lineItems") || [];
+    const totalRefundAmount = lineItemsData.reduce((sum, item) => {
+      const itemAmount = Number(item.value?.amount || 0);
+      return sum + itemAmount;
+    }, 0);
+
+    // Ustaw wartość amount na obliczoną sumę
+    form.setValue("amount", {
+      amount: totalRefundAmount.toString(),
+      currency: "PLN",
+    });
+
+    const data: Refund = form.getValues();
+
+    showDialog({
+      message: `Czy na pewno chcesz zwrócić ${totalRefundAmount.toString()} zł?`,
+      description: "Ta operacja jest nieodwracalna.",
+      onConfirm: async () => {
+        router.back();
+        showToast("Zmiany zostały odrzucone.", "default");
+      },
+    });
+  };
 
   return (
     <Form {...form}>
@@ -86,10 +142,18 @@ export default function SendRefundForm({
             </FormItem>
           )}
         />
-        <div className="p-4 rounded-lg">
-          <p className="text-lg font-semibold">
-            Łączna kwota do zwrotu: {form.watch("amount")?.amount || "0.00"} zł
-          </p>
+        <div className="flex gap-4 mt-8">
+          <Button type="button" onClick={handleSubmit} className="w-fit">
+            Zapisz
+          </Button>
+          <Button
+            type="button"
+            onClick={handleReject}
+            className="w-fit"
+            variant="destructive"
+          >
+            Odrzuć
+          </Button>
         </div>
       </div>
     </Form>

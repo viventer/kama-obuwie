@@ -55,7 +55,7 @@ export async function getAllegroUserAccessTokens(): Promise<{
   for (const account of ["AL1", "AL2"] as const) {
     const accessToken = sess[`${account}AccessToken`] as string | undefined;
     const expiryTs = parseInt(
-      (sess[`${account}AccessTokenExpiry`] as string) || "0",
+      (sess[`${account}TokenExpiry`] as string) || "0",
       10
     );
 
@@ -104,7 +104,7 @@ export async function getAllegroUserAccessTokens(): Promise<{
     const newExpiry = now + expires_in;
     await redis.hset(key, {
       [`${account}AccessToken`]: access_token,
-      [`${account}AccessTokenExpiry`]: newExpiry.toString(),
+      [`${account}TokenExpiry`]: newExpiry.toString(),
     });
 
     // 6. Zapisz nowy refresh token w Firestore

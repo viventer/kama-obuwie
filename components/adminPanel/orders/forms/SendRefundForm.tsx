@@ -11,6 +11,8 @@ import { Order, Refund } from "@/firebase/schemas/ordersSchemas";
 import { useForm } from "react-hook-form";
 import SingleSelect from "../../global/form/SingleSelect";
 import ItemsToRefundList from "./ItemsToRefundList";
+import { Textarea } from "@/components/ui/textarea";
+import { useEffect } from "react";
 
 export const refundReasons = [
   { name: "zwrot produktu", value: "REFUND" },
@@ -65,6 +67,30 @@ export default function SendRefundForm({
           )}
         />
         <ItemsToRefundList lineItems={lineItems} />
+        <FormField
+          control={form.control}
+          name="sellerComment"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel className="text-sm opacity-85 font-normal">
+                Komentarz sprzedawcy
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  className="w-full p-2 border rounded"
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.target.value)}
+                  maxLength={250}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <div className="p-4 rounded-lg">
+          <p className="text-lg font-semibold">
+            Łączna kwota do zwrotu: {form.watch("amount")?.amount || "0.00"} zł
+          </p>
+        </div>
       </div>
     </Form>
   );

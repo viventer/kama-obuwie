@@ -35,6 +35,7 @@ export default async function SendRefundPage(props: Props) {
         refund={data?.refund}
         paymentId={data.payment?.id}
         lineItems={data.lineItems}
+        salesChannel={data.salesChannel}
       />
     </FormWrapper>
   );

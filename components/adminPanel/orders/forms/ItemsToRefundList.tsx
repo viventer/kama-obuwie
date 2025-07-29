@@ -38,6 +38,13 @@ export default function ItemsToRefundList({
                         onChange={(e) => {
                           field.onChange(e.target.value);
                           const quantity = Number(e.target.value);
+                          if (quantity > lineItems[index].quantity) {
+                            setValue(
+                              `lineItems.${index}.quantity`,
+                              lineItems[index].quantity
+                            );
+                            return;
+                          }
                           const unitPrice = Number(
                             lineItems[index].price.amount
                           );

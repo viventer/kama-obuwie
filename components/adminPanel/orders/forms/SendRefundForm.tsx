@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { useToast } from "@/hooks/useToast";
 import { useParams, useRouter } from "next/navigation";
+import axios from "axios";
+import { allegroSalesChannels } from "@/lib/constants";
 
 export const refundReasons = [
   { name: "zwrot produktu", value: "REFUND" },
@@ -35,10 +37,12 @@ export default function SendRefundForm({
   refund,
   paymentId,
   lineItems,
+  salesChannel,
 }: {
   refund: Refund | undefined;
   paymentId: string | undefined;
   lineItems: Order["lineItems"];
+  salesChannel: Order["salesChannel"];
 }) {
   const form = useForm<Refund>({
     defaultValues: {
@@ -85,11 +89,40 @@ export default function SendRefundForm({
       return sum + itemAmount;
     }, 0);
 
+    // Oblicz sumę wartości wszystkich zamówionych produktów
+    const totalOrderAmount = lineItems.reduce((sum, item) => {
+      const itemPrice = Number(item.price.amount);
+      return sum + itemPrice * item.quantity;
+    }, 0);
+
     // Ustaw wartość amount na obliczoną sumę
     form.setValue("amount", {
       amount: totalRefundAmount.toString(),
       currency: "PLN",
     });
+
+    // Ustaw wartość type na podstawie porównania kwot
+    let refundType: "NONE" | "PARTIAL" | "FULL";
+    if (totalRefundAmount === 0) {
+      refundType = "NONE";
+    } else if (totalRefundAmount < totalOrderAmount) {
+      refundType = "PARTIAL";
+    } else {
+      refundType = "FULL";
+    }
+
+    form.setValue("type", refundType);
+
+    // Przekonwertuj wszystkie quantity na typ number
+    const lineItemsWithNumberQuantity = lineItemsData.map((item, index) => ({
+      ...item,
+      id: lineItems[index].id,
+      type: item.type || "AMOUNT",
+      quantity: Number(item.quantity || 0),
+      value: { amount: item.value?.amount || "0", currency: "PLN" as const },
+    }));
+
+    form.setValue("lineItems", lineItemsWithNumberQuantity);
 
     const data: Refund = form.getValues();
 
@@ -97,8 +130,27 @@ export default function SendRefundForm({
       message: `Czy na pewno chcesz zwrócić ${totalRefundAmount.toString()} zł?`,
       description: "Ta operacja jest nieodwracalna.",
       onConfirm: async () => {
-        router.back();
-        showToast("Zmiany zostały odrzucone.", "default");
+        await axios.patch(`/api/orders/${id}`, {
+          refund: {
+            ...data,
+          },
+        });
+
+        if (["AL1", "AL2"].includes(salesChannel)) {
+          await axios.post(`/api/allegro/orders/refunds`, {
+            refund: {
+              payment: { id: paymentId },
+              reason: data.reason,
+              lineItems: data.lineItems,
+              sellerComment: data.sellerComment,
+              delivery: data.delivery,
+            },
+            account: salesChannel,
+          });
+        }
+
+        router.replace("/admin-panel/orders/new");
+        showToast("Wpłata została zwrócona.", "success");
       },
     });
   };

@@ -37,7 +37,11 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     name: "Zwróć część wpłaty",
     onClick: async (id) => {
       const { data } = await axios.get(`/api/orders/${id}`);
-      if (!data.payment?.paidAmount || !data.payment?.id) {
+      if (
+        !data.payment?.paidAmount ||
+        !data.payment?.id ||
+        data.refund.type !== "NONE"
+      ) {
         showToast("Brak wpłaty do zwrotu", "error");
         return;
       }

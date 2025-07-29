@@ -4,8 +4,8 @@ import {
   AllegroRefund,
   AllegroRefundSchema,
 } from "@/firebase/schemas/ordersSchemas";
-import { getAllegroUserAccessToken, getAllegroUserAccessTokens } from "./auth";
-import { getAllegroHeaders, getSingleAllegroHeaders } from "./global";
+import { getAllegroUserAccessToken } from "./auth";
+import { getSingleAllegroHeaders } from "./global";
 import { verifyUser } from "../auth/auth";
 import axios from "axios";
 import { allegroSalesChannels } from "@/lib/constants";

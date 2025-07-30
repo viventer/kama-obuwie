@@ -45,6 +45,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useOrderActions } from "@/hooks/useOrderActions";
+import OrderCostDisplay from "./OrderCostDisplay";
 
 interface OrdersDataTableProps {
   orders: Order[];
@@ -154,8 +155,14 @@ export default function OrdersDataTable({
     },
     {
       id: "orderInfo",
-      header: "Informacje",
+      header: "Podstawowe informacje",
       cell: ({ row }) => <OrderInfoDisplay order={row.original} />,
+      enableSorting: false,
+    },
+    {
+      id: "costInfo",
+      header: "Koszty",
+      cell: ({ row }) => <OrderCostDisplay order={row.original} />,
       enableSorting: false,
     },
     {
@@ -258,7 +265,7 @@ export default function OrdersDataTable({
   });
 
   return (
-    <div className="w-full max-h-[70svh] max-w-[1024px]">
+    <div className="w-full max-h-[70svh] max-w-[1440px]">
       {/* Pole wyszukiwania */}
       <div className="flex items-center py-4">
         <Input

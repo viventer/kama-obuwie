@@ -40,11 +40,6 @@ export function OrderInfoDisplay({ order }: OrderInfoDisplayProps) {
           <UserIcon className="size-3" /> {order.buyer.login}
         </div>
       </div>
-
-      <div className="font-medium text-sm">
-        <span className="font-light">Suma:</span>{" "}
-        {order.summary.totalToPay.amount} {order.summary.totalToPay.currency}
-      </div>
     </div>
   );
 }

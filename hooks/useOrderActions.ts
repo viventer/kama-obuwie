@@ -40,7 +40,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
       if (
         !data.payment?.paidAmount ||
         !data.payment?.id ||
-        data.refund.type !== "NONE"
+        (data?.refund?.type && data.refund.type !== "NONE")
       ) {
         showToast("Brak wpłaty do zwrotu", "error");
         return;

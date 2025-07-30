@@ -162,7 +162,10 @@ export default function OrdersDataTable({
       accessorKey: "lineItems",
       header: "Produkty",
       cell: ({ row }) => (
-        <OrderLineItemDisplay lineItems={row.getValue("lineItems")} />
+        <OrderLineItemDisplay
+          lineItems={row.getValue("lineItems")}
+          refund={row.original.refund}
+        />
       ),
       enableSorting: false,
     },

@@ -89,11 +89,10 @@ export default function SendRefundForm({
       return sum + itemAmount;
     }, 0);
 
-    // Oblicz sumę wartości wszystkich zamówionych produktów
-    const totalOrderAmount = lineItems.reduce((sum, item) => {
-      const itemPrice = Number(item.price.amount);
-      return sum + itemPrice * item.quantity;
-    }, 0);
+    if (totalRefundAmount <= 0) {
+      showToast("Kwota zwrotu musi być większa niż 0.", "error");
+      return;
+    }
 
     // Ustaw wartość amount na obliczoną sumę
     form.setValue("amount", {
@@ -101,14 +100,34 @@ export default function SendRefundForm({
       currency: "PLN",
     });
 
-    // Ustaw wartość type na podstawie porównania kwot
+    // Sprawdź czy ilości zwracanych produktów nie przekraczają zamówionych
+    for (let index = 0; index < lineItemsData.length; index++) {
+      const refundQuantity = Number(lineItemsData[index].quantity || 0);
+      const orderQuantity = lineItems[index]?.quantity || 0;
+
+      if (refundQuantity > orderQuantity) {
+        showToast(
+          "Ilość zwracanego produktu nie może być większa niż zamówiona.",
+          "error"
+        );
+        return;
+      }
+    }
+
+    // Ustaw wartość type na podstawie porównania ilości produktów
     let refundType: "NONE" | "PARTIAL" | "FULL";
-    if (totalRefundAmount === 0) {
-      refundType = "NONE";
-    } else if (totalRefundAmount < totalOrderAmount) {
-      refundType = "PARTIAL";
-    } else {
+
+    // Sprawdź czy wszystkie produkty zostały zwrócone w pełnej ilości
+    const allItemsFullyRefunded = lineItemsData.every((item, index) => {
+      const refundQuantity = Number(item.quantity || 0);
+      const orderQuantity = lineItems[index]?.quantity || 0;
+      return refundQuantity === orderQuantity;
+    });
+
+    if (allItemsFullyRefunded) {
       refundType = "FULL";
+    } else {
+      refundType = "PARTIAL";
     }
 
     form.setValue("type", refundType);

@@ -10,6 +10,7 @@ export default function OrderDataWidget({ data }: { data: OrderWithId }) {
       <div className="flex flex-wrap gap-8">
         <OrderInfoDisplay order={data as OrderWithId} />
         <OrderLineItemDisplay
+          refund={data?.refund}
           lineItems={data.lineItems}
           className="max-h-[140px] overflow-auto scrollbar-thin pr-2"
         />

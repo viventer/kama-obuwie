@@ -8,12 +8,14 @@ interface OrderLineItemDisplayProps {
   lineItems: Order["lineItems"];
   className?: string;
   withPrice?: boolean;
+  refund?: Order["refund"];
 }
 
 export function OrderLineItemDisplay({
   lineItems,
   className,
   withPrice = true,
+  refund,
 }: OrderLineItemDisplayProps) {
   return (
     <div className={cn("flex flex-col gap-2", className)}>
@@ -22,6 +24,7 @@ export function OrderLineItemDisplay({
           key={item.id || index}
           item={item}
           withPrice={withPrice}
+          refund={refund}
         />
       ))}
     </div>

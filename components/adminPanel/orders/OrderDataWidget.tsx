@@ -1,7 +1,7 @@
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";
 import React from "react";
-import { OrderInfoDisplay } from "./OrderInfoDisplay";
-import { OrderLineItemDisplay } from "./OrderLineItemDisplay";
+import { OrderInfoDisplay } from "./tables/OrderInfoDisplay";
+import { OrderLineItemDisplay } from "./tables/OrderLineItemDisplay";
 
 export default function OrderDataWidget({ data }: { data: OrderWithId }) {
   return (

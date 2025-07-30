@@ -235,6 +235,7 @@ export const OrderSchema = z.object({
   salesChannel: SalesChannelSchema,
   refund: RefundSchema.optional(),
   percelNumbers: z.array(z.string()).optional(),
+  isPickupOrdered: z.boolean().optional(),
 });
 
 export const AllegroOrderItemSchema = z.object({

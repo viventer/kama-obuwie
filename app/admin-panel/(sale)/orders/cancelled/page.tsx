@@ -1,5 +1,5 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import OrdersDataTable from "@/components/adminPanel/orders/OrdersDataTable";
+import OrdersDataTable from "@/components/adminPanel/orders/tables/OrdersDataTable";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 

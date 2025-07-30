@@ -9,7 +9,7 @@ import { createOrder, updateOrder } from "@/server-actions/orders/orders";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { Offer } from "@/firebase/schemas/offersSchemas";
-import { AllegroSalesChanell } from "@/lib/constants";
+import { AllegroSalesChannel } from "@/lib/constants";
 import { getAllegroOffer } from "./offers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
@@ -379,7 +379,7 @@ function transformAllegroToOrderUpdate(
  */
 export async function getOfferIdByAllegroId(
   allegroOfferId: string,
-  salesChannel: AllegroSalesChanell
+  salesChannel: AllegroSalesChannel
 ): Promise<string | null> {
   try {
     // Pobierz wszystkie oferty z bazy danych

@@ -37,7 +37,7 @@ import {
 import { Order, OrderPhase } from "@/firebase/schemas/ordersSchemas";
 import { OrderLineItemDisplay } from "./OrderLineItemDisplay";
 import { OrderInfoDisplay } from "./OrderInfoDisplay";
-import IconButton from "../global/IconButton";
+import IconButton from "../../global/IconButton";
 import {
   DropdownMenu,
   DropdownMenuContent,

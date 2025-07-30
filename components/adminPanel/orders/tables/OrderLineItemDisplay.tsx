@@ -2,7 +2,7 @@
 
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { cn } from "@/lib/utils";
-import OrderItemFromList from "./OrderItemFromList";
+import OrderItemFromList from "../OrderItemFromList";
 
 interface OrderLineItemDisplayProps {
   lineItems: Order["lineItems"];

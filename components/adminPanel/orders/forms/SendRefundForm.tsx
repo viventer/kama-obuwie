@@ -18,7 +18,6 @@ import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { useToast } from "@/hooks/useToast";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
-import { allegroSalesChannels } from "@/lib/constants";
 
 export const refundReasons = [
   { name: "zwrot produktu", value: "REFUND" },
@@ -38,11 +37,13 @@ export default function SendRefundForm({
   paymentId,
   lineItems,
   salesChannel,
+  allegroOrderId,
 }: {
   refund: Refund | undefined;
   paymentId: string | undefined;
   lineItems: Order["lineItems"];
   salesChannel: Order["salesChannel"];
+  allegroOrderId: string | null;
 }) {
   const form = useForm<Refund>({
     defaultValues: {
@@ -149,13 +150,24 @@ export default function SendRefundForm({
       message: `Czy na pewno chcesz zwrócić ${totalRefundAmount.toString()} zł?`,
       description: "Ta operacja jest nieodwracalna.",
       onConfirm: async () => {
-        await axios.patch(`/api/orders/${id}`, {
+        let updateOrderData: Partial<Order> = {
           refund: {
             ...data,
           },
-        });
+        };
 
-        if (["AL1", "AL2"].includes(salesChannel)) {
+        if (refundType === "FULL") {
+          updateOrderData = {
+            ...updateOrderData,
+            fulfillment: {
+              status: "CANCELLED",
+            },
+          };
+        }
+
+        await axios.patch(`/api/orders/${id}`, updateOrderData);
+
+        if (["AL1", "AL2"].includes(salesChannel) && allegroOrderId) {
           await axios.post(`/api/allegro/orders/refunds`, {
             refund: {
               payment: { id: paymentId },
@@ -166,6 +178,13 @@ export default function SendRefundForm({
             },
             account: salesChannel,
           });
+
+          if (refundType === "FULL") {
+            await axios.put(`/api/allegro/orders/status/${allegroOrderId}`, {
+              status: "CANCELLED",
+              account: salesChannel,
+            });
+          }
         }
 
         router.replace("/admin-panel/orders/new");

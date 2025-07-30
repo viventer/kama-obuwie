@@ -36,6 +36,7 @@ export default async function SendRefundPage(props: Props) {
         paymentId={data.payment?.id}
         lineItems={data.lineItems}
         salesChannel={data.salesChannel}
+        allegroOrderId={data.allegroId}
       />
     </FormWrapper>
   );

@@ -19,6 +19,19 @@ export type lastEventId = {
   AL2?: string;
 };
 
+export async function updateAllegroOrderStatus(
+  orderId: string,
+  status: string,
+  account: "AL1" | "AL2"
+): Promise<void> {
+  const accessToken = await getAllegroUserAccessToken(account);
+  const headers = getSingleAllegroHeaders(accessToken);
+
+  const url = `${ALLEGRO_API_BASE_URL}/order/checkout-forms/${orderId}/fulfillment`;
+
+  await axios.put(url, { status }, { headers });
+}
+
 export async function getAllegroOrderEvents() {
   const { AL1: AL1AccessToken, AL2: AL2AccessToken } =
     await getAllegroUserAccessTokens();

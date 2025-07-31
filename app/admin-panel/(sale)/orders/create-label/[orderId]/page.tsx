@@ -45,10 +45,12 @@ export default async function CreateLabelPage(props: Props) {
     <FormWrapper headingText="Utwórz etykietę">
       <OrderDataWidget data={data as OrderWithId} />
       <CreateLabelForm
+        orderNumber={data.number}
         salesChannel={data.salesChannel as AllegroSalesChannel}
         allegroOrderId={data.allegroId}
-        orderDeliveryData={data.delivery}
+        orderDeliveryData={data!.delivery}
         deliveryService={selectedService}
+        buyer={data.buyer}
       />
     </FormWrapper>
   );

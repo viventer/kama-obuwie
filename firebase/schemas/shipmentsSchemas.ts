@@ -145,3 +145,4 @@ export const CreateShipmentDataSchema = z.object({
 
 export type CreateShipmentData = z.infer<typeof CreateShipmentDataSchema>;
 export type DeliveryService = z.infer<typeof DeliveryServiceSchema>;
+export type PackageData = z.infer<typeof PackageRequestSchema>;

@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useOrderActions } from "@/hooks/useOrderActions";
 import OrderCostDisplay from "./OrderCostDisplay";
+import { useRouter } from "next/navigation";
 
 interface OrdersDataTableProps {
   orders: Order[];
@@ -71,6 +72,7 @@ export default function OrdersDataTable({
   const [globalFilter, setGlobalFilter] = useState("");
 
   const actions = useOrderActions(phase);
+  const router = useRouter();
 
   const columns: ColumnDef<Order>[] = [
     {
@@ -199,6 +201,13 @@ export default function OrdersDataTable({
                     ? "text-success"
                     : "text-destructive"
                 } hover:text-primary`}
+                onClick={() => {
+                  if (!row.original.percelNumbers?.length) {
+                    router.push(
+                      `/admin-panel/orders/create-label/${row.original.id}`
+                    );
+                  }
+                }}
               >
                 <PackageIcon className="size-4" />
               </IconButton>

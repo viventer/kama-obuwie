@@ -4,10 +4,11 @@ import OrderDataWidget from "@/components/adminPanel/orders/OrderDataWidget";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";
 import { AllegroSalesChannel } from "@/lib/constants";
+import { getAllegroDeliveryServices } from "@/server-actions/allegro/shipmentManagement";
 import { notFound } from "next/navigation";
 
 type Props = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ orderId: string }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
@@ -18,10 +19,25 @@ export async function generateMetadata() {
 }
 
 export default async function CreateLabelPage(props: Props) {
-  const { id } = await props.params;
-  const { data } = await getDocumentFromAdminDB<OrderWithId>("orders", id);
+  const { orderId } = await props.params;
+  const { data } = await getDocumentFromAdminDB<OrderWithId>("orders", orderId);
 
-  if (!data || !data.delivery || !data.allegroId) {
+  if (!data || !data?.delivery || !data.allegroId) {
+    return notFound();
+  }
+
+  const deliveryServices = await getAllegroDeliveryServices();
+  if (!deliveryServices || !deliveryServices.AL1 || !deliveryServices.AL2) {
+    return notFound();
+  }
+
+  const selectedService = deliveryServices[
+    data.salesChannel as AllegroSalesChannel
+  ].find(
+    (service: any) => service.id.deliveryMethodId === data!.delivery!.method!.id
+  );
+
+  if (!selectedService) {
     return notFound();
   }
 
@@ -32,6 +48,7 @@ export default async function CreateLabelPage(props: Props) {
         salesChannel={data.salesChannel as AllegroSalesChannel}
         allegroOrderId={data.allegroId}
         orderDeliveryData={data.delivery}
+        deliveryService={selectedService}
       />
     </FormWrapper>
   );

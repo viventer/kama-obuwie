@@ -1,9 +1,12 @@
 "use server";
 
 import axios from "axios";
-import { getAllegroUserAccessTokens } from "./auth";
-import { getAllegroHeaders } from "./global";
-import { DeliveryService } from "@/firebase/schemas/shipmentsSchemas";
+import { getAllegroUserAccessToken, getAllegroUserAccessTokens } from "./auth";
+import { getAllegroHeaders, getSingleAllegroHeaders } from "./global";
+import {
+  CreateShipmentData,
+  DeliveryService,
+} from "@/firebase/schemas/shipmentsSchemas";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -32,5 +35,22 @@ export async function getAllegroDeliveryServices(): Promise<
     };
   } catch (error) {
     console.error(error);
+  }
+}
+
+export async function createAllegroShipment(
+  data: CreateShipmentData,
+  salesChannel: "AL1" | "AL2"
+): Promise<string | undefined> {
+  const accessToken = await getAllegroUserAccessToken(salesChannel);
+  const headers = getSingleAllegroHeaders(accessToken);
+  const url = `${ALLEGRO_API_BASE_URL}/shipment-management/shipments/create-commands`;
+
+  try {
+    const response = await axios.post(url, data, { headers });
+    return response.data.commandId;
+  } catch (error) {
+    console.error("Error creating Allegro shipment:", error);
+    throw error;
   }
 }

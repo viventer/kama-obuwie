@@ -5,7 +5,7 @@ import { OrderLineItemDisplay } from "./tables/OrderLineItemDisplay";
 
 export default function OrderDataWidget({ data }: { data: OrderWithId }) {
   return (
-    <section className="px-5 py-3 bg-foreground/10 rounded-sm w-fit">
+    <section className="px-5 py-3 bg-foreground/10 rounded-sm w-fit max-w-full">
       <h3 className="font-medium text-lg mb-2">Informacje o zamówieniu</h3>
       <div className="flex flex-wrap gap-8">
         <OrderInfoDisplay order={data as OrderWithId} />

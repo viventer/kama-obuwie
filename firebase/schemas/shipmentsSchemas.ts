@@ -1,12 +1,26 @@
 import { z } from "zod";
 
-export type AvailableInpostSendingMethods =
+export const availableInpostSendingMethods = [
+  "parcel_locker",
+  "dispatch_order",
+  "pop",
+  "any_point",
+];
+
+export const inpostSendingMethodsTranslation: Record<string, string> = {
+  parcel_locker: "Paczkomat",
+  dispatch_order: "Podjazd kuriera",
+  pop: "Paczkopunkt",
+  any_point: "Dowolny punkt",
+};
+
+export type InpostSendingMethod =
   | "parcel_locker"
   | "dispatch_order"
   | "pop"
   | "any_point";
 
-export const AvailableInpostSendingMethodsSchema = z.enum([
+export const InpostSendingMethodSchema = z.enum([
   "parcel_locker",
   "dispatch_order",
   "pop",

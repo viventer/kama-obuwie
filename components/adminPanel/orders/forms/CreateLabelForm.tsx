@@ -1,9 +1,12 @@
+"use client";
+
 import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import {
+  availableInpostSendingMethods,
   CreateShipmentData,
-  CreateShipmentDataSchema,
   DeliveryService,
+  inpostSendingMethodsTranslation,
   PackageData,
 } from "@/firebase/schemas/shipmentsSchemas";
 import { useToast } from "@/hooks/useToast";
@@ -14,6 +17,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import ReceiverAddressField from "./ReceiverAddressField";
 import { Input } from "@/components/ui/input";
+import PackageDataFormSection from "./PackageDataFormSection";
+import SingleSelect from "../../global/form/SingleSelect";
 
 export type CreateLabelFormValues = Pick<
   CreateShipmentData,
@@ -62,19 +67,19 @@ export default function CreateLabelForm({
       package: {
         type: "PACKAGE" as const,
         length: {
-          value: 0,
+          value: 64,
           unit: "CENTIMETER",
         },
         width: {
-          value: 0,
+          value: 38,
           unit: "CENTIMETER",
         },
         height: {
-          value: 0,
+          value: 19,
           unit: "CENTIMETER",
         },
         weight: {
-          value: 0,
+          value: 1,
           unit: "KILOGRAMS",
         },
         textOnLabel: orderNumber,
@@ -85,28 +90,31 @@ export default function CreateLabelForm({
 
   return (
     <Form {...form}>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 mt-6">
         <ReceiverAddressField />
-        <FormField
-          control={form.control}
-          name="referenceNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Numer referencyjny</FormLabel>
-              <Input {...field} />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="package.textOnLabel"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tekst na etykiecie</FormLabel>
-              <Input {...field} />
-            </FormItem>
-          )}
-        />
+        <PackageDataFormSection />
+        {deliveryService.carrierId == "INPOST" && (
+          <FormField
+            control={form.control}
+            name="additionalProperties.inpost#sendingMethod"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Sposób nadania</FormLabel>
+                <SingleSelect
+                  value={field.value}
+                  onChange={field.onChange}
+                  availableOptions={availableInpostSendingMethods.map(
+                    (method) => ({
+                      name: inpostSendingMethodsTranslation[method],
+                      value: method,
+                    })
+                  )}
+                  defaultValue="dispatch_order"
+                />
+              </FormItem>
+            )}
+          />
+        )}
       </div>
     </Form>
   );

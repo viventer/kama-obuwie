@@ -23,6 +23,7 @@ import SingleSelect from "../../global/form/SingleSelect";
 import { Button } from "@/components/ui/button";
 import { FormEvent } from "react";
 import { createAllegroShipment } from "@/server-actions/allegro/shipmentManagement";
+import axios, { AxiosError } from "axios";
 
 export type CreateLabelFormValues = Pick<
   CreateShipmentData,
@@ -138,9 +139,32 @@ export default function CreateLabelForm({
     }
 
     try {
-      await createAllegroShipment(data, salesChannel);
+      const response = await axios.post(
+        "/api/allegro/shipment-management/label",
+        {
+          data,
+          account: salesChannel,
+        },
+        {
+          responseType: "blob", // Pobieramy jako blob
+        }
+      );
+
+      // Tworzenie URL z blob i automatyczne pobieranie
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `etykieta_${orderNumber}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      showToast("Etykieta została pomyślnie utworzona i pobrana", "success");
     } catch (err) {
-      showToast("Wystąpił błąd podczas tworzenia etykiety.", "error");
+      console.error("Błąd API:", err);
+      showToast(`Wystąpił błąd podczas tworzenia etykiety: ${err}`, "error");
       return;
     }
   };

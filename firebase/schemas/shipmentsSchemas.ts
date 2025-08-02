@@ -157,6 +157,32 @@ export const CreateShipmentDataSchema = z.object({
   additionalProperties: z.record(z.string(), z.string()).optional(),
 });
 
+export type ShipmentCreationCommandStatus = {
+  commandId: string;
+  status: "IN_PROGRESS" | "SUCCESS" | "ERROR";
+  errors: Array<{
+    code: string;
+    message: string;
+    details: string;
+    path: string;
+    userMessage: string;
+  }>;
+  shipmentId: string;
+};
+
 export type CreateShipmentData = z.infer<typeof CreateShipmentDataSchema>;
 export type DeliveryService = z.infer<typeof DeliveryServiceSchema>;
 export type PackageData = z.infer<typeof PackageRequestSchema>;
+
+// Schema dla metadanych zapisanych etykiet
+export const LabelMetadataSchema = z.object({
+  orderNumber: z.string(),
+  shipmentId: z.string(),
+  filename: z.string(),
+  storagePath: z.string(),
+  downloadUrl: z.string(),
+  createdAt: z.string(),
+  account: z.enum(["AL1", "AL2"]),
+});
+
+export type LabelMetadata = z.infer<typeof LabelMetadataSchema>;

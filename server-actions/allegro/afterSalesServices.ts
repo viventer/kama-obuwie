@@ -3,6 +3,7 @@
 import axios from "axios";
 import { getAllegroUserAccessTokens } from "./auth";
 import { getAllegroHeaders } from "./global";
+import { handleAxiosError } from "../helpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -23,7 +24,10 @@ export async function getAllegroReturnPolicies() {
       AL2: AL2Response.data.returnPolicies,
     };
   } catch (error) {
-    console.error(error);
+    handleAxiosError(
+      error,
+      "Błąd podczas pobierania polityk zwrotów z Allegro"
+    );
   }
 }
 
@@ -44,7 +48,7 @@ export async function getAllegroImpliedWarranties() {
       AL2: AL2Response.data.impliedWarranties,
     };
   } catch (error) {
-    console.error(error);
+    handleAxiosError(error, "Błąd podczas pobierania gwarancji z Allegro");
   }
 }
 
@@ -65,6 +69,9 @@ export async function getAllegroWarranties() {
       AL2: AL2Response.data.warranties,
     };
   } catch (error) {
-    console.error(error);
+    handleAxiosError(
+      error,
+      "Błąd podczas pobierania warunków gwarancji z Allegro"
+    );
   }
 }

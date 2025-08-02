@@ -8,6 +8,7 @@ import {
   AllegroSizingTableSchema,
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
+import { handleAxiosError } from "../helpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -23,7 +24,10 @@ export async function getAllegroSizingTables() {
     });
     return response.data.tables;
   } catch (error) {
-    console.error(error);
+    handleAxiosError(
+      error,
+      "Błąd podczas pobierania tabel rozmiarów z Allegro"
+    );
   }
 }
 
@@ -65,7 +69,10 @@ export async function createAllegroSizingTable(
     );
     return response.data.id as string;
   } catch (error) {
-    console.error(error);
+    handleAxiosError(
+      error,
+      "Błąd podczas tworzenia tabeli rozmiarów w Allegro"
+    );
   }
 }
 
@@ -86,6 +93,9 @@ export async function updateAllegroSizingTable(
     });
     return response.data;
   } catch (error) {
-    console.error(error);
+    handleAxiosError(
+      error,
+      "Błąd podczas aktualizacji tabeli rozmiarów w Allegro"
+    );
   }
 }

@@ -9,7 +9,7 @@ import {
   getShipmentLabel,
   getShipmentStatus,
 } from "@/server-actions/allegro/shipmentManagement";
-import { apiResponse } from "@/server-actions/helpers";
+import { apiResponse, apiErrorResponse } from "@/server-actions/helpers";
 import { adminStorage } from "@/firebase/firebaseAdmin";
 import { NextRequest } from "next/server";
 
@@ -22,10 +22,28 @@ export async function POST(request: NextRequest) {
     commandId = await createAllegroShipment(body.data, body.account);
     console.log("Command ID:", commandId);
     if (!commandId) {
-      throw new Error();
+      throw new Error("Nie otrzymano identyfikatora komendy z API Allegro");
     }
-  } catch (err) {
-    return apiResponse("Nie udało się utworzyć etykiety.", 400);
+  } catch (err: any) {
+    console.error("Błąd podczas tworzenia przesyłki:", err);
+
+    // Sprawdź czy to błąd z Allegro z dodatkowymi informacjami
+    if (err.allegroErrors && err.status) {
+      return apiErrorResponse(
+        "Nie udało się utworzyć etykiety",
+        err.status,
+        err.allegroErrors,
+        {
+          step: "shipment_creation",
+          originalMessage: err.message,
+        }
+      );
+    }
+
+    return apiErrorResponse("Nie udało się utworzyć etykiety", 500, null, {
+      step: "shipment_creation",
+      originalMessage: err.message,
+    });
   }
 
   let shipmentStatusData: ShipmentCreationCommandStatus | undefined;
@@ -57,11 +75,19 @@ export async function POST(request: NextRequest) {
         );
         await new Promise((resolve) => setTimeout(resolve, 3000));
       }
-    } catch (err) {
+    } catch (err: any) {
+      console.error(`Błąd przy próbie ${attempt}:`, err);
       if (attempt === maxRetries) {
-        return apiResponse(
-          "Nie udało się pobrać statusu przesyłki po wszystkich próbach.",
-          400
+        return apiErrorResponse(
+          "Nie udało się pobrać statusu przesyłki po wszystkich próbach",
+          500,
+          null,
+          {
+            step: "shipment_status_check",
+            attempt: attempt,
+            commandId: commandId,
+            originalMessage: err.message,
+          }
         );
       }
       // Jeśli nie jest to ostatnia próba, czekamy i próbujemy ponownie
@@ -73,13 +99,27 @@ export async function POST(request: NextRequest) {
   }
 
   if (!shipmentStatusData) {
-    return apiResponse("Nie udało się pobrać statusu przesyłki.", 400);
+    return apiErrorResponse(
+      "Nie udało się pobrać statusu przesyłki",
+      500,
+      null,
+      {
+        step: "shipment_status_check",
+        commandId: commandId,
+      }
+    );
   }
 
   if (shipmentStatusData.status === "ERROR") {
-    return apiResponse(
-      `Wystąpił błąd podczas tworzenia przesyłki: ${shipmentStatusData.errors[0].userMessage}`,
-      400
+    return apiErrorResponse(
+      "Wystąpił błąd podczas tworzenia przesyłki",
+      400,
+      shipmentStatusData.errors,
+      {
+        step: "shipment_creation_failed",
+        commandId: commandId,
+        shipmentStatus: shipmentStatusData.status,
+      }
     );
   }
 
@@ -92,9 +132,18 @@ export async function POST(request: NextRequest) {
     if (!shipmentDetails) {
       throw new Error("Nie udało się pobrać szczegółów przesyłki.");
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error("Błąd podczas pobierania szczegółów przesyłki:", err);
-    return apiResponse("Nie udało się pobrać szczegółów przesyłki.", 400);
+    return apiErrorResponse(
+      "Nie udało się pobrać szczegółów przesyłki",
+      500,
+      null,
+      {
+        step: "shipment_details",
+        shipmentId: shipmentStatusData.shipmentId,
+        originalMessage: err.message,
+      }
+    );
   }
 
   let label: Buffer | undefined;
@@ -104,9 +153,18 @@ export async function POST(request: NextRequest) {
     if (!label || label.length === 0) {
       throw new Error("Pusta etykieta");
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error("Błąd pobierania etykiety:", err);
-    return apiResponse("Nie udało się pobrać etykiety przesyłki.", 400);
+    return apiErrorResponse(
+      "Nie udało się pobrać etykiety przesyłki",
+      500,
+      null,
+      {
+        step: "label_download",
+        shipmentId: shipmentStatusData.shipmentId,
+        originalMessage: err.message,
+      }
+    );
   }
 
   // Zapisz w Firebase Storage i zwróć informacje o pliku
@@ -147,8 +205,12 @@ export async function POST(request: NextRequest) {
       200,
       returnData
     );
-  } catch (err) {
+  } catch (err: any) {
     console.error("Błąd podczas zapisywania etykiety:", err);
-    return apiResponse("Nie udało się zapisać etykiety.", 500);
+    return apiErrorResponse("Nie udało się zapisać etykiety", 500, null, {
+      step: "file_storage",
+      filename: filename,
+      originalMessage: err.message,
+    });
   }
 }

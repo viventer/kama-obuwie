@@ -10,6 +10,7 @@ import {
   PackageData,
 } from "@/firebase/schemas/shipmentsSchemas";
 import { useToast } from "@/hooks/useToast";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 import {
   AllegroSalesChannel,
   bankAccountData,
@@ -23,7 +24,7 @@ import SingleSelect from "../../global/form/SingleSelect";
 import { Button } from "@/components/ui/button";
 import { FormEvent } from "react";
 import { createAllegroShipment } from "@/server-actions/allegro/shipmentManagement";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 export type CreateLabelFormValues = Pick<
   CreateShipmentData,
@@ -51,6 +52,7 @@ export default function CreateLabelForm({
 
   const router = useRouter();
   const { showToast } = useToast();
+  const { handleError } = useErrorHandler();
 
   if (!orderDeliveryData?.address) {
     router.replace("/admin-panel/orders/new");
@@ -186,9 +188,11 @@ export default function CreateLabelForm({
           "error"
         );
       }
-    } catch (err) {
-      console.error("Błąd API:", err);
-      showToast(`Wystąpił błąd podczas tworzenia etykiety: ${err}`, "error");
+    } catch (err: any) {
+      handleError(
+        err,
+        "Wystąpił nieoczekiwany błąd podczas tworzenia etykiety"
+      );
       return;
     }
   };

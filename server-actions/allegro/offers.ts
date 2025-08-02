@@ -25,6 +25,11 @@ import { getImageUrl } from "../images/images";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath, safetyInformation } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";
+import {
+  AllegroError,
+  AllegroAuthError,
+} from "@/firebase/schemas/shipmentsSchemas";
+import { handleAxiosError } from "../helpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -325,38 +330,7 @@ export async function postIndividualAllegroOffer(
     });
     return resp.data.id! as string;
   } catch (err) {
-    const error = err as AxiosError<{
-      errors: Array<{
-        code: string;
-        details: string;
-        message: string;
-        path: string;
-        userMessage: string;
-        metadata: Record<string, any>;
-      }>;
-    }>;
-
-    if (error.response) {
-      console.error("Status:", error.response.status);
-      console.error("Body:", JSON.stringify(error.response.data, null, 2));
-      error.response.data.errors.forEach((e, idx) => {
-        console.error(`Error #${idx + 1}`);
-        console.error("  code       :", e.code);
-        console.error("  message    :", e.message);
-        console.error("  details    :", e.details);
-        console.error("  userMessage:", e.userMessage);
-        console.error("  path       :", e.path);
-        console.error("  metadata   :", JSON.stringify(e.metadata));
-      });
-    } else if (error.request) {
-      console.error("No response received:", error.request);
-    } else {
-      // Błąd w konfiguracji Axios lub inny
-      console.error("Unexpected error:", error.message);
-    }
-    throw new Error(
-      `Błąd podczas publikacji oferty na Allegro: ${error.message}`
-    );
+    return handleAxiosError(err, "Błąd podczas tworzenia oferty na Allegro");
   }
 }
 

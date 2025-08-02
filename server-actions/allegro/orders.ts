@@ -1,8 +1,12 @@
 "use server";
 
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { getAllegroUserAccessToken, getAllegroUserAccessTokens } from "./auth";
 import { getAllegroHeaders, getSingleAllegroHeaders } from "./global";
+import {
+  AllegroError,
+  AllegroAuthError,
+} from "@/firebase/schemas/shipmentsSchemas";
 import { redis } from "@/upstash/redis";
 import { AllegroOrder } from "@/firebase/schemas/ordersSchemas";
 import { createOrder, updateOrder } from "@/server-actions/orders/orders";
@@ -11,6 +15,7 @@ import { Order } from "@/firebase/schemas/ordersSchemas";
 import { Offer } from "@/firebase/schemas/offersSchemas";
 import { AllegroSalesChannel } from "@/lib/constants";
 import { getAllegroOffer } from "./offers";
+import { handleAxiosError } from "../helpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -80,7 +85,7 @@ export async function getAllegroOrderEvents() {
       AL2: AL2Events,
     };
   } catch (error) {
-    console.error(error);
+    handleAxiosError(error, "Błąd podczas pobierania zdarzeń z Allegro");
   }
 }
 
@@ -94,10 +99,12 @@ export async function getAllegroOrderDetails(
 
   try {
     const response = await axios.get(url, { headers: headers });
-
     return response.data;
   } catch (err) {
-    console.error("Error fetching Allegro order details:", err);
+    handleAxiosError(
+      err,
+      "Błąd podczas pobierania szczegółów zamówienia z Allegro"
+    );
   }
 }
 

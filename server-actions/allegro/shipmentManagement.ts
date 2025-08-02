@@ -8,7 +8,10 @@ import {
   DeliveryService,
   ShipmentCreationCommandStatus,
   ShipmentDetails,
+  AllegroError,
+  AllegroAuthError,
 } from "@/firebase/schemas/shipmentsSchemas";
+import { handleAxiosError } from "../helpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -36,7 +39,7 @@ export async function getAllegroDeliveryServices(): Promise<
       AL2: AL2Response.data.services,
     };
   } catch (error) {
-    console.error(error);
+    handleAxiosError(error, "Błąd podczas pobierania usług przewoźników");
   }
 }
 
@@ -52,36 +55,7 @@ export async function createAllegroShipment(
     const response = await axios.post(url, { input: data }, { headers });
     return response.data.commandId;
   } catch (err) {
-    const error = err as AxiosError<{
-      errors: Array<{
-        code: string;
-        details: string;
-        message: string;
-        path: string;
-        userMessage: string;
-        metadata: Record<string, any>;
-      }>;
-    }>;
-
-    if (error.response) {
-      console.error("Status:", error.response.status);
-      console.error("Body:", JSON.stringify(error.response.data, null, 2));
-      error.response.data.errors.forEach((e, idx) => {
-        console.error(`Error #${idx + 1}`);
-        console.error("  code       :", e.code);
-        console.error("  message    :", e.message);
-        console.error("  details    :", e.details);
-        console.error("  userMessage:", e.userMessage);
-        console.error("  path       :", e.path);
-        console.error("  metadata   :", JSON.stringify(e.metadata));
-      });
-    } else if (error.request) {
-      console.error("No response received:", error.request);
-    } else {
-      // Błąd w konfiguracji Axios lub inny
-      console.error("Unexpected error:", error.message);
-    }
-    throw new Error(`Błąd podczas tworzenia przesyłki: ${error.message}`);
+    handleAxiosError(err, "Błąd podczas tworzenia przesyłki Allegro");
   }
 }
 
@@ -97,8 +71,7 @@ export async function getShipmentStatus(
     const response = await axios.get(url, { headers });
     return response.data;
   } catch (err) {
-    console.error("Error fetching shipment status:", err);
-    throw new Error(`Błąd podczas pobierania statusu przesyłki: ${err}`);
+    handleAxiosError(err, "Błąd podczas pobierania statusu przesyłki Allegro");
   }
 }
 
@@ -128,36 +101,7 @@ export async function getShipmentLabel(
 
     return buffer;
   } catch (err) {
-    const error = err as AxiosError<{
-      errors: Array<{
-        code: string;
-        details: string;
-        message: string;
-        path: string;
-        userMessage: string;
-        metadata: Record<string, any>;
-      }>;
-    }>;
-
-    if (error.response) {
-      console.error("Status:", error.response.status);
-      console.error("Body:", JSON.stringify(error.response.data, null, 2));
-      error.response.data.errors.forEach((e, idx) => {
-        console.error(`Error #${idx + 1}`);
-        console.error("  code       :", e.code);
-        console.error("  message    :", e.message);
-        console.error("  details    :", e.details);
-        console.error("  userMessage:", e.userMessage);
-        console.error("  path       :", e.path);
-        console.error("  metadata   :", JSON.stringify(e.metadata));
-      });
-    } else if (error.request) {
-      console.error("No response received:", error.request);
-    } else {
-      // Błąd w konfiguracji Axios lub inny
-      console.error("Unexpected error:", error.message);
-    }
-    throw new Error(`Błąd podczas tworzenia przesyłki: ${error.message}`);
+    handleAxiosError(err, "Błąd podczas pobierania etykiety przesyłki Allegro");
   }
 }
 
@@ -173,7 +117,6 @@ export async function getShipmentDetails(
     const response = await axios.get(url, { headers });
     return response.data;
   } catch (err) {
-    console.error("Error fetching shipment data:", err);
-    throw new Error(`Błąd podczas pobierania danych przesyłki: ${err}`);
+    handleAxiosError(err, "Błąd podczas pobierania danych przesyłki");
   }
 }

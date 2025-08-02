@@ -1,5 +1,20 @@
 import { z } from "zod";
 
+// Typy błędów z Allegro API
+export interface AllegroError {
+  code: string;
+  details: string;
+  message: string;
+  path: string | null;
+  userMessage: string;
+  metadata?: Record<string, any>;
+}
+
+export interface AllegroAuthError {
+  error: string;
+  error_description: string;
+}
+
 export const availableInpostSendingMethods = [
   "parcel_locker",
   "dispatch_order",

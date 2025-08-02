@@ -7,6 +7,7 @@ import {
   CreateShipmentData,
   DeliveryService,
   ShipmentCreationCommandStatus,
+  ShipmentDetails,
 } from "@/firebase/schemas/shipmentsSchemas";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
@@ -157,5 +158,22 @@ export async function getShipmentLabel(
       console.error("Unexpected error:", error.message);
     }
     throw new Error(`Błąd podczas tworzenia przesyłki: ${error.message}`);
+  }
+}
+
+export async function getShipmentDetails(
+  shipmentId: string,
+  salesChannel: "AL1" | "AL2"
+): Promise<ShipmentDetails | undefined> {
+  const accessToken = await getAllegroUserAccessToken(salesChannel);
+  const headers = getSingleAllegroHeaders(accessToken);
+  const url = `${ALLEGRO_API_BASE_URL}/shipment-management/shipments/${shipmentId}`;
+
+  try {
+    const response = await axios.get(url, { headers });
+    return response.data;
+  } catch (err) {
+    console.error("Error fetching shipment data:", err);
+    throw new Error(`Błąd podczas pobierania danych przesyłki: ${err}`);
   }
 }

@@ -197,12 +197,12 @@ export default function OrdersDataTable({
             row.original.fulfillment?.status !== "CANCELLED" && (
               <IconButton
                 className={`${
-                  row.original.percelNumbers?.length
+                  row.original?.shipment?.isCreated
                     ? "text-success"
                     : "text-destructive"
                 } hover:text-primary`}
                 onClick={() => {
-                  if (!row.original.percelNumbers?.length) {
+                  if (!row.original?.shipment?.isCreated) {
                     router.push(
                       `/admin-panel/orders/create-label/${row.original.id}`
                     );

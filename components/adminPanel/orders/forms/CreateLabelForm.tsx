@@ -144,24 +144,48 @@ export default function CreateLabelForm({
         {
           data,
           account: salesChannel,
-        },
-        {
-          responseType: "blob", // Pobieramy jako blob
         }
       );
 
-      // Tworzenie URL z blob i automatyczne pobieranie
-      const blob = new Blob([response.data], { type: "application/pdf" });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `etykieta_${orderNumber}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      console.log("API Response:", response.data);
 
-      showToast("Etykieta została pomyślnie utworzona i pobrana", "success");
+      if (response.data.downloadUrl) {
+        window.open(response.data.downloadUrl, "_blank");
+
+        await axios.patch(`/api/orders/${orderData.id}`, {
+          shipment: {
+            isCreated: true,
+            isPickupOrdered:
+              deliveryService.carrierId === "INPOST" ||
+              orderData?.shipment?.isPickupOrdered ||
+              false,
+            parcelNumbers: [
+              ...(orderData?.shipment?.parcelNumbers || []),
+              response.data.parcelNumber,
+            ],
+            labelFilePath: response.data.storagePath,
+            shipmentIds: {
+              ...(orderData?.shipment?.shipmentIds || {}),
+              [response.data.parcelNumber]: response.data.shipmentId,
+            },
+            isPickupAvailable: response.data.isPickupAvailable,
+            createdAt:
+              orderData?.shipment?.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        });
+
+        showToast(
+          `Etykieta została pomyślnie utworzona i zapisana w chmurze (${response.data.storagePath})`,
+          "success"
+        );
+      } else {
+        console.error("Brak downloadUrl w odpowiedzi:", response.data);
+        showToast(
+          "Etykieta została utworzona, ale nie znaleziono linku do pobrania",
+          "error"
+        );
+      }
     } catch (err) {
       console.error("Błąd API:", err);
       showToast(`Wystąpił błąd podczas tworzenia etykiety: ${err}`, "error");

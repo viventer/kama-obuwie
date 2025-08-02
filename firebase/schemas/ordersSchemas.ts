@@ -210,6 +210,17 @@ export const AllegroRefundSchema = z.object({
   sellerComment: z.string().max(250).optional(),
 });
 
+export const OrderShipmentSchema = z.object({
+  isCreated: z.boolean(),
+  isPickupOrdered: z.boolean(),
+  parcelNumbers: z.array(z.string()),
+  labelFilePath: z.string().optional(),
+  shipmentIds: z.record(z.string(), z.string()),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  isPickupAvailable: z.boolean(),
+});
+
 export const OrderSchema = z.object({
   id: z.string().optional(),
   number: z.string(),
@@ -234,8 +245,7 @@ export const OrderSchema = z.object({
   createdAt: z.string(),
   salesChannel: SalesChannelSchema,
   refund: RefundSchema.optional(),
-  percelNumbers: z.array(z.string()).optional(),
-  isPickupOrdered: z.boolean().optional(),
+  shipment: OrderShipmentSchema.optional(),
 });
 
 export const AllegroOrderItemSchema = z.object({

@@ -170,10 +170,6 @@ export type ShipmentCreationCommandStatus = {
   shipmentId: string;
 };
 
-export type CreateShipmentData = z.infer<typeof CreateShipmentDataSchema>;
-export type DeliveryService = z.infer<typeof DeliveryServiceSchema>;
-export type PackageData = z.infer<typeof PackageRequestSchema>;
-
 // Schema dla metadanych zapisanych etykiet
 export const LabelMetadataSchema = z.object({
   orderNumber: z.string(),
@@ -185,4 +181,39 @@ export const LabelMetadataSchema = z.object({
   account: z.enum(["AL1", "AL2"]),
 });
 
+// Schema dla szczegółów przesyłki
+const ShipmentPackageSchema = z.object({
+  waybill: z.string().optional(),
+  type: z.enum(["DOX", "PACKAGE", "PALLET", "OTHER"]),
+  length: DimensionValueSchema,
+  width: DimensionValueSchema,
+  height: DimensionValueSchema,
+  weight: WeightValueSchema,
+  textOnLabel: z.string().optional(),
+});
+
+export const ShipmentDetailsSchema = z.object({
+  id: z.string(),
+  deliveryMethodId: z.string(),
+  credentialsId: z.string().optional(),
+  sender: SenderAddressSchema,
+  receiver: ReceiverAddressSchema,
+  referenceNumber: z.string().optional(),
+  packages: z.array(ShipmentPackageSchema),
+  insurance: InsuranceSchema.optional(),
+  cashOnDelivery: CashOnDeliverySchema.optional(),
+  createdDate: z.string().optional(),
+  canceledDate: z.string().optional(),
+  carrier: z.string().optional(),
+  labelFormat: z.enum(["PDF", "ZPL", "EPL"]).optional(),
+  additionalServices: z.array(z.string()).optional(),
+  additionalProperties: z.record(z.string(), z.string()).optional(),
+  transport: z.array(z.string()).optional(),
+  pickupAvailable: z.boolean().optional(),
+});
+
+export type ShipmentDetails = z.infer<typeof ShipmentDetailsSchema>;
+export type CreateShipmentData = z.infer<typeof CreateShipmentDataSchema>;
+export type DeliveryService = z.infer<typeof DeliveryServiceSchema>;
+export type PackageData = z.infer<typeof PackageRequestSchema>;
 export type LabelMetadata = z.infer<typeof LabelMetadataSchema>;

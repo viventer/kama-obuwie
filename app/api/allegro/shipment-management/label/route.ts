@@ -1,15 +1,17 @@
 import {
   CreateShipmentData,
   ShipmentCreationCommandStatus,
+  ShipmentDetails,
 } from "@/firebase/schemas/shipmentsSchemas";
 import {
   createAllegroShipment,
+  getShipmentDetails,
   getShipmentLabel,
   getShipmentStatus,
 } from "@/server-actions/allegro/shipmentManagement";
 import { apiResponse } from "@/server-actions/helpers";
 import { adminStorage } from "@/firebase/firebaseAdmin";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   const body: { data: CreateShipmentData; account: "AL1" | "AL2" } =
@@ -81,6 +83,20 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  let shipmentDetails: ShipmentDetails | undefined;
+  try {
+    shipmentDetails = await getShipmentDetails(
+      shipmentStatusData.shipmentId,
+      body.account
+    );
+    if (!shipmentDetails) {
+      throw new Error("Nie udało się pobrać szczegółów przesyłki.");
+    }
+  } catch (err) {
+    console.error("Błąd podczas pobierania szczegółów przesyłki:", err);
+    return apiResponse("Nie udało się pobrać szczegółów przesyłki.", 400);
+  }
+
   let label: Buffer | undefined;
   try {
     label = await getShipmentLabel(shipmentStatusData.shipmentId, body.account);
@@ -93,7 +109,7 @@ export async function POST(request: NextRequest) {
     return apiResponse("Nie udało się pobrać etykiety przesyłki.", 400);
   }
 
-  // Zapisz w Firebase Storage i zwróć plik bezpośrednio
+  // Zapisz w Firebase Storage i zwróć informacje o pliku
   const bucket = adminStorage.bucket();
   const filename = `labels/${body.data.referenceNumber}_${Date.now()}.pdf`;
   const file = bucket.file(filename);
@@ -111,14 +127,26 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Zwróć plik bezpośrednio jako download
-    const headers = new Headers({
-      "Content-Type": "application/octet-stream",
-      "Content-Disposition": `attachment; filename="etykieta_${body.data.referenceNumber}.pdf"`,
-      "Content-Length": label.length.toString(),
+    // Wygeneruj signed URL do pobrania
+    const [signedUrl] = await file.getSignedUrl({
+      action: "read",
+      expires: Date.now() + 1000 * 60 * 60 * 24, // 24 godziny
     });
 
-    return new NextResponse(label, { headers });
+    const returnData = {
+      downloadUrl: signedUrl,
+      storagePath: filename,
+      shipmentId: shipmentDetails.id,
+      parcelNumber: shipmentDetails.packages[0].waybill,
+      isPickupAvailable: shipmentDetails.pickupAvailable,
+    };
+
+    // Zwróć informacje o pliku w JSON
+    return apiResponse(
+      "Etykieta została utworzona i zapisana pomyślnie.",
+      200,
+      returnData
+    );
   } catch (err) {
     console.error("Błąd podczas zapisywania etykiety:", err);
     return apiResponse("Nie udało się zapisać etykiety.", 500);

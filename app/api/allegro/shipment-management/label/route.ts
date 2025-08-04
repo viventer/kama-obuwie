@@ -20,7 +20,6 @@ export async function POST(request: NextRequest) {
   let commandId: string | undefined;
   try {
     commandId = await createAllegroShipment(body.data, body.account);
-    console.log("Command ID:", commandId);
     if (!commandId) {
       throw new Error("Nie otrzymano identyfikatora komendy z API Allegro");
     }

@@ -185,6 +185,20 @@ export type ShipmentCreationCommandStatus = {
   shipmentId: string;
 };
 
+export type PickupCreationCommandStatus = {
+  commandId: string;
+  status: "IN_PROGRESS" | "SUCCESS" | "ERROR";
+  errors: Array<{
+    code: string;
+    message: string;
+    details: string;
+    path: string;
+    userMessage: string;
+  }>;
+  pickupId: string;
+  carrierPickupId: string;
+};
+
 // Schema dla metadanych zapisanych etykiet
 export const LabelMetadataSchema = z.object({
   orderNumber: z.string(),
@@ -227,8 +241,15 @@ export const ShipmentDetailsSchema = z.object({
   pickupAvailable: z.boolean().optional(),
 });
 
+export const PickupProposalSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().optional(),
+});
+
 export type ShipmentDetails = z.infer<typeof ShipmentDetailsSchema>;
 export type CreateShipmentData = z.infer<typeof CreateShipmentDataSchema>;
 export type DeliveryService = z.infer<typeof DeliveryServiceSchema>;
 export type PackageData = z.infer<typeof PackageRequestSchema>;
 export type LabelMetadata = z.infer<typeof LabelMetadataSchema>;
+export type PickupProposal = z.infer<typeof PickupProposalSchema>;

@@ -10,6 +10,8 @@ import {
   ShipmentDetails,
   AllegroError,
   AllegroAuthError,
+  PickupProposal,
+  PickupCreationCommandStatus,
 } from "@/firebase/schemas/shipmentsSchemas";
 import { handleAxiosError } from "../helpers";
 
@@ -118,5 +120,67 @@ export async function getShipmentDetails(
     return response.data;
   } catch (err) {
     handleAxiosError(err, "Błąd podczas pobierania danych przesyłki");
+  }
+}
+
+export async function getPickupProposals(
+  shipmentId: string,
+  salesChannel: "AL1" | "AL2"
+): Promise<PickupProposal[] | undefined> {
+  const accessToken = await getAllegroUserAccessToken(salesChannel);
+  const headers = getSingleAllegroHeaders(accessToken);
+  const url = `${ALLEGRO_API_BASE_URL}/shipment-management/pickup-proposals`;
+
+  try {
+    const response = await axios.post(
+      url,
+      { shipmentIds: [shipmentId] },
+      { headers }
+    );
+    return response.data[0].proposals[0].proposalItems;
+  } catch (err) {
+    handleAxiosError(err, "Błąd podczas pobierania propozycji odbioru");
+  }
+}
+
+export async function requestPickup(
+  shipmentId: string,
+  pickupDateProposalId: string,
+  salesChannel: "AL1" | "AL2"
+): Promise<string | undefined> {
+  const accessToken = await getAllegroUserAccessToken(salesChannel);
+  const headers = getSingleAllegroHeaders(accessToken);
+  const url = `${ALLEGRO_API_BASE_URL}/shipment-management/pickups/create-commands`;
+
+  try {
+    const response = await axios.post(
+      url,
+      {
+        input: {
+          shipmentIds: [shipmentId],
+          pickupDateProposalId: pickupDateProposalId,
+        },
+      },
+      { headers }
+    );
+    return response.data.commandId;
+  } catch (err) {
+    handleAxiosError(err, "Błąd podczas zamawiania podjazdu");
+  }
+}
+
+export async function getCreatePickupStatus(
+  commandId: string,
+  salesChannel: "AL1" | "AL2"
+): Promise<PickupCreationCommandStatus | undefined> {
+  const accessToken = await getAllegroUserAccessToken(salesChannel);
+  const headers = getSingleAllegroHeaders(accessToken);
+  const url = `${ALLEGRO_API_BASE_URL}/shipment-management/pickups/create-commands/${commandId}`;
+
+  try {
+    const response = await axios.get(url, { headers });
+    return response.data;
+  } catch (err) {
+    handleAxiosError(err, "Błąd podczas pobierania statusu podjazdu");
   }
 }

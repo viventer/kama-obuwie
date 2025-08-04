@@ -22,11 +22,9 @@ import ReceiverAddressField from "./ReceiverAddressField";
 import PackageDataFormSection from "./PackageDataFormSection";
 import SingleSelect from "../../global/form/SingleSelect";
 import { Button } from "@/components/ui/button";
-import { FormEvent, useEffect } from "react";
-import { createAllegroShipment } from "@/server-actions/allegro/shipmentManagement";
+import { FormEvent } from "react";
 import axios from "axios";
 import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
-import { start } from "repl";
 
 export type CreateLabelFormValues = Pick<
   CreateShipmentData,
@@ -165,8 +163,6 @@ export default function CreateLabelForm({
         }
       );
 
-      console.log("API Response:", response.data);
-
       if (response.data.downloadUrl) {
         window.open(response.data.downloadUrl, "_blank");
 
@@ -190,6 +186,7 @@ export default function CreateLabelForm({
             createdAt:
               orderData?.shipment?.createdAt || new Date().toISOString(),
             updatedAt: new Date().toISOString(),
+            carrier: deliveryService.carrierId,
           },
         });
 
@@ -199,7 +196,9 @@ export default function CreateLabelForm({
           response.data.isPickupAvailable &&
           deliveryService.carrierId !== "INPOST"
         ) {
-          router.push(`/admin-panel/orders/pickup/${response.data.shipmentId}`);
+          router.replace(
+            `/admin-panel/orders/pickup/${orderData.id}?shipmentId=${response.data.shipmentId}`
+          );
         } else {
           router.back();
         }

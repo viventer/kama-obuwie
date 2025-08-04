@@ -22,9 +22,11 @@ import ReceiverAddressField from "./ReceiverAddressField";
 import PackageDataFormSection from "./PackageDataFormSection";
 import SingleSelect from "../../global/form/SingleSelect";
 import { Button } from "@/components/ui/button";
-import { FormEvent } from "react";
+import { FormEvent, useEffect } from "react";
 import { createAllegroShipment } from "@/server-actions/allegro/shipmentManagement";
 import axios from "axios";
+import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
+import { start } from "repl";
 
 export type CreateLabelFormValues = Pick<
   CreateShipmentData,
@@ -53,6 +55,7 @@ export default function CreateLabelForm({
   const router = useRouter();
   const { showToast } = useToast();
   const { handleError } = useErrorHandler();
+  const { startLoading, stopLoading } = useFullPageLoading();
 
   if (!orderDeliveryData?.address) {
     router.replace("/admin-panel/orders/new");
@@ -107,6 +110,8 @@ export default function CreateLabelForm({
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    startLoading();
+
     const deliveryPrice = Number(orderDeliveryData?.cost?.amount) || 0;
     const refundAmount = Number(orderData.refund?.amount?.amount) || 0;
     const totalToPay = Number(orderData.summary.totalToPay.amount);
@@ -132,7 +137,18 @@ export default function CreateLabelForm({
       data.additionalProperties = formData.additionalProperties;
     }
 
-    if (orderData!.payment!.type === "CASH_ON_DELIVERY") {
+    if (
+      orderData!.payment!.type === "CASH_ON_DELIVERY" &&
+      deliveryService.cashOnDelivery?.forceRequireIban === false
+    ) {
+      data.cashOnDelivery = {
+        amount: totalToPay.toFixed(2),
+        currency: "PLN",
+      };
+    } else if (
+      orderData!.payment!.type === "CASH_ON_DELIVERY" &&
+      deliveryService.cashOnDelivery?.forceRequireIban === true
+    ) {
       data.cashOnDelivery = {
         ...bankAccountData,
         amount: totalToPay.toFixed(2),
@@ -177,11 +193,23 @@ export default function CreateLabelForm({
           },
         });
 
+        stopLoading();
+
+        if (
+          response.data.isPickupAvailable &&
+          deliveryService.carrierId !== "INPOST"
+        ) {
+          router.push(`/admin-panel/orders/pickup/${response.data.shipmentId}`);
+        } else {
+          router.back();
+        }
+
         showToast(
           `Etykieta została pomyślnie utworzona i zapisana w chmurze (${response.data.storagePath})`,
           "success"
         );
       } else {
+        stopLoading();
         console.error("Brak downloadUrl w odpowiedzi:", response.data);
         showToast(
           "Etykieta została utworzona, ale nie znaleziono linku do pobrania",
@@ -193,6 +221,7 @@ export default function CreateLabelForm({
         err,
         "Wystąpił nieoczekiwany błąd podczas tworzenia etykiety"
       );
+      stopLoading();
       return;
     }
   };

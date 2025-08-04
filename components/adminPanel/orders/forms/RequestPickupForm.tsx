@@ -70,6 +70,17 @@ export default function RequestPickupForm({
 
     try {
       await axios.post("/api/allegro/shipment-management/pickup", requestData);
+      const pickupDate = pickupProposals.find(
+        (proposal) => proposal.id === data.pickupDateProposalId
+      )?.name;
+
+      await axios.patch(`/api/orders/${orderId}`, {
+        shipment: {
+          ...shipmentData,
+          pickupDate,
+          isPickupOrdered: true,
+        },
+      });
       showToast("Podjazd kuriera został zamówiony pomyślnie.", "success");
       router.replace(`/admin-panel/orders/processing`);
     } catch (err: any) {

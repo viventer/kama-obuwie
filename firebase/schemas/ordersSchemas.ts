@@ -220,6 +220,7 @@ export const OrderShipmentSchema = z.object({
   updatedAt: z.string().optional(),
   isPickupAvailable: z.boolean(),
   carrier: z.string(),
+  pickupDate: z.string().optional(),
 });
 
 export const OrderSchema = z.object({

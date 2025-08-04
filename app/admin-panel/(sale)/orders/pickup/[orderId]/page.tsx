@@ -39,6 +39,14 @@ export default async function RequestPickupPage(props: Props) {
 
   return (
     <FormWrapper headingText="Zamów podjazd">
+      {data.shipment?.carrier && (
+        <p className="text-muted-foreground text-sm">
+          Przewoźnik:{" "}
+          <span className="font-medium">
+            {data.shipment?.carrier.toLowerCase()}
+          </span>
+        </p>
+      )}
       <RequestPickupForm
         shipmentData={data.shipment}
         pickupProposals={pickupProposals}

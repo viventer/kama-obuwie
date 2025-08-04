@@ -4,7 +4,7 @@ import RequestPickupForm from "@/components/adminPanel/orders/forms/RequestPicku
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";
 import { getPickupProposals } from "@/server-actions/allegro/shipmentManagement";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 type Props = {
   params: Promise<{ orderId: string }>;
@@ -34,7 +34,7 @@ export default async function RequestPickupPage(props: Props) {
   );
 
   if (!pickupProposals || pickupProposals.length === 0) {
-    return notFound();
+    redirect("/admin-panel/orders/processing");
   }
 
   return (
@@ -42,9 +42,7 @@ export default async function RequestPickupPage(props: Props) {
       {data.shipment?.carrier && (
         <p className="text-muted-foreground text-sm">
           Przewoźnik:{" "}
-          <span className="font-medium">
-            {data.shipment?.carrier.toLowerCase()}
-          </span>
+          <span className="font-medium">{data.shipment?.carrier}</span>
         </p>
       )}
       <RequestPickupForm

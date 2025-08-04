@@ -47,6 +47,8 @@ import {
 import { useOrderActions } from "@/hooks/useOrderActions";
 import OrderCostDisplay from "./OrderCostDisplay";
 import { useRouter } from "next/navigation";
+import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
+import ShipmentsDialogContent from "../ShipmentsDialogContent";
 
 interface OrdersDataTableProps {
   orders: Order[];
@@ -73,6 +75,7 @@ export default function OrdersDataTable({
 
   const actions = useOrderActions(phase);
   const router = useRouter();
+  const { openDialog } = useDialogWindow();
 
   const columns: ColumnDef<Order>[] = [
     {
@@ -207,6 +210,16 @@ export default function OrdersDataTable({
                       `/admin-panel/orders/create-label/${row.original.id}`
                     );
                   }
+
+                  openDialog({
+                    title: "Informacje o wysyłce",
+                    content: (
+                      <ShipmentsDialogContent
+                        shipmentData={row.original?.shipment}
+                        orderId={row.original.id as string}
+                      />
+                    ),
+                  });
                 }}
               >
                 <PackageIcon className="size-4" />

@@ -219,7 +219,7 @@ export const OrderShipmentSchema = z.object({
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
   isPickupAvailable: z.boolean(),
-  carrier: z.string(),
+  carrier: z.string().optional(),
   pickupDate: z.string().optional(),
 });
 

@@ -37,7 +37,7 @@ export async function getAllegroOrderEvents() {
   const { AL1: AL1AccessToken, AL2: AL2AccessToken } =
     await getAllegroUserAccessTokens();
   const headers = getAllegroHeaders(AL1AccessToken, AL2AccessToken);
-  const url = `${ALLEGRO_API_BASE_URL}/order/events?type=READY_FOR_PROCESSING&type=CANCELLED&limit=60`;
+  const url = `${ALLEGRO_API_BASE_URL}/order/events?type=READY_FOR_PROCESSING&type=BUYER_CANCELLED&type=AUTO_CANCELLED&limit=60`;
   let urlAL1 = url;
   let urlAL2 = url;
   const lastEventId: lastEventId | null = await redis.hgetall(
@@ -108,6 +108,7 @@ export async function syncAllegroOrders() {
   try {
     // 1. Pobierz nowe zdarzenia
     const events = await getAllegroOrderEvents();
+    console.log(events);
     if (!events) return;
 
     const allEvents = [...(events.AL1 || []), ...(events.AL2 || [])];
@@ -356,6 +357,12 @@ function transformAllegroToOrderUpdate(
     },
     payment: allegroOrder.payment,
     allegroStatus: allegroOrder.status,
+    fulfillment: {
+      status:
+        allegroOrder.status === "CANCELLED"
+          ? "CANCELLED"
+          : existingOrder.fulfillment?.status || "NEW",
+    },
     delivery: allegroOrder.delivery,
     invoice: allegroOrder.invoice?.required
       ? {

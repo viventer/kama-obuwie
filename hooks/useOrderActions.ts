@@ -95,6 +95,21 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     {
       name: "Oznacz jako gotowe do wysyłki",
       onClick: async (id) => {
+        const { data } = await axios.get(`/api/orders/${id}`);
+        if (!data.invoice?.isAdded) {
+          showToast(
+            "Aby przenieść zamówienie do kolejnego etapu, dodaj fakturę.",
+            "error"
+          );
+          return;
+        }
+        if (!data.shipment?.isCreated) {
+          showToast(
+            "Aby przenieść zamówienie do kolejnego etapu, utwórz przesyłkę.",
+            "error"
+          );
+          return;
+        }
         await changeOrderPhase(id, "ready_for_shipment");
         showToast(
           "Zamówienie zostało przeniesione do kolejnego etapu.",
@@ -114,6 +129,17 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
         await changeOrderPhase(id, "sent");
         showToast(
           "Zamówienie zostało przeniesione do kolejnego etapu.",
+          "success"
+        );
+        router.refresh();
+      },
+    },
+    {
+      name: "Cofnij do realizacji",
+      onClick: async (id) => {
+        await changeOrderPhase(id, "processing");
+        showToast(
+          "Zamówienie zostało cofnięte do poprzedniego etapu.",
           "success"
         );
         router.refresh();

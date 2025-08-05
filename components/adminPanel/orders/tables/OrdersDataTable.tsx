@@ -381,20 +381,20 @@ export default function OrdersDataTable({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="cursor-pointer"
-                    onClick={(e) => {
-                      const target = e.target as HTMLElement;
-                      if (
-                        target.closest("[role='checkbox']") ||
-                        target.closest("[data-ignore-row-click]") ||
-                        target.closest("[data-radix-popper-content-wrapper]") ||
-                        target.closest("button") ||
-                        target.closest("[role='menuitem']")
-                      ) {
-                        return;
-                      }
-                      row.toggleExpanded();
-                    }}
+                    // className="cursor-pointer"
+                    // onClick={(e) => {
+                    //   const target = e.target as HTMLElement;
+                    //   if (
+                    //     target.closest("[role='checkbox']") ||
+                    //     target.closest("[data-ignore-row-click]") ||
+                    //     target.closest("[data-radix-popper-content-wrapper]") ||
+                    //     target.closest("button") ||
+                    //     target.closest("[role='menuitem']")
+                    //   ) {
+                    //     return;
+                    //   }
+                    //   row.toggleExpanded();
+                    // }}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>

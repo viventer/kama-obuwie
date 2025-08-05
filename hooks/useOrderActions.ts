@@ -69,7 +69,28 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
           },
         };
         await axios.patch(`/api/orders/${id}`, updateData);
+
+        const { data } = await axios.get(`/api/orders/${id}`);
+
+        if (["AL1", "AL2"].includes(data.salesChannel) && data.allegroId) {
+          await axios.put(`/api/allegro/orders/status/${data.allegroId}`, {
+            status: "CANCELLED",
+            account: data.salesChannel,
+          });
+        }
+
         showToast("Zamówienie odrzucone", "default");
+
+        if (
+          !data.payment?.paidAmount ||
+          !data.payment?.id ||
+          (data?.refund?.type && data.refund.type !== "NONE") ||
+          data.payment.type === "CASH_ON_DELIVERY"
+        ) {
+          showToast("Brak wpłaty do zwrotu", "default");
+          router.refresh();
+          return;
+        }
         router.push(`/admin-panel/orders/send-refund/${id}`);
       } catch (err) {
         showToast(`Błąd podczas odrzucania zamówienia: ${err}`, "error");
@@ -96,7 +117,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
       name: "Oznacz jako gotowe do wysyłki",
       onClick: async (id) => {
         const { data } = await axios.get(`/api/orders/${id}`);
-        if (!data.invoice?.isAdded) {
+        if (!data.invoice?.isAdded && data.invoice?.required) {
           showToast(
             "Aby przenieść zamówienie do kolejnego etapu, dodaj fakturę.",
             "error"

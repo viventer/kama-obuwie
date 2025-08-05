@@ -22,12 +22,23 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     newPhase: OrderPhase
   ) => {
     try {
+      console.log("Changing order phase to:", newPhase);
       const updateData: Partial<Order> = {
         fulfillment: {
           status: newPhase.toUpperCase() as FulfillmentStatus,
         },
       };
       await axios.patch(`/api/orders/${id}`, updateData);
+
+      const order = await axios.get(`/api/orders/${id}`);
+      const salesChannel = order.data.salesChannel;
+      const allegroOrderId = order.data.allegroId;
+      if (["AL1", "AL2"].includes(salesChannel) && allegroOrderId) {
+        await axios.put(`/api/allegro/orders/status/${allegroOrderId}`, {
+          status: newPhase.toUpperCase(),
+          account: salesChannel,
+        });
+      }
     } catch (err) {
       showToast(`Błąd podczas zmiany statusu zamówienia: ${err}`, "error");
     }
@@ -75,7 +86,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
         await changeOrderPhase(id, "processing");
         showToast("Zamówienie zatwierdzone", "success");
         router.refresh();
-        // server action do utworzenia przesyłki
+        router.push(`/admin-panel/orders/create-label/${id}`);
       },
     },
     cancelOrderAction,

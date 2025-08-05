@@ -3,10 +3,6 @@
 import axios, { AxiosError } from "axios";
 import { getAllegroUserAccessToken, getAllegroUserAccessTokens } from "./auth";
 import { getAllegroHeaders, getSingleAllegroHeaders } from "./global";
-import {
-  AllegroError,
-  AllegroAuthError,
-} from "@/firebase/schemas/shipmentsSchemas";
 import { redis } from "@/upstash/redis";
 import { AllegroOrder } from "@/firebase/schemas/ordersSchemas";
 import { createOrder, updateOrder } from "@/server-actions/orders/orders";

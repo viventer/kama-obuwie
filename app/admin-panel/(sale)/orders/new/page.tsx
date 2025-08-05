@@ -4,7 +4,7 @@ import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { syncAllegroOrders } from "@/server-actions/allegro/orders";
 
-export const revalidate = 180;
+export const revalidate = 0;
 
 export default async function OrdersNewPage() {
   await syncAllegroOrders();

@@ -155,6 +155,8 @@ export const InvoiceInfoSchema = z.object({
       })
       .nullable(),
   }),
+  isAdded: z.boolean().optional(),
+  sendingMethod: z.enum(["inBox", "allegro", "email"]).optional(),
 });
 
 export const OrderItemSchema = z.object({
@@ -227,7 +229,12 @@ export const OrderSchema = z.object({
   id: z.string().optional(),
   number: z.string(),
   allegroId: z.string().nullable(), // order id in Allegro
-  messageToSeller: z.string().nullable(),
+  messageToSeller: z
+    .object({
+      content: z.string().nullable(),
+      isRead: z.boolean(),
+    })
+    .nullable(),
   buyer: BuyerSchema,
   payment: PaymentSchema.nullable(),
   allegroStatus: AllegroOrderStatusSchema,

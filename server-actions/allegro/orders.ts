@@ -323,13 +323,22 @@ async function transformAllegroToOrder(
 
   return {
     allegroId: allegroOrder.id,
-    messageToSeller: allegroOrder.messageToSeller,
+    messageToSeller: {
+      content: allegroOrder.messageToSeller,
+      isRead: false,
+    },
     buyer: allegroOrder.buyer,
     payment: allegroOrder.payment,
     allegroStatus: allegroOrder.status,
     fulfillment: allegroOrder.fulfillment,
     delivery: allegroOrder.delivery,
-    invoice: allegroOrder.invoice || null,
+    invoice: allegroOrder.invoice?.required
+      ? {
+          ...allegroOrder.invoice,
+          isAdded: false,
+          sendingMethod: "inBox",
+        }
+      : null,
     lineItems: lineItems,
     surcharges: allegroOrder.surcharges,
     summary: allegroOrder.summary,
@@ -345,12 +354,20 @@ function transformAllegroToOrderUpdate(
   existingOrder: Order
 ): Partial<Order> {
   return {
-    messageToSeller: allegroOrder.messageToSeller,
+    messageToSeller: {
+      content: allegroOrder.messageToSeller,
+      isRead: existingOrder.messageToSeller?.isRead || false,
+    },
     payment: allegroOrder.payment,
     allegroStatus: allegroOrder.status,
-    fulfillment: allegroOrder.fulfillment,
     delivery: allegroOrder.delivery,
-    invoice: allegroOrder.invoice || null,
+    invoice: allegroOrder.invoice?.required
+      ? {
+          ...allegroOrder.invoice,
+          isAdded: existingOrder.invoice?.isAdded || false,
+          sendingMethod: existingOrder.invoice?.sendingMethod || "inBox",
+        }
+      : null,
     lineItems: allegroOrder.lineItems.map((item) => {
       const existingLineItem = existingOrder.lineItems.find(
         (existingItem) => existingItem.id === item.id

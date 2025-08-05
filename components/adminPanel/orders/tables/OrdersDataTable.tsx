@@ -49,6 +49,7 @@ import OrderCostDisplay from "./OrderCostDisplay";
 import { useRouter } from "next/navigation";
 import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
 import ShipmentsDialogContent from "../ShipmentsDialogContent";
+import axios from "axios";
 
 interface OrdersDataTableProps {
   orders: Order[];
@@ -186,8 +187,31 @@ export default function OrdersDataTable({
       header: "",
       cell: ({ row }) => (
         <div className="flex items-center gap-2 flex-col">
-          {row.original.messageToSeller && (
-            <IconButton className="text-destructive hover:text-primary">
+          {row.original.messageToSeller?.content && (
+            <IconButton
+              className={`${
+                row.original.messageToSeller?.isRead
+                  ? "text-primary"
+                  : "text-destructive"
+              } hover:text-primary`}
+              onClick={() =>
+                openDialog({
+                  title: "Wiadomość do sprzedawcy",
+                  content: <p>{row.original.messageToSeller?.content}</p>,
+                  onConfirm: async () => {
+                    await axios.patch(`/api/orders/${row.original.id}`, {
+                      messageToSeller: {
+                        content: row.original.messageToSeller?.content,
+                        isRead: true,
+                      },
+                    });
+
+                    router.refresh();
+                  },
+                  confirmText: "Ok",
+                })
+              }
+            >
               <Mail className="size-4" />
             </IconButton>
           )}

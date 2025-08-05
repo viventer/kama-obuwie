@@ -1,5 +1,4 @@
 import {
-  AllegroOrderStatus,
   FulfillmentStatus,
   Order,
   OrderPhase,
@@ -44,7 +43,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
   };
 
   const refundAction: TableAction = {
-    name: "Zwróć część wpłaty",
+    name: "Zwróć wpłatę",
     onClick: async (id) => {
       const { data } = await axios.get(`/api/orders/${id}`);
       if (
@@ -145,6 +144,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
         router.refresh();
       },
     },
+    refundAction,
   ];
 
   const actions: OrderActions = {

@@ -50,6 +50,8 @@ import { useRouter } from "next/navigation";
 import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
 import ShipmentsDialogContent from "../ShipmentsDialogContent";
 import axios from "axios";
+import InvoiceInfo from "../InvoiceInfo";
+import { useToast } from "@/hooks/useToast";
 
 interface OrdersDataTableProps {
   orders: Order[];
@@ -76,7 +78,8 @@ export default function OrdersDataTable({
 
   const actions = useOrderActions(phase);
   const router = useRouter();
-  const { openDialog } = useDialogWindow();
+  const { openDialog, closeDialog } = useDialogWindow();
+  const { showToast } = useToast();
 
   const columns: ColumnDef<Order>[] = [
     {
@@ -216,7 +219,37 @@ export default function OrdersDataTable({
             </IconButton>
           )}
           {row.original?.invoice?.required && (
-            <IconButton className="text-destructive hover:text-primary">
+            <IconButton
+              className={`${
+                row.original?.invoice?.isAdded
+                  ? "text-success"
+                  : "text-destructive"
+              } hover:text-primary`}
+              onClick={() =>
+                openDialog({
+                  title: "Dodaj fakturę",
+                  content: <InvoiceInfo data={row.original.invoice} />,
+                  onConfirm: async () => {
+                    if (!row.original.invoice?.isAdded) {
+                      await axios.patch(`/api/orders/${row.original.id}`, {
+                        invoice: {
+                          ...row.original.invoice,
+                          sendingMethod: "inBox",
+                          isAdded: true,
+                        },
+                      });
+                      router.refresh();
+                      showToast("Faktura została dodana", "success");
+                    }
+                  },
+                  confirmText: row.original.invoice?.isAdded
+                    ? "Zamknij"
+                    : "Oznacz jako dodaną",
+                  cancelText: "Anuluj",
+                  hasCancelButton: true,
+                })
+              }
+            >
               <FilePlus2Icon className="size-4" />
             </IconButton>
           )}

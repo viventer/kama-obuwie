@@ -1,22 +1,19 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import OrdersDataTable from "@/components/adminPanel/orders/tables/OrdersDataTable";
-import { getDocumentsFromAdminDB } from "@/firebase/getters";
-import { Order } from "@/firebase/schemas/ordersSchemas";
+import { getAllegroReturns } from "@/server-actions/allegro/returns";
+import { notFound } from "next/navigation";
 
 export const revalidate = 180;
 
-export default async function OrdersNewPage() {
-  const orders = await getDocumentsFromAdminDB<Order>("orders", (ref) =>
-    ref
-      .where("fulfillment.status", "==", "NEW")
-      .orderBy("createdAt", "desc")
-      .limit(60)
-  );
+export default async function ReturnsPage() {
+  const returnsResponse = await getAllegroReturns();
+
+  if (!returnsResponse) {
+    notFound();
+  }
 
   return (
     <>
-      <SubpageHeading text="Nowe zamówienia" />
-      <OrdersDataTable orders={orders || []} phase="new" />
+      <SubpageHeading text="Zwroty" />
     </>
   );
 }

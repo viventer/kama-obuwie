@@ -99,9 +99,9 @@ export default function AppSidebar() {
             <SidebarMenuItem>
               <LinkText href="/admin-panel/orders/new">Zamówienia</LinkText>
             </SidebarMenuItem>
-            {/* <SidebarMenuItem>
+            <SidebarMenuItem>
               <LinkText href="/admin-panel/returns">Zwroty</LinkText>
-            </SidebarMenuItem> */}
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
         {/* <SidebarGroup>

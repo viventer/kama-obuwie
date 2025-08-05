@@ -17,7 +17,7 @@ export default function Loader() {
   return (
     <div
       ref={containerRef}
-      className="w-screen h-screen flex items-center justify-center text-primary"
+      className="flex items-center justify-center text-primary p-4"
     >
       <HashLoader color={spinnerColor} loading={true} size={50} />
     </div>

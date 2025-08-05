@@ -4,6 +4,9 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { ConfirmDialogProvider } from "@/app/providers/ConfirmDialogProvider";
 import { AuthProvider } from "./providers/AuthProvider";
+import { FullPageLoaderProvider } from "@/components/adminPanel/global/FullPageLoader";
+import { DialogWindowProvider } from "@/components/providers/DialogWindowProvider";
+import GlobalDialogWindow from "@/components/adminPanel/global/GlobalDialogWindow";
 
 const ubuntuSans = Ubuntu({
   variable: "--font-ubuntu-sans",
@@ -36,7 +39,14 @@ export default async function RootLayout({
         className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen overflow-auto scrollbar  [scrollbar-gutter:stable]`}
       >
         <ConfirmDialogProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <FullPageLoaderProvider>
+              <DialogWindowProvider>
+                {children}
+                <GlobalDialogWindow />
+              </DialogWindowProvider>
+            </FullPageLoaderProvider>
+          </AuthProvider>
           <Toaster
             toastOptions={{
               unstyled: true,

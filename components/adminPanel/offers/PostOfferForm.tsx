@@ -20,6 +20,7 @@ import { FormEvent, useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/useToast";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { PostOfferBody } from "@/app/api/allegro/offers/route";
 import { getPostOfferBody } from "@/server-actions/offers/offers";
 import { getColorVariantName } from "../products/helpers/productsHelpers";
@@ -28,6 +29,7 @@ import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { useRouter } from "next/navigation";
 import MiniLoader from "../global/MiniLoader";
 import ReturnPolicySelector from "./ReturnPolicySelector";
+import { handleApiError } from "@/server-actions/helpers";
 import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
 import WarrantySelector from "./WarrantySelector";
 import TitlesField from "./TitlesField";
@@ -92,6 +94,7 @@ export default function PostOfferForm({
   });
 
   const { showToast } = useToast();
+  const { handleError } = useErrorHandler();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -130,6 +133,15 @@ export default function PostOfferForm({
       ],
     };
 
+    if (!productData.editedPhotos) {
+      showToast("Brak zdjęć produktu", "error");
+      return;
+    }
+
+    const mainOfferThumbnail = productData.editedPhotos.find(
+      (photo) => photo.colorVariantName === colorVariantsNames[0]
+    )?.filePath;
+
     const formDataWithoutTitlesAndEAN = {
       ...formData,
       title: "",
@@ -145,12 +157,16 @@ export default function PostOfferForm({
         colorVariantName: colorVariantsNames[0],
         signature:
           signatureWithoutColorVariant.trim() + ` ${colorVariantsNames[0]}`,
+        thumbnail: mainOfferThumbnail,
       });
 
       for (const colorVariantName of colorVariantsNames) {
         if (colorVariantName === colorVariantsNames[0]) {
           continue;
         }
+        const offerThumbnail = productData.editedPhotos.find(
+          (photo) => photo.colorVariantName === colorVariantName
+        )?.filePath;
         const id = await createOfferForDifferentVariant({
           ...oldOfferData,
           ...formDataWithoutTitlesAndEAN,
@@ -159,6 +175,7 @@ export default function PostOfferForm({
           colorVariantName,
           signature:
             signatureWithoutColorVariant.trim() + ` ${colorVariantName}`,
+          thumbnail: offerThumbnail,
         });
         offersIds?.AL1?.push({
           value: id,
@@ -220,9 +237,10 @@ export default function PostOfferForm({
       setIsPosting(false);
       showToast("Oferta została wystawiona.", "success");
       router.replace("/admin-panel/create-products/post-offer");
-    } catch (err) {
-      showToast(`Nie udało się wystawić oferty: ${err}`, "error");
-      setIsPosting(false);
+    } catch (err: any) {
+      handleError(err, "Nie udało się wystawić oferty", () =>
+        setIsPosting(false)
+      );
       return;
     }
   };
@@ -249,8 +267,12 @@ export default function PostOfferForm({
   const updateMainOffer = async (offerData: Offer) => {
     try {
       await axios.patch(`/api/offers/${oldOfferData.id}`, offerData);
-    } catch (err) {
-      throw new Error(`Nie można zaktualizować głównej oferty: ${err}`);
+    } catch (err: any) {
+      const errorMessage = handleApiError(
+        err,
+        "Nie można zaktualizować głównej oferty"
+      );
+      throw new Error(errorMessage);
     }
   };
 
@@ -262,8 +284,12 @@ export default function PostOfferForm({
         ...offerData,
       });
       return data.id;
-    } catch (err) {
-      throw new Error(`Nie można utworzyć oferty dla wariantu: ${err}`);
+    } catch (err: any) {
+      const errorMessage = handleApiError(
+        err,
+        "Nie można utworzyć oferty dla wariantu"
+      );
+      throw new Error(errorMessage);
     }
   };
 

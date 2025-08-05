@@ -266,6 +266,7 @@ export default function OrdersDataTable({
                     router.push(
                       `/admin-panel/orders/create-label/${row.original.id}`
                     );
+                    return;
                   }
 
                   openDialog({

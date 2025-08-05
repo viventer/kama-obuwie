@@ -22,7 +22,6 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     newPhase: OrderPhase
   ) => {
     try {
-      console.log("Changing order phase to:", newPhase);
       const updateData: Partial<Order> = {
         fulfillment: {
           status: newPhase.toUpperCase() as FulfillmentStatus,

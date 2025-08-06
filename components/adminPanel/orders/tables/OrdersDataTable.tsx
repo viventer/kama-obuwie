@@ -261,23 +261,53 @@ export default function OrdersDataTable({
                     ? "text-success"
                     : "text-destructive"
                 } hover:text-primary`}
-                onClick={() => {
-                  if (!row.original?.shipment?.isCreated) {
-                    router.push(
-                      `/admin-panel/orders/create-label/${row.original.id}`
-                    );
+                onClick={async () => {
+                  if (row.original?.shipment?.isCreated) {
+                    openDialog({
+                      title: "Informacje o wysyłce",
+                      content: (
+                        <ShipmentsDialogContent
+                          shipmentData={row.original?.shipment}
+                          orderId={row.original.id as string}
+                        />
+                      ),
+                    });
                     return;
                   }
 
-                  openDialog({
-                    title: "Informacje o wysyłce",
-                    content: (
-                      <ShipmentsDialogContent
-                        shipmentData={row.original?.shipment}
-                        orderId={row.original.id as string}
-                      />
-                    ),
-                  });
+                  const { data: returnsForOrder } = await axios.get(
+                    `/api/allegro/returns?allegroOrderId=${row.original.allegroId}`
+                  );
+
+                  if (
+                    returnsForOrder.AL1.length > 0 ||
+                    returnsForOrder.AL2.length > 0
+                  ) {
+                    openDialog({
+                      title: "Zamówienie ma zwroty",
+                      content: (
+                        <p>
+                          Do tego zamówienia został już zgłoszony zwrot. Czy na
+                          pewno chcesz wygenerować etykietę?
+                        </p>
+                      ),
+                      cancelText: "Anuluj tworzenie etykiety",
+                      hasCancelButton: true,
+                      onCancel: () => {
+                        showToast(
+                          "Etykieta nie została wygenerowana.",
+                          "default"
+                        );
+                        router.back();
+                        return;
+                      },
+                    });
+                  }
+
+                  router.push(
+                    `/admin-panel/orders/create-label/${row.original.id}`
+                  );
+                  return;
                 }}
               >
                 <PackageIcon className="size-4" />

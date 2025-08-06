@@ -22,6 +22,11 @@ export default function GlobalDialogWindow() {
     closeDialog();
   };
 
+  const handleCancel = () => {
+    config.onCancel?.();
+    closeDialog();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeDialog()}>
       <DialogContent className="max-h-[90svh]">
@@ -36,11 +41,9 @@ export default function GlobalDialogWindow() {
 
         <DialogFooter>
           {config.hasCancelButton === true && (
-            <DialogClose asChild>
-              <Button variant="destructive">
-                {config.cancelText || "Anuluj"}
-              </Button>
-            </DialogClose>
+            <Button variant="destructive" onClick={handleCancel}>
+              {config.cancelText || "Anuluj"}
+            </Button>
           )}
           {config.onConfirm && (
             <Button

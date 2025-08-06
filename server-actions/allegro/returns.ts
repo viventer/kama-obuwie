@@ -13,9 +13,9 @@ export type allegroReturnsResponse = {
   AL2: AllegroReturn[];
 };
 
-export async function getAllegroReturns(): Promise<
-  allegroReturnsResponse | undefined
-> {
+export async function getAllegroReturns(
+  allegroOrderId?: string | null
+): Promise<allegroReturnsResponse | undefined> {
   const { AL1: AL1AccessToken, AL2: AL2AccessToken } =
     await getAllegroUserAccessTokens();
   const headers = getAllegroHeaders(AL1AccessToken, AL2AccessToken);
@@ -24,7 +24,13 @@ export async function getAllegroReturns(): Promise<
   const monthAgo = new Date(now);
   monthAgo.setDate(now.getDate() - 30);
   const monthAgoISO = monthAgo.toISOString();
-  const url = `${ALLEGRO_API_BASE_URL}/order/customer-returns?createdAt.gte=${monthAgoISO}`;
+
+  let url = `${ALLEGRO_API_BASE_URL}/order/customer-returns?createdAt.gte=${monthAgoISO}`;
+
+  // Dodaj filtrowanie po allegroOrderId jeśli został podany
+  if (allegroOrderId) {
+    url += `&orderId=${allegroOrderId}`;
+  }
 
   try {
     const [AL1Response, AL2Response] = await Promise.all([

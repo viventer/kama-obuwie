@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Fragment, useEffect } from "react";
+import { useState, Fragment } from "react";
 import {
   Table,
   TableBody,
@@ -36,7 +36,6 @@ import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
 import { useToast } from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";
-import axios from "axios";
 import { getOrderByAllegroId } from "@/server-actions/orders/orders";
 
 interface ReturnsDataTableProps {

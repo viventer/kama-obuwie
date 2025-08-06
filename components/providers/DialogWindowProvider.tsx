@@ -10,6 +10,7 @@ export interface DialogConfig {
   cancelText?: string;
   confirmText?: string;
   onConfirm?: () => void;
+  onCancel?: () => void;
   confirmVariant?:
     | "default"
     | "destructive"

@@ -3,8 +3,9 @@
 import { AllegroReturn } from "@/firebase/schemas/returnsSchemas";
 import { cn } from "@/lib/utils";
 import ReturnItemFromList from "./ReturnItemFromList";
-import { useEffect, useState } from "react";
-import { getOrderByAllegroId } from "@/server-actions/orders/orders";
+import MiniLoader from "../../global/MiniLoader";
+import { useOrderOffers } from "@/hooks/useOrderCache";
+import { useToast } from "@/hooks/useToast";
 
 interface ReturnItemsDisplayProps {
   items: AllegroReturn["items"];
@@ -23,24 +24,17 @@ export function ReturnItemsDisplay({
   allegroOrderId,
   className,
 }: ReturnItemsDisplayProps) {
-  const [orderOffers, setOrderOffers] = useState<ReturnOffer[]>([]);
+  const { orderOffers, loading, error } = useOrderOffers(allegroOrderId);
+  const { showToast } = useToast();
 
-  useEffect(() => {
-    (async function () {
-      const order = await getOrderByAllegroId(allegroOrderId);
-      if (!order) {
-        console.error("Order not found for Allegro ID:", allegroOrderId);
-        return;
-      }
-      const offers: ReturnOffer[] = order.lineItems.map((item) => ({
-        thumbnail: item.offer.thumbnail,
-        allegroId: item.offer.allegroId,
-        signature: item.offer.signature,
-      }));
+  if (loading) {
+    return <MiniLoader />;
+  }
 
-      setOrderOffers(offers);
-    })();
-  }, []);
+  if (error) {
+    showToast("Błąd ładowania danych ofert", "error");
+    return;
+  }
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>

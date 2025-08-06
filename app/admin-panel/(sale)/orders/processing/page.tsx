@@ -3,7 +3,7 @@ import OrdersDataTable from "@/components/adminPanel/orders/tables/OrdersDataTab
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 
-export const revalidate = 180;
+export const revalidate = 0;
 
 export default async function OrdersProcessingPage() {
   const orders = await getDocumentsFromAdminDB<Order>("orders", (ref) =>

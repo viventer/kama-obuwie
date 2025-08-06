@@ -5,10 +5,13 @@ import { extractSizeFromTitle } from "@/helpers/extractSizeFromTitle";
 import { ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { ReturnOffer } from "./ReturnItemsDisplay";
 
 interface ReturnItemFromListProps {
   item: AllegroReturn["items"][number];
   className?: string;
+  thumbnail?: string;
+  signature?: string;
 }
 
 const reasonTranslations: Record<string, string> = {
@@ -29,6 +32,8 @@ const reasonTranslations: Record<string, string> = {
 export default function ReturnItemFromList({
   item,
   className,
+  thumbnail,
+  signature,
 }: ReturnItemFromListProps) {
   const size = extractSizeFromTitle(item.name || "");
 
@@ -37,14 +42,16 @@ export default function ReturnItemFromList({
       className={cn("flex items-start gap-3 p-2 border rounded-md", className)}
     >
       <div className="w-12 h-12 bg-primary/25 rounded overflow-hidden flex-shrink-0">
-        {item.url ? (
-          <Image
-            src={item.url}
-            width={128}
-            height={128}
-            alt="Product"
-            className="w-full h-full object-cover"
-          />
+        {thumbnail ? (
+          <a href={item.url}>
+            <Image
+              src={thumbnail}
+              width={128}
+              height={128}
+              alt="Product"
+              className="w-full h-full object-cover"
+            />
+          </a>
         ) : (
           <ImageIcon className="w-full h-full p-2" />
         )}
@@ -52,7 +59,7 @@ export default function ReturnItemFromList({
 
       <div className="flex-1 min-w-0 space-y-1">
         <p className="font-medium text-sm">
-          {item.name}
+          {signature ? signature : item.name}
           {size && (
             <span className="ml-2 text-xs bg-primary/25 px-2 py-1 rounded">
               {size}

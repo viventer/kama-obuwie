@@ -194,7 +194,12 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
     {
       id: "items",
       header: "Produkty",
-      cell: ({ row }) => <ReturnItemsDisplay items={row.original.items} />,
+      cell: ({ row }) => (
+        <ReturnItemsDisplay
+          items={row.original.items}
+          allegroOrderId={row.original.orderId}
+        />
+      ),
       enableSorting: false,
     },
     {
@@ -295,20 +300,6 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="cursor-pointer"
-                    onClick={(e) => {
-                      const target = e.target as HTMLElement;
-                      if (
-                        target.closest("[role='checkbox']") ||
-                        target.closest("[data-ignore-row-click]") ||
-                        target.closest("[data-radix-popper-content-wrapper]") ||
-                        target.closest("button") ||
-                        target.closest("[role='menuitem']")
-                      ) {
-                        return;
-                      }
-                      row.toggleExpanded();
-                    }}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -319,54 +310,6 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
                       </TableCell>
                     ))}
                   </TableRow>
-                  {row.getIsExpanded() && (
-                    <TableRow>
-                      <TableCell colSpan={columns.length} className="p-0">
-                        <div className="p-4 bg-muted">
-                          <div className="space-y-4">
-                            <div>
-                              <h4 className="font-medium mb-2">
-                                Szczegółowe informacje o zwrocie
-                              </h4>
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                  <span className="font-medium">
-                                    ID zamówienia:
-                                  </span>{" "}
-                                  {row.original.orderId}
-                                </div>
-                                <div>
-                                  <span className="font-medium">
-                                    Marketplace ID:
-                                  </span>{" "}
-                                  {row.original.marketplaceId}
-                                </div>
-                                {row.original.rejection && (
-                                  <div className="col-span-2 p-3 bg-muted border rounded">
-                                    <div className="font-medium text-destructive">
-                                      Odrzucono:
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                      Kod: {row.original.rejection.code}
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                      Powód: {row.original.rejection.reason}
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                      Data:{" "}
-                                      {new Date(
-                                        row.original.rejection.createdAt
-                                      ).toLocaleDateString("pl-PL")}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
                 </Fragment>
               ))
             ) : (

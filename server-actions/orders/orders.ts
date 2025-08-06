@@ -3,11 +3,7 @@
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { verifyUser } from "../auth/auth";
 import { Order, OrderSchema } from "@/firebase/schemas/ordersSchemas";
-import {
-  getDocumentsFromAdminDB,
-  getDocumentFromAdminDB,
-} from "@/firebase/getters";
-import { revalidatePath } from "next/cache";
+import { getDocumentsFromAdminDB } from "@/firebase/getters";
 
 export const createOrder = async function (newOrder: Order) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -64,4 +60,18 @@ export const getOrders = async function (lastOrderId?: string) {
   return await getDocumentsFromAdminDB<Order>("orders", (colRef) => {
     return colRef.orderBy("createdAt", "desc").limit(60);
   });
+};
+
+export const getOrderByAllegroId = async function (allegroId: string) {
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
+  const orders = await getDocumentsFromAdminDB<Order>("orders", (ref) =>
+    ref.where("allegroId", "==", allegroId).limit(1)
+  );
+
+  if (!orders) {
+    throw new Error("Zamówienie o podanym ID nie istnieje.");
+  }
+
+  return orders[0];
 };

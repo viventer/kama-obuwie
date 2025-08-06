@@ -6,10 +6,12 @@ export default function IconButton({
   className,
   disabled = false,
   onClick,
+  title,
 }: {
   children: React.ReactNode;
   className?: string;
   disabled?: boolean;
+  title?: string;
   onClick?: (e?: FormEvent) => void;
 }) {
   return (
@@ -17,6 +19,7 @@ export default function IconButton({
       className={cn("hover:text-accent hover:cursor-pointer", className)}
       onClick={onClick}
       disabled={disabled}
+      title={title}
     >
       {children}
     </button>

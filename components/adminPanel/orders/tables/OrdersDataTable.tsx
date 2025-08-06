@@ -78,7 +78,7 @@ export default function OrdersDataTable({
 
   const actions = useOrderActions(phase);
   const router = useRouter();
-  const { openDialog, closeDialog } = useDialogWindow();
+  const { openDialog } = useDialogWindow();
   const { showToast } = useToast();
 
   const columns: ColumnDef<Order>[] = [

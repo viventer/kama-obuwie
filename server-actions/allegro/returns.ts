@@ -24,7 +24,7 @@ export async function getAllegroReturns(): Promise<
   const monthAgo = new Date(now);
   monthAgo.setDate(now.getDate() - 30);
   const monthAgoISO = monthAgo.toISOString();
-  const url = `${ALLEGRO_API_BASE_URL}/order/customer-returns`;
+  const url = `${ALLEGRO_API_BASE_URL}/order/customer-returns?createdAt.gte=${monthAgoISO}`;
 
   try {
     const [AL1Response, AL2Response] = await Promise.all([

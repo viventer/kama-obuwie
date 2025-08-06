@@ -11,7 +11,6 @@ export type AllegroRefundCreateData = {
 export async function POST(request: NextRequest) {
   const data: AllegroRefundCreateData = await request.json();
 
-  console.log(data.refund.lineItems);
   await createAllegroRefund(data.refund, data.account);
   return apiResponse("Wpłata została zwrócona.", 201);
 }

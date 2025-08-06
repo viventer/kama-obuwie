@@ -77,7 +77,6 @@ const customerReturnItemSchema = z.object({
   price: priceSchema,
   url: z.string().optional(),
   reason: customerReturnItemReasonSchema.optional(),
-  refund: customerReturnRefundSchema.optional(),
 });
 
 const customerReturnParcelSenderSchema = z.object({
@@ -106,6 +105,7 @@ export const allegroReturnSchema = z.object({
   orderId: z.string(),
   buyer: customerReturnBuyerSchema,
   items: z.array(customerReturnItemSchema),
+  refund: customerReturnRefundSchema.optional(),
   parcels: z.array(customerReturnReturnParcelSchema).optional(),
   rejection: customerReturnRejectionSchema.optional(),
   marketplaceId: z.string(),

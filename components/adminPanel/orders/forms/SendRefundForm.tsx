@@ -18,6 +18,7 @@ import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { useToast } from "@/hooks/useToast";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export const refundReasons = [
   { name: "zwrot produktu", value: "REFUND" },
@@ -57,6 +58,7 @@ export default function SendRefundForm({
   });
 
   const { showDialog } = useConfirmDialog();
+  const { handleError } = useErrorHandler();
   const { showToast } = useToast();
   const router = useRouter();
   const handleReject = async (e: FormEvent) => {
@@ -168,16 +170,20 @@ export default function SendRefundForm({
         await axios.patch(`/api/orders/${id}`, updateOrderData);
 
         if (["AL1", "AL2"].includes(salesChannel) && allegroOrderId) {
-          await axios.post(`/api/allegro/orders/refunds`, {
-            refund: {
-              payment: { id: paymentId },
-              reason: data.reason,
-              lineItems: data.lineItems,
-              sellerComment: data.sellerComment,
-              delivery: data.delivery,
-            },
-            account: salesChannel,
-          });
+          try {
+            await axios.post(`/api/allegro/orders/refunds`, {
+              refund: {
+                payment: { id: paymentId },
+                reason: data.reason,
+                lineItems: data.lineItems,
+                sellerComment: data.sellerComment,
+                delivery: data.delivery,
+              },
+              account: salesChannel,
+            });
+          } catch (err: any) {
+            handleError(err, "Błąd podczas tworzenia zwrotu w Allegro");
+          }
 
           if (refundType === "FULL") {
             await axios.put(`/api/allegro/orders/status/${allegroOrderId}`, {
@@ -187,7 +193,7 @@ export default function SendRefundForm({
           }
         }
 
-        router.replace("/admin-panel/orders/new");
+        router.back();
         showToast("Wpłata została zwrócona.", "success");
       },
     });

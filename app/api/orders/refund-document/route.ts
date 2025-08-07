@@ -23,10 +23,11 @@ export const POST = async (req: NextRequest) => {
 
     const tableRows = items
       .map((item, i) => {
-        const brutto = parseFloat(item.value);
-        const vat = +(brutto * 0.23).toFixed(2);
-        const netto = +(brutto - vat).toFixed(2);
-        totalBrutto += brutto;
+        const cenaJednostkowa = parseFloat(item.value);
+        const wartoscBrutto = +(cenaJednostkowa * item.quantity).toFixed(2);
+        const vat = +(wartoscBrutto * 0.23).toFixed(2);
+        const netto = +(wartoscBrutto - vat).toFixed(2);
+        totalBrutto += wartoscBrutto;
         totalVat += vat;
         totalNetto += netto;
 
@@ -35,7 +36,9 @@ export const POST = async (req: NextRequest) => {
           <td>${i + 1}</td>
           <td>${item.name}</td>
           <td>${item.quantity}</td>
-          <td>${brutto.toFixed(2)} zł</td>
+          <td>${cenaJednostkowa.toFixed(2)} zł</td>
+          <td>${wartoscBrutto.toFixed(2)} zł</td>
+          <td>23%</td>
           <td>${vat.toFixed(2)} zł</td>
           <td>${netto.toFixed(2)} zł</td>
         </tr>
@@ -54,36 +57,40 @@ export const POST = async (req: NextRequest) => {
         <style>
           body {
             font-family: Arial, sans-serif;
-            margin: 50px;
-            line-height: 1.4;
+            margin: 20px;
+            line-height: 1.3;
             color: #000;
+            font-size: 10px;
           }
           .header {
             text-align: center;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-transform: uppercase;
           }
           .location-date {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            font-size: 10px;
           }
           table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            font-size: 9px;
           }
           th, td {
             border: 1px solid #000;
-            padding: 8px;
+            padding: 4px;
             text-align: left;
           }
           th {
             background-color: #f5f5f5;
             font-weight: bold;
             text-align: center;
+            font-size: 8px;
           }
           td {
             text-align: center;
@@ -92,26 +99,28 @@ export const POST = async (req: NextRequest) => {
             text-align: left;
           }
           .summary {
-            margin: 20px 0;
+            margin: 15px 0;
+            font-size: 10px;
           }
           .summary div {
-            margin: 5px 0;
+            margin: 3px 0;
           }
           .form-fields {
-            margin-top: 20px;
+            margin-top: 15px;
+            font-size: 10px;
           }
           .form-fields div {
-            margin: 15px 0;
+            margin: 10px 0;
           }
           .underline {
             border-bottom: 1px solid #000;
             display: inline-block;
-            min-width: 200px;
+            min-width: 150px;
           }
           .signature-line {
             border-bottom: 1px solid #000;
             display: inline-block;
-            min-width: 300px;
+            min-width: 200px;
           }
         </style>
       </head>
@@ -131,7 +140,9 @@ export const POST = async (req: NextRequest) => {
               <th>Lp.</th>
               <th>Nazwa towaru</th>
               <th>Ilość</th>
-              <th>Cena brutto</th>
+              <th>Cena jednostkowa brutto</th>
+              <th>Wartość brutto</th>
+              <th>Stawka VAT</th>
               <th>Kwota VAT</th>
               <th>Wartość netto</th>
             </tr>
@@ -152,7 +163,7 @@ export const POST = async (req: NextRequest) => {
         
         <div class="form-fields">
           <div>Załączono paragon nr: <span class="underline">&nbsp;</span></div>
-          <div>Przyczyna anulowania paragonu: <span class="signature-line">&nbsp;</span></div>
+          <div>Przyczyna anulowania paragonu: zwrot allegro</div>
           <div style="margin-top: 30px;">
             Imię i nazwisko oraz podpis osoby sporządzającej protokół: <span class="signature-line">&nbsp;</span>
           </div>
@@ -180,12 +191,13 @@ export const POST = async (req: NextRequest) => {
 
     // Generowanie PDF
     const pdfBuffer = await page.pdf({
-      format: "A4",
+      format: "A5",
+      landscape: true,
       margin: {
-        top: "50px",
-        bottom: "50px",
-        left: "50px",
-        right: "50px",
+        top: "15px",
+        bottom: "15px",
+        left: "15px",
+        right: "15px",
       },
       printBackground: true,
     });

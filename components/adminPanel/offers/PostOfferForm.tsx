@@ -247,7 +247,6 @@ export default function PostOfferForm({
 
   const validateForm = async (): Promise<boolean> => {
     const isValid = await form.trigger();
-    console.log(form.formState.errors);
     if (!isValid) {
       showToast("Formularz zawiera błędy", "error");
       return false;

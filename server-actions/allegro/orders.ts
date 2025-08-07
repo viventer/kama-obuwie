@@ -108,7 +108,6 @@ export async function syncAllegroOrders() {
   try {
     // 1. Pobierz nowe zdarzenia
     const events = await getAllegroOrderEvents();
-    console.log(events);
     if (!events) return;
 
     const allEvents = [...(events.AL1 || []), ...(events.AL2 || [])];

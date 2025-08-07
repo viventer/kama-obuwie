@@ -62,7 +62,6 @@ export async function POST(request: NextRequest) {
         commandId,
         body.salesChannel
       );
-      console.log(`Pickup Status Data (attempt ${attempt}):`, pickupStatusData);
 
       if (!pickupStatusData) {
         throw new Error();
@@ -75,11 +74,6 @@ export async function POST(request: NextRequest) {
 
       // Jeśli to nie jest ostatnia próba i status to IN_PROGRESS, czekamy 3 sekundy
       if (attempt < maxRetries) {
-        console.log(
-          `Status IN_PROGRESS, oczekiwanie 3 sekundy przed próbą ${
-            attempt + 1
-          }...`
-        );
         await new Promise((resolve) => setTimeout(resolve, 3000));
       }
     } catch (err: any) {
@@ -98,9 +92,6 @@ export async function POST(request: NextRequest) {
         );
       }
       // Jeśli nie jest to ostatnia próba, czekamy i próbujemy ponownie
-      console.log(
-        `Błąd przy próbie ${attempt}, oczekiwanie przed kolejną próbą...`
-      );
       await new Promise((resolve) => setTimeout(resolve, 3000));
     }
   }

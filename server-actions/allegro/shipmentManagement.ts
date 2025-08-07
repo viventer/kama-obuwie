@@ -99,7 +99,6 @@ export async function getShipmentLabel(
     });
 
     const buffer = Buffer.from(response.data);
-    console.log("Received label buffer length:", buffer.length); // Debug log
 
     return buffer;
   } catch (err) {

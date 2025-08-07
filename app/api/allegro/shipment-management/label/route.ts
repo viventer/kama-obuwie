@@ -51,10 +51,6 @@ export async function POST(request: NextRequest) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       shipmentStatusData = await getShipmentStatus(commandId, body.account);
-      console.log(
-        `Shipment Status Data (attempt ${attempt}):`,
-        shipmentStatusData
-      );
 
       if (!shipmentStatusData) {
         throw new Error();
@@ -67,11 +63,6 @@ export async function POST(request: NextRequest) {
 
       // Jeśli to nie jest ostatnia próba i status to IN_PROGRESS, czekamy 3 sekundy
       if (attempt < maxRetries) {
-        console.log(
-          `Status IN_PROGRESS, oczekiwanie 3 sekundy przed próbą ${
-            attempt + 1
-          }...`
-        );
         await new Promise((resolve) => setTimeout(resolve, 3000));
       }
     } catch (err: any) {
@@ -89,10 +80,6 @@ export async function POST(request: NextRequest) {
           }
         );
       }
-      // Jeśli nie jest to ostatnia próba, czekamy i próbujemy ponownie
-      console.log(
-        `Błąd przy próbie ${attempt}, oczekiwanie przed kolejną próbą...`
-      );
       await new Promise((resolve) => setTimeout(resolve, 3000));
     }
   }
@@ -148,7 +135,6 @@ export async function POST(request: NextRequest) {
   let label: Buffer | undefined;
   try {
     label = await getShipmentLabel(shipmentStatusData.shipmentId, body.account);
-    console.log("Label buffer length:", label?.length); // Debug log
     if (!label || label.length === 0) {
       throw new Error("Pusta etykieta");
     }

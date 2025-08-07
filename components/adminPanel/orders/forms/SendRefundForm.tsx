@@ -76,6 +76,42 @@ export default function SendRefundForm({
 
   const { id } = useParams();
 
+  const generateRefundDocument = async (
+    orderLineItems: Order["lineItems"],
+    refundLineItems: Refund["lineItems"]
+  ) => {
+    const items = refundLineItems!.map((refundItem, index) => {
+      const orderItem = orderLineItems[index];
+      if (refundItem) {
+        return {
+          name: orderItem.offer.name,
+          quantity: Number(refundItem?.quantity) || 0,
+          value: refundItem?.value?.amount,
+        };
+      }
+    });
+
+    console.log("order items", orderLineItems);
+    console.log("refund items", refundLineItems);
+    console.log("items", items);
+
+    try {
+      const response = await axios.post(`/api/orders/refund-document`, {
+        items,
+      });
+
+      const { filePath, url } = response.data;
+      if (!filePath || !url) {
+        throw new Error("Nie udało się wygenerować dokumentu zwrotu wpłaty");
+      }
+      window.open(url, "_blank");
+
+      showToast("Dokument zwrotu wpłaty został wygenerowany.", "success");
+    } catch (error: any) {
+      handleError(error, "Błąd podczas generowania dokumentu zwrotu wpłaty");
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -167,31 +203,33 @@ export default function SendRefundForm({
           };
         }
 
-        await axios.patch(`/api/orders/${id}`, updateOrderData);
+        // await axios.patch(`/api/orders/${id}`, updateOrderData);
 
-        if (["AL1", "AL2"].includes(salesChannel) && allegroOrderId) {
-          try {
-            await axios.post(`/api/allegro/orders/refunds`, {
-              refund: {
-                payment: { id: paymentId },
-                reason: data.reason,
-                lineItems: data.lineItems,
-                sellerComment: data.sellerComment,
-                delivery: data.delivery,
-              },
-              account: salesChannel,
-            });
-          } catch (err: any) {
-            handleError(err, "Błąd podczas tworzenia zwrotu w Allegro");
-          }
+        // if (["AL1", "AL2"].includes(salesChannel) && allegroOrderId) {
+        //   try {
+        //     await axios.post(`/api/allegro/orders/refunds`, {
+        //       refund: {
+        //         payment: { id: paymentId },
+        //         reason: data.reason,
+        //         lineItems: data.lineItems,
+        //         sellerComment: data.sellerComment,
+        //         delivery: data.delivery,
+        //       },
+        //       account: salesChannel,
+        //     });
+        //   } catch (err: any) {
+        //     handleError(err, "Błąd podczas tworzenia zwrotu w Allegro");
+        //   }
 
-          if (refundType === "FULL") {
-            await axios.put(`/api/allegro/orders/status/${allegroOrderId}`, {
-              status: "CANCELLED",
-              account: salesChannel,
-            });
-          }
-        }
+        //   if (refundType === "FULL") {
+        //     await axios.put(`/api/allegro/orders/status/${allegroOrderId}`, {
+        //       status: "CANCELLED",
+        //       account: salesChannel,
+        //     });
+        //   }
+        // }
+
+        await generateRefundDocument(lineItems, lineItemsData);
 
         router.back();
         showToast("Wpłata została zwrócona.", "success");

@@ -188,6 +188,17 @@ export const RefundItemSchema = z.object({
   value: PriceSchema.optional(), // required if type is "AMOUNT"
 });
 
+export const RefundDocumentItemSchema = z.object({
+  quantity: z.number().int().min(1),
+  value: z.string(),
+  name: z.string(),
+});
+
+export const RefundDocumentSchema = z.object({
+  items: z.array(RefundDocumentItemSchema),
+  filePath: z.string().optional(),
+});
+
 export const RefundSchema = z.object({
   type: z.enum(["PARTIAL", "FULL", "NONE"]),
   amount: PriceSchema.optional(),
@@ -195,6 +206,7 @@ export const RefundSchema = z.object({
   lineItems: z.array(RefundItemSchema).optional(),
   delivery: PriceSchema.optional(),
   sellerComment: z.string().max(250).optional(),
+  refundDocument: RefundDocumentSchema.optional(),
 });
 
 export const AllegroRefundSchema = z.object({
@@ -255,6 +267,7 @@ export const OrderSchema = z.object({
   salesChannel: SalesChannelSchema,
   refund: RefundSchema.optional(),
   shipment: OrderShipmentSchema.optional(),
+  returnDocumentFilePath: z.string().optional(),
 });
 
 export const AllegroOrderItemSchema = z.object({

@@ -110,7 +110,7 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
 
   const handleDownloadDocument = async (returnId: string) => {
     try {
-      // Tutaj będzie implementacja pobierania dokumentu
+      const returnData = returns.find((r) => r.id === returnId);
       console.log("Pobieranie dokumentu dla zwrotu:", returnId);
       showToast("Dokument zostanie pobrany", "success");
     } catch (error) {

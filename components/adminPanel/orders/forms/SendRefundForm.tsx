@@ -203,31 +203,31 @@ export default function SendRefundForm({
           };
         }
 
-        // await axios.patch(`/api/orders/${id}`, updateOrderData);
+        await axios.patch(`/api/orders/${id}`, updateOrderData);
 
-        // if (["AL1", "AL2"].includes(salesChannel) && allegroOrderId) {
-        //   try {
-        //     await axios.post(`/api/allegro/orders/refunds`, {
-        //       refund: {
-        //         payment: { id: paymentId },
-        //         reason: data.reason,
-        //         lineItems: data.lineItems,
-        //         sellerComment: data.sellerComment,
-        //         delivery: data.delivery,
-        //       },
-        //       account: salesChannel,
-        //     });
-        //   } catch (err: any) {
-        //     handleError(err, "Błąd podczas tworzenia zwrotu w Allegro");
-        //   }
+        if (["AL1", "AL2"].includes(salesChannel) && allegroOrderId) {
+          try {
+            await axios.post(`/api/allegro/orders/refunds`, {
+              refund: {
+                payment: { id: paymentId },
+                reason: data.reason,
+                lineItems: data.lineItems,
+                sellerComment: data.sellerComment,
+                delivery: data.delivery,
+              },
+              account: salesChannel,
+            });
+          } catch (err: any) {
+            handleError(err, "Błąd podczas tworzenia zwrotu w Allegro");
+          }
 
-        //   if (refundType === "FULL") {
-        //     await axios.put(`/api/allegro/orders/status/${allegroOrderId}`, {
-        //       status: "CANCELLED",
-        //       account: salesChannel,
-        //     });
-        //   }
-        // }
+          if (refundType === "FULL") {
+            await axios.put(`/api/allegro/orders/status/${allegroOrderId}`, {
+              status: "CANCELLED",
+              account: salesChannel,
+            });
+          }
+        }
 
         await generateRefundDocument(lineItems, lineItemsData);
 

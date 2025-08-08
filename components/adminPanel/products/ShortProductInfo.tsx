@@ -1,5 +1,5 @@
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
-import { getImageUrl } from "@/server-actions/images/images";
+import { getImageUrl } from "@/server-actions/files/files";
 import Image from "next/image";
 import { getColorVariantName } from "./helpers/productsHelpers";
 

@@ -24,7 +24,7 @@ import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { PostOfferBody } from "@/app/api/allegro/offers/route";
 import { getPostOfferBody } from "@/server-actions/offers/offers";
 import { getColorVariantName } from "../products/helpers/productsHelpers";
-import { getImagesUrls } from "@/server-actions/images/images";
+import { getImagesUrls } from "@/server-actions/files/files";
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { useRouter } from "next/navigation";
 import MiniLoader from "../global/MiniLoader";

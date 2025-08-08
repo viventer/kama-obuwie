@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useFormContext } from "react-hook-form";
 import SingleSelect from "../../global/form/SingleSelect";
 import { useEffect, useState } from "react";
-import { getImageUrl } from "@/server-actions/images/images";
+import { getImageUrl } from "@/server-actions/files/files";
 import { choosingSizeImageFilePath } from "@/lib/constants";
 import { useProductTypeContext } from "../ProductsTypeContext";
 

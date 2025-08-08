@@ -3,7 +3,7 @@ import CreateProductsPhotosForm from "@/components/adminPanel/products/create/Cr
 import { Button } from "@/components/ui/button";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
-import { getImageUrl } from "@/server-actions/images/images";
+import { getImageUrl } from "@/server-actions/files/files";
 import Image from "next/image";
 import Link from "next/link";
 

@@ -21,7 +21,7 @@ import {
   getSingleAllegroHeaders,
 } from "./global";
 import axios, { AxiosError } from "axios";
-import { getImageUrl } from "../images/images";
+import { getImageUrl } from "../files/files";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath, safetyInformation } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";

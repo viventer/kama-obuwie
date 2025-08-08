@@ -10,7 +10,7 @@ import {
   deleteImageFromStorage,
   getImageUrl,
   uploadImageToStorage,
-} from "@/server-actions/images/images";
+} from "@/server-actions/files/files";
 import { cn } from "@/lib/utils";
 import { getNewFileName } from "../../../../helpers/files";
 import IconButton from "../IconButton";

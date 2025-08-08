@@ -14,7 +14,7 @@ import axios from "axios";
 import { useToast } from "@/hooks/useToast";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { deleteUnusedPhotosFromStorage } from "@/server-actions/images/images";
+import { deleteUnusedPhotosFromStorage } from "@/server-actions/files/files";
 import { useProductTypeContext } from "../ProductsTypeContext";
 import MiniLoader from "../../global/MiniLoader";
 

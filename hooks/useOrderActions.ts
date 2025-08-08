@@ -7,7 +7,7 @@ import { TableAction } from "../lib/dataTableColumns";
 import { useToast } from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { getImageUrl } from "@/server-actions/images/images";
+import { getImageUrl } from "@/server-actions/files/files";
 import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
 
 export type OrderActions = {
@@ -127,6 +127,32 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     },
   };
 
+  const downloadShippingLabelAction: TableAction = {
+    name: "Pobierz etykietę przesyłki",
+    onClick: async (id) => {
+      startLoading();
+      try {
+        const response = await axios.get(
+          `/api/orders/shipment-management/label/${id}`
+        );
+
+        if (response.data.url) {
+          window.open(response.data.url, "_blank");
+          showToast("Etykieta przesyłki została otwarta", "success");
+        } else {
+          showToast("Nie udało się pobrać etykiety przesyłki", "error");
+        }
+      } catch (error: any) {
+        const errorMessage =
+          error.response?.data?.error ||
+          "Wystąpił błąd podczas pobierania etykiety";
+        showToast(errorMessage, "error");
+      } finally {
+        stopLoading();
+      }
+    },
+  };
+
   const newActions: TableAction[] = [
     {
       name: "Zatwierdź",
@@ -169,6 +195,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
         router.refresh();
       },
     },
+    downloadShippingLabelAction,
     cancelOrderAction,
     refundAction,
     downloadRefundDocumentAction,
@@ -197,6 +224,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
         router.refresh();
       },
     },
+    downloadShippingLabelAction,
     cancelOrderAction,
     refundAction,
     downloadRefundDocumentAction,

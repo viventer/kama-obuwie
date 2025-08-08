@@ -6,7 +6,7 @@ import {
   deleteImageFromStorage,
   getImagesUrls,
   uploadImageToStorage,
-} from "@/server-actions/images/images";
+} from "@/server-actions/files/files";
 import { useToast } from "@/hooks/useToast";
 import { cn } from "@/lib/utils";
 

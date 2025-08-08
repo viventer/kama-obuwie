@@ -6,7 +6,7 @@ import {
   RawPhoto,
 } from "@/firebase/schemas/productsSchemas";
 import { Dispatch, useEffect, useState } from "react";
-import { deleteRawPhoto } from "@/server-actions/images/images";
+import { deleteRawPhoto } from "@/server-actions/files/files";
 import { useParams } from "next/navigation";
 import MultipleImageUploader from "../global/uploaders/MultipleImageUploader";
 import { getColorVariantName } from "./helpers/productsHelpers";

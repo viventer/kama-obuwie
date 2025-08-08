@@ -7,7 +7,7 @@ import {
   ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
-import { getImagesUrls } from "@/server-actions/images/images";
+import { getImagesUrls } from "@/server-actions/files/files";
 import { notFound } from "next/navigation";
 
 type Props = {

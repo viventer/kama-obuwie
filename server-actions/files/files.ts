@@ -160,6 +160,34 @@ export const deleteUnusedPhotosFromStorage = async function (
   await Promise.all(unusedFiles.map((file) => file.delete()));
 };
 
+export const getSignedUrl = async function (
+  filePath: string
+): Promise<string | null> {
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
+  try {
+    const bucket = adminStorage.bucket();
+    const fileRef = bucket.file(filePath);
+
+    // Sprawdź czy plik istnieje
+    const [exists] = await fileRef.exists();
+    if (!exists) {
+      return null;
+    }
+
+    // Wygeneruj signed URL ważny przez 1 godzinę
+    const [signedUrl] = await fileRef.getSignedUrl({
+      action: "read",
+      expires: Date.now() + 60 * 60 * 1000, // 1 godzina
+    });
+
+    return signedUrl;
+  } catch (error) {
+    console.error("Error generating signed URL:", error);
+    return null;
+  }
+};
+
 export const makeFilePublic = async function (filePath: string) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 

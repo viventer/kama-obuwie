@@ -82,7 +82,7 @@ export default function SendRefundForm({
   ) => {
     const items = refundLineItems!.map((refundItem, index) => {
       const orderItem = orderLineItems[index];
-      if (refundItem) {
+      if (refundItem?.quantity && refundItem.quantity > 0) {
         return {
           name: orderItem.offer.name,
           quantity: Number(refundItem?.quantity) || 0,
@@ -91,13 +91,13 @@ export default function SendRefundForm({
       }
     });
 
-    console.log("order items", orderLineItems);
-    console.log("refund items", refundLineItems);
-    console.log("items", items);
+    const filteredItems = items.filter(
+      (item) => item !== null && item !== undefined
+    );
 
     try {
       const response = await axios.post(`/api/orders/refund-document`, {
-        items,
+        items: filteredItems,
       });
 
       const { filePath, url } = response.data;

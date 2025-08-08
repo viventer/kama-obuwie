@@ -34,7 +34,7 @@ export const POST = async (req: NextRequest) => {
         return `
         <tr>
           <td>${i + 1}</td>
-          <td>${item.name}</td>
+          <td></td>
           <td>${item.quantity}</td>
           <td>${cenaJednostkowa.toFixed(2)} zł</td>
           <td>${wartoscBrutto.toFixed(2)} zł</td>

@@ -50,9 +50,18 @@ export async function getAllegroReturns(
       }),
     ]);
 
+    const sortedAL1 = AL1Response.data.customerReturns.sort(
+      (a: AllegroReturn, b: AllegroReturn) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    const sortedAL2 = AL2Response.data.customerReturns.sort(
+      (a: AllegroReturn, b: AllegroReturn) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
     return {
-      AL1: AL1Response.data.customerReturns,
-      AL2: AL2Response.data.customerReturns,
+      AL1: sortedAL1,
+      AL2: sortedAL2,
     };
   } catch (error) {
     handleAxiosError(error, "Błąd podczas pobierania zwrotów z Allegro");

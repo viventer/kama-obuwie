@@ -6,6 +6,7 @@ import { ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { ReturnOffer } from "./ReturnItemsDisplay";
+import { reasonTranslations } from "@/lib/constants";
 
 interface ReturnItemFromListProps {
   item: AllegroReturn["items"][number];
@@ -13,21 +14,6 @@ interface ReturnItemFromListProps {
   thumbnail?: string;
   signature?: string;
 }
-
-const reasonTranslations: Record<string, string> = {
-  NONE: "Nie podano",
-  MISTAKE: "Pomyłka",
-  TRANSPORT: "Uszkodzenie w transporcie",
-  DAMAGED: "Uszkodzone",
-  NOT_AS_DESCRIBED: "Niezgodne z opisem",
-  DONT_LIKE_IT: "Nie pasuje mi",
-  OVERDUE_DELIVERY: "Opóźniona dostawa",
-  INCOMPLETE: "Niekompletne",
-  HIDDEN_FLAW: "Ukryta wada",
-  OTHER_FLAW: "Inna wada",
-  DIFFERENT: "Inne niż zamówione",
-  COUNTERFEIT: "Podróbka",
-};
 
 export default function ReturnItemFromList({
   item,

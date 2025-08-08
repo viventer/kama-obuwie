@@ -59,3 +59,18 @@ export const bankAccountData = {
   owner: "ANNA KAMIŃSKA - KAM-A",
   iban: "PL66 1140 2004 0000 3302 8572 0482",
 };
+
+export const reasonTranslations: Record<string, string> = {
+  NONE: "Nie podano",
+  MISTAKE: "Pomyłka",
+  TRANSPORT: "Uszkodzenie w transporcie",
+  DAMAGED: "Uszkodzone",
+  NOT_AS_DESCRIBED: "Niezgodne z opisem",
+  DONT_LIKE_IT: "Nie pasuje mi",
+  OVERDUE_DELIVERY: "Opóźniona dostawa",
+  INCOMPLETE: "Niekompletne",
+  HIDDEN_FLAW: "Ukryta wada",
+  OTHER_FLAW: "Inna wada",
+  DIFFERENT: "Inne niż zamówione",
+  COUNTERFEIT: "Podróbka",
+};

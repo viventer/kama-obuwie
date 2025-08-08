@@ -112,6 +112,29 @@ export const allegroReturnSchema = z.object({
   status: returnStatusSchema,
 });
 
+export const returnFormDataSchema = z.object({
+  sellerData: z.object({
+    companyName: z.string(),
+    nip: z.string(),
+    street: z.string(),
+    city: z.string(),
+    zipCode: z.string(),
+    country: z.string(),
+  }),
+  items: z.array(customerReturnItemSchema),
+  totalValue: z.string(),
+  orderDate: z.string(),
+  buyerData: z.object({
+    name: z.string().optional(),
+    allegroLogin: z.string(),
+    companyName: z.string().optional(),
+    street: z.string(),
+    city: z.string(),
+    zipCode: z.string(),
+    country: z.string(),
+  }),
+});
+
 export type AllegroReturn = z.infer<typeof allegroReturnSchema>;
 export type ReturnStatus = z.infer<typeof returnStatusSchema>;
 export type ReturnReasonType = z.infer<typeof returnReasonTypeSchema>;
@@ -123,3 +146,4 @@ export type CustomerReturnReturnParcel = z.infer<
 export type CustomerReturnRejection = z.infer<
   typeof customerReturnRejectionSchema
 >;
+export type ReturnFormData = z.infer<typeof returnFormDataSchema>;

@@ -27,7 +27,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight, CheckCircle, Download } from "lucide-react";
-import { AllegroReturn } from "@/firebase/schemas/returnsSchemas";
+import {
+  AllegroReturn,
+  ReturnFormData,
+} from "@/firebase/schemas/returnsSchemas";
 import { ReturnInfoDisplay } from "./ReturnInfoDisplay";
 import { ReturnBuyerDataDisplay } from "./ReturnBuyerDataDisplay";
 import { ReturnItemsDisplay } from "./ReturnItemsDisplay";
@@ -37,6 +40,9 @@ import { useToast } from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";
 import { getOrderByAllegroId } from "@/server-actions/orders/orders";
+import axios from "axios";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { useFullPageLoading } from "../../global/FullPageLoader";
 
 interface ReturnsDataTableProps {
   returns: AllegroReturn[];
@@ -108,13 +114,58 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
     });
   };
 
+  const { handleError } = useErrorHandler();
+  const { startLoading, stopLoading } = useFullPageLoading();
+
   const handleDownloadDocument = async (returnId: string) => {
+    startLoading();
     try {
       const returnData = returns.find((r) => r.id === returnId);
-      console.log("Pobieranie dokumentu dla zwrotu:", returnId);
+      if (!returnData) {
+        showToast("Nie znaleziono zwrotu o podanym ID", "error");
+        return;
+      }
+
+      const order: OrderWithId = await getOrderByAllegroId(returnData.orderId);
+      const returnFormData: ReturnFormData = {
+        sellerData: {
+          companyName: "Anna Kamińska KAM-A",
+          nip: "8681255945",
+          street: "Hala Targowa Gazaris box nr 39",
+          city: "Bochnia",
+          zipCode: "32-700",
+          country: "Polska",
+        },
+        items: returnData.items,
+        totalValue: returnData.items
+          .reduce((sum, item) => sum + parseFloat(item.price.amount), 0)
+          .toFixed(2),
+        orderDate: order.createdAt,
+        buyerData: {
+          name: `${order.buyer.firstName} ${order.buyer.lastName}`,
+          allegroLogin: order.buyer.login,
+          companyName: order.buyer.companyName || undefined,
+          street: order.delivery?.address?.street || "",
+          city: order.delivery?.address?.city || "",
+          zipCode: order.delivery?.address?.zipCode || "",
+          country: "Polska",
+        },
+      };
+
+      const response = await axios.post("/api/allegro/returns/return-form", {
+        ...returnFormData,
+      });
+      const { url, filePath } = response.data;
+      if (!filePath || !url) {
+        throw new Error("Nie udało się wygenerować dokumentu zwrotu wpłaty");
+      }
+      window.open(url, "_blank");
+
       showToast("Dokument zostanie pobrany", "success");
     } catch (error) {
-      showToast("Wystąpił błąd podczas pobierania dokumentu", "error");
+      handleError(error, "Błąd podczas generowania dokumentu zwrotu wpłaty");
+    } finally {
+      stopLoading();
     }
   };
 

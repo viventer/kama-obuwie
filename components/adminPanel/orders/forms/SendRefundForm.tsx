@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/useToast";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { useFullPageLoading } from "../../global/FullPageLoader";
 
 export const refundReasons = [
   { name: "zwrot produktu", value: "REFUND" },
@@ -75,11 +76,13 @@ export default function SendRefundForm({
   };
 
   const { id } = useParams();
+  const { startLoading, stopLoading } = useFullPageLoading();
 
   const generateRefundDocument = async (
     orderLineItems: Order["lineItems"],
     refundLineItems: Refund["lineItems"]
   ) => {
+    startLoading();
     const items = refundLineItems!.map((refundItem, index) => {
       const orderItem = orderLineItems[index];
       if (refundItem?.quantity && refundItem.quantity > 0) {
@@ -109,6 +112,8 @@ export default function SendRefundForm({
       showToast("Dokument zwrotu wpłaty został wygenerowany.", "success");
     } catch (error: any) {
       handleError(error, "Błąd podczas generowania dokumentu zwrotu wpłaty");
+    } finally {
+      stopLoading();
     }
   };
 

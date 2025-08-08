@@ -20,6 +20,7 @@ import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { useFullPageLoading } from "../../global/FullPageLoader";
+import { getOrderByAllegroId } from "@/server-actions/orders/orders";
 
 export const refundReasons = [
   { name: "zwrot produktu", value: "REFUND" },
@@ -108,6 +109,19 @@ export default function SendRefundForm({
         throw new Error("Nie udało się wygenerować dokumentu zwrotu wpłaty");
       }
       window.open(url, "_blank");
+
+      if (allegroOrderId) {
+        const order = await getOrderByAllegroId(allegroOrderId);
+        await axios.patch(`/api/orders/${order.id}`, {
+          refund: {
+            ...order.refund,
+            refundDocument: {
+              items: filteredItems,
+              filePath: filePath,
+            },
+          },
+        });
+      }
 
       showToast("Dokument zwrotu wpłaty został wygenerowany.", "success");
     } catch (error: any) {

@@ -17,9 +17,7 @@ export const getImageUrl = async function (
   const fileRef = bucket.file(filePath);
   const imageUrl = fileRef.publicUrl();
 
-  try {
-    ImageUrlSchema.parse(imageUrl);
-  } catch (err) {
+  if (!imageUrl) {
     return null;
   }
 

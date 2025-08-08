@@ -7,6 +7,8 @@ import { TableAction } from "../lib/dataTableColumns";
 import { useToast } from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { getImageUrl } from "@/server-actions/images/images";
+import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
 
 export type OrderActions = {
   [key in OrderPhase]: TableAction[];
@@ -14,6 +16,7 @@ export type OrderActions = {
 
 export const useOrderActions = (orderPhase: OrderPhase) => {
   const { showToast } = useToast();
+  const { startLoading, stopLoading } = useFullPageLoading();
   const router = useRouter();
 
   const changeOrderPhase = async (
@@ -98,6 +101,32 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     },
   };
 
+  const downloadRefundDocumentAction: TableAction = {
+    name: "Potwierdzenie zwrotu wpłaty",
+    onClick: async (id) => {
+      startLoading();
+      const order = await axios.get(`/api/orders/${id}`);
+      const filePath = order.data.refund?.refundDocument?.filePath;
+      if (!filePath) {
+        showToast("Brak potwierdzenia zwrotu wpłaty.", "error");
+        stopLoading();
+        return;
+      }
+      console.log(filePath);
+      const url = await getImageUrl(filePath);
+      if (!url) {
+        showToast("Nie udało się pobrać potwierdzenia zwrotu wpłaty.", "error");
+        stopLoading();
+        return;
+      }
+
+      window.open(url, "_blank");
+
+      stopLoading();
+      router.refresh();
+    },
+  };
+
   const newActions: TableAction[] = [
     {
       name: "Zatwierdź",
@@ -110,6 +139,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     },
     cancelOrderAction,
     refundAction,
+    downloadRefundDocumentAction,
   ];
 
   const processingActions: TableAction[] = [
@@ -141,6 +171,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     },
     cancelOrderAction,
     refundAction,
+    downloadRefundDocumentAction,
   ];
 
   const readyForShipmentActions: TableAction[] = [
@@ -168,6 +199,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     },
     cancelOrderAction,
     refundAction,
+    downloadRefundDocumentAction,
   ];
 
   const sentActions: TableAction[] = [
@@ -191,7 +223,9 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
         router.refresh();
       },
     },
+
     refundAction,
+    downloadRefundDocumentAction,
   ];
 
   const actions: OrderActions = {

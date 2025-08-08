@@ -214,13 +214,15 @@ export const POST = async (req: NextRequest) => {
     await file.save(pdfBuffer, {
       metadata: { contentType: "application/pdf" },
     });
-    const [signedUrl] = await file.getSignedUrl({
-      action: "read",
-      expires: Date.now() + 86400_000,
-    });
+
+    // Ustawienie pliku jako publiczny
+    await file.makePublic();
+
+    // Utworzenie publicznego URL
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`;
 
     return apiResponse("Dokument został wygenerowany i zapisany", 200, {
-      url: signedUrl,
+      url: publicUrl,
       filePath: filename,
     });
   } catch (error: any) {

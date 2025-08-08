@@ -1,9 +1,6 @@
 import { DocumentReference } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
-import {
-  AllegroError,
-  AllegroAuthError,
-} from "@/firebase/schemas/shipmentsSchemas";
+import { AllegroAuthError } from "@/firebase/schemas/shipmentsSchemas";
 
 /**
  * Rozszerzona obsługa błędów API

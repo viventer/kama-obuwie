@@ -338,7 +338,7 @@ async function transformAllegroToOrder(
     lineItems: lineItems,
     surcharges: allegroOrder.surcharges,
     summary: allegroOrder.summary,
-    createdAt: new Date().toISOString(),
+    createdAt: allegroOrder.updatedAt || new Date().toISOString(),
     updatedAt: allegroOrder.updatedAt,
     salesChannel: salesChannel,
     number: generateOrderNumber(salesChannel),

@@ -175,6 +175,7 @@ export const ProductSchema = z.object({
   brandInfoId: z.string().optional(),
   offersIds: OffersIdsSchema.optional(),
   responsibleProducer: z.record(SalesChannelSchema, z.string()).optional(),
+  SKU: z.record(z.string(), z.string()).optional(), // {"red": "AF12"}
 });
 
 export const ProductPartialSchema = ProductSchema.partial();

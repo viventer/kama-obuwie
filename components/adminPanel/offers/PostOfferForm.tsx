@@ -34,6 +34,7 @@ import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
 import WarrantySelector from "./WarrantySelector";
 import TitlesField from "./TitlesField";
 import EANsField from "./EANsField";
+import { generateUniqueSKU, generateUniqueSKUs } from "@/helpers/SKU";
 
 export type PostOfferFormValues = Pick<
   Offer,
@@ -148,6 +149,21 @@ export default function PostOfferForm({
       EAN: {},
     };
 
+    const SKUsArray = await Promise.all(
+      colorVariantsNames.map(async (variant) => {
+        const sku = await generateUniqueSKU();
+        return {
+          [variant]: sku,
+        };
+      })
+    );
+
+    // Konwertujemy tablicę na obiekt
+    const SKUs = SKUsArray.reduce(
+      (acc, curr) => ({ ...acc, ...curr }),
+      {} as Record<string, string>
+    );
+
     try {
       await updateMainOffer({
         ...oldOfferData,
@@ -158,6 +174,7 @@ export default function PostOfferForm({
         signature:
           signatureWithoutColorVariant.trim() + ` ${colorVariantsNames[0]}`,
         thumbnail: mainOfferThumbnail,
+        SKU: SKUs[colorVariantsNames[0]],
       });
 
       for (const colorVariantName of colorVariantsNames) {
@@ -176,6 +193,7 @@ export default function PostOfferForm({
           signature:
             signatureWithoutColorVariant.trim() + ` ${colorVariantName}`,
           thumbnail: offerThumbnail,
+          SKU: SKUs[colorVariantName],
         });
         offersIds?.AL1?.push({
           value: id,
@@ -231,6 +249,7 @@ export default function PostOfferForm({
         await axios.patch(`/api/products/${productData.id}`, {
           offersIds,
           creationStage: "done",
+          SKU: SKUs,
         });
       }
 

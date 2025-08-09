@@ -71,6 +71,7 @@ export const OfferSchema = z.object({
     )
     .optional(),
   EAN: z.record(z.string(), z.string().optional()).optional(), // { "31": "1234567890123", "32": "9876543210987" }
+  SKU: z.string().optional(),
 });
 
 export const AllegroDescriptionItemSchema = z.object({

@@ -235,3 +235,15 @@ export type DocumentDataWithRef<T> = {
   data: T | null;
   ref: DocumentReference;
 };
+
+/**
+ * Validates if a string is a valid 4-character base32 SKU
+ * @param sku - string to validate
+ * @returns boolean indicating if the SKU is valid
+ */
+export const isValidSKU = (sku: string): boolean => {
+  if (sku.length !== 4) return false;
+
+  const base32Regex = /^[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/;
+  return base32Regex.test(sku);
+};

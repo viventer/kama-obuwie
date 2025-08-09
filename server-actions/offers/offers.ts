@@ -18,10 +18,10 @@ export const createOffer = async function (newOffer: Partial<Offer>) {
 
   OfferSchema.partial().parse(newOffer);
 
-  if (newOffer?.signature) {
+  if (newOffer?.SKU) {
     const existingOfferQuery = await adminDB
       .collection("offers")
-      .where("signature", "==", newOffer.signature)
+      .where("SKU", "==", newOffer.SKU)
       .limit(1)
       .get();
 
@@ -63,7 +63,7 @@ export const getPostOfferBody = async ({
   productData: ProductWithId;
   oldOfferData: OfferWithId;
   sizingTable: SizingTableWithId;
-}): Promise<Omit<PostOfferBody, "colorVariant" | "images">> => {
+}): Promise<Omit<PostOfferBody, "colorVariant" | "images" | "SKU">> => {
   const { data: category } = await getDocumentFromAdminDB<CategoryWithId>(
     "categories",
     productData.categoryId as string

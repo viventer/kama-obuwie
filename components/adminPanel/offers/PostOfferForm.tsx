@@ -34,7 +34,10 @@ import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
 import WarrantySelector from "./WarrantySelector";
 import TitlesField from "./TitlesField";
 import EANsField from "./EANsField";
-import { generateUniqueSKU, generateUniqueSKUs } from "@/helpers/SKU";
+import {
+  generateUniqueSKU,
+  generateUniqueSKUs,
+} from "@/server-actions/products/SKU";
 
 export type PostOfferFormValues = Pick<
   Offer,
@@ -203,7 +206,7 @@ export default function PostOfferForm({
 
       const postAllegroOfferBody: Omit<
         PostOfferBody,
-        "colorVariant" | "images"
+        "colorVariant" | "images" | "SKU"
       > = await getPostOfferBody({
         formDataWithoutTitlesAndEAN,
         productData,
@@ -233,6 +236,7 @@ export default function PostOfferForm({
           ...postAllegroOfferBody,
           colorVariant: variant,
           images: imagesUrls,
+          SKU: SKUs[colorVariantName],
         });
 
         // Data teraz zawiera { allegroIds: { AL1: {...}, AL2: {...} } }

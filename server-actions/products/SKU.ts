@@ -1,3 +1,5 @@
+"use server";
+
 import { redis } from "@/upstash/redis";
 
 const SKU_REDIS_SET = "generated_skus";
@@ -7,7 +9,7 @@ const SKU_REDIS_SET = "generated_skus";
  * Base32 uses characters: A-Z and 2-7 (total 32 characters)
  * This gives us 32^4 = 1,048,576 possible combinations
  */
-export const generateSKU = (): string => {
+const generateSKU = (): string => {
   // Base32 alphabet (RFC 4648) - excluding 0, 1, 8, 9 to avoid confusion
   const base32Chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 
@@ -90,18 +92,6 @@ export const generateUniqueSKUs = async (
   }
 
   return skus;
-};
-
-/**
- * Validates if a string is a valid 4-character base32 SKU
- * @param sku - string to validate
- * @returns boolean indicating if the SKU is valid
- */
-export const isValidSKU = (sku: string): boolean => {
-  if (sku.length !== 4) return false;
-
-  const base32Regex = /^[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}$/;
-  return base32Regex.test(sku);
 };
 
 /**

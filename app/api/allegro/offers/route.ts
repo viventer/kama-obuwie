@@ -15,6 +15,7 @@ export type PostOfferBody = {
   allegroCategoryId: string;
   sizingTable: SizingTable;
   colorVariant: ColorVariant;
+  SKU: string;
 };
 
 export async function POST(request: NextRequest) {

@@ -25,10 +25,6 @@ import { getImageUrl } from "../files/files";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath, safetyInformation } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";
-import {
-  AllegroError,
-  AllegroAuthError,
-} from "@/firebase/schemas/shipmentsSchemas";
 import { handleAxiosError } from "../helpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
@@ -53,6 +49,7 @@ type AllegroIndividualOffer = {
   allegroCategoryId: string;
   images: string[];
   channel: "AL1" | "AL2";
+  SKU: string;
 };
 
 export const getAllegroOffer = async (
@@ -87,6 +84,7 @@ export const postAllegroOffer = async (
     allegroCategoryId,
     sizingTable,
     colorVariant,
+    SKU,
   } = data;
 
   const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
@@ -160,6 +158,7 @@ export const postAllegroOffer = async (
         allegroCategoryId,
         images,
         channel,
+        SKU,
       });
 
       channelResults[insoleLength.size.toString()] = allegroId;
@@ -192,6 +191,7 @@ export async function postIndividualAllegroOffer(
     url,
     allegroCategoryId,
     channel,
+    SKU,
   } = data;
 
   const formattedProductParameters = await formatAllegroProductParameters(
@@ -309,7 +309,7 @@ export async function postIndividualAllegroOffer(
   } ${getColorVariantName(colorVariant)}`;
 
   // Dodaj unikalny identyfikator z kanałem i rozmiarem
-  const externalId = `${signature} r${insoleLength.size}`;
+  const externalId = `${signature} [${SKU}r${insoleLength.size}]`;
 
   const allegroOffer: AllegroOffer = {
     ...allegroOfferData,

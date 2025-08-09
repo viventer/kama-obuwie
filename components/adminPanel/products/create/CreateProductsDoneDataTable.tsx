@@ -20,6 +20,7 @@ export default function CreateProductsrDoneDataTable({
     { attributeName: "brand", displayName: "Marka" },
     { attributeName: "manufacturerCode", displayName: "Kod producenta" },
     { attributeName: "purchasePrice", displayName: "Cena zakupu" },
+    { attributeName: "suggestedPrice", displayName: "Cena sugerowana" },
   ];
   const shoesProductColumnNames = [
     ...elementaryColumnNames,

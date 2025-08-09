@@ -327,7 +327,7 @@ export default function PostOfferForm({
         <ImpliedWarrantySelector />
         <WarrantySelector />
         <AvailabilityField sizes={sizes} />
-        {productData.rootCategory === "obuwie dziecięce" && (
+        {/* {productData.rootCategory === "obuwie dziecięce" && (
           <EANsField
             colorVariants={
               productData.colorVariants?.map((variant) =>
@@ -336,11 +336,11 @@ export default function PostOfferForm({
             }
             sizes={sizes}
           />
-        )}
+        )} */}
       </div>
       <div className="flex mt-8 gap-4">
         <Button onClick={(e) => handleSubmit(e)} className="w-fit">
-          Zapisz
+          Wystaw
         </Button>
         <Button
           onClick={(e) => handleReject(e)}

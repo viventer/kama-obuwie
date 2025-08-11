@@ -20,7 +20,7 @@ import {
   getAllegroHeaders,
   getSingleAllegroHeaders,
 } from "./global";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { getImageUrl } from "../files/files";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath, safetyInformation } from "@/lib/constants";
@@ -50,6 +50,21 @@ type AllegroIndividualOffer = {
   images: string[];
   channel: "AL1" | "AL2";
   SKU: string;
+};
+
+export const editAllegroOffer = async (
+  id: string,
+  channel: "AL1" | "AL2",
+  data: Partial<AllegroOffer>
+): Promise<void> => {
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
+  const accessToken = await getAllegroUserAccessToken(channel);
+  const headers = getSingleAllegroHeaders(accessToken);
+
+  const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers/${id}`;
+
+  await axios.patch(url, data, { headers });
 };
 
 export const getAllegroOffer = async (

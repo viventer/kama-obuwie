@@ -1,7 +1,7 @@
 "use client";
 
 import { AllegroReturn } from "@/firebase/schemas/returnsSchemas";
-import { extractSizeFromTitle } from "@/helpers/extractSizeFromTitle";
+import { extractSizeFromTitle } from "@/helpers/titles";
 import { ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";

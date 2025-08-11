@@ -39,15 +39,15 @@ export const AvailabilitySchema = z.object({
 export const OfferSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(3).max(72),
-  productId: z.string(),
+  productId: z.string().nullable(),
   thumbnail: z.string().optional(),
   signature: z.string(), // brand + manufacturer code + color variant name
   colorVariantName: z.string().optional(),
   sellingPrices: z.record(SalesChannelSchema, z.string()),
   initialSellingPrices: z.record(SalesChannelSchema, z.string()),
   statsId: z.string().optional(),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
   shippingRates: z.record(SalesChannelSchema, ShippingRatesSchema),
   returnPolicy: z.record(SalesChannelSchema, z.string()).optional(),
   warranty: z.record(SalesChannelSchema, z.string().optional()).optional(),
@@ -57,10 +57,6 @@ export const OfferSchema = z.object({
     .record(z.enum(["AL1", "AL2"]), z.record(z.string(), z.string()))
     .optional(), // { AL1: { 41: "offerId1" }, AL2: { 42: "offerId2" } }
   offerGroupId: z.string().optional(),
-  isPosted: z.object({
-    salesChannel: SalesChannelSchema,
-    value: z.boolean(),
-  }),
   allegroProductsIds: z
     .array(
       z.object({
@@ -192,11 +188,91 @@ export const PostOfferFormSchema = OfferSchema.pick({
     .optional(),
 });
 
+export const AllegroOfferFromListingSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  category: z.object({
+    id: z.string(),
+  }),
+  primaryImage: z.object({
+    url: z.string(),
+  }),
+  sellingMode: z.object({
+    format: z.enum(["BUY_NOW", "AUCTION", "ADVERTISEMENT"]),
+    price: z.object({
+      amount: z.string(),
+      currency: z.string(),
+    }),
+  }),
+  saleInfo: z
+    .object({
+      currentPrice: z.object({
+        amount: z.string(),
+        currency: z.string(),
+      }),
+    })
+    .optional(),
+  stock: z.object({
+    available: z.number().min(0),
+    sold: z.number().min(0),
+  }),
+  stats: z
+    .object({
+      watchersCount: z.number().min(0),
+      visitsCount: z.number().min(0),
+    })
+    .nullable(),
+  publication: z.object({
+    status: z.enum(["INACTIVE", "ACTIVATING", "ACTIVE", "ENDED"]),
+    startingAt: z.string().optional(),
+    startedAt: z.string().optional(),
+    endingAt: z.string().optional(),
+    endedAt: z.string().optional(),
+    marketplaces: z.object({
+      base: z.object({}),
+      additional: z.array(z.object({})),
+    }),
+  }),
+  afterSalesServices: z.object({
+    impliedWarranty: z.object({
+      id: z.string(),
+    }),
+    returnPolicy: z.object({
+      id: z.string(),
+    }),
+    warranty: z.object({
+      id: z.string(),
+    }),
+  }),
+  additionalServices: z.object({
+    id: z.string(),
+  }),
+  external: z.object({
+    id: z.string().max(100),
+  }),
+  delivery: z.object({
+    shippingRates: z.object({
+      id: z.string(),
+    }),
+  }),
+  b2b: z.object({
+    buyableOnlyByBusiness: z.boolean(),
+  }),
+  fundraisingCampaign: z
+    .object({
+      id: z.string(),
+    })
+    .optional(),
+});
+
 export type ShippingRate = z.infer<typeof shippingRateSchema>;
 export type ShippingRates = z.infer<typeof ShippingRatesSchema>;
 export type Availability = z.infer<typeof AvailabilitySchema>;
 export type Offer = z.infer<typeof OfferSchema>;
 export type AllegroOffer = z.infer<typeof AllegroOfferSchema>;
+export type AllegroOfferFromListing = z.infer<
+  typeof AllegroOfferFromListingSchema
+>;
 export type AllegroDescriptionSection = z.infer<
   typeof AllegroDescriptionSectionSchema
 >;

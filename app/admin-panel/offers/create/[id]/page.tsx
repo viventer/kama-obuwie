@@ -26,7 +26,7 @@ export default async function CreateOfferPage(props: Props) {
   if (!data) {
     notFound();
   }
-  const productId = data.productId;
+  const productId = data.productId as string;
   const productResult = await getDocumentFromAdminDB<ProductWithId>(
     "products",
     productId

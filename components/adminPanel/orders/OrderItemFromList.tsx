@@ -1,7 +1,7 @@
 "use client";
 
 import { Order } from "@/firebase/schemas/ordersSchemas";
-import { extractSizeFromTitle } from "@/helpers/extractSizeFromTitle";
+import { extractSizeFromTitle } from "@/helpers/titles";
 import { ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";

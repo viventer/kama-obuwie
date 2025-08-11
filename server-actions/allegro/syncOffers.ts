@@ -13,31 +13,9 @@ import axios from "axios";
 import { editAllegroOffer } from "./offers";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { createOffer, updateOffer } from "../offers/offers";
+import { cleanOldExternalId } from "@/helpers/externalId";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
-
-/**
- * Usuwa rozmiar i kanał sprzedaży z external.id
- * Formaty do usunięcia:
- * - r[rozmiar] np. "r32"
- * - [kanał]r[rozmiar] np. "AL1r32" lub "AL2r32"
- *
- * @param externalId - Ciąg znaków z external.id (może być pusty)
- * @returns Oczyszczony ciąg znaków
- */
-export function cleanExternalId(externalId: string | null | undefined): string {
-  if (!externalId || externalId.trim() === "") {
-    return "";
-  }
-
-  let cleaned = externalId.trim();
-
-  cleaned = cleaned.replace(/\s*(AL[12])r\d+\s*$/, "");
-
-  cleaned = cleaned.replace(/\s*r\d+\s*$/, "");
-
-  return cleaned.trim();
-}
 
 export const getAllAllegroOffers = async (
   channel: "AL1" | "AL2"
@@ -48,7 +26,7 @@ export const getAllAllegroOffers = async (
   const headers = getSingleAllegroHeaders(accessToken);
 
   const generalUrl = `${ALLEGRO_API_BASE_URL}/sale/offers`;
-  const url1 = `${generalUrl}?sellingMode.price.amount.lte=50`;
+  const url1 = `${generalUrl}?sellingMode.price.amount.lte=50&sellingMode.price.amount.gte=29`;
   const url2 = `${generalUrl}?sellingMode.price.amount.lte=80&sellingMode.price.amount.gte=51`;
   const url3 = `${generalUrl}?sellingMode.price.amount.gte=81`;
 
@@ -74,7 +52,7 @@ export const transformAllegroAL1OfferToOffer = async (
 ): Promise<Offer> => {
   const size = extractSizeFromTitle(offer.name) as string;
   const cleanedTitle = removeSizeFromTitle(offer.name);
-  const cleanedExternalId = cleanExternalId(offer.external.id);
+  const cleanedExternalId = cleanOldExternalId(offer.external.id);
 
   return {
     title: cleanedTitle,
@@ -188,7 +166,7 @@ const updateOfferInDB = async (
 const syncAL1Offers = async (offers: AllegroOfferFromListing[]) => {
   offers.forEach(async (offer) => {
     const SKU = await generateUniqueSKU();
-    const cleanedExternalId = cleanExternalId(offer.external.id);
+    const cleanedExternalId = cleanOldExternalId(offer.external.id);
     const size = extractSizeFromTitle(offer.name) as string;
 
     await editAllegroOffer(offer.id, "AL1", {
@@ -222,7 +200,7 @@ const syncAL1Offers = async (offers: AllegroOfferFromListing[]) => {
 
 const syncAL2Offers = async (offers: AllegroOfferFromListing[]) => {
   offers.forEach(async (offer) => {
-    const cleanedExternalId = cleanExternalId(offer.external.id);
+    const cleanedExternalId = cleanOldExternalId(offer.external.id);
     const size = extractSizeFromTitle(offer.name) as string;
 
     const existingOffer = await getOfferFromDBByExternalId(cleanedExternalId);

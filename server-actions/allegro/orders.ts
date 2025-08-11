@@ -12,6 +12,7 @@ import { Offer } from "@/firebase/schemas/offersSchemas";
 import { AllegroSalesChannel } from "@/lib/constants";
 import { getAllegroOffer } from "./offers";
 import { handleAxiosError } from "../helpers";
+import { parseExternalId } from "@/helpers/externalId";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -297,13 +298,14 @@ async function transformAllegroToOrder(
       throw new Error(`Offer not found for ID: ${item.offer.id}`);
     }
     const offerThumbnail = offer?.images[0];
+    const { signature } = parseExternalId(item.offer.external?.id || "");
 
     return {
       id: item.id,
       offer: {
         thumbnail: offerThumbnail,
         id: "",
-        signature: item.offer.external?.id || "",
+        signature,
         name: item.offer.name,
         allegroId: item.offer.id,
       },
@@ -374,13 +376,14 @@ function transformAllegroToOrderUpdate(
       const existingLineItem = existingOrder.lineItems.find(
         (existingItem) => existingItem.id === item.id
       );
+      const { signature } = parseExternalId(item.offer.external?.id || "");
 
       return {
         id: item.id,
         offer: {
           thumbnail: existingLineItem?.offer?.thumbnail || "", // Zachowaj istniejącą miniaturkę
           id: existingLineItem?.offer?.id || "",
-          signature: item.offer.external?.id || "",
+          signature,
           name: item.offer.name,
           allegroId: item.offer.id,
         },

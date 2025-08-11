@@ -1,0 +1,80 @@
+/**
+ * Extracts SKU and size from externalId and returns the signature
+ * @param externalId - string containing signature and SKU with size in format "[SKU]r[size]"
+ * @returns object with signature, SKU, and size
+ */
+export const parseExternalId = (
+  externalId: string
+): {
+  signature: string;
+  SKU: string | null;
+  size: string | null;
+} => {
+  if (!externalId || typeof externalId !== "string") {
+    return {
+      signature: externalId || "",
+      SKU: null,
+      size: null,
+    };
+  }
+
+  // Pattern to match [SKU]r[size] at the end of string
+  // SKU is 4 characters (base32), size is numeric
+  const pattern = /\[([A-Z2-9]{4}r\d+)\]$/;
+  const match = externalId.match(pattern);
+
+  if (!match) {
+    return {
+      signature: externalId,
+      SKU: null,
+      size: null,
+    };
+  }
+
+  const fullMatch = match[1]; // e.g., "AB1Cr32"
+  const skuSizePattern = /^([A-Z2-9]{4})r(\d+)$/;
+  const skuSizeMatch = fullMatch.match(skuSizePattern);
+
+  if (!skuSizeMatch) {
+    return {
+      signature: externalId,
+      SKU: null,
+      size: null,
+    };
+  }
+
+  const sku = skuSizeMatch[1]; // e.g., "AB1C"
+  const size = skuSizeMatch[2]; // e.g., "32"
+  const signature = externalId.replace(match[0], "").trim(); // Remove the full bracket part
+
+  return {
+    signature,
+    SKU: sku,
+    size,
+  };
+};
+
+/**
+ * Usuwa rozmiar i kanał sprzedaży z external.id
+ * Formaty do usunięcia:
+ * - r[rozmiar] np. "r32"
+ * - [kanał]r[rozmiar] np. "AL1r32" lub "AL2r32"
+ *
+ * @param externalId - Ciąg znaków z external.id (może być pusty)
+ * @returns Oczyszczony ciąg znaków
+ */
+export const cleanOldExternalId = (
+  externalId: string | null | undefined
+): string => {
+  if (!externalId || externalId.trim() === "") {
+    return "";
+  }
+
+  let cleaned = externalId.trim();
+
+  cleaned = cleaned.replace(/\s*(AL[12])r\d+\s*$/, "");
+
+  cleaned = cleaned.replace(/\s*r\d+\s*$/, "");
+
+  return cleaned.trim();
+};

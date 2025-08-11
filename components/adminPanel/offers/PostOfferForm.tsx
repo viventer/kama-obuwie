@@ -34,10 +34,7 @@ import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
 import WarrantySelector from "./WarrantySelector";
 import TitlesField from "./TitlesField";
 import EANsField from "./EANsField";
-import {
-  generateUniqueSKU,
-  generateUniqueSKUs,
-} from "@/server-actions/products/SKU";
+import { generateUniqueSKU } from "@/server-actions/products/SKU";
 
 export type PostOfferFormValues = Pick<
   Offer,

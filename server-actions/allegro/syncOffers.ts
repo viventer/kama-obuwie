@@ -22,27 +22,66 @@ export const getAllAllegroOffers = async (
 ): Promise<AllegroOfferFromListing[]> => {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
+  console.log(`🔄 Fetching all offers for ${channel}...`);
+
   const accessToken = await getAllegroUserAccessToken(channel);
   const headers = getSingleAllegroHeaders(accessToken);
 
-  const generalUrl = `${ALLEGRO_API_BASE_URL}/sale/offers`;
-  const url1 = `${generalUrl}?sellingMode.price.amount.lte=50&sellingMode.price.amount.gte=29`;
-  const url2 = `${generalUrl}?sellingMode.price.amount.lte=80&sellingMode.price.amount.gte=51`;
-  const url3 = `${generalUrl}?sellingMode.price.amount.gte=81`;
+  let allOffers: AllegroOfferFromListing[] = [];
+  let offset = 0;
+  const limit = 1000; // Maksymalna liczba ofert na żądanie
+  let hasMore = true;
 
-  const response1 = await axios.get(url1, { headers });
-  const response2 = await axios.get(url2, { headers });
-  const response3 = await axios.get(url3, { headers });
+  while (hasMore) {
+    try {
+      console.log(
+        `📥 Fetching offers ${offset}-${offset + limit} for ${channel}`
+      );
 
-  const data1 = response1.data.offers;
-  const data2 = response2.data.offers;
-  const data3 = response3.data.offers;
+      const response = await axios.get(`${ALLEGRO_API_BASE_URL}/sale/offers`, {
+        params: {
+          limit: limit,
+          offset: offset,
+          "sellingMode.price.amount.gte": "29", // Tylko oferty >= 29 zł
+        },
+        headers,
+      });
 
-  if (!data1 && !data2 && !data3) {
+      const offers = response.data.offers;
+
+      if (!offers || offers.length === 0) {
+        console.log(
+          `✅ No more offers found for ${channel} at offset ${offset}`
+        );
+        hasMore = false;
+      } else {
+        console.log(
+          `📦 Found ${offers.length} offers for ${channel} at offset ${offset}`
+        );
+        allOffers = [...allOffers, ...offers];
+        offset += offers.length;
+
+        // Jeśli otrzymaliśmy mniej ofert niż limit, to koniec
+        if (offers.length < limit) {
+          hasMore = false;
+        }
+      }
+    } catch (error) {
+      console.error(
+        `❌ Error fetching offers for ${channel} at offset ${offset}:`,
+        error
+      );
+      hasMore = false;
+    }
+  }
+
+  console.log(`🎉 Total offers fetched for ${channel}: ${allOffers.length}`);
+
+  if (allOffers.length === 0) {
     throw new Error("Nie znaleziono oferty na Allegro.");
   }
 
-  return [...data1, ...data2, ...data3] as AllegroOfferFromListing[];
+  return allOffers;
 };
 
 export const transformAllegroAL1OfferToOffer = async (
@@ -52,14 +91,20 @@ export const transformAllegroAL1OfferToOffer = async (
 ): Promise<Offer> => {
   const size = extractSizeFromTitle(offer.name) as string;
   const cleanedTitle = removeSizeFromTitle(offer.name);
-  const cleanedExternalId = cleanOldExternalId(offer.external.id);
+
+  // Sprawdź czy oferta ma external.id
+  const externalId = offer.external?.id || "";
+  const cleanedExternalId = cleanOldExternalId(externalId);
   const { signature } = parseExternalId(cleanedExternalId);
+
+  // Jeśli signature jest puste, użyj tytułu jako fallback
+  const finalSignature = signature.trim() || cleanedTitle;
 
   return {
     title: cleanedTitle,
     productId: productId || null,
     thumbnail: offer.primaryImage.url,
-    signature,
+    signature: finalSignature,
     sellingPrices: {
       AL1: offer.sellingMode.price.amount,
     },
@@ -169,8 +214,22 @@ const syncAL1Offers = async (offers: AllegroOfferFromListing[]) => {
   const offersBySignature = new Map<string, AllegroOfferFromListing[]>();
 
   for (const offer of offers) {
+    // Sprawdź czy oferta ma external.id
+    if (!offer.external?.id) {
+      console.log(
+        `⚠️  AL1: Skipping offer "${offer.name}" - missing external.id`
+      );
+      continue;
+    }
+
     const cleanedExternalId = cleanOldExternalId(offer.external.id);
     const { signature } = parseExternalId(cleanedExternalId);
+
+    // Sprawdź czy signature nie jest puste
+    if (!signature || signature.trim() === "") {
+      console.log(`⚠️  AL1: Skipping offer "${offer.name}" - empty signature`);
+      continue;
+    }
 
     if (!offersBySignature.has(signature)) {
       offersBySignature.set(signature, []);
@@ -199,44 +258,65 @@ const syncAL1Offers = async (offers: AllegroOfferFromListing[]) => {
     }
 
     // Przetwarzaj wszystkie rozmiary dla tej signature
+    const processedSizes = new Set<string>(); // Deduplikacja rozmiarów
+
     for (const offer of groupedOffers) {
       const size = extractSizeFromTitle(offer.name) as string;
 
+      // Sprawdź czy ten rozmiar już był przetwarzany
+      if (processedSizes.has(size)) {
+        console.log(
+          `⚠️  AL1: Skipping duplicate size ${size} for ${signature}`
+        );
+        continue;
+      }
+      processedSizes.add(size);
+
       console.log(`📦 Processing size ${size} for ${signature}`);
 
-      await editAllegroOffer(offer.id, "AL1", {
-        external: {
-          id: `${signature} [${SKU}r${size}]`,
-        },
-      });
-
-      if (existingOffer?.id) {
-        // Aktualizuj istniejącą ofertę z nowym rozmiarem
-        await updateOfferInDB(
-          existingOffer,
-          {
-            size,
-            allegroId: offer.id,
-            availability: offer.stock.available.toString(),
-            SKU,
+      try {
+        await editAllegroOffer(offer.id, "AL1", {
+          external: {
+            id: `${signature} [${SKU}r${size}]`,
           },
-          "AL1"
+        });
+
+        if (existingOffer?.id) {
+          // Aktualizuj istniejącą ofertę z nowym rozmiarem
+          await updateOfferInDB(
+            existingOffer,
+            {
+              size,
+              allegroId: offer.id,
+              availability: offer.stock.available.toString(),
+              SKU,
+            },
+            "AL1"
+          );
+
+          // WAŻNE: Pobierz zaktualizowaną ofertę z bazy danych
+          existingOffer = await getOfferFromDBBySignature(signature);
+        } else {
+          // Utwórz nową ofertę tylko raz dla pierwszego rozmiaru
+          const transformedOffer = await transformAllegroAL1OfferToOffer(
+            offer,
+            SKU
+          );
+
+          const createdOfferId = await createOffer(transformedOffer);
+          console.log(`✨ Created new offer with ID: ${createdOfferId}`);
+
+          // Pobierz świeżo utworzoną ofertę z bazy danych
+          existingOffer = await getOfferFromDBBySignature(signature);
+        }
+
+        console.log(`✅ AL1: Successfully processed size ${size}`);
+      } catch (sizeError: any) {
+        console.error(
+          `❌ AL1: Error processing size ${size} for signature "${signature}":`,
+          sizeError.message || sizeError
         );
-
-        // WAŻNE: Pobierz zaktualizowaną ofertę z bazy danych
-        existingOffer = await getOfferFromDBBySignature(signature);
-      } else {
-        // Utwórz nową ofertę tylko raz dla pierwszego rozmiaru
-        const transformedOffer = await transformAllegroAL1OfferToOffer(
-          offer,
-          SKU
-        );
-
-        const createdOfferId = await createOffer(transformedOffer);
-        console.log(`✨ Created new offer with ID: ${createdOfferId}`);
-
-        // Pobierz świeżo utworzoną ofertę z bazy danych
-        existingOffer = await getOfferFromDBBySignature(signature);
+        // Kontynuuj z następnym rozmiarem
       }
     }
   }
@@ -249,15 +329,28 @@ const syncAL2Offers = async (offers: AllegroOfferFromListing[]) => {
   const offersBySignature = new Map<string, AllegroOfferFromListing[]>();
 
   for (const offer of offers) {
+    // Sprawdź czy oferta ma external.id
+    if (!offer.external?.id) {
+      console.log(
+        `⚠️  AL2: Skipping offer "${offer.name}" - missing external.id`
+      );
+      continue;
+    }
+
     const cleanedExternalId = cleanOldExternalId(offer.external.id);
     const { signature } = parseExternalId(cleanedExternalId);
+
+    // Sprawdź czy signature nie jest puste
+    if (!signature || signature.trim() === "") {
+      console.log(`⚠️  AL2: Skipping offer "${offer.name}" - empty signature`);
+      continue;
+    }
 
     if (!offersBySignature.has(signature)) {
       offersBySignature.set(signature, []);
     }
     offersBySignature.get(signature)!.push(offer);
   }
-
   console.log(`🔍 AL2: Found ${offersBySignature.size} unique signatures`);
 
   let processedSignatures = 0;
@@ -289,9 +382,20 @@ const syncAL2Offers = async (offers: AllegroOfferFromListing[]) => {
       );
 
       // Przetwarzaj wszystkie rozmiary dla tej signature
+      const processedSizes = new Set<string>(); // Deduplikacja rozmiarów
+
       for (let i = 0; i < groupedOffers.length; i++) {
         const offer = groupedOffers[i];
         const size = extractSizeFromTitle(offer.name) as string;
+
+        // Sprawdź czy ten rozmiar już był przetwarzany
+        if (processedSizes.has(size)) {
+          console.log(
+            `⚠️  AL2: Skipping duplicate size ${size} for ${signature}`
+          );
+          continue;
+        }
+        processedSizes.add(size);
 
         console.log(
           `📦 AL2: Processing size ${i + 1}/${

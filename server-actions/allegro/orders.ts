@@ -293,21 +293,36 @@ async function transformAllegroToOrder(
 ): Promise<Order> {
   // Pobierz wszystkie oferty równolegle
   const lineItemsPromises = allegroOrder.lineItems.map(async (item) => {
-    const offer = await getAllegroOffer(item.offer.id, salesChannel);
-    if (!offer || !offer.images || offer.images.length === 0) {
+    const allegroOffer = await getAllegroOffer(item.offer.id, salesChannel);
+    if (
+      !allegroOffer ||
+      !allegroOffer.images ||
+      allegroOffer.images.length === 0
+    ) {
       throw new Error(`Offer not found for ID: ${item.offer.id}`);
     }
-    const offerThumbnail = offer?.images[0];
-    const { signature } = parseExternalId(item.offer.external?.id || "");
+    const offerThumbnail = allegroOffer?.images[0];
+    const { signature, size, SKU } = parseExternalId(
+      item.offer.external?.id || ""
+    );
+    const offerResp = await getDocumentsFromAdminDB<Order>("orders", (ref) =>
+      ref.where("SKU", "==", SKU).limit(1)
+    );
+    if (!offerResp) {
+      throw new Error(`Offer not found for SKU: ${SKU}`);
+    }
+    const offer = offerResp[0];
 
     return {
       id: item.id,
       offer: {
         thumbnail: offerThumbnail,
-        id: "",
+        id: offer.id,
         signature,
         name: item.offer.name,
         allegroId: item.offer.id,
+        SKU: SKU || null,
+        size: size || null,
       },
       quantity: item.quantity,
       originalPrice: item.originalPrice,
@@ -383,6 +398,8 @@ function transformAllegroToOrderUpdate(
         offer: {
           thumbnail: existingLineItem?.offer?.thumbnail || "", // Zachowaj istniejącą miniaturkę
           id: existingLineItem?.offer?.id || "",
+          SKU: existingLineItem?.offer?.SKU || null,
+          size: existingLineItem?.offer?.size || null,
           signature,
           name: item.offer.name,
           allegroId: item.offer.id,

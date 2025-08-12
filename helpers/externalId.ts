@@ -18,12 +18,12 @@ export const parseExternalId = (
     };
   }
 
-  // Pattern to match [SKU]r[size] at the end of string
+  // Pattern to match [SKU]r[size] anywhere in the string
   // SKU is 4 characters (base32), size is numeric
-  const pattern = /\[([A-Z2-9]{4}r\d+)\]$/;
-  const match = externalId.match(pattern);
+  const pattern = /\[([A-Z2-9]{4}r\d+)\]/g;
+  const matches = [...externalId.matchAll(pattern)];
 
-  if (!match) {
+  if (matches.length === 0) {
     return {
       signature: externalId,
       SKU: null,
@@ -31,7 +31,9 @@ export const parseExternalId = (
     };
   }
 
-  const fullMatch = match[1]; // e.g., "AB1Cr32"
+  // Take the last match (most recent SKU)
+  const lastMatch = matches[matches.length - 1];
+  const fullMatch = lastMatch[1]; // e.g., "AB1Cr32"
   const skuSizePattern = /^([A-Z2-9]{4})r(\d+)$/;
   const skuSizeMatch = fullMatch.match(skuSizePattern);
 
@@ -45,7 +47,9 @@ export const parseExternalId = (
 
   const sku = skuSizeMatch[1]; // e.g., "AB1C"
   const size = skuSizeMatch[2]; // e.g., "32"
-  const signature = externalId.replace(match[0], "").trim(); // Remove the full bracket part
+
+  // Remove ALL occurrences of [SKU]r[size] pattern
+  const signature = externalId.replace(/\[([A-Z2-9]{4}r\d+)\]/g, "").trim();
 
   return {
     signature,

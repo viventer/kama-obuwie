@@ -167,6 +167,8 @@ export const OrderItemSchema = z.object({
     allegroId: z.string().nullable(),
     name: z.string().nullable(),
     signature: z.string(),
+    size: z.string().nullable(),
+    SKU: z.string().nullable(),
   }),
   quantity: z.number().min(1),
   originalPrice: PriceSchema,

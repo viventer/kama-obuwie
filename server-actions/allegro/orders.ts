@@ -305,8 +305,9 @@ async function transformAllegroToOrder(
     const { signature, size, SKU } = parseExternalId(
       item.offer.external?.id || ""
     );
-    const offerResp = await getDocumentsFromAdminDB<Order>("orders", (ref) =>
-      ref.where("SKU", "==", SKU).limit(1)
+    console.log(SKU);
+    const offerResp = await getDocumentsFromAdminDB<Offer>("offers", (ref) =>
+      ref.where("SKU", "==", SKU)
     );
     if (!offerResp) {
       throw new Error(`Offer not found for SKU: ${SKU}`);

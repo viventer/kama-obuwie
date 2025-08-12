@@ -4,6 +4,8 @@ import { adminDB } from "@/firebase/firebaseAdmin";
 import { verifyUser } from "../auth/auth";
 import { Order, OrderSchema } from "@/firebase/schemas/ordersSchemas";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
+import { AllegroSalesChannel } from "@/lib/constants";
+import { syncOffersAvailabilityAfterOrder } from "../offers/offers";
 
 export const createOrder = async function (newOrder: Order) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -13,6 +15,11 @@ export const createOrder = async function (newOrder: Order) {
   const orderRef = adminDB.collection("orders").doc();
 
   await orderRef.set(newOrder);
+
+  await syncOffersAvailabilityAfterOrder(
+    newOrder.lineItems,
+    newOrder.salesChannel as AllegroSalesChannel
+  );
 
   return orderRef.id;
 };

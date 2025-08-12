@@ -12,6 +12,9 @@ import {
   SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
+import { Order } from "@/firebase/schemas/ordersSchemas";
+import { AllegroSalesChannel } from "@/lib/constants";
+import { editAllegroOffer } from "../allegro/offers";
 
 export const createOffer = async function (newOffer: Partial<Offer>) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -80,4 +83,86 @@ export const getPostOfferBody = async ({
     allegroCategoryId,
     sizingTable,
   };
+};
+
+export const syncOffersAvailabilityAfterOrder = async function (
+  orderItems: Order["lineItems"],
+  salesChannel: AllegroSalesChannel
+) {
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
+  // Określ przeciwny kanał Allegro
+  const otherChannel: AllegroSalesChannel =
+    salesChannel === "AL1" ? "AL2" : "AL1";
+
+  for (const item of orderItems) {
+    const { SKU, size } = item.offer;
+
+    if (!SKU || !size) {
+      console.warn(`Brak SKU lub rozmiaru dla produktu ${item.offer.id}`);
+      continue;
+    }
+
+    try {
+      // Pobierz ofertę z bazy danych na podstawie SKU
+      const offersQuery = await adminDB
+        .collection("offers")
+        .where("SKU", "==", SKU)
+        .limit(1)
+        .get();
+
+      if (offersQuery.empty) {
+        console.warn(`Nie znaleziono oferty dla SKU: ${SKU}`);
+        continue;
+      }
+
+      const offerDoc = offersQuery.docs[0];
+      const offer = offerDoc.data() as Offer;
+      const offerId = offerDoc.id;
+
+      // Sprawdź czy rozmiar istnieje w dostępności
+      if (!offer.availability?.[size]) {
+        console.warn(`Rozmiar ${size} nie istnieje w ofercie ${SKU}`);
+        continue;
+      }
+
+      const currentAvailability = parseInt(offer.availability[size].value);
+      const newAvailability = Math.max(0, currentAvailability - item.quantity);
+
+      // Zaktualizuj dostępność w bazie danych
+      await adminDB
+        .collection("offers")
+        .doc(offerId)
+        .update({
+          [`availability.${size}.value`]: newAvailability.toString(),
+        });
+
+      // Zaktualizuj dostępność na przeciwnym kanale Allegro
+      const allegroOfferId = offer.allegroOffersIds?.[otherChannel]?.[size];
+
+      if (allegroOfferId) {
+        try {
+          await editAllegroOffer(allegroOfferId, otherChannel, {
+            stock: {
+              available: newAvailability,
+              unit: "PAIR",
+            },
+          });
+        } catch (error) {
+          console.error(
+            `Błąd podczas aktualizacji oferty Allegro ${allegroOfferId} na kanale ${otherChannel}:`,
+            error
+          );
+          // Nie przerywamy wykonywania funkcji, tylko logujemy błąd
+        }
+      } else {
+        console.warn(
+          `Brak ID oferty Allegro dla SKU: ${SKU}, rozmiar: ${size}, kanał: ${otherChannel}`
+        );
+      }
+    } catch (error) {
+      console.error(`Błąd podczas przetwarzania produktu ${SKU}:`, error);
+      // Kontynuuj przetwarzanie pozostałych produktów
+    }
+  }
 };

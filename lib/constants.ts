@@ -74,3 +74,17 @@ export const reasonTranslations: Record<string, string> = {
   DIFFERENT: "Inne niż zamówione",
   COUNTERFEIT: "Podróbka",
 };
+
+export const returnStatusTranslations: Record<string, string> = {
+  CREATED: "Utworzony",
+  DISPATCHED: "Wysłany",
+  IN_TRANSIT: "W transporcie",
+  DELIVERED: "Doręczony",
+  FINISHED: "Zakończony",
+  FINISHED_APT: "Zakończony APT",
+  REJECTED: "Odrzucony",
+  COMMISSION_REFUND_CLAIMED: "Żądanie zwrotu prowizji",
+  COMMISSION_REFUNDED: "Prowizja zwrócona",
+  WAREHOUSE_DELIVERED: "Dostarczony do magazynu",
+  WAREHOUSE_VERIFICATION: "Weryfikacja magazynowa",
+};

@@ -1,26 +1,13 @@
 "use client";
 
 import { AllegroReturn } from "@/firebase/schemas/returnsSchemas";
+import { returnStatusTranslations } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 interface ReturnInfoDisplayProps {
   return: AllegroReturn;
   className?: string;
 }
-
-const statusTranslations: Record<string, string> = {
-  CREATED: "Utworzony",
-  DISPATCHED: "Wysłany",
-  IN_TRANSIT: "W transporcie",
-  DELIVERED: "Dostarczony",
-  FINISHED: "Zakończony",
-  FINISHED_APT: "Zakończony APT",
-  REJECTED: "Odrzucony",
-  COMMISSION_REFUND_CLAIMED: "Żądanie zwrotu prowizji",
-  COMMISSION_REFUNDED: "Prowizja zwrócona",
-  WAREHOUSE_DELIVERED: "Dostarczony do magazynu",
-  WAREHOUSE_VERIFICATION: "Weryfikacja magazynowa",
-};
 
 export function ReturnInfoDisplay({
   return: returnData,
@@ -49,7 +36,7 @@ export function ReturnInfoDisplay({
         <span
           className={`ml-1 px-2 py-1 rounded text-xs font-medium ${statusColor}`}
         >
-          {statusTranslations[returnData.status] || returnData.status}
+          {returnStatusTranslations[returnData.status] || returnData.status}
         </span>
       </div>
     </div>

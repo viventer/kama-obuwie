@@ -46,6 +46,14 @@ import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { useFullPageLoading } from "../../global/FullPageLoader";
 import RefundTransferDetails from "../RefundTransferDetails";
 import { syncOffersAvailability } from "@/server-actions/offers/offers";
+import { returnStatusTranslations } from "@/lib/constants";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ReturnsDataTableProps {
   returns: AllegroReturn[];
@@ -65,6 +73,7 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [globalFilter, setGlobalFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
 
   const { openDialog } = useDialogWindow();
   const { showToast } = useToast();
@@ -318,6 +327,20 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
       size: 0,
       meta: { hidden: true },
     },
+    // Kolumna dla filtrowania po statusie
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: () => null,
+      enableSorting: false,
+      enableColumnFilter: true,
+      filterFn: (row, columnId, filterValue) => {
+        if (!filterValue) return true;
+        return row.getValue(columnId) === filterValue;
+      },
+      size: 0,
+      meta: { hidden: true },
+    },
     {
       id: "returnInfo",
       header: "Dane zwrotu",
@@ -367,6 +390,37 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
     },
   ];
 
+  const usefulStatuses = [
+    "CREATED",
+    "DISPATCHED",
+    "IN_TRANSIT",
+    "DELIVERED",
+    "FINISHED",
+    "REJECTED",
+    "COMISSION_REFUNDED",
+  ];
+  const filteredStatuses = Object.entries(returnStatusTranslations).filter(
+    ([key]) => usefulStatuses.includes(key)
+  );
+
+  // Opcje statusów do filtrowania
+  const statusOptions = [
+    { name: "Wszystkie statusy", value: "ALL" },
+    ...filteredStatuses.map(([key, value]) => ({
+      name: value,
+      value: key,
+    })),
+  ];
+
+  // Funkcja do obsługi zmiany filtru statusu
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status);
+    setColumnFilters((prev) => [
+      ...prev.filter((filter) => filter.id !== "status"),
+      ...(status !== "ALL" ? [{ id: "status", value: status }] : []),
+    ]);
+  };
+
   const table = useReactTable({
     data: returns,
     columns,
@@ -382,6 +436,7 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
         buyerLogin: false,
         buyerEmail: false,
         itemNames: false,
+        status: false,
       },
       rowSelection,
       expanded,
@@ -403,14 +458,28 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
 
   return (
     <div className="w-full max-h-[70svh] max-w-[1440px]">
-      {/* Pole wyszukiwania */}
-      <div className="flex items-center py-4">
+      {/* Pole wyszukiwania i filtry */}
+      <div className="flex flex-col sm:flex-row gap-4 py-4">
         <Input
           placeholder="Szukaj zwrotów"
           value={globalFilter}
           onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-xs"
         />
+        <div className="max-w-xs">
+          <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+            <SelectTrigger className="w-[250px]">
+              <SelectValue placeholder="Filtruj po statusie" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Tabela */}

@@ -5,7 +5,7 @@ import { verifyUser } from "../auth/auth";
 import { Order, OrderSchema } from "@/firebase/schemas/ordersSchemas";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { AllegroSalesChannel } from "@/lib/constants";
-import { syncOffersAvailabilityAfterOrder } from "../offers/offers";
+import { syncOffersAvailability } from "../offers/offers";
 
 export const createOrder = async function (newOrder: Order) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -16,9 +16,10 @@ export const createOrder = async function (newOrder: Order) {
 
   await orderRef.set(newOrder);
 
-  await syncOffersAvailabilityAfterOrder(
+  await syncOffersAvailability(
     newOrder.lineItems,
-    newOrder.salesChannel as AllegroSalesChannel
+    newOrder.salesChannel as AllegroSalesChannel,
+    "order"
   );
 
   return orderRef.id;

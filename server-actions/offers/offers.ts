@@ -85,9 +85,10 @@ export const getPostOfferBody = async ({
   };
 };
 
-export const syncOffersAvailabilityAfterOrder = async function (
+export const syncOffersAvailability = async function (
   orderItems: Order["lineItems"],
-  salesChannel: AllegroSalesChannel
+  salesChannel: AllegroSalesChannel,
+  eventType: "order" | "return"
 ) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
@@ -96,7 +97,7 @@ export const syncOffersAvailabilityAfterOrder = async function (
     salesChannel === "AL1" ? "AL2" : "AL1";
 
   for (const item of orderItems) {
-    const { SKU, size } = item.offer;
+    const { SKU, size, allegroId: mainChannelOfferId } = item.offer;
 
     if (!SKU || !size) {
       console.warn(`Brak SKU lub rozmiaru dla produktu ${item.offer.id}`);
@@ -127,7 +128,10 @@ export const syncOffersAvailabilityAfterOrder = async function (
       }
 
       const currentAvailability = parseInt(offer.availability[size].value);
-      const newAvailability = Math.max(0, currentAvailability - item.quantity);
+      const newAvailability =
+        eventType === "order"
+          ? Math.max(0, currentAvailability - Number(item.quantity))
+          : currentAvailability + Number(item.quantity);
 
       // Zaktualizuj dostępność w bazie danych
       await adminDB
@@ -138,19 +142,42 @@ export const syncOffersAvailabilityAfterOrder = async function (
         });
 
       // Zaktualizuj dostępność na przeciwnym kanale Allegro
-      const allegroOfferId = offer.allegroOffersIds?.[otherChannel]?.[size];
+      const otherChannelOfferId =
+        offer.allegroOffersIds?.[otherChannel]?.[size];
 
-      if (allegroOfferId) {
+      console.log(otherChannelOfferId);
+      console.log("Obecna dostępność:", currentAvailability);
+      console.log("Nowa dostępność:", newAvailability);
+
+      if (otherChannelOfferId) {
         try {
-          await editAllegroOffer(allegroOfferId, otherChannel, {
+          const updateOfferData = {
             stock: {
               available: newAvailability,
-              unit: "PAIR",
+              unit: "PAIR" as const,
             },
-          });
+            publication: {
+              status: newAvailability > 0 ? "ACTIVE" : "INACTIVE",
+            },
+          };
+
+          console.log("Aktualizowane dane oferty:", updateOfferData);
+
+          await editAllegroOffer(
+            otherChannelOfferId,
+            otherChannel,
+            updateOfferData
+          );
+          if (eventType === "return" && mainChannelOfferId) {
+            await editAllegroOffer(
+              mainChannelOfferId,
+              salesChannel,
+              updateOfferData
+            );
+          }
         } catch (error) {
           console.error(
-            `Błąd podczas aktualizacji oferty Allegro ${allegroOfferId} na kanale ${otherChannel}:`,
+            `Błąd podczas aktualizacji oferty Allegro ${otherChannelOfferId} na kanale ${otherChannel}:`,
             error
           );
           // Nie przerywamy wykonywania funkcji, tylko logujemy błąd

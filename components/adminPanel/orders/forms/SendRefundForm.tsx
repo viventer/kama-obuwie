@@ -21,6 +21,8 @@ import axios from "axios";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { useFullPageLoading } from "../../global/FullPageLoader";
 import { getOrderByAllegroId } from "@/server-actions/orders/orders";
+import { syncOffersAvailability } from "@/server-actions/offers/offers";
+import { AllegroSalesChannel } from "@/lib/constants";
 
 export const refundReasons = [
   { name: "zwrot produktu", value: "REFUND" },
@@ -78,6 +80,32 @@ export default function SendRefundForm({
 
   const { id } = useParams();
   const { startLoading, stopLoading } = useFullPageLoading();
+
+  const syncOffersAvailabilityAfterRefund = async (
+    orderLineItems: Order["lineItems"],
+    refundLineItems: Refund["lineItems"]
+  ) => {
+    startLoading();
+    const returnedItemsFromOrder = orderLineItems
+      .map((orderItem, index) => {
+        const refundItem = refundLineItems![index];
+
+        if (refundItem?.quantity && refundItem.quantity > 0) {
+          return {
+            ...orderItem,
+            quantity: refundItem.quantity,
+          };
+        }
+      })
+      .filter((item) => item !== undefined);
+
+    await syncOffersAvailability(
+      returnedItemsFromOrder,
+      salesChannel as AllegroSalesChannel,
+      "return"
+    );
+    stopLoading();
+  };
 
   const generateRefundDocument = async (
     orderLineItems: Order["lineItems"],
@@ -248,6 +276,7 @@ export default function SendRefundForm({
           }
         }
 
+        await syncOffersAvailabilityAfterRefund(lineItems, lineItemsData);
         await generateRefundDocument(lineItems, lineItemsData);
 
         router.back();

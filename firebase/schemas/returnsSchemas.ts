@@ -143,6 +143,9 @@ export type CustomerReturnRefund = z.infer<typeof customerReturnRefundSchema>;
 export type CustomerReturnReturnParcel = z.infer<
   typeof customerReturnReturnParcelSchema
 >;
+export type CustomerBankAccountData = z.infer<
+  typeof customerReturnRefundBankAccountSchema
+>;
 export type CustomerReturnRejection = z.infer<
   typeof customerReturnRejectionSchema
 >;

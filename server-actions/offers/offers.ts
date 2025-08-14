@@ -145,10 +145,6 @@ export const syncOffersAvailability = async function (
       const otherChannelOfferId =
         offer.allegroOffersIds?.[otherChannel]?.[size];
 
-      console.log(otherChannelOfferId);
-      console.log("Obecna dostępność:", currentAvailability);
-      console.log("Nowa dostępność:", newAvailability);
-
       if (otherChannelOfferId) {
         try {
           const updateOfferData = {
@@ -160,8 +156,6 @@ export const syncOffersAvailability = async function (
               status: newAvailability > 0 ? "ACTIVE" : "INACTIVE",
             },
           };
-
-          console.log("Aktualizowane dane oferty:", updateOfferData);
 
           await editAllegroOffer(
             otherChannelOfferId,

@@ -112,7 +112,6 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
         stopLoading();
         return;
       }
-      console.log(filePath);
       const url = await getImageUrl(filePath);
       if (!url) {
         showToast("Nie udało się pobrać potwierdzenia zwrotu wpłaty.", "error");

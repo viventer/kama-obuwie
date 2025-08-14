@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { ChevronLeft, ChevronRight, CheckCircle, Download } from "lucide-react";
 import {
   AllegroReturn,
+  CustomerBankAccountData,
   ReturnFormData,
 } from "@/firebase/schemas/returnsSchemas";
 import { ReturnInfoDisplay } from "./ReturnInfoDisplay";
@@ -43,6 +44,8 @@ import { getOrderByAllegroId } from "@/server-actions/orders/orders";
 import axios from "axios";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { useFullPageLoading } from "../../global/FullPageLoader";
+import RefundTransferDetails from "../RefundTransferDetails";
+import { syncOffersAvailability } from "@/server-actions/offers/offers";
 
 interface ReturnsDataTableProps {
   returns: AllegroReturn[];
@@ -68,50 +71,136 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
   const router = useRouter();
 
   const handleApproveAndRefund = async (returnId: string) => {
-    openDialog({
-      title: "Potwierdź akcję",
-      content: (
-        <p>
-          Czy na pewno chcesz zatwierdzić zwrot i zainicjować zwrot wpłaty? Tej
-          akcji nie można cofnąć.
-        </p>
-      ),
-      onConfirm: async () => {
-        try {
-          const returnData = returns.find((r) => r.id === returnId);
-          if (!returnData) {
-            showToast("Nie znaleziono zwrotu o podanym ID", "error");
-            return;
-          }
-          const order: OrderWithId = await getOrderByAllegroId(
-            returnData.orderId
-          );
-          const paidAmount = Number(order.payment?.paidAmount?.amount) || 0;
-          const deliveryCost = Number(order.delivery?.cost?.amount) || 0;
-          const refundAmount = Number(order.refund?.amount?.amount) || 0;
-          const isAllRefunded = refundAmount >= paidAmount - deliveryCost;
+    try {
+      const returnData = returns.find((r) => r.id === returnId);
+      if (!returnData) {
+        showToast("Nie znaleziono zwrotu o podanym ID", "error");
+        return;
+      }
+      const order: OrderWithId = await getOrderByAllegroId(returnData.orderId);
+      const paidAmount = Number(order.payment?.paidAmount?.amount) || 0;
+      const deliveryCost = Number(order.delivery?.cost?.amount) || 0;
+      const refundAmount = Number(order.refund?.amount?.amount) || 0;
+      const isAllRefunded = refundAmount >= paidAmount - deliveryCost;
 
-          if (
-            !paidAmount ||
-            !order.payment?.id ||
-            order.payment.type === "CASH_ON_DELIVERY" ||
-            isAllRefunded
-          ) {
-            showToast(
-              "Nie można zwrócić wpłaty, ponieważ zamówienie nie ma opłaconej kwoty lub jest to zamówienie za pobraniem.",
-              "error"
+      if (order?.payment?.type === "CASH_ON_DELIVERY") {
+        openDialog({
+          title: "Zwróć wpłatę przelewem",
+          content: (
+            <RefundTransferDetails
+              accountData={
+                returnData.refund?.bankAccount as CustomerBankAccountData
+              }
+            />
+          ),
+          description:
+            "Jest to zamówienie za pobraniem, dlatego zwrot przez Allegro Finanse nie jest możliwy.",
+          confirmText: "Wpłata została zwrócona",
+          cancelText: "Anuluj",
+          hasCancelButton: true,
+          onConfirm: async () => {
+            startLoading();
+            const returnedItemsFromOrder = order.lineItems
+              .map((orderItem, index) => {
+                const refundItem = returnData.items![index];
+
+                if (refundItem?.quantity && refundItem.quantity > 0) {
+                  return {
+                    ...orderItem,
+                    quantity: refundItem.quantity,
+                  };
+                }
+              })
+              .filter((item) => item !== undefined);
+
+            await syncOffersAvailability(
+              returnedItemsFromOrder,
+              order.salesChannel as "AL1" | "AL2",
+              "return"
             );
-            return;
-          }
-          router.push(`/admin-panel/orders/send-refund/${order.id}`);
-        } catch (error) {
-          showToast("Wystąpił błąd podczas zatwierdzania zwrotu", "error");
-        }
-      },
-      confirmText: "Zatwierdź i zwróć wpłatę",
-      cancelText: "Anuluj",
-      hasCancelButton: true,
-    });
+
+            const itemsForRefundDocument = returnedItemsFromOrder.map(
+              (item) => ({
+                name: item.offer.name,
+                quantity: Number(item.quantity),
+                value: (
+                  Number(item.price.amount) * Number(item.quantity)
+                ).toString(),
+              })
+            );
+
+            const refundAmount = itemsForRefundDocument.reduce(
+              (sum, item) => sum + Number(item.value),
+              0
+            );
+
+            try {
+              const response = await axios.post(`/api/orders/refund-document`, {
+                items: itemsForRefundDocument,
+              });
+
+              const { filePath, url } = response.data;
+              if (!filePath || !url) {
+                throw new Error(
+                  "Nie udało się wygenerować dokumentu zwrotu wpłaty"
+                );
+              }
+              window.open(url, "_blank");
+
+              await axios.patch(`/api/orders/${order.id}`, {
+                refund: {
+                  type: "FULL",
+                  amount: {
+                    amount: refundAmount.toString(),
+                    currency: "PLN",
+                  },
+                  reason: "REFUND",
+                  lineItems: returnedItemsFromOrder.map((item) => ({
+                    id: item.id,
+                    type: "AMOUNT",
+                    quantity: item.quantity,
+                    value: {
+                      amount: (
+                        Number(item.price.amount) * Number(item.quantity)
+                      ).toString(),
+                      currency: item.price.currency,
+                    },
+                  })),
+                  refundDocument: {
+                    items: itemsForRefundDocument,
+                    filePath: filePath,
+                  },
+                },
+              });
+              showToast(
+                "Dokument zwrotu wpłaty został wygenerowany.",
+                "success"
+              );
+            } catch (error: any) {
+              handleError(
+                error,
+                "Błąd podczas generowania dokumentu zwrotu wpłaty"
+              );
+            } finally {
+              stopLoading();
+            }
+          },
+        });
+
+        return;
+      }
+
+      if (!paidAmount || !order.payment?.id || isAllRefunded) {
+        showToast(
+          "Nie można zwrócić wpłaty, ponieważ zamówienie nie ma opłaconej kwoty lub jest to zamówienie za pobraniem.",
+          "error"
+        );
+        return;
+      }
+      router.push(`/admin-panel/orders/send-refund/${order.id}`);
+    } catch (error) {
+      showToast("Wystąpił błąd podczas zatwierdzania zwrotu", "error");
+    }
   };
 
   const { handleError } = useErrorHandler();

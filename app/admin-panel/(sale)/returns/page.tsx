@@ -3,7 +3,7 @@ import { getAllegroReturns } from "@/server-actions/allegro/returns";
 import { notFound } from "next/navigation";
 import ReturnsDataTable from "@/components/adminPanel/returns/tables/ReturnsDataTable";
 
-export const revalidate = 180;
+export const revalidate = 0;
 
 export default async function ReturnsPage() {
   const returnsResponse = await getAllegroReturns();

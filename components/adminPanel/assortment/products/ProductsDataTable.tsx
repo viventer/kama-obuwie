@@ -5,6 +5,7 @@ import { ColumnName, TableAction } from "@/lib/dataTableColumns";
 import { DataTable } from "../../global/data-table/DataTable";
 import { useProductTypeContext } from "../ProductsTypeContext";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ProductsDataTable({
   data,
@@ -29,6 +30,8 @@ export default function ProductsDataTable({
   const [columnNames, setColumnNames] = useState<ColumnName<ProductWithId>[]>(
     elementaryColumnNames
   );
+
+  const router = useRouter();
 
   useEffect(() => {
     if (!data) {
@@ -59,6 +62,24 @@ export default function ProductsDataTable({
           "_blank",
           "noopener,noreferrer"
         );
+      },
+    },
+    {
+      name: "Edytuj dane",
+      onClick: (id) => {
+        router.push(`/admin-panel/products/data/${id}`);
+      },
+    },
+    {
+      name: "Edytuj zdjęcia",
+      onClick: (id) => {
+        router.push(`/admin-panel/products/images/${id}`);
+      },
+    },
+    {
+      name: "Edytuj opis",
+      onClick: (id) => {
+        router.push(`/admin-panel/products/description/${id}`);
       },
     },
   ];

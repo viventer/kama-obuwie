@@ -1,4 +1,4 @@
-import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";
+import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {

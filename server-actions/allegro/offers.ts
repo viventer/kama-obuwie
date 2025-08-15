@@ -24,7 +24,7 @@ import axios from "axios";
 import { getImageUrl } from "../files/files";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath, safetyInformation } from "@/lib/constants";
-import { getColorVariantName } from "@/components/adminPanel/products/helpers/productsHelpers";
+import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { handleAxiosError } from "../helpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;

@@ -65,9 +65,9 @@ export default function ProductsDataTable({
       },
     },
     {
-      name: "Edytuj dane",
+      name: "Edytuj parametry",
       onClick: (id) => {
-        router.push(`/admin-panel/products/data/${id}`);
+        router.push(`/admin-panel/products/parameters/${id}`);
       },
     },
     {

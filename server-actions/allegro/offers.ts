@@ -349,7 +349,7 @@ export async function postIndividualAllegroOffer(
   }
 }
 
-async function formatAllegroProductParameters(
+export async function formatAllegroProductParameters(
   productParameters: ProductParameters,
   allegroCategoryId: string,
   productBrand?: string

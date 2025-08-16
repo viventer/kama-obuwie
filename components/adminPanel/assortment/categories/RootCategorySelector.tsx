@@ -8,10 +8,12 @@ export default function RootCategorySelector({
   onChange,
   value,
   defaultValue,
+  disabled = false,
 }: {
   onChange: (...event: any[]) => void;
   value: RootCategory | undefined;
   defaultValue?: RootCategory;
+  disabled?: boolean;
 }) {
   return (
     <SingleSelect
@@ -23,6 +25,7 @@ export default function RootCategorySelector({
         name: rootCategory,
         value: rootCategory,
       }))}
+      disabled={disabled}
     />
   );
 }

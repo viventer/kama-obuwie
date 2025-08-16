@@ -11,7 +11,11 @@ import { ResponsibleProducersResponse } from "@/server-actions/allegro/responsib
 import SingleSelect from "../../global/form/SingleSelect";
 import MiniLoader from "../../global/MiniLoader";
 
-export default function ResponsibleProducerSelector() {
+export default function ResponsibleProducerSelector({
+  disabled = false,
+}: {
+  disabled?: boolean;
+}) {
   const [availableResponsibleProducers, setAvailableResponsibleProducers] =
     useState<ResponsibleProducersResponse>();
 
@@ -52,6 +56,7 @@ export default function ResponsibleProducerSelector() {
                     value: producer.name,
                   })
                 )}
+                disabled={disabled}
               />
             )}
           />

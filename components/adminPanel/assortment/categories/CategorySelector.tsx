@@ -12,11 +12,13 @@ export default function CategorySelector({
   onChange,
   rootCategory,
   setAllegroCategoryId,
+  disabled = false,
 }: {
   value: string | undefined;
   onChange: (value: string) => void;
   rootCategory: RootCategory | undefined;
   setAllegroCategoryId: Dispatch<SetStateAction<string | undefined>>;
+  disabled?: boolean;
 }) {
   const { showToast } = useToast();
   const [categories, setCategories] = useState<CategoryWithId[]>([]);
@@ -60,6 +62,7 @@ export default function CategorySelector({
           name: category.name,
           value: category.id,
         }))}
+        disabled={disabled}
       />
     </div>
   );

@@ -28,13 +28,20 @@ import RootCategorySelector from "../categories/RootCategorySelector";
 import SizingTableSelector from "../sizing-tables/SizingTableSelector";
 import ImageUploader from "../../global/uploaders/ImageUploader";
 import AllegroParametersSection from "./AllegroParametersSection";
-import { DocumentDataWithRef } from "@/server-actions/helpers";
+import {
+  DocumentDataWithRef,
+  formatAllegroError,
+} from "@/server-actions/helpers";
 import RangeSizesFormItem, { RangeSizeString } from "./RangeSizesFormItem";
 import MatchingCategoriesSelector from "../categories/MatchingCategoriesSelector";
 import MultipleSearchSelect from "../../global/form/MultipleSearchSelect";
 import { availableProductFeatures } from "@/lib/constants";
 import TextEditor from "../description/TextEditor";
 import ResponsibleProducerSelector from "./ResponsibleProducerSelector";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { useFullPageLoading } from "../../global/FullPageLoader";
+import { formatAllegroProductParameters } from "@/server-actions/allegro/offers";
+import { AllegroOffer, Offer } from "@/firebase/schemas/offersSchemas";
 
 export type ProductParametersFormData = Omit<Product, "rangeSizes"> & {
   rangeSizes: RangeSizeString[];
@@ -47,7 +54,10 @@ export default function EditProductParametersForm({
 }) {
   const { productType, setProductType } = useProductTypeContext();
   const { showToast } = useToast();
+  const { handleError } = useErrorHandler();
+  const { startLoading, stopLoading } = useFullPageLoading();
   const router = useRouter();
+  const isDone = oldData.creationStage === "done";
 
   useEffect(() => {
     setProductType(oldData.productType);
@@ -109,6 +119,127 @@ export default function EditProductParametersForm({
     })();
   }, [categoryId]);
 
+  const editAllegroOfferParams = async (
+    formData: ProductParametersFormData
+  ) => {
+    startLoading();
+
+    if (!allegroCategoryId) {
+      showToast("Kategoria Allegro jest wymagana.", "error");
+      stopLoading();
+      return;
+    }
+
+    try {
+      const newAllegroParameters = await formatAllegroProductParameters(
+        formData.parameters,
+        allegroCategoryId,
+        formData.brand
+      );
+
+      // Pobierz SKU dla wszystkich wariantów kolorystycznych
+      const allSKUs = oldData.SKU ? Object.values(oldData.SKU) : [];
+
+      if (allSKUs.length === 0) {
+        throw new Error("Brak SKU dla wariantów kolorystycznych");
+      }
+
+      // Pobierz oferty dla wszystkich wariantów kolorystycznych
+      const offersPromises = allSKUs.map(async (sku) => {
+        const response = await axios.get(`/api/offers?SKU=${sku}`);
+        return Object.values(response.data)[0] as Offer;
+      });
+
+      const offers = await Promise.all(offersPromises);
+
+      console.log(allSKUs);
+      console.log(offers);
+
+      // Zgrupuj allegroOffersIds z wszystkich ofert według kanałów sprzedaży
+      const allegroOffersIds: Record<"AL1" | "AL2", string[]> = {
+        AL1: [],
+        AL2: [],
+      };
+
+      offers.forEach((offer) => {
+        if (offer.allegroOffersIds) {
+          Object.entries(offer.allegroOffersIds).forEach(
+            ([salesChannel, sizeToIdMap]) => {
+              const channel = salesChannel as "AL1" | "AL2";
+              const offerIds = Object.values(sizeToIdMap);
+              allegroOffersIds[channel].push(...offerIds);
+            }
+          );
+        }
+      });
+
+      console.log("Wszystkie SKU:", allSKUs);
+      console.log("Pobrane oferty:", offers);
+      console.log("Zgrupowane allegroOffersIds:", allegroOffersIds);
+
+      // Funkcja pomocnicza do tworzenia updateData dla danego kanału
+      const createUpdateData = async (
+        salesChannel: "AL1" | "AL2"
+      ): Promise<Partial<AllegroOffer>> => {
+        const firstOfferId = allegroOffersIds[salesChannel]?.[0];
+
+        if (!firstOfferId) {
+          throw new Error(`Brak ofert dla kanału ${salesChannel}`);
+        }
+
+        const allegroOffer: AllegroOffer = await axios.get(
+          `/api/allegro/offers/${firstOfferId}`
+        );
+
+        return {
+          productSet: [
+            {
+              ...allegroOffer.productSet[0],
+              product: {
+                ...allegroOffer.productSet[0].product,
+                parameters: newAllegroParameters,
+              },
+            },
+          ],
+        };
+      };
+
+      // Tworzenie updateData dla obu kanałów
+      const [updateDataAL1, updateDataAL2] = await Promise.all([
+        createUpdateData("AL1"),
+        createUpdateData("AL2"),
+      ]);
+
+      // Mapowanie aktualizacji dla obu kanałów
+      const salesChannels: Array<{
+        channel: "AL1" | "AL2";
+        updateData: Partial<AllegroOffer>;
+      }> = [
+        { channel: "AL1", updateData: updateDataAL1 },
+        { channel: "AL2", updateData: updateDataAL2 },
+      ];
+
+      const allUpdates = salesChannels.flatMap(({ channel, updateData }) =>
+        allegroOffersIds[channel].map(async (allegroOfferId) => {
+          return axios.patch(`/api/allegro/offers/${allegroOfferId}`, {
+            offerPartial: updateData,
+            salesChannel: channel,
+          });
+        })
+      );
+
+      await Promise.all(allUpdates);
+    } catch (error) {
+      handleError(
+        error,
+        "Wystąpił błąd podczas aktualizacji parametrów na Allegro."
+      );
+      return;
+    } finally {
+      stopLoading();
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const data = form.getValues();
@@ -165,6 +296,12 @@ export default function EditProductParametersForm({
       return;
     }
 
+    if (isDone && allegroCategoryId) {
+      await editAllegroOfferParams(data);
+    }
+
+    return;
+
     try {
       if (oldData) {
         const resp = await axios.patch(`/api/products/${oldData.id}`, payload);
@@ -181,6 +318,8 @@ export default function EditProductParametersForm({
         `Wystąpił błąd podczas aktualizacji parametrów: ${error}`,
         "error"
       );
+    } finally {
+      stopLoading();
     }
   };
 
@@ -204,6 +343,7 @@ export default function EditProductParametersForm({
         <FormField
           rules={{ required: "Zdjęcie poglądowe jest wymagane" }}
           control={form.control}
+          disabled={isDone}
           name="samplePhoto"
           render={({ field }) => (
             <FormItem>
@@ -213,6 +353,7 @@ export default function EditProductParametersForm({
                   filePath={field.value || ""}
                   setFilePath={field.onChange}
                   folderPath={`products/sample-photos/${productType}`}
+                  disabled={isDone}
                 />
               </FormControl>
             </FormItem>
@@ -230,7 +371,7 @@ export default function EditProductParametersForm({
             </FormItem>
           )}
         />
-        <ResponsibleProducerSelector />
+        <ResponsibleProducerSelector disabled={isDone} />
         <FormField
           control={form.control}
           rules={{ required: "Kod producenta jest wymagany." }}
@@ -280,7 +421,7 @@ export default function EditProductParametersForm({
             </FormItem>
           )}
         />
-        {productType === "obuwie" ? (
+        {productType === "obuwie" && !isDone ? (
           <>
             <FormField
               control={form.control}
@@ -310,7 +451,7 @@ export default function EditProductParametersForm({
               )}
             />
           </>
-        ) : (
+        ) : productType === "akcesoria" ? (
           <FormField
             control={form.control}
             name="rangeSizes"
@@ -341,6 +482,8 @@ export default function EditProductParametersForm({
               />
             )}
           />
+        ) : (
+          <></>
         )}
         <FormField
           control={form.control}
@@ -369,6 +512,7 @@ export default function EditProductParametersForm({
             <RootCategorySelector
               value={field.value}
               onChange={field.onChange}
+              disabled={isDone}
             />
           )}
         />
@@ -384,6 +528,7 @@ export default function EditProductParametersForm({
               onChange={field.onChange}
               rootCategory={rootCategory}
               setAllegroCategoryId={setAllegroCategoryId}
+              disabled={isDone}
             />
           )}
         />

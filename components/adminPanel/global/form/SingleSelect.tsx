@@ -21,6 +21,7 @@ export default function SingleSelect({
   defaultValue,
   availableOptions,
   placeholder = "Wybierz",
+  disabled = false,
 }: {
   label?: string;
   onChange: (...event: any[]) => void;
@@ -28,6 +29,7 @@ export default function SingleSelect({
   defaultValue?: string;
   placeholder?: string;
   availableOptions: Option[];
+  disabled?: boolean;
 }) {
   return (
     <FormItem>
@@ -37,6 +39,7 @@ export default function SingleSelect({
           onValueChange={onChange}
           value={value}
           defaultValue={defaultValue}
+          disabled={disabled}
         >
           <FormControl>
             <SelectTrigger className="text-base border-primary ">
@@ -58,7 +61,11 @@ export default function SingleSelect({
             ))}
           </SelectContent>
         </Select>
-        <IconButton onClick={() => onChange("")} className="text-primary">
+        <IconButton
+          onClick={() => onChange("")}
+          className="text-primary"
+          disabled={disabled}
+        >
           <XIcon className="size-6" />
         </IconButton>
       </div>

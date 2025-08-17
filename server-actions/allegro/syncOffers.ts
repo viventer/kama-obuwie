@@ -45,7 +45,8 @@ export const getAllAllegroOffers = async (
         params: {
           limit: limit,
           offset: offset,
-          "sellingMode.price.amount.gte": "200", // Tylko oferty >= 200 zł (na próbę)
+          "sellingMode.price.amount.gte": "110", // Tylko oferty >= 110 zł (na próbę)
+          "sellingMode.price.amount.lte": "120", // Tylko oferty <= 120 zł (na próbę)
         },
         headers,
       });

@@ -1,7 +1,7 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import LinkText from "@/components/adminPanel/global/LinkText";
 import PostOfferForm from "@/components/adminPanel/offers/PostOfferForm";
-import ShortProductInfo from "@/components/adminPanel/products/ShortProductInfo";
+import ShortProductInfo from "@/components/adminPanel/assortment/ShortProductInfo";
 import { Button } from "@/components/ui/button";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";

@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const productIdParam = request.nextUrl.searchParams.get("productId");
   const signatureParam = request.nextUrl.searchParams.get("signature");
+  const SKUParam = request.nextUrl.searchParams.get("SKU");
 
   const queryFn = (ref: FirebaseFirestore.CollectionReference) => {
     let query: FirebaseFirestore.Query = ref;
@@ -23,6 +24,10 @@ export async function GET(request: NextRequest) {
 
     if (signatureParam) {
       query = query.where("signature", "==", signatureParam);
+    }
+
+    if (SKUParam) {
+      query = query.where("SKU", "==", SKUParam);
     }
 
     return query;

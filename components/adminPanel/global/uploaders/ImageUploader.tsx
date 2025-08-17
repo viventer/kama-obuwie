@@ -20,6 +20,7 @@ interface ImageUploaderProps {
   filePath: string;
   folderPath: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export default function ImageUploader({
@@ -27,6 +28,7 @@ export default function ImageUploader({
   setFilePath,
   folderPath,
   className,
+  disabled = false,
 }: ImageUploaderProps) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -89,6 +91,7 @@ export default function ImageUploader({
     accept: { "image/*": [] },
     maxFiles: 1,
     maxSize: 10 * 1024 * 1024,
+    disabled,
   });
 
   const handleDeleteImage = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -108,19 +111,29 @@ export default function ImageUploader({
   return (
     <div className={cn("flex flex-col gap-2 max-w-xs", className)}>
       <div
-        {...getRootProps()}
-        className="border-2 border-dashed rounded text-center cursor-pointer w-full aspect-[3/2] flex items-center justify-center relative bg-primary/15"
+        {...(disabled ? {} : getRootProps())}
+        className={cn(
+          "border-2 border-dashed rounded text-center w-full aspect-[3/2] flex items-center justify-center relative bg-primary/15",
+          disabled ? "cursor-default" : "cursor-pointer"
+        )}
       >
-        <input {...getInputProps()} />
-        {isDragActive ? (
+        {!disabled && <input {...getInputProps()} />}
+        {!disabled && isDragActive ? (
           <p>Upuść obrazek tutaj...</p>
         ) : !imageUrl ? (
-          <div className="flex items-center gap-2 m-4">
-            <ImageIcon className="size-20 hidden sm:block" />
-            <p className="text-left">
-              Przeciągnij i upuść obrazek lub kliknij, aby wybrać
-            </p>
-          </div>
+          !disabled ? (
+            <div className="flex items-center gap-2 m-4">
+              <ImageIcon className="size-20 hidden sm:block" />
+              <p className="text-left">
+                Przeciągnij i upuść obrazek lub kliknij, aby wybrać
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 m-4 text-muted-foreground">
+              <ImageIcon className="size-20 hidden sm:block" />
+              <p className="text-left">Brak obrazka</p>
+            </div>
+          )
         ) : (
           <>
             <Image
@@ -129,17 +142,19 @@ export default function ImageUploader({
               layout="fill"
               className="w-full aspect-[3/2] object-contain"
             />
-            <div className="text-3xl z-10 w-full h-full bg-transparent backdrop-brightness-100 items-center justify-center flex relative transition-all ease-in-out opacity-0 hover:backdrop-brightness-[25%] hover:opacity-100">
-              <IconButton
-                className="absolute right-0 top-0 m-2 hover:text-destructive"
-                onClick={(e: any) => handleDeleteImage(e)}
-              >
-                <TrashIcon className="size-6" />
-              </IconButton>
-              <IconButton className="hover:text-accent">
-                <ReplaceIcon className="size-8 " />
-              </IconButton>
-            </div>
+            {!disabled && (
+              <div className="text-3xl z-10 w-full h-full bg-transparent backdrop-brightness-100 items-center justify-center flex relative transition-all ease-in-out opacity-0 hover:backdrop-brightness-[25%] hover:opacity-100">
+                <IconButton
+                  className="absolute right-0 top-0 m-2 hover:text-destructive"
+                  onClick={(e: any) => handleDeleteImage(e)}
+                >
+                  <TrashIcon className="size-6" />
+                </IconButton>
+                <IconButton className="hover:text-accent">
+                  <ReplaceIcon className="size-8 " />
+                </IconButton>
+              </div>
+            )}
           </>
         )}
       </div>

@@ -14,6 +14,9 @@ import { editAllegroOffer } from "./offers";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { createOffer, updateOffer } from "../offers/offers";
 import { cleanOldExternalId, parseExternalId } from "@/helpers/externalId";
+import { updateProduct } from "../products/products";
+import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -157,6 +160,151 @@ const getOfferFromDBBySignature = async (
   return { ...existingOffer.data(), id: existingOffer.id } as Offer;
 };
 
+// Nowa funkcja do wyszukiwania produktów na podstawie signature
+const getProductsBySignature = async (
+  signature: string
+): Promise<ProductWithId[]> => {
+  // signature ma format: "brand manufacturerCode colorVariantName"
+  // Parsujemy signature, aby wydobyć brand, manufacturerCode i colorVariantName
+  const parts = signature.trim().split(" ");
+  if (parts.length < 2) {
+    return [];
+  }
+
+  // Ostatnia część to colorVariantName, reszta to brand + manufacturerCode
+  const colorVariantName = parts[parts.length - 1];
+  const brandAndCode = parts.slice(0, -1).join(" ");
+
+  // Próbujemy rozdzielić brand i manufacturerCode
+  // W zależności od formatowania może być różnie - spróbujmy kilku podejść
+  let brand: string | undefined;
+  let manufacturerCode: string;
+
+  // Jeśli brandAndCode zawiera spacje, prawdopodobnie pierwsza część to brand
+  const brandCodeParts = brandAndCode.split(" ");
+  if (brandCodeParts.length > 1) {
+    brand = brandCodeParts.slice(0, -1).join(" ");
+    manufacturerCode = brandCodeParts[brandCodeParts.length - 1];
+  } else {
+    manufacturerCode = brandAndCode;
+  }
+
+  console.log(
+    `🔍 Searching products: brand="${brand}", manufacturerCode="${manufacturerCode}", colorVariant="${colorVariantName}"`
+  );
+
+  // Szukamy produktów które pasują do manufacturerCode
+  const productsQuery = adminDB
+    .collection("products")
+    .where("manufacturerCode", "==", manufacturerCode);
+
+  const querySnapshot = await productsQuery.get();
+
+  if (querySnapshot.empty) {
+    console.log(
+      `⚠️  No products found for manufacturerCode: ${manufacturerCode}`
+    );
+    return [];
+  }
+
+  const products: ProductWithId[] = [];
+
+  querySnapshot.forEach((doc) => {
+    const productData = { ...doc.data(), id: doc.id } as ProductWithId;
+
+    // Sprawdzamy czy brand się zgadza (jeśli jest)
+    if (brand && productData.brand && productData.brand !== brand) {
+      return; // Pomijamy jeśli brand się nie zgadza
+    }
+
+    // Sprawdzamy czy product ma colorVariant o tej nazwie
+    if (productData.colorVariants) {
+      const hasMatchingVariant = productData.colorVariants.some(
+        (variant) => getColorVariantName(variant) === colorVariantName
+      );
+
+      if (hasMatchingVariant) {
+        products.push(productData);
+      }
+    }
+  });
+
+  console.log(
+    `✅ Found ${products.length} matching products for signature: ${signature}`
+  );
+  return products;
+};
+
+// Funkcja do aktualizacji pola offersIds w produktach
+const updateProductOffersIds = async (
+  products: ProductWithId[],
+  colorVariantName: string,
+  offerId: string
+) => {
+  console.log(
+    `🏗️  Starting updateProductOffersIds: ${products.length} products, variant: ${colorVariantName}, offerId: ${offerId}`
+  );
+
+  // Usuwamy duplikaty produktów
+  const uniqueProducts = products.filter(
+    (product, index, self) =>
+      self.findIndex((p) => p.id === product.id) === index
+  );
+
+  if (uniqueProducts.length === 0) {
+    console.log(`⚠️  No unique products found for updateProductOffersIds`);
+    return;
+  }
+
+  if (uniqueProducts.length > 1) {
+    console.log(
+      `⚠️  Found ${uniqueProducts.length} duplicate products for colorVariant: ${colorVariantName}, removing duplicates`
+    );
+  }
+
+  for (const product of uniqueProducts) {
+    try {
+      // WAŻNE: Czyścimy stare offersIds które mają starą strukturę z AL1/AL2
+      // Stara struktura: { AL1: [{value: "offerId", colorVariantName: "color"}] }
+      // Nowa struktura: { "colorVariantName": "offerId" }
+      let currentOffersIds = product.offersIds || {};
+
+      // Sprawdź czy offersIds ma starą strukturę i wyczyść ją
+      if (currentOffersIds && typeof currentOffersIds === "object") {
+        // Jeśli istnieją klucze AL1 lub AL2, znaczy to że mamy starą strukturę
+        if ("AL1" in currentOffersIds || "AL2" in currentOffersIds) {
+          console.log(
+            `🧹 Cleaning old offersIds structure for product ${product.id}`
+          );
+          currentOffersIds = {}; // Resetuj do pustego obiektu
+        }
+      }
+
+      const updatedOffersIds = {
+        ...currentOffersIds,
+        [colorVariantName]: offerId,
+      };
+
+      console.log(
+        `🔄 Updating product ${product.id} offersIds from:`,
+        currentOffersIds,
+        `to:`,
+        updatedOffersIds
+      );
+
+      await updateProduct(product.id, {
+        offersIds: updatedOffersIds,
+      });
+
+      console.log(
+        `✅ Updated product ${product.id} offersIds for variant: ${colorVariantName} -> ${offerId}`
+      );
+    } catch (error) {
+      console.error(`❌ Failed to update product ${product.id}:`, error);
+    }
+  }
+};
+
 const updateOfferInDB = async (
   offerData: Offer,
   updateData: {
@@ -247,6 +395,13 @@ const syncAL1Offers = async (offers: AllegroOfferFromListing[]) => {
 
     // Sprawdź czy oferta już istnieje
     let existingOffer = await getOfferFromDBBySignature(signature);
+
+    // Znajdź odpowiadające produkty na podstawie signature
+    const matchingProducts = await getProductsBySignature(signature);
+    console.log(
+      `🎯 Found ${matchingProducts.length} matching products for signature: ${signature}`
+    );
+
     let SKU: string;
 
     if (existingOffer?.SKU) {
@@ -300,7 +455,8 @@ const syncAL1Offers = async (offers: AllegroOfferFromListing[]) => {
           // Utwórz nową ofertę tylko raz dla pierwszego rozmiaru
           const transformedOffer = await transformAllegroAL1OfferToOffer(
             offer,
-            SKU
+            SKU,
+            existingOffer?.productId || undefined
           );
 
           const createdOfferId = await createOffer(transformedOffer);
@@ -317,6 +473,65 @@ const syncAL1Offers = async (offers: AllegroOfferFromListing[]) => {
           sizeError.message || sizeError
         );
         // Kontynuuj z następnym rozmiarem
+      }
+    }
+
+    // Zaktualizuj offersIds w odpowiadających produktach (po przetworzeniu wszystkich rozmiarów)
+    if (matchingProducts.length > 0 && existingOffer?.id) {
+      const parts = signature.trim().split(" ");
+      const colorVariantName = parts[parts.length - 1];
+
+      console.log(
+        `🔄 Updating offersIds for ${matchingProducts.length} products, variant: ${colorVariantName}, offerId: ${existingOffer.id}`
+      );
+      await updateProductOffersIds(
+        matchingProducts,
+        colorVariantName,
+        existingOffer.id as string
+      );
+    } else if (matchingProducts.length > 0 && !existingOffer?.id) {
+      console.log(
+        `⚠️  Cannot update offersIds: existingOffer is null or missing ID for signature: ${signature}`
+      );
+    } else if (matchingProducts.length === 0) {
+      console.log(
+        `ℹ️  No matching products found for signature: ${signature}, skipping offersIds update`
+      );
+    }
+
+    // Zaktualizuj SKU w odpowiadających produktach (jeśli istnieją)
+    if (matchingProducts.length > 0) {
+      const parts = signature.trim().split(" ");
+      const colorVariantName = parts[parts.length - 1];
+
+      for (const product of matchingProducts) {
+        try {
+          const currentSKU = product.SKU || {};
+          const updatedSKU = {
+            ...currentSKU,
+            [colorVariantName]: SKU,
+          };
+
+          console.log(
+            `🔄 Updating product ${product.id} SKU from:`,
+            currentSKU,
+            `to:`,
+            updatedSKU
+          );
+
+          await updateProduct(product.id, {
+            SKU: updatedSKU,
+          });
+
+          console.log(
+            `✅ Updated product ${product.id} SKU for variant: ${colorVariantName} = ${SKU}`
+          );
+        } catch (error) {
+          console.error(
+            `❌ Failed to update product ${product.id} SKU:`,
+            error
+          );
+        }
       }
     }
   }

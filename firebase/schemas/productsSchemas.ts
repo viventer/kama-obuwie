@@ -137,15 +137,7 @@ export const rangeSizeSchema = z.object({
 
 export type RangeSize = z.infer<typeof rangeSizeSchema>;
 
-export const OffersIdsSchema = z.record(
-  SalesChannelSchema,
-  z.array(
-    z.object({
-      value: z.string(),
-      colorVariantName: z.string().optional(),
-    })
-  )
-);
+export const OffersIdsSchema = z.record(z.string(), z.string());
 
 export type OffersIds = z.infer<typeof OffersIdsSchema>;
 

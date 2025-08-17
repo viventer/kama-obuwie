@@ -1,0 +1,20 @@
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
+import SizingTablesDataTable from "@/components/adminPanel/assortment/sizing-tables/SizingTablesDataTable";
+import { SizingTableWithId } from "@/firebase/schemas/productsSchemas";
+import { getDocumentsFromAdminDB } from "@/firebase/getters";
+
+export const revalidate = 0;
+
+export default async function SizingTablesPage() {
+  const sizingTables = await getDocumentsFromAdminDB<SizingTableWithId>(
+    "sizingTables"
+  );
+
+  return (
+    <>
+      <SubpageHeading text="Tabele rozmiarów" />
+
+      <SizingTablesDataTable data={sizingTables} />
+    </>
+  );
+}

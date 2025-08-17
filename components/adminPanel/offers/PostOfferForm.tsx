@@ -126,12 +126,7 @@ export default function PostOfferForm({
       productData.brand ? productData.brand : ""
     } ${productData.manufacturerCode}`;
     const offersIds: OffersIds = {
-      AL1: [
-        {
-          value: oldOfferData.id,
-          colorVariantName: colorVariantsNames[0],
-        },
-      ],
+      [colorVariantsNames[0]]: oldOfferData.id,
     };
 
     if (!productData.editedPhotos) {
@@ -195,10 +190,7 @@ export default function PostOfferForm({
           thumbnail: offerThumbnail,
           SKU: SKUs[colorVariantName],
         });
-        offersIds?.AL1?.push({
-          value: id,
-          colorVariantName,
-        });
+        offersIds[colorVariantName] = id;
       }
 
       const postAllegroOfferBody: Omit<
@@ -239,9 +231,7 @@ export default function PostOfferForm({
         // Data teraz zawiera { allegroIds: { AL1: {...}, AL2: {...} } }
         const formattedAllegroIds = data.allegroIds;
 
-        const offerId = offersIds?.AL1?.find(
-          (offer) => offer.colorVariantName === colorVariantName
-        )?.value;
+        const offerId = offersIds[colorVariantName];
 
         await axios.patch(`/api/offers/${offerId}`, {
           allegroOffersIds: formattedAllegroIds,

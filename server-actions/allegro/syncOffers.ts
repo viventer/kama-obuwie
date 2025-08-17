@@ -32,7 +32,7 @@ export const getAllAllegroOffers = async (
 
   let allOffers: AllegroOfferFromListing[] = [];
   let offset = 0;
-  const limit = 1000; // Maksymalna liczba ofert na żądanie
+  const limit = 500; // Maksymalna liczba ofert na żądanie
   let hasMore = true;
 
   while (hasMore) {
@@ -45,8 +45,7 @@ export const getAllAllegroOffers = async (
         params: {
           limit: limit,
           offset: offset,
-          "sellingMode.price.amount.gte": "110", // Tylko oferty >= 110 zł (na próbę)
-          "sellingMode.price.amount.lte": "120", // Tylko oferty <= 120 zł (na próbę)
+          "sellingMode.price.amount.gte": "29",
         },
         headers,
       });

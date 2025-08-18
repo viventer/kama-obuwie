@@ -101,8 +101,7 @@ export const transformAllegroAL1OfferToOffer = async (
   const cleanedExternalId = cleanOldExternalId(externalId);
   const { signature } = parseExternalId(cleanedExternalId);
 
-  // Jeśli signature jest puste, użyj tytułu jako fallback
-  const finalSignature = signature.trim() || cleanedTitle;
+  const finalSignature = signature.trim() || "";
 
   return {
     title: cleanedTitle,
@@ -165,33 +164,19 @@ const getOfferFromDBBySignature = async (
 const getProductsBySignature = async (
   signature: string
 ): Promise<ProductWithId[]> => {
-  // signature ma format: "brand manufacturerCode colorVariantName"
-  // Parsujemy signature, aby wydobyć brand, manufacturerCode i colorVariantName
+  // signature ma format: "... manufacturerCode colorVariantName"
+  // Parsujemy signature, aby wydobyć manufacturerCode i colorVariantName
   const parts = signature.trim().split(" ");
   if (parts.length < 2) {
     return [];
   }
 
-  // Ostatnia część to colorVariantName, reszta to brand + manufacturerCode
+  // Ostatni element to colorVariantName, przedostatni to manufacturerCode
   const colorVariantName = parts[parts.length - 1];
-  const brandAndCode = parts.slice(0, -1).join(" ");
-
-  // Próbujemy rozdzielić brand i manufacturerCode
-  // W zależności od formatowania może być różnie - spróbujmy kilku podejść
-  let brand: string | undefined;
-  let manufacturerCode: string;
-
-  // Jeśli brandAndCode zawiera spacje, prawdopodobnie pierwsza część to brand
-  const brandCodeParts = brandAndCode.split(" ");
-  if (brandCodeParts.length > 1) {
-    brand = brandCodeParts.slice(0, -1).join(" ");
-    manufacturerCode = brandCodeParts[brandCodeParts.length - 1];
-  } else {
-    manufacturerCode = brandAndCode;
-  }
+  const manufacturerCode = parts[parts.length - 2];
 
   console.log(
-    `🔍 Searching products: brand="${brand}", manufacturerCode="${manufacturerCode}", colorVariant="${colorVariantName}"`
+    `🔍 Searching products: manufacturerCode="${manufacturerCode}", colorVariant="${colorVariantName}"`
   );
 
   // Szukamy produktów które pasują do manufacturerCode
@@ -212,11 +197,6 @@ const getProductsBySignature = async (
 
   querySnapshot.forEach((doc) => {
     const productData = { ...doc.data(), id: doc.id } as ProductWithId;
-
-    // Sprawdzamy czy brand się zgadza (jeśli jest)
-    if (brand && productData.brand && productData.brand !== brand) {
-      return; // Pomijamy jeśli brand się nie zgadza
-    }
 
     // Sprawdzamy czy product ma colorVariant o tej nazwie
     if (productData.colorVariants) {

@@ -12,6 +12,7 @@ import {
   EditedPhotoSchema,
   EditedPhotoWithUrl,
   EditedPhotoWithUrlSchema,
+  ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
 import DescriptionRow from "./DescriptionRow";
 import PhotosReorder from "../PhotosReorder";
@@ -32,9 +33,13 @@ export interface DescriptionFormValues {
 export const EditProductDescriptionForm = ({
   oldDescription,
   oldPhotos,
+  productData,
+  isDone,
 }: {
   oldDescription: Description | undefined;
   oldPhotos: EditedPhotoWithUrl[];
+  productData?: ProductWithId;
+  isDone?: boolean;
 }) => {
   const form = useForm<DescriptionFormValues>({
     resolver: zodResolver(
@@ -79,6 +84,11 @@ export const EditProductDescriptionForm = ({
 
   const { id } = useParams();
 
+  const editAllegroOfferDescription = async (
+    newDescription: Description,
+    photosWithUrls: EditedPhotoWithUrl[]
+  ) => {};
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -93,6 +103,10 @@ export const EditProductDescriptionForm = ({
     } catch (error) {
       showToast(`Wystąpił błąd walidacji danych: ${error}`, "error");
       return;
+    }
+
+    if (isDone) {
+      await editAllegroOfferDescription(data.description, data.reorderedPhotos);
     }
 
     try {

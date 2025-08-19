@@ -54,6 +54,8 @@ export default async function ProductEditPage(props: Props) {
       <EditProductDescriptionForm
         oldDescription={data.description}
         oldPhotos={photosWithUrls}
+        productData={data}
+        isDone={true}
       />
     </FormWrapper>
   );

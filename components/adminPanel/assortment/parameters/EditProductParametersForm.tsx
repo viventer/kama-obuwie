@@ -41,7 +41,12 @@ import ResponsibleProducerSelector from "./ResponsibleProducerSelector";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { useFullPageLoading } from "../../global/FullPageLoader";
 import { formatAllegroProductParameters } from "@/server-actions/allegro/offers";
-import { AllegroOffer, Offer } from "@/firebase/schemas/offersSchemas";
+import {
+  AllegroOffer,
+  AllegroOfferSchema,
+  Offer,
+  AllegroOfferParameters,
+} from "@/firebase/schemas/offersSchemas";
 
 export type ProductParametersFormData = Omit<Product, "rangeSizes"> & {
   rangeSizes: RangeSizeString[];
@@ -131,7 +136,7 @@ export default function EditProductParametersForm({
     }
 
     try {
-      const newAllegroParameters = await formatAllegroProductParameters(
+      const formattedParameters = await formatAllegroProductParameters(
         formData.parameters,
         allegroCategoryId,
         formData.brand
@@ -152,9 +157,6 @@ export default function EditProductParametersForm({
 
       const offers = await Promise.all(offersPromises);
 
-      console.log(allSKUs);
-      console.log(offers);
-
       // Zgrupuj allegroOffersIds z wszystkich ofert według kanałów sprzedaży
       const allegroOffersIds: Record<"AL1" | "AL2", string[]> = {
         AL1: [],
@@ -173,59 +175,76 @@ export default function EditProductParametersForm({
         }
       });
 
-      console.log("Wszystkie SKU:", allSKUs);
-      console.log("Pobrane oferty:", offers);
-      console.log("Zgrupowane allegroOffersIds:", allegroOffersIds);
+      // Mapowanie aktualizacji dla obu kanałów - teraz dla każdej oferty osobno
+      const allUpdates = Object.entries(allegroOffersIds).flatMap(
+        ([salesChannel, offerIds]) =>
+          offerIds.map(async (allegroOfferId) => {
+            const channel = salesChannel as "AL1" | "AL2";
 
-      // Funkcja pomocnicza do tworzenia updateData dla danego kanału
-      const createUpdateData = async (
-        salesChannel: "AL1" | "AL2"
-      ): Promise<Partial<AllegroOffer>> => {
-        const firstOfferId = allegroOffersIds[salesChannel]?.[0];
+            // Pobierz aktualną ofertę Allegro dla tego konkretnego ID
+            const allegroOfferResponse = await axios.get(
+              `/api/allegro/offers/${allegroOfferId}?salesChannel=${channel}`
+            );
 
-        if (!firstOfferId) {
-          throw new Error(`Brak ofert dla kanału ${salesChannel}`);
-        }
+            const currentAllegroOffer =
+              allegroOfferResponse.data as AllegroOffer;
 
-        const allegroOffer: AllegroOffer = await axios.get(
-          `/api/allegro/offers/${firstOfferId}`
-        );
+            // Usuń publication z obecnej oferty (jeśli istnieje)
+            const productWithoutPublication = {
+              ...currentAllegroOffer.productSet[0].product,
+            };
+            if ("publication" in productWithoutPublication) {
+              delete (productWithoutPublication as any).publication;
+            }
 
-        return {
-          productSet: [
-            {
-              ...allegroOffer.productSet[0],
-              product: {
-                ...allegroOffer.productSet[0].product,
-                parameters: newAllegroParameters,
-              },
-            },
-          ],
-        };
-      };
+            // Połącz obecne parametry z nowymi (nowe parametry nadpisują stare)
+            const currentParameters =
+              currentAllegroOffer.productSet[0].product.parameters;
 
-      // Tworzenie updateData dla obu kanałów
-      const [updateDataAL1, updateDataAL2] = await Promise.all([
-        createUpdateData("AL1"),
-        createUpdateData("AL2"),
-      ]);
+            // Upewnij się, że formattedParameters to tablica
+            const newParameters = Array.isArray(formattedParameters)
+              ? formattedParameters
+              : (Object.values(
+                  formattedParameters
+                ) as AllegroOfferParameters[0][]);
 
-      // Mapowanie aktualizacji dla obu kanałów
-      const salesChannels: Array<{
-        channel: "AL1" | "AL2";
-        updateData: Partial<AllegroOffer>;
-      }> = [
-        { channel: "AL1", updateData: updateDataAL1 },
-        { channel: "AL2", updateData: updateDataAL2 },
-      ];
+            // Połącz parametry - jeśli parametr o tej samej nazwie istnieje, zastąp go nowym
+            const mergedParametersMap = new Map<
+              string,
+              AllegroOfferParameters[0]
+            >();
 
-      const allUpdates = salesChannels.flatMap(({ channel, updateData }) =>
-        allegroOffersIds[channel].map(async (allegroOfferId) => {
-          return axios.patch(`/api/allegro/offers/${allegroOfferId}`, {
-            offerPartial: updateData,
-            salesChannel: channel,
-          });
-        })
+            // Dodaj obecne parametry
+            currentParameters.forEach((param: AllegroOfferParameters[0]) => {
+              mergedParametersMap.set(param.name, param);
+            });
+
+            // Nadpisz/dodaj nowe parametry
+            newParameters.forEach((param: AllegroOfferParameters[0]) => {
+              mergedParametersMap.set(param.name, param);
+            });
+
+            // Przekonwertuj z powrotem na tablicę
+            const mergedParameters = Array.from(mergedParametersMap.values());
+
+            // Utwórz updateData z połączonymi parametrami
+            const updateData = {
+              productSet: [
+                {
+                  ...currentAllegroOffer.productSet[0],
+                  product: {
+                    ...productWithoutPublication,
+                    parameters: mergedParameters,
+                  },
+                },
+              ],
+            };
+
+            return axios.patch(`/api/allegro/offers/${allegroOfferId}`, {
+              offerPartial: updateData,
+              salesChannel: channel,
+            });
+          })
       );
 
       await Promise.all(allUpdates);

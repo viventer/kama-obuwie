@@ -29,8 +29,16 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { salesChannel } = await request.json();
+  const { searchParams } = new URL(request.url);
+  const salesChannel = searchParams.get("salesChannel") as "AL1" | "AL2";
   const { id } = await params;
+
+  if (!salesChannel || !["AL1", "AL2"].includes(salesChannel)) {
+    return apiResponse(
+      "Parametr salesChannel jest wymagany i musi być AL1 lub AL2.",
+      400
+    );
+  }
 
   const offer = await getAllegroOffer(id, salesChannel);
 

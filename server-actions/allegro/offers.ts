@@ -26,6 +26,7 @@ import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath, safetyInformation } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { handleAxiosError } from "../helpers";
+import { addMissingAllegroParameters } from "@/components/adminPanel/assortment/helpers/allegroParameters";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -64,7 +65,11 @@ export const editAllegroOffer = async (
 
   const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers/${id}`;
 
-  await axios.patch(url, data, { headers });
+  try {
+    await axios.patch(url, data, { headers });
+  } catch (error) {
+    handleAxiosError(error, "Błąd podczas edytowania oferty Allegro");
+  }
 };
 
 export const getAllegroOffer = async (
@@ -78,14 +83,17 @@ export const getAllegroOffer = async (
 
   const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers/${id}`;
 
-  const response = await axios.get(url, { headers });
-  const data = response.data;
+  try {
+    const response = await axios.get(url, { headers });
+    const data = response.data;
+    if (!data) {
+      throw new Error("Nie znaleziono oferty na Allegro.");
+    }
 
-  if (!data) {
-    throw new Error("Nie znaleziono oferty na Allegro.");
+    return data as AllegroOffer;
+  } catch (error) {
+    handleAxiosError(error, "Błąd podczas pobierania oferty z Allegro");
   }
-
-  return data as AllegroOffer;
 };
 
 export const postAllegroOffer = async (
@@ -214,63 +222,15 @@ export async function postIndividualAllegroOffer(
     allegroCategoryId,
     product.brand
   );
-  const formattedManufacturerCode = `${
-    product.manufacturerCode
-  } ${getColorVariantName(colorVariant)}`;
 
-  const shadeValue = colorVariant.shade ?? "";
-  const additionalColorValue = colorVariant.additionalColor ?? "brak";
-
-  const sizeParameterName =
-    product.rootCategory === "obuwie dziecięce" ? "Rozmiar (new)" : "Rozmiar";
-
-  const insoleLengthParameterName =
-    product.rootCategory === "obuwie dziecięce"
-      ? "Długość wkładki wew."
-      : "Długość wkładki";
-
-  const allegroProductParameters: AllegroOfferParameters = [
-    ...formattedProductParameters,
-    {
-      name: sizeParameterName,
-      values: [insoleLength.size.toString()],
-    },
-    {
-      name: insoleLengthParameterName,
-      values: [insoleLength.insoleLength.toString()],
-    },
-    {
-      name: "Kolor",
-      values: [colorVariant.color],
-    },
-    {
-      name: "Kod producenta",
-      values: [formattedManufacturerCode],
-    },
-  ];
-
-  if (shadeValue) {
-    allegroProductParameters.push({
-      name: "Odcień",
-      values: [shadeValue],
-    });
-  }
-
-  if (additionalColorValue) {
-    allegroProductParameters.push({
-      name: "Kolor dodatkowy",
-      values: [additionalColorValue],
-    });
-  }
-
-  const EAN = offer.EAN?.[`r${insoleLength.size}`];
-
-  if (EAN) {
-    allegroProductParameters.push({
-      name: "EAN (GTIN)",
-      values: [EAN],
-    });
-  }
+  const allegroProductParameters = addMissingAllegroParameters(
+    formattedProductParameters,
+    product.rootCategory as string,
+    insoleLength,
+    colorVariant,
+    product.manufacturerCode,
+    offer.EAN?.[`r${insoleLength.size}`]
+  );
 
   if (!product?.responsibleProducer?.[channel]) {
     throw new Error(`Brak producenta odpowiedzialnego dla kanału ${channel}.`);

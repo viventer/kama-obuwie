@@ -319,7 +319,7 @@ export default function EditProductParametersForm({
       await editAllegroOfferParams(data);
     }
 
-    return;
+    startLoading();
 
     try {
       if (oldData) {

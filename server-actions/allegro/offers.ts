@@ -27,6 +27,7 @@ import { choosingSizeImageFilePath, safetyInformation } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { handleAxiosError } from "../helpers";
 import { addMissingAllegroParameters } from "@/components/adminPanel/assortment/helpers/allegroParameters";
+import { getFormattedSizingTable } from "@/lib/utils";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -415,26 +416,6 @@ function replaceDescriptionVariables(
   }
 
   return result;
-}
-
-function getFormattedSizingTable(
-  insoleLengths: { size: string; insoleLength: number }[]
-): string {
-  const header = `
-<h2>Jak dobrać rozmiar?</h2>
-<p><b>1.</b>&nbsp;Stojąc na kartce papieru odrysuj kontur stopy.</p>
-<p><b>2.</b>&nbsp;Zmierz w centymetrach odległość pomiędzy najdalszymi punktami (A).</p>
-<p><b>3.</b>&nbsp;Dodaj do wyniku 0,5 cm i porównaj z długościami podanymi poniżej:</p>
-`.trim();
-
-  const listItems = insoleLengths
-    .map(
-      ({ size, insoleLength }) =>
-        `<ul><li><b>r. ${size}</b> - ${insoleLength} cm</li></ul>`
-    )
-    .join("");
-
-  return header + listItems;
 }
 
 export async function convertToAllegroDescription(

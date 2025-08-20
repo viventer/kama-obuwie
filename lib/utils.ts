@@ -26,3 +26,23 @@ export function formatDate(dateString?: string): string | null {
     return "nieprawidłowa data";
   }
 }
+
+export function getFormattedSizingTable(
+  insoleLengths: { size: string; insoleLength: number }[]
+): string {
+  const header = `
+<h2>Jak dobrać rozmiar?</h2>
+<p><b>1.</b>&nbsp;Stojąc na kartce papieru odrysuj kontur stopy.</p>
+<p><b>2.</b>&nbsp;Zmierz w centymetrach odległość pomiędzy najdalszymi punktami (A).</p>
+<p><b>3.</b>&nbsp;Dodaj do wyniku 0,5 cm i porównaj z długościami podanymi poniżej:</p>
+`.trim();
+
+  const listItems = insoleLengths
+    .map(
+      ({ size, insoleLength }) =>
+        `<ul><li><b>r. ${size}</b> - ${insoleLength} cm</li></ul>`
+    )
+    .join("");
+
+  return header + listItems;
+}

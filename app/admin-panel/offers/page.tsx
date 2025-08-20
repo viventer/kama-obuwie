@@ -1,18 +1,17 @@
-"use client";
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
+import OffersDataTable from "@/components/adminPanel/offers/tables/OffersDataTable";
+import { getDocumentsFromAdminDB } from "@/firebase/getters";
+import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 
-import { Button } from "@/components/ui/button";
-import { syncAllegroOffers } from "@/server-actions/allegro/syncOffers";
+export const revalidate = 0;
 
-export default function page() {
+export default async function ProductsPage() {
+  const offers = await getDocumentsFromAdminDB<OfferWithId>("offers");
+
   return (
-    <Button
-      onClick={async () => {
-        console.log("Syncing Allegro offers...");
-        await syncAllegroOffers();
-        console.log("Finished sync");
-      }}
-    >
-      Synchronizuj oferty z Allegro
-    </Button>
+    <>
+      <SubpageHeading text="Oferty" />
+      <OffersDataTable data={offers || null} />
+    </>
   );
 }

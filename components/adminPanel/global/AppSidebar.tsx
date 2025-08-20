@@ -64,11 +64,6 @@ export default function AppSidebar() {
                 Wystawione produkty
               </LinkText>
             </SidebarMenuItem>
-            {/* <SidebarMenuItem>
-              <LinkText href="/admin-panel/assortment">
-                Zarządzanie asortymentem
-              </LinkText>
-            </SidebarMenuItem> */}
             <SidebarMenuItem>
               <LinkText
                 href="/admin-panel/sizing-tables"
@@ -98,6 +93,21 @@ export default function AppSidebar() {
             </SidebarMenuItem>
             <SidebarMenuItem>
               <LinkText href="/admin-panel/returns">Zwroty</LinkText>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Oferty</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <LinkText href="/admin-panel/offers">
+                Zarządzanie ofertami
+              </LinkText>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <LinkText href="/admin-panel/offers/sync">
+                Synchronizacja z Allegro
+              </LinkText>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>

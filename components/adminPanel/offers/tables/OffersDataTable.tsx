@@ -2,7 +2,6 @@
 
 import { TableAction } from "@/lib/dataTableColumns";
 import { DataTable } from "../../global/data-table/DataTable";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 
@@ -11,14 +10,12 @@ export default function OffersDataTable({
 }: {
   data: OfferWithId[] | null;
 }) {
-  const [filteredData, setFilteredData] = useState<OfferWithId[] | null>(null);
   const router = useRouter();
 
   const columnNames = [
     { attributeName: "signature", displayName: "Sygnatura" },
     { attributeName: "title", displayName: "Tytuł" },
-    { attributeName: "suggestedPrice", displayName: "Cena sugerowana" },
-    { attributeName: "colorVariantName", displayName: "Kolor" },
+    { attributeName: "SKU", displayName: "SKU" },
   ];
 
   const actions: TableAction[] = [
@@ -54,14 +51,30 @@ export default function OffersDataTable({
 
   return (
     <DataTable
-      data={filteredData || []}
+      data={data || []}
       columnNames={columnNames}
       actions={actions}
       searchPlaceholder="Szukaj produktu"
       searchColumns={["signature", "title"]}
       hasImages={true}
       imageAttribute="thumbnail"
-      imageFolderPath="offers"
+      imageValueType="url"
+      additionalContent={(row) => (
+        <>
+          <h4 className="font-bold">Ceny sprzedaży:</h4>
+          <div className="flex">
+            <p className="border-r-1 pr-2">AL1: {row.sellingPrices.AL1}</p>
+            <p className="pl-2">AL2: {row.sellingPrices.AL2}</p>
+          </div>
+          <h4 className="font-bold">Ceny początkowe:</h4>
+          <div className="flex">
+            <p className="border-r-1 pr-2">
+              AL1: {row.initialSellingPrices.AL1}
+            </p>
+            <p className="pl-2">AL2: {row.initialSellingPrices.AL2}</p>
+          </div>
+        </>
+      )}
     />
   );
 }

@@ -60,6 +60,8 @@ export function DataTable<T extends { id: string }>({
   maxSelectable,
   onSelectionChange,
   disableSelection = false,
+  imageValueType = "path",
+  additionalContent,
 }: {
   data: T[];
   columnNames: ColumnName<T>[];
@@ -75,6 +77,8 @@ export function DataTable<T extends { id: string }>({
   maxSelectable?: number;
   onSelectionChange?: (selected: T[]) => void;
   disableSelection?: boolean;
+  imageValueType?: "path" | "url";
+  additionalContent?: (row: T) => React.ReactNode;
 }) {
   const [pagination, setPagination] = useState<{
     pageIndex: number;
@@ -252,13 +256,15 @@ export function DataTable<T extends { id: string }>({
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <Fragment key={row.id}>
-                  {hasImages && imageAttribute && imageFolderPath ? (
+                  {hasImages && imageAttribute ? (
                     <DataTableRowWithImage<T>
                       row={row}
                       imageAttribute={imageAttribute}
                       imageFolderPath={imageFolderPath}
                       isReadyAttribute={isReadyAttribute}
                       onRowClick={() => onRowClick?.(row.original)}
+                      imageValueType={imageValueType}
+                      additionalContent={additionalContent}
                     />
                   ) : (
                     <DataTableRow<T>

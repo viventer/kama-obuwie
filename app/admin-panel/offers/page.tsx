@@ -7,6 +7,11 @@ export const revalidate = 0;
 
 export default async function ProductsPage() {
   const offers = await getDocumentsFromAdminDB<OfferWithId>("offers");
+  const sortedOffers = offers?.sort((a, b) => {
+    if (a.signature < b.signature) return -1;
+    if (a.signature > b.signature) return 1;
+    return 0;
+  });
 
   return (
     <>

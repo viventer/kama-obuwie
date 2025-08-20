@@ -13,17 +13,26 @@ export default function DataTableRowWithImage<T>({
   imageFolderPath,
   isReadyAttribute,
   onRowClick,
+  imageValueType = "path",
+  additionalContent,
 }: {
   row: Row<T>;
   imageAttribute: keyof T;
-  imageFolderPath: string;
+  imageFolderPath?: string;
   isReadyAttribute?: keyof T;
   onRowClick?: (row: Row<T>) => void;
+  imageValueType: "path" | "url";
+  additionalContent?: (row: T) => React.ReactNode;
 }) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isReady, setIsReady] = useState<boolean>(false);
 
   useEffect(() => {
+    if (imageValueType == "url") {
+      setImageUrl(row.original[imageAttribute] as string);
+      return;
+    }
+
     const imageFilePath = row.original[imageAttribute] as string;
     if (!imageFilePath) return;
     if (isReadyAttribute) {
@@ -115,6 +124,7 @@ export default function DataTableRowWithImage<T>({
               </p>
             );
           })}
+          {additionalContent && <div>{additionalContent(row.original)}</div>}
         </section>
       </TableCell>
       <TableCell className="block cursor-pointer">

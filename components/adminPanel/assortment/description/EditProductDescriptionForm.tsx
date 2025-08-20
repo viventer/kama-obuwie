@@ -27,7 +27,6 @@ import { convertToAllegroDescription } from "@/server-actions/allegro/offers";
 import { getColorVariantName } from "../helpers/productsHelpers";
 import {
   DescriptionVariable,
-  DescriptionVariables,
   SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";

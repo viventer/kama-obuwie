@@ -43,7 +43,6 @@ import { useFullPageLoading } from "../../global/FullPageLoader";
 import { formatAllegroProductParameters } from "@/server-actions/allegro/offers";
 import {
   AllegroOffer,
-  AllegroOfferSchema,
   Offer,
   AllegroOfferParameters,
 } from "@/firebase/schemas/offersSchemas";

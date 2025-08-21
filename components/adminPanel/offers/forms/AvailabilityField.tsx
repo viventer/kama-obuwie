@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 import { PostOfferFormValues } from "./PostOfferForm";
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import MiniLoader from "../global/MiniLoader";
+import MiniLoader from "../../global/MiniLoader";
 
 export default function AvailabilityField({ sizes }: { sizes: string[] }) {
   const { control } = useFormContext<PostOfferFormValues>();

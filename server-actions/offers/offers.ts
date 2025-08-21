@@ -4,7 +4,7 @@ import { adminDB } from "@/firebase/firebaseAdmin";
 import { Offer, OfferSchema } from "@/firebase/schemas/offersSchemas";
 import { verifyUser } from "../auth/auth";
 import { PostOfferBody } from "@/app/api/allegro/offers/route";
-import { PostOfferFormValues } from "@/components/adminPanel/offers/PostOfferForm";
+import { PostOfferFormValues } from "@/components/adminPanel/offers/forms/PostOfferForm";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import {
   CategoryWithId,

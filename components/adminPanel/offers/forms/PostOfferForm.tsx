@@ -23,11 +23,11 @@ import { useToast } from "@/hooks/useToast";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { PostOfferBody } from "@/app/api/allegro/offers/route";
 import { getPostOfferBody } from "@/server-actions/offers/offers";
-import { getColorVariantName } from "../assortment/helpers/productsHelpers";
+import { getColorVariantName } from "../../assortment/helpers/productsHelpers";
 import { getImagesUrls } from "@/server-actions/files/files";
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { useRouter } from "next/navigation";
-import MiniLoader from "../global/MiniLoader";
+import MiniLoader from "../../global/MiniLoader";
 import ReturnPolicySelector from "./ReturnPolicySelector";
 import { handleApiError } from "@/server-actions/helpers";
 import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
@@ -35,6 +35,7 @@ import WarrantySelector from "./WarrantySelector";
 import TitlesField from "./TitlesField";
 import EANsField from "./EANsField";
 import { generateUniqueSKU } from "@/server-actions/products/SKU";
+import { validateOfferForm } from "../helpers/validation";
 
 export type PostOfferFormValues = Pick<
   Offer,
@@ -101,8 +102,9 @@ export default function PostOfferForm({
     e.preventDefault();
     setIsPosting(true);
     const formData = form.getValues();
-    const isValid = await validateForm();
-    if (!isValid) {
+    const validationResult = await validateOfferForm(form as any);
+    if (!validationResult.isValid) {
+      showToast(validationResult.message, "error");
       setIsPosting(false);
       return;
     }
@@ -170,6 +172,7 @@ export default function PostOfferForm({
           signatureWithoutColorVariant.trim() + ` ${colorVariantsNames[0]}`,
         thumbnail: mainOfferThumbnail,
         SKU: SKUs[colorVariantsNames[0]],
+        productId: productData.id,
       });
 
       for (const colorVariantName of colorVariantsNames) {
@@ -189,6 +192,7 @@ export default function PostOfferForm({
             signatureWithoutColorVariant.trim() + ` ${colorVariantName}`,
           thumbnail: offerThumbnail,
           SKU: SKUs[colorVariantName],
+          productId: productData.id,
         });
         offersIds[colorVariantName] = id;
       }
@@ -253,24 +257,6 @@ export default function PostOfferForm({
       );
       return;
     }
-  };
-
-  const validateForm = async (): Promise<boolean> => {
-    const isValid = await form.trigger();
-    if (!isValid) {
-      showToast("Formularz zawiera błędy", "error");
-      return false;
-    }
-
-    const availability = form.getValues("availability");
-    for (const sizeAvailability of Object.values(availability)) {
-      if (sizeAvailability.value === "" || sizeAvailability.value === "0") {
-        showToast("Minimalna dostępność produktu wynosi 1.", "error");
-        return false;
-      }
-    }
-
-    return true;
   };
 
   const updateMainOffer = async (offerData: Offer) => {

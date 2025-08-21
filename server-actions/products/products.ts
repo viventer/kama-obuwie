@@ -5,7 +5,9 @@ import {
   Product,
   ProductPartialSchema,
   ProductSchema,
+  ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
+import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { verifyUser } from "../auth/auth";
 
 export const createProduct = async function (newProduct: Product) {
@@ -34,4 +36,31 @@ export const updateProduct = async function (
   }
 
   await productRef.update(updateData);
+};
+
+export const getProductBySKU = async function (
+  sku: string
+): Promise<ProductWithId | null> {
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
+  if (!sku || sku.trim() === "") {
+    throw new Error("SKU nie może być pusty.");
+  }
+
+  const products = await getDocumentsFromAdminDB<Product>("products");
+
+  if (!products) {
+    return null;
+  }
+
+  for (const product of products) {
+    if (product.SKU) {
+      const skuValues = Object.values(product.SKU);
+      if (skuValues.includes(sku)) {
+        return product as ProductWithId;
+      }
+    }
+  }
+
+  return null;
 };

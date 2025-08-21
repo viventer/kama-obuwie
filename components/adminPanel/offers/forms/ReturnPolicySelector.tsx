@@ -5,8 +5,8 @@ import { PostOfferFormValues } from "./PostOfferForm";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FormField, FormLabel } from "@/components/ui/form";
-import SingleSelect from "../global/form/SingleSelect";
-import MiniLoader from "../global/MiniLoader";
+import SingleSelect from "../../global/form/SingleSelect";
+import MiniLoader from "../../global/MiniLoader";
 import { allegroSalesChannels } from "@/lib/constants";
 
 export type ReturnPolicy = {

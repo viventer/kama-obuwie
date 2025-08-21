@@ -172,6 +172,7 @@ export const AllegroOfferSchema = z.object({
       name: z.string().optional(),
     })
     .optional(),
+  name: z.string().optional(),
 });
 
 export const PostOfferFormSchema = OfferSchema.pick({

@@ -36,7 +36,6 @@ export default function TitlesField({
                       onChange={variantField.onChange}
                       minLength={12}
                       maxLength={72}
-                      className="no-spinner"
                     />
                   )}
                 />

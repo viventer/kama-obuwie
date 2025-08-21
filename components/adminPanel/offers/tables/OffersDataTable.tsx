@@ -4,6 +4,8 @@ import { TableAction } from "@/lib/dataTableColumns";
 import { DataTable } from "../../global/data-table/DataTable";
 import { useRouter } from "next/navigation";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
+import { ArrowRightIcon, MoveRightIcon } from "lucide-react";
+import { allegroSalesChannels } from "@/lib/constants";
 
 export default function OffersDataTable({
   data,
@@ -20,31 +22,9 @@ export default function OffersDataTable({
 
   const actions: TableAction[] = [
     {
-      name: "Zobacz dane",
+      name: "Edytuj ofertę",
       onClick: (id) => {
-        window.open(
-          `/admin-panel/create-products/product-data/${id}`,
-          "_blank",
-          "noopener,noreferrer"
-        );
-      },
-    },
-    {
-      name: "Edytuj parametry",
-      onClick: (id) => {
-        router.push(`/admin-panel/products/parameters/${id}`);
-      },
-    },
-    {
-      name: "Edytuj zdjęcia",
-      onClick: (id) => {
-        router.push(`/admin-panel/products/images/${id}`);
-      },
-    },
-    {
-      name: "Edytuj opis",
-      onClick: (id) => {
-        router.push(`/admin-panel/products/description/${id}`);
+        router.push(`/admin-panel/offers/${id}`);
       },
     },
   ];
@@ -62,17 +42,36 @@ export default function OffersDataTable({
       additionalContent={(row) => (
         <>
           <h4 className="font-bold">Ceny sprzedaży:</h4>
-          <div className="flex">
-            <p className="border-r-1 pr-2">AL1: {row.sellingPrices.AL1}</p>
-            <p className="pl-2">AL2: {row.sellingPrices.AL2}</p>
-          </div>
-          <h4 className="font-bold">Ceny początkowe:</h4>
-          <div className="flex">
-            <p className="border-r-1 pr-2">
-              AL1: {row.initialSellingPrices.AL1}
-            </p>
-            <p className="pl-2">AL2: {row.initialSellingPrices.AL2}</p>
-          </div>
+          {allegroSalesChannels.map((salesChannel) => (
+            <section
+              key={salesChannel}
+              className="flex gap-2 items-center mt-1"
+            >
+              <p className="font-medium">{salesChannel}</p>
+              {row.initialSellingPrices[salesChannel] !==
+                row.sellingPrices[salesChannel] && (
+                <>
+                  <div className="bg-destructive/25 rounded-sm px-2 py-1 w-fit">
+                    {row.initialSellingPrices[salesChannel]} zł
+                  </div>
+                  <MoveRightIcon />
+                </>
+              )}
+              <div className="bg-primary/25 rounded-sm px-2 py-1 w-fit">
+                {row.sellingPrices[salesChannel]} zł
+              </div>
+            </section>
+          ))}
+
+          <h4 className="font-bold mt-2 mb-1">Dostępność:</h4>
+          <section className="flex gap-2">
+            {Object.entries(row.availability).map(([size, availability]) => (
+              <div key={size} className="bg-primary/25 rounded-sm px-2 py-1">
+                <span className="font-medium">{size}:</span>{" "}
+                {availability.value}
+              </div>
+            ))}
+          </section>
         </>
       )}
     />

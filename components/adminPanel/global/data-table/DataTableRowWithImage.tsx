@@ -124,9 +124,11 @@ export default function DataTableRowWithImage<T>({
               </p>
             );
           })}
-          {additionalContent && <div>{additionalContent(row.original)}</div>}
         </section>
       </TableCell>
+      {additionalContent && (
+        <TableCell>{additionalContent(row.original)}</TableCell>
+      )}
       <TableCell className="block cursor-pointer">
         {flexRender(actionsCellColumnDef, actionsCellContext)}
       </TableCell>

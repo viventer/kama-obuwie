@@ -21,9 +21,9 @@ export async function getAllegroReturns(
   const headers = getAllegroHeaders(AL1AccessToken, AL2AccessToken);
 
   const now = new Date();
-  const monthAgo = new Date(now);
-  monthAgo.setDate(now.getDate() - 30);
+  const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 dni w milisekundach
   const monthAgoISO = monthAgo.toISOString();
+  console.log(monthAgoISO);
 
   let url = `${ALLEGRO_API_BASE_URL}/order/customer-returns?createdAt.gte=${monthAgoISO}`;
 

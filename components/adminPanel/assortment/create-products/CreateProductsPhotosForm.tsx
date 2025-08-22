@@ -281,7 +281,11 @@ export default function CreateProductsPhotosForm({
       await axios.patch(`/api/products/${id}`, updateData);
       await deleteUnusedPhotosFromStorage(productData.id, storageEndpoint);
       showToast("Zdjęcia zostały dodane do produktu", "success");
-      router.back();
+      if (creationStage === "done") {
+        router.push("/admin-panel/products");
+      } else {
+        router.push(`/admin-panel/create-products/${urlEndpoint}`);
+      }
     } catch (err) {
       showToast("Nie udało się zapisać zmian w produkcie", "error");
     }

@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import MiniLoader from "../global/MiniLoader";
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { useFormContext } from "react-hook-form";
 import { PostOfferFormValues } from "./PostOfferForm";
 import { Input } from "@/components/ui/input";
+import MiniLoader from "../../global/MiniLoader";
 
 export default function EANsField({
   colorVariants,

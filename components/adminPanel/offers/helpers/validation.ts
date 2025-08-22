@@ -130,3 +130,13 @@ export const validateOfferForm = async (
 
   return { message: "Formularz jest poprawny", isValid: true };
 };
+
+export const isValidUrl = (value: any): value is string => {
+  if (typeof value !== "string") return false;
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+};

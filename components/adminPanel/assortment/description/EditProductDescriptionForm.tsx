@@ -289,7 +289,11 @@ export const EditProductDescriptionForm = ({
         throw new Error("Nie udało się edytować produktu.");
       }
       showToast("Opis został pomyślnie edytowany.", "success");
-      router.back();
+      if (isDone) {
+        router.push("/admin-panel/products");
+      } else {
+        router.push("/admin-panel/create-products/description");
+      }
     } catch (error) {
       showToast(`Wystąpił błąd podczas edycji opisu: ${error}`, "error");
     }

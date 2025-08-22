@@ -293,10 +293,11 @@ const updateOfferInDB = async (
     size: string;
     SKU?: string;
     availability?: string;
+    allegroOffer?: AllegroOfferFromListing;
   },
   salesChannel: "AL1" | "AL2"
 ) => {
-  const { size, allegroId, availability, SKU } = updateData;
+  const { size, allegroId, availability, SKU, allegroOffer } = updateData;
 
   let updatedOffer;
 
@@ -321,8 +322,41 @@ const updateOfferInDB = async (
       SKU,
     };
   } else {
+    // Dla AL2 dodajemy też właściwości z oferty Allegro
+    const al2Updates = allegroOffer
+      ? {
+          sellingPrices: {
+            ...offerData.sellingPrices,
+            AL2: allegroOffer.sellingMode.price.amount,
+          },
+          initialSellingPrices: {
+            ...offerData.initialSellingPrices,
+            AL2: allegroOffer.sellingMode.price.amount,
+          },
+          shippingRates: {
+            ...offerData.shippingRates,
+            AL2: {
+              allegroId: allegroOffer.delivery.shippingRates.id,
+            },
+          },
+          returnPolicy: {
+            ...offerData.returnPolicy,
+            AL2: allegroOffer.afterSalesServices.returnPolicy.id,
+          },
+          impliedWarranty: {
+            ...offerData.impliedWarranty,
+            AL2: allegroOffer.afterSalesServices.impliedWarranty.id,
+          },
+          warranty: {
+            ...offerData.warranty,
+            AL2: allegroOffer.afterSalesServices.warranty.id,
+          },
+        }
+      : {};
+
     updatedOffer = {
       ...offerData,
+      ...al2Updates,
       allegroOffersIds: {
         AL1: {
           ...offerData.allegroOffersIds?.AL1,
@@ -613,6 +647,7 @@ const syncAL2Offers = async (offers: AllegroOfferFromListing[]) => {
             {
               size,
               allegroId: offer.id,
+              allegroOffer: offer,
             },
             "AL2"
           );

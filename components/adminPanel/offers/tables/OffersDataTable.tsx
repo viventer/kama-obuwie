@@ -4,7 +4,7 @@ import { TableAction } from "@/lib/dataTableColumns";
 import { DataTable } from "../../global/data-table/DataTable";
 import { useRouter } from "next/navigation";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
-import { ArrowRightIcon, MoveRightIcon } from "lucide-react";
+import { MoveRightIcon } from "lucide-react";
 import { allegroSalesChannels } from "@/lib/constants";
 
 export default function OffersDataTable({
@@ -34,11 +34,10 @@ export default function OffersDataTable({
       data={data || []}
       columnNames={columnNames}
       actions={actions}
-      searchPlaceholder="Szukaj produktu"
+      searchPlaceholder="Szukaj ofert"
       searchColumns={["signature", "title"]}
       hasImages={true}
       imageAttribute="thumbnail"
-      imageValueType="url"
       additionalContent={(row) => (
         <>
           <h4 className="font-bold">Ceny sprzedaży:</h4>
@@ -48,15 +47,16 @@ export default function OffersDataTable({
               className="flex gap-2 items-center mt-1"
             >
               <p className="font-medium">{salesChannel}</p>
-              {row.initialSellingPrices[salesChannel] !==
-                row.sellingPrices[salesChannel] && (
-                <>
-                  <div className="bg-destructive/25 rounded-sm px-2 py-1 w-fit">
-                    {row.initialSellingPrices[salesChannel]} zł
-                  </div>
-                  <MoveRightIcon />
-                </>
-              )}
+              {row.initialSellingPrices?.[salesChannel] &&
+                row.initialSellingPrices[salesChannel] !==
+                  row.sellingPrices[salesChannel] && (
+                  <>
+                    <div className="bg-destructive/25 rounded-sm px-2 py-1 w-fit">
+                      {row.initialSellingPrices[salesChannel]} zł
+                    </div>
+                    <MoveRightIcon />
+                  </>
+                )}
               <div className="bg-primary/25 rounded-sm px-2 py-1 w-fit">
                 {row.sellingPrices[salesChannel]} zł
               </div>

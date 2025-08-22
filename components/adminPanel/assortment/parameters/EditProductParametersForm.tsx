@@ -330,7 +330,12 @@ export default function EditProductParametersForm({
         throw new Error("Produkt nie istnieje.");
       }
       showToast("Parametry zostały zaaktualizowane.", "success");
-      router.back();
+
+      if (isDone) {
+        router.push("/admin-panel/products");
+      } else {
+        router.push("/admin-panel/create-products/parameters");
+      }
     } catch (error) {
       showToast(
         `Wystąpił błąd podczas aktualizacji parametrów: ${error}`,

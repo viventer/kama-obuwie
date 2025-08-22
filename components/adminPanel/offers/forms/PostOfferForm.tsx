@@ -173,6 +173,7 @@ export default function PostOfferForm({
         thumbnail: mainOfferThumbnail,
         SKU: SKUs[colorVariantsNames[0]],
         productId: productData.id,
+        initialSellingPrices: formData.sellingPrices,
       });
 
       for (const colorVariantName of colorVariantsNames) {
@@ -193,6 +194,7 @@ export default function PostOfferForm({
           thumbnail: offerThumbnail,
           SKU: SKUs[colorVariantName],
           productId: productData.id,
+          initialSellingPrices: formData.sellingPrices,
         });
         offersIds[colorVariantName] = id;
       }

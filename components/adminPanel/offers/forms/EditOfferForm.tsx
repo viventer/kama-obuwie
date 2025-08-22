@@ -198,7 +198,7 @@ export default function EditOfferForm({
         });
       });
       showToast("Oferty zostały zaaktualizowane.", "success");
-      router.back();
+      router.push("/admin-panel/offers");
     } catch (err) {
       handleError(err, "Błąd podczas aktualizacji oferty na Allegro");
     } finally {

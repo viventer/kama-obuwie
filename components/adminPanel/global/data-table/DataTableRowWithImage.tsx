@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { getImageUrl } from "@/server-actions/files/files";
 import Image from "next/image";
+import { isValidUrl } from "../../offers/helpers/validation";
 
 export default function DataTableRowWithImage<T>({
   row,
@@ -13,7 +14,6 @@ export default function DataTableRowWithImage<T>({
   imageFolderPath,
   isReadyAttribute,
   onRowClick,
-  imageValueType = "path",
   additionalContent,
 }: {
   row: Row<T>;
@@ -21,14 +21,13 @@ export default function DataTableRowWithImage<T>({
   imageFolderPath?: string;
   isReadyAttribute?: keyof T;
   onRowClick?: (row: Row<T>) => void;
-  imageValueType: "path" | "url";
   additionalContent?: (row: T) => React.ReactNode;
 }) {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isReady, setIsReady] = useState<boolean>(false);
 
   useEffect(() => {
-    if (imageValueType == "url") {
+    if (isValidUrl(row.original[imageAttribute])) {
       setImageUrl(row.original[imageAttribute] as string);
       return;
     }

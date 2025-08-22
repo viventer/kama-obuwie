@@ -102,7 +102,7 @@ export default function PostOfferForm({
     e.preventDefault();
     setIsPosting(true);
     const formData = form.getValues();
-    const validationResult = await validateOfferForm(form as any);
+    const validationResult = await validateOfferForm(form as any, "create");
     if (!validationResult.isValid) {
       showToast(validationResult.message, "error");
       setIsPosting(false);
@@ -322,7 +322,7 @@ export default function PostOfferForm({
         <ReturnPolicySelector />
         <ImpliedWarrantySelector />
         <WarrantySelector />
-        <AvailabilityField sizes={sizes} />
+        <AvailabilityField sizes={sizes} mode="create" />
         {/* {productData.rootCategory === "obuwie dziecięce" && (
           <EANsField
             colorVariants={

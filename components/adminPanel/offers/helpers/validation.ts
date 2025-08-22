@@ -2,7 +2,8 @@ import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { UseFormReturn } from "react-hook-form";
 
 export const validateOfferForm = async (
-  form: UseFormReturn
+  form: UseFormReturn,
+  mode: "edit" | "create"
 ): Promise<{ message: string; isValid: boolean }> => {
   // Sprawdź walidację pól formularza
   const isValid = await form.trigger();
@@ -34,7 +35,7 @@ export const validateOfferForm = async (
     if (
       !sizeAvailability?.value ||
       sizeAvailability.value === "" ||
-      sizeAvailability.value === "0"
+      (sizeAvailability.value === "0" && mode === "create")
     ) {
       return {
         message: `Minimalna dostępność dla rozmiaru ${size} wynosi 1.`,

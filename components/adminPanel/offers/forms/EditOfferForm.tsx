@@ -31,10 +31,6 @@ function convertOfferPartialToAllegroOfferPartial(
 ): Partial<AllegroOffer> {
   const allegroOffer: Partial<AllegroOffer> = {};
 
-  if (offerFragment.title) {
-    allegroOffer.name = offerFragment.title;
-  }
-
   if (offerFragment.sellingPrices?.[salesChannel]) {
     allegroOffer.sellingMode = {
       price: {
@@ -44,21 +40,6 @@ function convertOfferPartialToAllegroOfferPartial(
     };
   } else {
     throw new Error(`Brak ceny sprzedaży dla kanału ${salesChannel}`);
-  }
-
-  if (offerFragment.availability) {
-    const availabilityEntries = Object.entries(offerFragment.availability);
-    if (availabilityEntries.length > 0) {
-      const firstAvailability = availabilityEntries[0][1];
-      allegroOffer.stock = {
-        available: Number(firstAvailability.value) || 0,
-        unit: "PAIR",
-      };
-    } else {
-      throw new Error("Brak dostępności produktu");
-    }
-  } else {
-    throw new Error("Brak dostępności produktu");
   }
 
   if (offerFragment.shippingRates?.[salesChannel]?.allegroId) {
@@ -150,7 +131,7 @@ export default function EditOfferForm({
     e.preventDefault();
     startLoading();
     const formData = form.getValues();
-    const validationResult = await validateOfferForm(form);
+    const validationResult = await validateOfferForm(form, "edit");
     if (!validationResult.isValid) {
       showToast(validationResult.message, "error");
       stopLoading();
@@ -196,8 +177,22 @@ export default function EditOfferForm({
           string
         >;
         Object.entries(offersIds).forEach(async ([size, offerId]) => {
-          axios.patch(`/api/allegro/offers/${offerId}`, {
-            offerPartial: offersPartials[salesChannel],
+          const availability = Number(
+            form.getValues(`availability.${size}.value`)
+          );
+
+          await axios.patch(`/api/allegro/offers/${offerId}`, {
+            offerPartial: {
+              ...offersPartials[salesChannel],
+              stock: {
+                available: availability || 0,
+                unit: "PAIR",
+              },
+              name: `${form.getValues("title")} ${size}`,
+              publication: {
+                status: availability > 0 ? "ACTIVE" : "INACTIVE",
+              },
+            },
             salesChannel,
           });
         });
@@ -232,7 +227,7 @@ export default function EditOfferForm({
                 message: "Tytuł może mieć maksymalnie 72 znaki",
               },
             }}
-            render={({ field, fieldState }) => (
+            render={({ field }) => (
               <>
                 <Input
                   type="text"
@@ -241,11 +236,6 @@ export default function EditOfferForm({
                   minLength={12}
                   maxLength={72}
                 />
-                {fieldState.error && (
-                  <p className="text-sm text-red-500 mt-1">
-                    {fieldState.error.message}
-                  </p>
-                )}
               </>
             )}
           />
@@ -255,7 +245,7 @@ export default function EditOfferForm({
         <ReturnPolicySelector />
         <ImpliedWarrantySelector />
         <WarrantySelector />
-        <AvailabilityField sizes={sizes} />
+        <AvailabilityField sizes={sizes} mode={"edit"} />
       </div>
       <div className="flex mt-8 gap-4">
         <Button onClick={(e) => handleSubmit(e)} className="w-fit">

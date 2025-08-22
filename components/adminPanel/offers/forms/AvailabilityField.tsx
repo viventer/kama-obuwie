@@ -6,7 +6,13 @@ import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import MiniLoader from "../../global/MiniLoader";
 
-export default function AvailabilityField({ sizes }: { sizes: string[] }) {
+export default function AvailabilityField({
+  sizes,
+  mode,
+}: {
+  sizes: string[];
+  mode: "edit" | "create";
+}) {
   const { control } = useFormContext<PostOfferFormValues>();
 
   return (
@@ -31,7 +37,7 @@ export default function AvailabilityField({ sizes }: { sizes: string[] }) {
                     type="number"
                     value={field.value || ""}
                     onChange={field.onChange}
-                    min={1}
+                    min={mode === "create" ? 1 : 0}
                     max={10000}
                   />
                 </FormItem>

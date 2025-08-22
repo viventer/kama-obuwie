@@ -38,7 +38,7 @@ export async function getAllegroOrderEvents() {
   const { AL1: AL1AccessToken, AL2: AL2AccessToken } =
     await getAllegroUserAccessTokens();
   const headers = getAllegroHeaders(AL1AccessToken, AL2AccessToken);
-  const url = `${ALLEGRO_API_BASE_URL}/order/events?type=READY_FOR_PROCESSING&type=BUYER_CANCELLED&type=AUTO_CANCELLED&limit=240`;
+  const url = `${ALLEGRO_API_BASE_URL}/order/events?type=READY_FOR_PROCESSING&type=BUYER_CANCELLED&type=AUTO_CANCELLED&limit=500`;
   let urlAL1 = url;
   let urlAL2 = url;
   const lastEventId: lastEventId | null = await redis.hgetall(

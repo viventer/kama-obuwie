@@ -25,7 +25,7 @@ export async function getAllegroReturns(
   const monthAgoISO = monthAgo.toISOString();
   console.log(monthAgoISO);
 
-  let url = `${ALLEGRO_API_BASE_URL}/order/customer-returns?createdAt.gte=${monthAgoISO}`;
+  let url = `${ALLEGRO_API_BASE_URL}/order/customer-returns?createdAt.gte=${monthAgoISO}&limit=500`;
 
   // Dodaj filtrowanie po allegroOrderId jeśli został podany
   if (allegroOrderId) {

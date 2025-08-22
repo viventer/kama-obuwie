@@ -57,14 +57,25 @@ export async function getAllegroOrderEvents() {
       axios.get(urlAL2, { headers: headers.AL2 }),
     ]);
 
-    const AL1Events = (AL1Response.data.events || []).map((event: any) => ({
-      ...event,
-      salesChannel: "AL1",
-    }));
-    const AL2Events = (AL2Response.data.events || []).map((event: any) => ({
-      ...event,
-      salesChannel: "AL2",
-    }));
+    const AL1Events = (AL1Response.data.events || [])
+      .map((event: any) => ({
+        ...event,
+        salesChannel: "AL1",
+      }))
+      .sort(
+        (a: any, b: any) =>
+          new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime()
+      );
+
+    const AL2Events = (AL2Response.data.events || [])
+      .map((event: any) => ({
+        ...event,
+        salesChannel: "AL2",
+      }))
+      .sort(
+        (a: any, b: any) =>
+          new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime()
+      );
 
     if (AL1Events.length !== 0) {
       await redis.hset("allegro:lastEventId", {

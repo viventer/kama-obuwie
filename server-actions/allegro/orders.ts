@@ -77,15 +77,22 @@ export async function getAllegroOrderEvents() {
           new Date(a.occurredAt).getTime() - new Date(b.occurredAt).getTime()
       );
 
-    if (AL1Events.length !== 0) {
+    // Aktualizuj lastEventId tylko jeśli mamy eventy i są prawidłowe
+    if (AL1Events.length > 0 && AL1Events[AL1Events.length - 1].id) {
       await redis.hset("allegro:lastEventId", {
         AL1: AL1Events[AL1Events.length - 1].id,
       });
+      console.log(
+        `Updated AL1 lastEventId to: ${AL1Events[AL1Events.length - 1].id}`
+      );
     }
-    if (AL2Events.length !== 0) {
+    if (AL2Events.length > 0 && AL2Events[AL2Events.length - 1].id) {
       await redis.hset("allegro:lastEventId", {
         AL2: AL2Events[AL2Events.length - 1].id,
       });
+      console.log(
+        `Updated AL2 lastEventId to: ${AL2Events[AL2Events.length - 1].id}`
+      );
     }
 
     return {
@@ -93,7 +100,13 @@ export async function getAllegroOrderEvents() {
       AL2: AL2Events,
     };
   } catch (error) {
+    console.error("Error fetching Allegro order events:", error);
     handleAxiosError(error, "Błąd podczas pobierania zdarzeń z Allegro");
+    // Zwróć pustą strukturę w przypadku błędu, aby nie przerywać synchronizacji
+    return {
+      AL1: [],
+      AL2: [],
+    };
   }
 }
 
@@ -240,7 +253,10 @@ async function createNewOrder(
       checkoutFormId,
       salesChannel
     );
-    if (!allegroOrderData) return;
+    if (!allegroOrderData) {
+      console.warn(`No Allegro order data found for ${checkoutFormId}`);
+      return;
+    }
 
     // Przekształć dane z Allegro na format Order
     const orderData = await transformAllegroToOrder(
@@ -252,6 +268,7 @@ async function createNewOrder(
     console.log(`Created new order for checkoutFormId: ${checkoutFormId}`);
   } catch (error) {
     console.error(`Error creating order for ${checkoutFormId}:`, error);
+    // Nie przerywaj przetwarzania innych zamówień
   }
 }
 

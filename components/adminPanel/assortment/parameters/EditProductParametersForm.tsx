@@ -314,11 +314,9 @@ export default function EditProductParametersForm({
       return;
     }
 
-    if (isDone && allegroCategoryId) {
-      await editAllegroOfferParams(data);
-    }
-
-    startLoading();
+    // if (isDone && allegroCategoryId) {
+    //   await editAllegroOfferParams(data);
+    // }
 
     try {
       if (oldData) {

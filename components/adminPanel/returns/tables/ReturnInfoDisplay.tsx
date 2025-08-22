@@ -13,6 +13,10 @@ export function ReturnInfoDisplay({
   return: returnData,
   className,
 }: ReturnInfoDisplayProps) {
+  if (!returnData) {
+    return;
+  }
+
   const statusColor =
     returnData.status === "DELIVERED"
       ? "bg-accent/50"

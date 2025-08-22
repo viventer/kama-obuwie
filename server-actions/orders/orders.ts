@@ -16,11 +16,11 @@ export const createOrder = async function (newOrder: Order) {
 
   await orderRef.set(newOrder);
 
-  // await syncOffersAvailability(
-  //   newOrder.lineItems,
-  //   newOrder.salesChannel as AllegroSalesChannel,
-  //   "order"
-  // );
+  await syncOffersAvailability(
+    newOrder.lineItems,
+    newOrder.salesChannel as AllegroSalesChannel,
+    "order"
+  );
 
   return orderRef.id;
 };

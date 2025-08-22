@@ -26,7 +26,6 @@ export async function POST(request: NextRequest) {
   } catch (err: any) {
     console.error("Błąd podczas tworzenia przesyłki:", err);
 
-    // Sprawdź czy to błąd z Allegro z dodatkowymi informacjami
     if (err.allegroErrors && err.status) {
       return apiErrorResponse(
         "Nie udało się utworzyć etykiety",
@@ -56,12 +55,10 @@ export async function POST(request: NextRequest) {
         throw new Error();
       }
 
-      // Jeśli status nie jest IN_PROGRESS, przerywamy pętlę
       if (shipmentStatusData.status !== "IN_PROGRESS") {
         break;
       }
 
-      // Jeśli to nie jest ostatnia próba i status to IN_PROGRESS, czekamy 3 sekundy
       if (attempt < maxRetries) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
       }

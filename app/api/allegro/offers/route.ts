@@ -27,7 +27,6 @@ export async function POST(request: NextRequest) {
   } catch (err: any) {
     console.error("Błąd podczas tworzenia oferty:", err);
 
-    // Sprawdź czy to błąd z Allegro z dodatkowymi informacjami
     if (err.allegroErrors && err.status) {
       return apiErrorResponse(
         "Nie udało się utworzyć oferty na Allegro",

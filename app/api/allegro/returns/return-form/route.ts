@@ -5,7 +5,6 @@ import { formatDate } from "@/lib/utils";
 import { apiErrorResponse, apiResponse } from "@/server-actions/helpers";
 import { NextRequest } from "next/server";
 import puppeteer, { Browser } from "puppeteer";
-import { z } from "zod";
 
 // Wymuszamy Node.js runtime
 export const runtime = "nodejs";
@@ -17,7 +16,6 @@ export const POST = async (req: NextRequest) => {
     const body = await req.json();
     const parsed: ReturnFormData = body;
 
-    // Sprawdzenie czy jest imię/nazwisko lub nazwa firmy
     const buyerName = parsed.buyerData.name || parsed.buyerData.companyName;
     if (!buyerName) {
       return apiErrorResponse(
@@ -26,7 +24,6 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
-    // Generowanie listy przedmiotów
     const itemsRows = parsed.items
       .map((item, i) => {
         return `
@@ -44,7 +41,6 @@ export const POST = async (req: NextRequest) => {
       })
       .join("");
 
-    // HTML template dla formularza zwrotu
     const htmlContent = `
       <!DOCTYPE html>
       <html lang="pl">
@@ -196,7 +192,6 @@ export const POST = async (req: NextRequest) => {
       </html>
     `;
 
-    // Uruchomienie puppeteer
     browser = await puppeteer.launch({
       headless: true,
       args: [
@@ -213,7 +208,6 @@ export const POST = async (req: NextRequest) => {
     const page = await browser.newPage();
     await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-    // Generowanie PDF w formacie A5 pionowy
     const pdfBuffer = await page.pdf({
       format: "A5",
       landscape: false,
@@ -226,10 +220,8 @@ export const POST = async (req: NextRequest) => {
       printBackground: true,
     });
 
-    // Zamknięcie przeglądarki
     await browser.close();
 
-    // Zapis do Firebase Storage
     const bucket = adminStorage.bucket();
     const filename = `return-forms/${Math.random()
       .toString(36)
@@ -248,7 +240,6 @@ export const POST = async (req: NextRequest) => {
       filePath: filename,
     });
   } catch (error: any) {
-    // Upewnij się, że przeglądarka zostanie zamknięta w przypadku błędu
     if (browser) {
       try {
         await browser.close();

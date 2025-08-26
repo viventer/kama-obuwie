@@ -72,7 +72,7 @@ export const PriceSchema = z.object({
 export const BuyerSchema = z.object({
   id: z.string(),
   email: z.string().email(),
-  login: z.string(),
+  login: z.string().optional(),
   firstName: z.string().nullable(),
   lastName: z.string().nullable(),
   phoneNumber: z.string().nullable(),
@@ -104,7 +104,7 @@ export const AddressSchema = z.object({
 });
 
 export const OrderDeliveryDataSchema = z.object({
-  address: AddressSchema,
+  address: AddressSchema.optional(),
   method: z
     .object({
       id: z.string(),
@@ -251,7 +251,7 @@ export const OrderSchema = z.object({
     .nullable(),
   buyer: BuyerSchema,
   payment: PaymentSchema.nullable(),
-  allegroStatus: AllegroOrderStatusSchema,
+  allegroStatus: AllegroOrderStatusSchema.optional(),
   fulfillment: z
     .object({
       status: FulfillmentStatusSchema,

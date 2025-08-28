@@ -21,8 +21,9 @@ const ubuntuMono = Ubuntu_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "kama-obuwie - AP",
-  description: "Aplikacja do zarządzania sklepem",
+  title: "kama-obuwie",
+  description:
+    "Obuwie dla całej rodziny w jednym miejscu. Wygodne buty na każdą okazję - od sportowych po eleganckie. Znajdź idealne buty dla siebie!",
 };
 
 export default async function RootLayout({
@@ -36,7 +37,7 @@ export default async function RootLayout({
       className="scrollbar scrollbar-track-transparent scrollbar-thumb-primary overflow-hidden"
     >
       <body
-        className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen overflow-auto scrollbar  [scrollbar-gutter:stable]`}
+        className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen`}
       >
         <ConfirmDialogProvider>
           <AuthProvider>

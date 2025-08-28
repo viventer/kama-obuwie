@@ -46,7 +46,7 @@ export default function HeaderBanner() {
 
   return (
     <Carousel
-      className="w-full bg-brand/15 px-4 py-2 border-foreground sm:bg-background sm:w-[360px] sm:border-l-1 overflow-clip"
+      className="w-full bg-brand/15 px-4 sm:px-8 py-2 border-foreground sm:bg-background sm:w-[360px] sm:border-l-1 overflow-clip"
       plugins={[
         Autoplay({
           delay: 10000,

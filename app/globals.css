@@ -9,6 +9,7 @@
     /* Ciemny motyw (domyślny) */
     --background: #1a1f23;
     --foreground: #e8ecf0;
+    --text: #e8ecf0;
 
     --primary: #4a7ba7;
     --primary-foreground: #ffffff;
@@ -54,6 +55,7 @@
       /* Jasny motyw */
       --background: #e9edf0;
       --foreground: #1b1f22;
+      --text: #1b1f22;
 
       --primary: #2e5e90;
       --primary-foreground: #ffffff;
@@ -98,6 +100,7 @@
   /* Główne kolory */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-text: var(--text);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);

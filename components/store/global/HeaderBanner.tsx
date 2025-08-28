@@ -49,7 +49,7 @@ export default function HeaderBanner() {
       className="w-full bg-brand/15 px-4 py-2 border-foreground sm:bg-background sm:w-[360px] sm:border-l-1 overflow-clip"
       plugins={[
         Autoplay({
-          delay: 100000000,
+          delay: 10000,
         }),
       ]}
       opts={{

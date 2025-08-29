@@ -11,7 +11,7 @@ export default function Header() {
         <section className="w-[90%] my-2 flex items-center gap-2 sm:order-first sm:w-fit  justify-between">
           <div className="flex items-center gap-2">
             <Image
-              src="logo.svg"
+              src="/logo.svg"
               alt="Logo"
               width={64}
               height={64}

@@ -13,7 +13,7 @@ export default async function layout({
       <div className="bg-card py-2 flex justify-center">
         <MainNav />
       </div>
-      <main className="my-20 mx-auto w-[90%] max-w-[1440px] pb-8 overflow-auto scrollbar  [scrollbar-gutter:stable]">
+      <main className="my-4 mx-auto w-[90%] max-w-[1440px] pb-8 overflow-auto scrollbar">
         {children}
       </main>
       <Footer />

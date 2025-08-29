@@ -34,7 +34,7 @@ export default async function RootLayout({
   return (
     <html
       lang="pl"
-      className="scrollbar scrollbar-track-transparent scrollbar-thumb-primary overflow-hidden"
+      className="scrollbar scrollbar-track-transparent scrollbar-thumb-primary"
     >
       <body
         className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen`}

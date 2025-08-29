@@ -9,8 +9,6 @@ import {
 } from "@/components/ui/navigation-menu";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { Category } from "@/firebase/schemas/productsSchemas";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 const mainCategories = [
   { label: "Męskie", rootCategory: "obuwie męskie" },
@@ -44,7 +42,7 @@ export default async function MainNav() {
                 key={mainCategory.rootCategory}
                 className="w-full"
               >
-                <NavigationMenuTrigger className="bg-primary/15 font-medium">
+                <NavigationMenuTrigger className="bg-primary/15 font-medium px-3">
                   {mainCategory.label}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-background w-full">

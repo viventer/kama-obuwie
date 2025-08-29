@@ -8,6 +8,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { MailIcon, PhoneIcon, ClockIcon } from "lucide-react";
+import LinkText from "@/components/adminPanel/global/LinkText";
 
 export default function ContactPage() {
   return (
@@ -37,12 +38,9 @@ export default function ContactPage() {
                 <MailIcon className="text-brand w-6 h-6" />
                 <div>
                   <h3 className="font-semibold text-foreground">Email</h3>
-                  <a
-                    href="mailto:kontakt.kama.obuwie@gmail.com"
-                    className=" hover:text-brand transition-colors"
-                  >
+                  <LinkText href="mailto:kontakt.kama.obuwie@gmail.com">
                     kontakt.kama.obuwie@gmail.com
-                  </a>
+                  </LinkText>
                 </div>
               </div>
 
@@ -50,12 +48,7 @@ export default function ContactPage() {
                 <PhoneIcon className="text-brand w-6 h-6" />
                 <div>
                   <h3 className="font-semibold text-foreground">Telefon</h3>
-                  <a
-                    href="tel:664097737"
-                    className=" hover:text-brand transition-colors"
-                  >
-                    664 097 737
-                  </a>
+                  <LinkText href="tel:664097737">664 097 737</LinkText>
                 </div>
               </div>
             </div>
@@ -92,7 +85,7 @@ export default function ContactPage() {
           {/* FAQ Items */}
           <div className="space-y-4">
             <Card className="gap-0">
-              <CardHeader className="pb-3">
+              <CardHeader>
                 <h3 className="font-semibold text-foreground">
                   Jak mogę sprawdzić status zamówienia?
                 </h3>
@@ -106,7 +99,7 @@ export default function ContactPage() {
             </Card>
 
             <Card className="gap-0">
-              <CardHeader className="pb-3">
+              <CardHeader>
                 <h3 className="font-semibold text-foreground">
                   Jak zwrócić produkt?
                 </h3>
@@ -126,7 +119,7 @@ export default function ContactPage() {
             </Card>
 
             <Card className="gap-0">
-              <CardHeader className="pb-3">
+              <CardHeader>
                 <h3 className="font-semibold text-foreground">
                   Jak wymienić niepasujący rozmiar?
                 </h3>
@@ -140,7 +133,7 @@ export default function ContactPage() {
             </Card>
 
             <Card className="gap-0">
-              <CardHeader className="pb-3">
+              <CardHeader>
                 <h3 className="font-semibold text-foreground">
                   Ile kosztuje dostawa?
                 </h3>
@@ -164,7 +157,7 @@ export default function ContactPage() {
             </Card>
 
             <Card className="gap-0">
-              <CardHeader className="pb-3">
+              <CardHeader>
                 <h3 className="font-semibold text-foreground">
                   Jak długo trwa dostawa?
                 </h3>
@@ -187,7 +180,7 @@ export default function ContactPage() {
             </Card>
 
             <Card className="gap-0">
-              <CardHeader className="pb-3">
+              <CardHeader>
                 <h3 className="font-semibold text-foreground">
                   Kiedy otrzymam zwrot środków?
                 </h3>
@@ -203,7 +196,7 @@ export default function ContactPage() {
             </Card>
 
             <Card className="gap-0">
-              <CardHeader className="pb-3">
+              <CardHeader>
                 <h3 className="font-semibold text-foreground">
                   Czy mogę anulować lub modyfikować zamówienie?
                 </h3>

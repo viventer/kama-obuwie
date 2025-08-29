@@ -33,19 +33,22 @@ export default async function MainNav() {
   return (
     <div className="w-[90%] max-w-[1440px] flex justify-start ">
       <NavigationMenu>
-        <p className="font-bold pr-6">Obuwie</p>
+        <p className="hidden font-bold pr-6 sm:inline">Obuwie</p>
         <NavigationMenuList className="gap-2">
           {mainCategories.map((mainCategory) => {
             const subcategories =
               categoriesByRoot[mainCategory.rootCategory] || [];
 
             return (
-              <NavigationMenuItem key={mainCategory.rootCategory}>
+              <NavigationMenuItem
+                key={mainCategory.rootCategory}
+                className="w-full"
+              >
                 <NavigationMenuTrigger className="bg-primary/15 font-medium">
                   {mainCategory.label}
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-background">
-                  <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                <NavigationMenuContent className="bg-background w-full">
+                  <div className="grid w-full max-w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                     {subcategories.map((category) => (
                       <NavigationMenuLink key={category.id} asChild>
                         <LinkText

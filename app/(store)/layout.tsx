@@ -1,3 +1,4 @@
+import Footer from "@/components/store/global/Footer";
 import Header from "@/components/store/global/Header";
 import MainNav from "@/components/store/global/MainNav";
 
@@ -15,6 +16,7 @@ export default async function layout({
       <main className="my-20 mx-auto w-[90%] max-w-[1440px] pb-8 overflow-auto scrollbar  [scrollbar-gutter:stable]">
         {children}
       </main>
+      <Footer />
     </>
   );
 }

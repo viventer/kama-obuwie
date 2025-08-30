@@ -17,7 +17,7 @@ export default function LinkText({
       href={href}
       onClick={onClick}
       className={cn(
-        "decoration-1 decoration-accent/0 underline underline-offset-3 hover:decoration-accent transition-all duration-150",
+        "decoration-1 decoration-brand underline underline-offset-3 hover:decoration-accent/0 transition-all duration-150 font-medium",
         className
       )}
     >

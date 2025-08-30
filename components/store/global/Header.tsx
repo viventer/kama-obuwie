@@ -9,7 +9,7 @@ export default function Header() {
       <div className="flex flex-col sm:flex-row  items-center gap-x-8 w-full sm:w-[90%] sm:max-w-[1440px]">
         <HeaderBanner />
         <section className="w-[90%] my-2 flex items-center gap-2 sm:order-first sm:w-fit  justify-between">
-          <div className="flex items-center gap-2">
+          <a className="flex items-center gap-2" href="/">
             <Image
               src="/logo.svg"
               alt="Logo"
@@ -18,7 +18,7 @@ export default function Header() {
               className="size-8"
             />
             <h1 className="text-lg font-bold">KAMA</h1>
-          </div>
+          </a>
           <IconButton className="sm:hidden">
             <ShoppingBasketIcon />
           </IconButton>

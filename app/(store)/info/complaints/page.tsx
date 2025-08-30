@@ -112,7 +112,7 @@ export default function ComplaintsPage() {
           </CardHeader>
           <CardContent>
             Koszt odesłania reklamowanego produktu{" "}
-            <span className="font-semibold text-success">
+            <span className="font-semibold underline decoration-2 decoration-success">
               zawsze pokrywa sklep
             </span>
             .

@@ -87,7 +87,10 @@ export default function RegulationsPage() {
               Koszt podstawowej przesyłki wynosi{" "}
               <span className="font-semibold">9,99 zł</span>. Dla zamówień o
               wartości co najmniej 55 zł dostawa jest{" "}
-              <span className="font-semibold text-success">bezpłatna</span>.
+              <span className="font-semibold underline decoration-2 decoration-success">
+                bezpłatna
+              </span>
+              .
             </p>
             <p>
               Szczegółowe informacje na temat kosztów i metod dostawy dostępne
@@ -117,7 +120,9 @@ export default function RegulationsPage() {
             </p>
             <p className="mb-3">
               Odesłanie towaru do sklepu można zrealizować{" "}
-              <span className="font-semibold text-success">bezpłatnie</span>{" "}
+              <span className="font-semibold underline decoration-2 decoration-success">
+                bezpłatnie
+              </span>{" "}
               przez Paczkomaty InPost. Po otrzymaniu zwróconego towaru, sklep
               niezwłocznie dokona zwrotu środków na rachunek bankowy, z którego
               dokonano pierwotnej płatności. W przypadku płatności za pobraniem

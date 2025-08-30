@@ -29,13 +29,13 @@ export default function Footer() {
     },
     {
       label: "polityka prywatności",
-      url: "/info/privacy-policy",
+      url: "/info/privacy",
     },
   ];
 
   return (
-    <footer className="bg-card px-4 py-2 border-t border-border mt-auto">
-      <nav>
+    <footer className="bg-card px-4 py-2 border-t border-border mt-auto flex justify-center">
+      <nav className="max-w-[1440px] w-full">
         <ul className="flex flex-wrap items-center gap-4">
           {links.map((link) => (
             <li key={link.url} className="text-sm">

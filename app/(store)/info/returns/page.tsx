@@ -29,7 +29,10 @@ export default function page() {
           </CardHeader>
           <CardContent>
             Zwrot poprzez InPost jest{" "}
-            <span className="text-success font-bold">darmowy</span>.
+            <span className="underline decoration-2 decoration-success font-bold">
+              darmowy
+            </span>
+            .
           </CardContent>
         </Card>
 

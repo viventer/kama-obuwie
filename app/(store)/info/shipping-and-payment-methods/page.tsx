@@ -87,7 +87,7 @@ export default function ShippingAndPaymentMethods() {
                 <p>
                   W przypadku zamówień złożonych do godziny 13:00, paczka
                   zostanie wysłana{" "}
-                  <span className="text-success font-bold">
+                  <span className="underline decoration-2 decoration-success font-bold">
                     tego samego dnia
                   </span>
                   , a dostawa nastąpi zwykle w ciągu jednego dnia roboczego.

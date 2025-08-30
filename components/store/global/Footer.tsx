@@ -12,6 +12,10 @@ export default function Footer() {
       url: "/info/returns",
     },
     {
+      label: "reklamacje",
+      url: "/info/complaints",
+    },
+    {
       label: "metody dostaw i płatności",
       url: "/info/shipping-and-payment-methods",
     },

@@ -1,15 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, h3 } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowRight,
-  ShoppingBag,
-  Target,
-  Footprints,
-  GraduationCap,
-  PackageIcon,
-} from "lucide-react";
+import { ArrowRight, GraduationCap, PackageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 

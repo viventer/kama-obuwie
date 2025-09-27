@@ -10,7 +10,7 @@ export default function HomeGrid() {
   const router = useRouter();
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4">
+    <div className="w-full mt-2 mb-8">
       <div className="grid grid-cols-5 grid-rows-4 gap-4 h-96 sm:grid-rows-3">
         <Card className="col-span-5 row-span-1 sm:col-span-2 sm:row-span-2 flex flex-row justify-center items-center bg-brand/25 px-4 gap-4">
           <GraduationCap className="min-w-8 min-h-8 lg:min-w-12 lg:min-h-12 text-brand" />

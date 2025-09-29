@@ -10,7 +10,7 @@ export default function HomeGrid() {
   const router = useRouter();
 
   return (
-    <div className="w-full mt-2 mb-8">
+    <div className="w-full mt-2 mb-16">
       <div className="grid grid-cols-5 grid-rows-4 gap-4 h-96 sm:grid-rows-3">
         <Card className="col-span-5 row-span-1 sm:col-span-2 sm:row-span-2 flex flex-row justify-center items-center bg-brand/25 px-4 gap-4">
           <GraduationCap className="min-w-8 min-h-8 lg:min-w-12 lg:min-h-12 text-brand" />
@@ -19,7 +19,10 @@ export default function HomeGrid() {
           </h3>
         </Card>
 
-        <Card className="col-span-5 row-span-1 flex flex-row justify-between items-center px-4 sm:col-span-3">
+        <Card
+          className="col-span-5 row-span-1 flex flex-row justify-between items-center px-4 sm:col-span-3 cursor-pointer transition-colors duration-200 hover:bg-secondary/50 active:bg-secondary/75"
+          onClick={() => router.push("/listing?category=TLNV6amSFBmC0b2iazJO")}
+        >
           <div className="flex items-center gap-4">
             <Image
               src={"/main-grid/trampki.jpg"}
@@ -41,7 +44,10 @@ export default function HomeGrid() {
           </Button>
         </Card>
 
-        <Card className="col-span-5 row-span-1 flex flex-row justify-between items-center px-4 sm:col-span-3">
+        <Card
+          className="col-span-5 row-span-1 flex flex-row justify-between items-center px-4 sm:col-span-3 cursor-pointer transition-colors duration-200 hover:bg-secondary/50 active:bg-secondary/75"
+          onClick={() => router.push("/listing?category=ejLcsifWXnMVszePrYc0")}
+        >
           <div className="flex items-center gap-4 ">
             <Image
               src={"/main-grid/halowki.jpeg"}
@@ -63,7 +69,10 @@ export default function HomeGrid() {
           </Button>
         </Card>
 
-        <Card className="col-span-5 row-span-1 flex flex-row justify-between items-center px-4 sm:col-span-3">
+        <Card
+          className="col-span-5 row-span-1 flex flex-row justify-between items-center px-4 sm:col-span-3 cursor-pointer transition-colors duration-200 hover:bg-secondary/50 active:bg-secondary/75"
+          onClick={() => router.push("/listing?category=ejLcsifWXnMVszePrYc0")}
+        >
           <div className="flex items-center gap-4">
             <Image
               src={"/main-grid/sportowe.jpg"}

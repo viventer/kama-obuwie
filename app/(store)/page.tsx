@@ -147,6 +147,7 @@ export default async function Page() {
         }
       }
 
+      if (offersListingData.length < 4) continue;
       offers[category.name] = offersListingData;
     }
   }
@@ -154,17 +155,19 @@ export default async function Page() {
   return (
     <>
       <HomeGrid />
-      {Object.entries(offers).map(([categoryName, offersInCategory]) => (
-        <ProductsList
-          key={categoryName}
-          offers={offersInCategory}
-          categoryName={categoryName}
-          displayName={
-            categories.find((cat) => cat.name === categoryName)?.displayName ||
-            ""
-          }
-        />
-      ))}
+      <div className="flex flex-col gap-12">
+        {Object.entries(offers).map(([categoryName, offersInCategory]) => (
+          <ProductsList
+            key={categoryName}
+            offers={offersInCategory}
+            categoryName={categoryName}
+            displayName={
+              categories.find((cat) => cat.name === categoryName)
+                ?.displayName || ""
+            }
+          />
+        ))}
+      </div>
     </>
   );
 }

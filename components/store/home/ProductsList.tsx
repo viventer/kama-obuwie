@@ -1,9 +1,10 @@
 "use client";
 
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
-import { ShoppingBasketIcon } from "lucide-react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import ProductFromList from "./ProductFromList";
+import { Button } from "@/components/ui/button";
+import { ArrowRightIcon, Ghost } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 export type OfferListingData = {
   thumbnailUrl: string;
@@ -25,24 +26,25 @@ export default function ProductsList({
 
   return (
     <section>
-      <h3 className="text-lg font-medium">{displayName}</h3>
-      <div className="flex gap-2 mt-2">
-        {offers.map((offer) => (
-          <article
-            key={offer.id}
-            onClick={() => {
-              router.push(`/offer/${offer.id}`);
-            }}
-            className="hover:translate-y-2 transition-transform cursor-pointer relative"
+      <h3 className="text-2xl font-bold mb-3">{displayName}</h3>
+      <div className="flex w-full justify-between">
+        <div className="flex gap-12 w-full pr-12">
+          {offers.slice(0, 4).map((offer) => (
+            <ProductFromList key={offer.id} offer={offer} />
+          ))}
+        </div>
+        <Card
+          className="p-0 px-6 flex justify-center cursor-pointer bg-brand/25 transition-colors duration-200 hover:bg-brand/50 active:bg-brand/75"
+          onClick={() => router.push("/listing?category=TLNV6amSFBmC0b2iazJO")}
+        >
+          <Button
+            variant={"ghost"}
+            onClick={() => router.push(`/listing?categoryName=${categoryName}`)}
+            className="hover:translate-x-1 transition-transform w-fit h-fit"
           >
-            <button className="bg-success text-white rounded-full p-2 absolute top-1 left-1 z-10 hover:brightness-75 transition-all">
-              <ShoppingBasketIcon className="size-4" />
-            </button>
-            <Image src={offer.thumbnailUrl} alt="" width={300} height={300} />
-            {offer?.brand && <p>{offer.brand}</p>}
-            <p className="font-medium">{offer.price}</p>
-          </article>
-        ))}
+            <ArrowRightIcon className="size-12 hover:translate-x-1 transition-transform" />
+          </Button>
+        </Card>
       </div>
     </section>
   );

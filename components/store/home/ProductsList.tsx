@@ -11,11 +11,11 @@ import { ProductListingData } from "@/firebase/schemas/productsSchemas";
 export default function ProductsList({
   displayName,
   products,
-  categoryName,
+  categoryId,
 }: {
   displayName: string;
   products: ProductListingData[];
-  categoryName: string;
+  categoryId: string;
 }) {
   const router = useRouter();
   const { currentBreakpoint } = useBreakpoint();
@@ -50,11 +50,11 @@ export default function ProductsList({
         </div>
         <Card
           className="p-0 px-2 sm:px-4 lg:px-6 flex justify-center cursor-pointer bg-brand/25 transition-colors duration-200 hover:bg-brand/50 active:bg-brand/75 flex-shrink-0"
-          onClick={() => router.push(`/listing?categoryName=${categoryName}`)}
+          onClick={() => router.push(`/listing?categoryId=${categoryId}`)}
         >
           <Button
             variant={"ghost"}
-            onClick={() => router.push(`/listing?categoryName=${categoryName}`)}
+            onClick={() => router.push(`/listing?categoryId=${categoryId}`)}
             className="hover:translate-x-1 transition-transform w-fit h-fit"
           >
             <ArrowRightIcon className="size-8 lg:size-12 hover:translate-x-1 transition-transform" />

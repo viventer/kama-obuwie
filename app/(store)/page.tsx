@@ -142,7 +142,7 @@ export default async function Page() {
       }
 
       if (productsListingData.length < 4) continue;
-      products[category.name] = productsListingData;
+      products[category.id] = productsListingData;
     }
   }
 
@@ -150,14 +150,13 @@ export default async function Page() {
     <>
       <HomeGrid />
       <div className="flex flex-col gap-12">
-        {Object.entries(products).map(([categoryName, productsInCategory]) => (
+        {Object.entries(products).map(([categoryId, productsInCategory]) => (
           <ProductsList
-            key={categoryName}
+            key={categoryId}
             products={productsInCategory}
-            categoryName={categoryName}
+            categoryId={categoryId}
             displayName={
-              categories.find((cat) => cat.name === categoryName)
-                ?.displayName || ""
+              categories.find((cat) => cat.id === categoryId)?.displayName || ""
             }
           />
         ))}

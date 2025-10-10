@@ -21,7 +21,9 @@ export default function HomeGrid() {
 
         <Card
           className="col-span-5 row-span-1 flex flex-row justify-between items-center px-4 sm:col-span-3 cursor-pointer transition-colors duration-200 hover:bg-secondary/50 active:bg-secondary/75"
-          onClick={() => router.push("/listing?categoryName=Trampki")}
+          onClick={() =>
+            router.push("/listing?categoryId=TLNV6amSFBmC0b2iazJO")
+          }
         >
           <div className="flex items-center gap-4">
             <Image
@@ -35,7 +37,9 @@ export default function HomeGrid() {
           </div>
           <Button
             variant="ghost"
-            onClick={() => router.push("/listing?categoryName=Trampki")}
+            onClick={() =>
+              router.push("/listing?categoryId=TLNV6amSFBmC0b2iazJO")
+            }
             className="hover:translate-x-1 transition-transform"
           >
             <ArrowRight className="size-6" />
@@ -44,7 +48,9 @@ export default function HomeGrid() {
 
         <Card
           className="col-span-5 row-span-1 flex flex-row justify-between items-center px-4 sm:col-span-3 cursor-pointer transition-colors duration-200 hover:bg-secondary/50 active:bg-secondary/75"
-          onClick={() => router.push("/listing?categoryName=Halówki")}
+          onClick={() =>
+            router.push("/listing?categoryId=ejLcsifWXnMVszePrYc0")
+          }
         >
           <div className="flex items-center gap-4 ">
             <Image
@@ -58,7 +64,9 @@ export default function HomeGrid() {
           </div>
           <Button
             variant="ghost"
-            onClick={() => router.push("/listing?categoryName=Halówki")}
+            onClick={() =>
+              router.push("/listing?categoryId=ejLcsifWXnMVszePrYc0")
+            }
             className="hover:translate-x-1 transition-transform"
           >
             <ArrowRight className="size-6" />
@@ -67,7 +75,9 @@ export default function HomeGrid() {
 
         <Card
           className="col-span-5 row-span-1 flex flex-row justify-between items-center px-4 sm:col-span-3 cursor-pointer transition-colors duration-200 hover:bg-secondary/50 active:bg-secondary/75"
-          onClick={() => router.push("/listing?categoryName=Sportowe")}
+          onClick={() =>
+            router.push("/listing?categoryId=ejLcsifWXnMVszePrYc0")
+          }
         >
           <div className="flex items-center gap-4">
             <Image
@@ -81,7 +91,9 @@ export default function HomeGrid() {
           </div>
           <Button
             variant="ghost"
-            onClick={() => router.push("/listing?categoryName=Sportowe")}
+            onClick={() =>
+              router.push("/listing?categoryId=ejLcsifWXnMVszePrYc0")
+            }
             className="hover:translate-x-1 transition-transform"
           >
             <ArrowRight className="size-6" />

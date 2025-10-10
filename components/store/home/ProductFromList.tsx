@@ -21,8 +21,8 @@ export default function ProductFromList({
       }}
       className="hover:translate-y-[-1rem] transition-all duration-200 delay-75 cursor-pointer relative rounded-lg p-0 hover:bg-secondary/50 active:bg-secondary/75 max-w-[300px]"
     >
-      <button className="bg-success text-white rounded-full p-2 absolute top-1 left-1 z-10 hover:brightness-75 transition-all">
-        <ShoppingBasketIcon className="size-4" />
+      <button className="bg-success text-white rounded-full p-2 absolute top-1 left-1 md:top-2 md:left-2 z-10 hover:brightness-75 transition-all">
+        <ShoppingBasketIcon className="size-6 md:size-8" />
       </button>
       <div className="w-full aspect-square bg-white rounded-t-lg flex justify-center items-center">
         <Image

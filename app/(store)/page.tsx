@@ -4,13 +4,12 @@ import {
   RootCategory,
   CategoryWithId,
   ProductWithId,
+  ProductListingData,
 } from "@/firebase/schemas/productsSchemas";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { getImageUrl } from "@/server-actions/files/files";
 import { isValidUrl } from "@/components/adminPanel/offers/helpers/validation";
-import ProductsList, {
-  OfferListingData,
-} from "@/components/store/home/ProductsList";
+import ProductsList from "@/components/store/home/ProductsList";
 
 type CategoryFromMainPage = {
   name: string;
@@ -83,7 +82,6 @@ export default async function Page() {
     }
   );
 
-  // Pobierz tylko produkty z kategorii o id podanych na liście categories
   const categoryIds = categories
     .map((cat) => cat.id)
     .filter(Boolean) as string[];
@@ -93,14 +91,11 @@ export default async function Page() {
     (ref) => ref.where("categoryId", "in", categoryIds)
   );
 
-  // Pobierz wszystkie oferty
   const allOffers = await getDocumentsFromAdminDB<OfferWithId>("offers");
 
-  // Funkcja pomocnicza do przekształcania produktu w ProductWithOfferData
-  const transformProductToOfferData = async (
+  const transformProductToProductListingData = async (
     product: ProductWithId
-  ): Promise<OfferListingData | null> => {
-    // Znajdź pierwszą ofertę dla tego produktu
+  ): Promise<ProductListingData | null> => {
     const offerEntry = product.offersIds
       ? Object.entries(product.offersIds)[0]
       : null;
@@ -110,7 +105,6 @@ export default async function Page() {
     const offer = allOffers?.find((offer) => offer.id === offerId);
     if (!offer) return null;
 
-    // Pobierz URL obrazu
     let thumbnailUrl = "";
     if (offer.thumbnail) {
       if (isValidUrl(offer.thumbnail)) {
@@ -124,13 +118,12 @@ export default async function Page() {
     return {
       thumbnailUrl,
       price: offer.sellingPrices.DTC || "0",
-      id: offer.id,
+      id: product.id,
       brand: product?.brand || undefined,
     };
   };
 
-  // Podziel produkty w obiekcie na poszczególne kategorie
-  const offers: Record<string, OfferListingData[]> = {};
+  const products: Record<string, ProductListingData[]> = {};
 
   for (const category of categories) {
     if (category.id) {
@@ -138,17 +131,18 @@ export default async function Page() {
         allProducts?.filter((product) => product.categoryId === category.id) ||
         [];
 
-      // Przekształć produkty na OfferListingData
-      const offersListingData: OfferListingData[] = [];
+      const productsListingData: ProductListingData[] = [];
       for (const product of categoryProducts) {
-        const productWithOfferData = await transformProductToOfferData(product);
-        if (productWithOfferData) {
-          offersListingData.push(productWithOfferData);
+        const productListingData = await transformProductToProductListingData(
+          product
+        );
+        if (productListingData) {
+          productsListingData.push(productListingData);
         }
       }
 
-      if (offersListingData.length < 4) continue;
-      offers[category.name] = offersListingData;
+      if (productsListingData.length < 4) continue;
+      products[category.name] = productsListingData;
     }
   }
 
@@ -156,10 +150,10 @@ export default async function Page() {
     <>
       <HomeGrid />
       <div className="flex flex-col gap-12">
-        {Object.entries(offers).map(([categoryName, offersInCategory]) => (
+        {Object.entries(products).map(([categoryName, productsInCategory]) => (
           <ProductsList
             key={categoryName}
-            offers={offersInCategory}
+            products={productsInCategory}
             categoryName={categoryName}
             displayName={
               categories.find((cat) => cat.name === categoryName)

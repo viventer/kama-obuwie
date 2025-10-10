@@ -251,3 +251,10 @@ export const AccessoriesGroupUpdateDataSchema =
   AccessoriesGroupSchema.partial().strict();
 
 export const BrandInfoUpdateDataSchema = BrandInfoSchema.partial().strict();
+
+export type ProductListingData = {
+  thumbnailUrl: string;
+  price: string;
+  id: string;
+  brand: string | undefined;
+};

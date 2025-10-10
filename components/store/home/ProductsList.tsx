@@ -6,21 +6,15 @@ import { Button } from "@/components/ui/button";
 import { ArrowRightIcon, Ghost } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
-
-export type OfferListingData = {
-  thumbnailUrl: string;
-  price: string;
-  id: string;
-  brand: string | undefined;
-};
+import { ProductListingData } from "@/firebase/schemas/productsSchemas";
 
 export default function ProductsList({
   displayName,
-  offers,
+  products,
   categoryName,
 }: {
   displayName: string;
-  offers: OfferListingData[];
+  products: ProductListingData[];
   categoryName: string;
 }) {
   const router = useRouter();
@@ -50,13 +44,13 @@ export default function ProductsList({
       <h3 className="text-2xl font-bold mb-3">{displayName}</h3>
       <div className="flex w-full justify-between">
         <div className="flex gap-4 w-full pr-4 md:pr-8 lg:pr-12">
-          {offers.slice(0, productsToShow).map((offer) => (
-            <ProductFromList key={offer.id} offer={offer} />
+          {products.slice(0, productsToShow).map((product) => (
+            <ProductFromList key={product.id} product={product} />
           ))}
         </div>
         <Card
           className="p-0 px-2 sm:px-4 lg:px-6 flex justify-center cursor-pointer bg-brand/25 transition-colors duration-200 hover:bg-brand/50 active:bg-brand/75 flex-shrink-0"
-          onClick={() => router.push("/listing?category=TLNV6amSFBmC0b2iazJO")}
+          onClick={() => router.push(`/listing?categoryName=${categoryName}`)}
         >
           <Button
             variant={"ghost"}

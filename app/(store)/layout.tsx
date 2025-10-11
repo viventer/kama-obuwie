@@ -15,7 +15,7 @@ export default async function layout({
           <MainNav />
         </div>
       </div>
-      <main className="flex-1 my-6 mx-auto w-[90%] max-w-[1440px] overflow-auto scrollbar pb-6">
+      <main className="flex-1 my-12 mx-auto w-[90%] max-w-[1440px] overflow-auto scrollbar pb-6">
         {children}
       </main>
       <Footer />

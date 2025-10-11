@@ -149,6 +149,10 @@
   --sidebar-accent-foreground: var(--accent-foreground);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
+
+  /* Custom breakpoints */
+  --breakpoint-xs: 30rem;
+  --breakpoint-2xs: 24rem;
 }
 
 * {

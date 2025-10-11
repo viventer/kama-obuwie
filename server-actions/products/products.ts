@@ -6,9 +6,13 @@ import {
   ProductPartialSchema,
   ProductSchema,
   ProductWithId,
+  ProductListingData,
 } from "@/firebase/schemas/productsSchemas";
+import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { verifyUser } from "../auth/auth";
+import { getImageUrl } from "@/server-actions/files/files";
+import { isValidUrl } from "@/components/adminPanel/offers/helpers/validation";
 
 export const createProduct = async function (newProduct: Product) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -63,4 +67,67 @@ export const getProductBySKU = async function (
   }
 
   return null;
+};
+
+export const getProductsListingData = async function (
+  categoryIds: string[]
+): Promise<Record<string, ProductListingData[]>> {
+  const allProducts = await getDocumentsFromAdminDB<ProductWithId>(
+    "products",
+    (ref) => ref.where("categoryId", "in", categoryIds)
+  );
+
+  const allOffers = await getDocumentsFromAdminDB<OfferWithId>("offers");
+
+  const transformProductToProductListingData = async (
+    product: ProductWithId
+  ): Promise<ProductListingData | null> => {
+    const offerEntry = product.offersIds
+      ? Object.entries(product.offersIds)[0]
+      : null;
+    if (!offerEntry) return null;
+
+    const [, offerId] = offerEntry;
+    const offer = allOffers?.find((offer) => offer.id === offerId);
+    if (!offer) return null;
+
+    let thumbnailUrl = "";
+    if (offer.thumbnail) {
+      if (isValidUrl(offer.thumbnail)) {
+        thumbnailUrl = offer.thumbnail;
+      } else {
+        const imageUrl = await getImageUrl(offer.thumbnail);
+        thumbnailUrl = imageUrl || "";
+      }
+    }
+
+    return {
+      thumbnailUrl,
+      price: offer.sellingPrices.DTC || "0",
+      id: product.id,
+      brand: product?.brand || undefined,
+    };
+  };
+
+  const products: Record<string, ProductListingData[]> = {};
+
+  for (const categoryId of categoryIds) {
+    const categoryProducts =
+      allProducts?.filter((product) => product.categoryId === categoryId) || [];
+
+    const productsListingData: ProductListingData[] = [];
+    for (const product of categoryProducts) {
+      const productListingData = await transformProductToProductListingData(
+        product
+      );
+      if (productListingData) {
+        productsListingData.push(productListingData);
+      }
+    }
+
+    if (productsListingData.length < 4) continue;
+    products[categoryId] = productsListingData;
+  }
+
+  return products;
 };

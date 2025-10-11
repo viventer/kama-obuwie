@@ -1,6 +1,5 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import ProductFromList from "@/components/store/home/ProductFromList";
-import ProductsList from "@/components/store/home/ProductsList";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { CategoryWithId } from "@/firebase/schemas/productsSchemas";
 import { getProductsListingData } from "@/server-actions/products/products";

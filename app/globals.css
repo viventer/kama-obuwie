@@ -5,6 +5,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @layer base {
+  .select-none {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
   :root {
     /* Ciemny motyw (domyślny) */
     --background: #1a1f23;

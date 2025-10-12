@@ -10,6 +10,7 @@ import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
+import "swiper/css/effect-fade";
 import { Swiper as SwiperType } from "swiper/types";
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ export default function ProductImagesSlider({
           }}
           loop={true}
           spaceBetween={10}
+          effect="fade"
           navigation={{
             nextEl: ".custom-next",
             prevEl: ".custom-prev",
@@ -63,7 +65,7 @@ export default function ProductImagesSlider({
           className="custom-prev absolute left-2 top-1/2 z-10 -translate-y-1/2 hover:-translate-x-1 transition-transform w-16 h-16"
           onClick={() => swiperRef.current?.slidePrev()}
         >
-          <ChevronLeft className="size-16 text-brand" />
+          <ChevronLeft className="size-16 text-black/75" />
         </Button>
 
         <Button
@@ -71,7 +73,7 @@ export default function ProductImagesSlider({
           className="custom-next absolute right-2 top-1/2 z-10 -translate-y-1/2 hover:translate-x-1 transition-transform w-16 h-16"
           onClick={() => swiperRef.current?.slideNext()}
         >
-          <ChevronRight className="size-16 text-brand" />
+          <ChevronRight className="size-16 text-black/75" />
         </Button>
       </div>
 

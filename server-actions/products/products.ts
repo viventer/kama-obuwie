@@ -13,6 +13,7 @@ import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { verifyUser } from "../auth/auth";
 import { getImageUrl } from "@/server-actions/files/files";
 import { isValidUrl } from "@/components/adminPanel/offers/helpers/validation";
+import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 
 export const createProduct = async function (newProduct: Product) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -81,32 +82,43 @@ export const getProductsListingData = async function (
 
   const transformProductToProductListingData = async (
     product: ProductWithId
-  ): Promise<ProductListingData | null> => {
-    const offerEntry = product.offersIds
-      ? Object.entries(product.offersIds)[0]
-      : null;
-    if (!offerEntry) return null;
+  ): Promise<ProductListingData[]> => {
+    const productListingDataArray: ProductListingData[] = [];
 
-    const [, offerId] = offerEntry;
-    const offer = allOffers?.find((offer) => offer.id === offerId);
-    if (!offer) return null;
-
-    let thumbnailUrl = "";
-    if (offer.thumbnail) {
-      if (isValidUrl(offer.thumbnail)) {
-        thumbnailUrl = offer.thumbnail;
-      } else {
-        const imageUrl = await getImageUrl(offer.thumbnail);
-        thumbnailUrl = imageUrl || "";
-      }
+    if (!product.offersIds || !product.colorVariants) {
+      return productListingDataArray;
     }
 
-    return {
-      thumbnailUrl,
-      price: offer.sellingPrices.DTC || "0",
-      id: product.id,
-      brand: product?.brand || undefined,
-    };
+    // Iterujemy przez wszystkie warianty kolorystyczne
+    for (const colorVariant of product.colorVariants) {
+      const colorVariantName = getColorVariantName(colorVariant);
+      const offerId = product.offersIds[colorVariantName];
+
+      if (!offerId) continue;
+
+      const offer = allOffers?.find((offer) => offer.id === offerId);
+      if (!offer) continue;
+
+      let thumbnailUrl = "";
+      if (offer.thumbnail) {
+        if (isValidUrl(offer.thumbnail)) {
+          thumbnailUrl = offer.thumbnail;
+        } else {
+          const imageUrl = await getImageUrl(offer.thumbnail);
+          thumbnailUrl = imageUrl || "";
+        }
+      }
+
+      productListingDataArray.push({
+        thumbnailUrl,
+        price: offer.sellingPrices.DTC || "0",
+        id: product.id,
+        brand: product?.brand || undefined,
+        colorVariantName,
+      });
+    }
+
+    return productListingDataArray;
   };
 
   const products: Record<string, ProductListingData[]> = {};
@@ -117,12 +129,10 @@ export const getProductsListingData = async function (
 
     const productsListingData: ProductListingData[] = [];
     for (const product of categoryProducts) {
-      const productListingData = await transformProductToProductListingData(
-        product
-      );
-      if (productListingData) {
-        productsListingData.push(productListingData);
-      }
+      const productListingDataArray =
+        await transformProductToProductListingData(product);
+      // Dodajemy wszystkie warianty kolorystyczne do listy
+      productsListingData.push(...productListingDataArray);
     }
 
     if (productsListingData.length < 4) continue;

@@ -257,4 +257,5 @@ export type ProductListingData = {
   price: string;
   id: string;
   brand: string | undefined;
+  colorVariantName: string;
 };

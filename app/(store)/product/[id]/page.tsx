@@ -60,6 +60,8 @@ export default async function CategoryEditPage(props: Props) {
     data.categoryId
   )) as { data: CategoryWithId };
 
+  console.log(data.offersIds);
+
   return (
     <ProductPage
       imagesUrls={imagesUrls}

@@ -50,8 +50,8 @@ export default async function MainNav() {
                     {subcategories.map((category) => (
                       <NavigationMenuLink key={category.id} asChild>
                         <LinkText
-                          href={`/listing?category=${encodeURIComponent(
-                            category.name
+                          href={`/listing?categoryId=${encodeURIComponent(
+                            category.id
                           )}`}
                         >
                           {category.name}

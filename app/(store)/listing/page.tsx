@@ -31,9 +31,16 @@ export default async function page({ searchParams }: Props) {
     <div className="w-fit 2xs:w-full mx-auto sm:mx-0 ">
       <SubpageHeading text={`${category.data.name}`} />
       <section className="grid gap-6 grid-cols- 2xs:grid-cols-[repeat(auto-fill,_minmax(10rem,_1fr))] lg:grid-cols-[repeat(auto-fill,_minmax(15rem,_1fr))]">
-        {productsInCategory.map((product) => (
-          <ProductFromList key={product.id} product={product} />
-        ))}
+        {productsInCategory && productsInCategory.length > 0 ? (
+          productsInCategory.map((product) => (
+            <ProductFromList
+              key={`${product.id}-${product.colorVariantName}`}
+              product={product}
+            />
+          ))
+        ) : (
+          <div className="text-lg">Brak dostępnych produktów</div>
+        )}
       </section>
     </div>
   );

@@ -45,7 +45,10 @@ export default function ProductsList({
       <div className="flex w-full justify-between">
         <div className="flex gap-4 w-full pr-4 md:pr-8 lg:pr-12">
           {products.slice(0, productsToShow).map((product) => (
-            <ProductFromList key={product.id} product={product} />
+            <ProductFromList
+              key={`${product.id}-${product.colorVariantName}`}
+              product={product}
+            />
           ))}
         </div>
         <Card

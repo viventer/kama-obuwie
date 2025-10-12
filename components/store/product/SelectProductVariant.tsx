@@ -67,9 +67,8 @@ export default function SelectProductVariant({
           return (
             <TabsContent key={variantName} value={variantName}>
               <div className="text-sm text-muted-foreground">
-                Wybrano{" "}
+                Wybrano kolor:{" "}
                 <span className="font-medium text-text">{variantName} </span>
-                kolor
               </div>
             </TabsContent>
           );

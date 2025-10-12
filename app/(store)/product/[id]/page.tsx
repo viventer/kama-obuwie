@@ -20,6 +20,12 @@ export async function generateMetadata() {
 
 export default async function CategoryEditPage(props: Props) {
   const { id } = await props.params;
+  const searchParams = await props.searchParams;
+  const colorVariantName =
+    typeof searchParams.colorVariantName === "string"
+      ? searchParams.colorVariantName
+      : undefined;
+
   const result = await getDocumentFromAdminDB<ProductWithId>("products", id);
   const { data } = result;
   if (!data || !data.editedPhotos || !data.categoryId) {
@@ -67,6 +73,7 @@ export default async function CategoryEditPage(props: Props) {
       imagesUrls={imagesUrls}
       productData={data}
       category={category}
+      initialColorVariantName={colorVariantName}
     />
   );
 }

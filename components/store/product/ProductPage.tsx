@@ -8,24 +8,48 @@ import ProductImagesSlider from "./ProductImagesSlider";
 import SelectProductVariant from "./SelectProductVariant";
 import { useState } from "react";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
-import { notFound } from "next/navigation";
+import { notFound, useRouter, useSearchParams } from "next/navigation";
 
 export default function ProductPage({
   imagesUrls,
   productData,
   category,
+  initialColorVariantName,
 }: {
   imagesUrls: Record<string, string[]>;
   productData: ProductWithId;
   category: CategoryWithId;
+  initialColorVariantName?: string;
 }) {
   if (!productData.colorVariants) {
     notFound();
   }
 
-  const [selectedColorVariant, setSelectedColorVariant] = useState(
-    getColorVariantName(productData.colorVariants[0])
-  );
+  // Sprawdź czy initialColorVariantName jest prawidłowy
+  const validInitialVariant =
+    initialColorVariantName &&
+    productData.colorVariants.some(
+      (variant) => getColorVariantName(variant) === initialColorVariantName
+    )
+      ? initialColorVariantName
+      : getColorVariantName(productData.colorVariants[0]);
+
+  const [selectedColorVariant, setSelectedColorVariant] =
+    useState(validInitialVariant);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const handleVariantChange = (newVariant: string) => {
+    setSelectedColorVariant(newVariant);
+
+    // Aktualizuj URL
+    const params = new URLSearchParams(searchParams);
+    params.set("colorVariantName", newVariant);
+    router.replace(`/product/${productData.id}?${params.toString()}`, {
+      scroll: false,
+    });
+  };
 
   return (
     <div className="flex gap-8">
@@ -42,7 +66,7 @@ export default function ProductPage({
           colorVariants={productData.colorVariants}
           imagesUrls={imagesUrls}
           selectedColorVariant={selectedColorVariant}
-          onVariantChange={setSelectedColorVariant}
+          onVariantChange={handleVariantChange}
         />
       </div>
     </div>

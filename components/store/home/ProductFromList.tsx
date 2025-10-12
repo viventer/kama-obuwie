@@ -17,7 +17,11 @@ export default function ProductFromList({
     <Card
       key={product.id}
       onClick={() => {
-        router.push(`/product/${product.id}`);
+        router.push(
+          `/product/${product.id}?colorVariantName=${encodeURIComponent(
+            product.colorVariantName
+          )}`
+        );
       }}
       className="hover:translate-y-[-1rem] transition-all duration-200 delay-75 cursor-pointer relative rounded-lg p-0 hover:bg-secondary/50 active:bg-secondary/75 max-w-[300px]"
     >

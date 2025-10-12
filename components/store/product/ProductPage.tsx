@@ -1,7 +1,11 @@
 "use client";
 
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  CategoryWithId,
+  ProductWithId,
+} from "@/firebase/schemas/productsSchemas";
 import ProductImagesSlider from "./ProductImagesSlider";
+import SelectProductVariant from "./SelectProductVariant";
 import { useState } from "react";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { notFound } from "next/navigation";
@@ -9,9 +13,11 @@ import { notFound } from "next/navigation";
 export default function ProductPage({
   imagesUrls,
   productData,
+  category,
 }: {
   imagesUrls: Record<string, string[]>;
   productData: ProductWithId;
+  category: CategoryWithId;
 }) {
   if (!productData.colorVariants) {
     notFound();
@@ -22,8 +28,23 @@ export default function ProductPage({
   );
 
   return (
-    <>
+    <div className="flex gap-8">
       <ProductImagesSlider imagesUrls={imagesUrls[selectedColorVariant]} />
-    </>
+      <div className="w-full flex flex-col gap-6">
+        <article className="bg-primary/50 rounded-sm px-4 py-2">
+          <h2 className="capitalize font-bold text-2xl ">{category.name}</h2>
+          <p className="text-lg">
+            {productData?.brand}{" "}
+            <span className="font-thin">{productData.manufacturerCode}</span>
+          </p>
+        </article>
+        <SelectProductVariant
+          colorVariants={productData.colorVariants}
+          imagesUrls={imagesUrls}
+          selectedColorVariant={selectedColorVariant}
+          onVariantChange={setSelectedColorVariant}
+        />
+      </div>
+    </div>
   );
 }

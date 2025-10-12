@@ -1,6 +1,9 @@
 import ProductPage from "@/components/store/product/ProductPage";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  CategoryWithId,
+  ProductWithId,
+} from "@/firebase/schemas/productsSchemas";
 import { getImagesUrls } from "@/server-actions/files/files";
 import { notFound } from "next/navigation";
 
@@ -19,17 +22,13 @@ export default async function CategoryEditPage(props: Props) {
   const { id } = await props.params;
   const result = await getDocumentFromAdminDB<ProductWithId>("products", id);
   const { data } = result;
-  if (!data) {
+  if (!data || !data.editedPhotos || !data.categoryId) {
     notFound();
   }
 
   const images = data.editedPhotos;
 
   const imagesUrls: Record<string, string[]> = {};
-
-  if (!images) {
-    notFound();
-  }
 
   for (const image of images) {
     if (image.colorVariantName) {
@@ -56,5 +55,16 @@ export default async function CategoryEditPage(props: Props) {
     }
   }
 
-  return <ProductPage imagesUrls={imagesUrls} productData={data} />;
+  const { data: category } = (await getDocumentFromAdminDB<CategoryWithId>(
+    "categories",
+    data.categoryId
+  )) as { data: CategoryWithId };
+
+  return (
+    <ProductPage
+      imagesUrls={imagesUrls}
+      productData={data}
+      category={category}
+    />
+  );
 }

@@ -4,6 +4,7 @@ import {
   CategoryWithId,
   ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
+import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { getImagesUrls } from "@/server-actions/files/files";
 import { notFound } from "next/navigation";
 
@@ -18,7 +19,7 @@ export async function generateMetadata() {
   };
 }
 
-export default async function CategoryEditPage(props: Props) {
+export default async function ProductDetails(props: Props) {
   const { id } = await props.params;
   const searchParams = await props.searchParams;
   const colorVariantName =
@@ -66,7 +67,20 @@ export default async function CategoryEditPage(props: Props) {
     data.categoryId
   )) as { data: CategoryWithId };
 
-  console.log(data.offersIds);
+  // Pobierz oferty dla wszystkich kolorów
+  const offersData: Record<string, OfferWithId> = {};
+
+  if (data.offersIds) {
+    for (const [colorVariantName, offerId] of Object.entries(data.offersIds)) {
+      const { data: offer } = await getDocumentFromAdminDB<OfferWithId>(
+        "offers",
+        offerId
+      );
+      if (offer) {
+        offersData[colorVariantName] = offer;
+      }
+    }
+  }
 
   return (
     <ProductPage
@@ -74,6 +88,7 @@ export default async function CategoryEditPage(props: Props) {
       productData={data}
       category={category}
       initialColorVariantName={colorVariantName}
+      offersData={offersData}
     />
   );
 }

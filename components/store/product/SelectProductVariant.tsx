@@ -24,7 +24,7 @@ export default function SelectProductVariant({
 
   return (
     <article>
-      <h3 className="text-xl font-medium mb-2">Wybierz kolor</h3>
+      <h3 className="text-lg mb-1">Kolor</h3>
       <Tabs
         value={selectedColorVariant}
         onValueChange={onVariantChange}

@@ -78,27 +78,35 @@ export default function SelectSize({
           })}
         </TabsList>
 
-        {availableSizes.map((size) => {
-          const available = isAvailable(size);
-          const sizeAvailability = availability[size];
+        {/* Zawsze wyświetlana informacja o wybranym rozmiarze */}
+        <div className="text-sm text-muted-foreground min-h-[1.25rem]">
+          {selectedSize ? (
+            <>
+              Wybrano rozmiar:{" "}
+              <span className="font-medium text-text">{selectedSize}</span>
+              {(() => {
+                const available = isAvailable(selectedSize);
+                const sizeAvailability = availability[selectedSize];
 
-          return (
-            <TabsContent key={size} value={size}>
-              <div className="text-sm text-muted-foreground">
-                Wybrano rozmiar:{" "}
-                <span className="font-medium text-text">{size}</span>
-                {available && (
-                  <span className="ml-2 text-success brightness-150">
-                    (dostępne: {sizeAvailability.value})
-                  </span>
-                )}
-                {!available && (
-                  <span className="ml-2 text-destructive">(niedostępne)</span>
-                )}
-              </div>
-            </TabsContent>
-          );
-        })}
+                if (available && sizeAvailability) {
+                  return (
+                    <span className="ml-2 text-success brightness-150">
+                      (dostępne: {sizeAvailability.value})
+                    </span>
+                  );
+                } else {
+                  return (
+                    <span className="ml-2 text-destructive">(niedostępne)</span>
+                  );
+                }
+              })()}
+            </>
+          ) : (
+            <span className="text-muted-foreground/70">
+              Nie wybrano rozmiaru
+            </span>
+          )}
+        </div>
       </Tabs>
     </article>
   );

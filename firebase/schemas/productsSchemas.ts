@@ -258,4 +258,5 @@ export type ProductListingData = {
   id: string;
   brand: string | undefined;
   colorVariantName: string;
+  isActive: boolean;
 };

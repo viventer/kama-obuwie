@@ -99,6 +99,14 @@ export const getProductsListingData = async function (
       const offer = allOffers?.find((offer) => offer.id === offerId);
       if (!offer) continue;
 
+      // Sprawdź, czy z danego koloru jest dostępny choć jeden rozmiar
+      const isActive = Object.values(offer.availability).some(
+        (availability) =>
+          availability.value &&
+          availability.value !== "" &&
+          availability.value !== "0"
+      );
+
       let thumbnailUrl = "";
       if (offer.thumbnail) {
         if (isValidUrl(offer.thumbnail)) {
@@ -115,6 +123,7 @@ export const getProductsListingData = async function (
         id: product.id,
         brand: product?.brand || undefined,
         colorVariantName,
+        isActive,
       });
     }
 

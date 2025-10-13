@@ -26,13 +26,16 @@ export default async function page({ searchParams }: Props) {
 
   const products = await getProductsListingData([categoryId]);
   const productsInCategory = products[categoryId];
+  const filteredProducts = productsInCategory?.filter(
+    (product) => product.isActive
+  );
 
   return (
     <div className="w-fit 2xs:w-full mx-auto sm:mx-0 ">
       <SubpageHeading text={`${category.data.name}`} />
       <section className="grid gap-6 grid-cols- 2xs:grid-cols-[repeat(auto-fill,_minmax(10rem,_1fr))] lg:grid-cols-[repeat(auto-fill,_minmax(15rem,_1fr))]">
-        {productsInCategory && productsInCategory.length > 0 ? (
-          productsInCategory.map((product) => (
+        {filteredProducts && filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
             <ProductFromList
               key={`${product.id}-${product.colorVariantName}`}
               product={product}

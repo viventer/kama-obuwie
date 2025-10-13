@@ -19,7 +19,6 @@ export async function verifyUser(roles?: string[]) {
   const sess = await redis.hgetall(key);
   if (!sess || !sess.firebaseIdToken || !sess.role) {
     await redis.del(key);
-    cookieStore.delete("sessionId");
     redirect("/admin-auth/login");
   }
 
@@ -31,7 +30,6 @@ export async function verifyUser(roles?: string[]) {
     if (ttl <= 0) {
       // Sesja wygasła
       await redis.del(key);
-      cookieStore.delete("sessionId");
       redirect("/admin-auth/login");
     }
   }

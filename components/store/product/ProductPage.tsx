@@ -12,7 +12,15 @@ import { useState } from "react";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { TagIcon } from "lucide-react";
+import { getShippingInfo } from "@/helpers/store";
+import {
+  ClockIcon,
+  CreditCardIcon,
+  PackageIcon,
+  TagIcon,
+  TruckIcon,
+  UndoIcon,
+} from "lucide-react";
 
 export default function ProductPage({
   imagesUrls,
@@ -63,6 +71,10 @@ export default function ProductPage({
   // Pobierz aktualną ofertę dla wybranego wariantu kolorystycznego
   const currentOffer = offersData[selectedColorVariant];
 
+  const price = Number(
+    offersData[selectedColorVariant].sellingPrices.DTC
+  ) as number;
+
   return (
     <div className="flex gap-8">
       <ProductImagesSlider imagesUrls={imagesUrls[selectedColorVariant]} />
@@ -83,9 +95,7 @@ export default function ProductPage({
               style: "currency",
               currency: "PLN",
               minimumFractionDigits: 2,
-            }).format(
-              Number(offersData[selectedColorVariant].sellingPrices.DTC) || 0
-            )}
+            }).format(price)}
           </p>
         </div>
         <SelectProductVariant
@@ -101,9 +111,35 @@ export default function ProductPage({
             onSizeChange={setSelectedSize}
           />
         )}
-        <Button className="w-full max-w-[300px] text-xl font-bold px-8 py-6 bg-primary text-white hover:brightness-125 hover:bg-primary">
-          Dodaj do koszyka
-        </Button>
+        <article>
+          <Button className="w-full max-w-[300px] text-xl font-bold px-8 py-6 bg-primary text-white hover:brightness-125 hover:bg-primary mb-2">
+            Dodaj do koszyka
+          </Button>
+          <p className="flex items-center gap-2 font-medium">
+            <ClockIcon className="size-5 text-success brightness-150" />
+            {getShippingInfo()}
+          </p>
+        </article>
+        <article>
+          <ul className="flex flex-col gap-2 border-secondary border-1 px-4 py-3 rounded-sm w-fit">
+            <li className="flex items-center gap-2 font-medium brightness-150">
+              <TruckIcon className="size-5 text-success" />
+              {price > 55 ? "Darmowa dostawa" : "Darmowa dostawa od 55 zł"}
+            </li>
+            <li className="flex items-center gap-2 font-medium brightness-150">
+              <UndoIcon className="size-5 text-success" />
+              30 dni na darmowy zwrot przez Paczkomat
+            </li>
+            <li className="flex items-center gap-2 font-medium brightness-150">
+              <PackageIcon className="size-5 text-success" />
+              Dostawa do Paczkomatu lub kurierem
+            </li>
+            <li className="flex items-center gap-2 font-medium brightness-150">
+              <CreditCardIcon className="size-5 text-success" />
+              Płatność online lub przy odbiorze
+            </li>
+          </ul>
+        </article>
       </div>
     </div>
   );

@@ -47,9 +47,6 @@ export default function CreateProductsParametersDataTable({
     const newDataWithStatus: ProductWithStatus[] = newData.map((product) => {
       const requiredParameters = product?.parameters?.required;
       const optionalParameters = product?.parameters?.optional;
-      console.log("required: ", requiredParameters);
-      console.log("optional: ", optionalParameters);
-      console.log("manufacturerCode: ", product.manufacturerCode);
       if (!requiredParameters && !optionalParameters) {
         return { ...product, isReady: false };
       }

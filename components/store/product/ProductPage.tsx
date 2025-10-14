@@ -13,14 +13,9 @@ import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { getShippingInfo } from "@/helpers/store";
-import {
-  ClockIcon,
-  CreditCardIcon,
-  PackageIcon,
-  TagIcon,
-  TruckIcon,
-  UndoIcon,
-} from "lucide-react";
+import { ClockIcon, TagIcon } from "lucide-react";
+import AdvantagesBox from "./AdvantagesBox";
+import ProductSpecifications from "./ProductSpecifications";
 
 export default function ProductPage({
   imagesUrls,
@@ -39,7 +34,6 @@ export default function ProductPage({
     notFound();
   }
 
-  // Sprawdź czy initialColorVariantName jest prawidłowy
   const validInitialVariant =
     initialColorVariantName &&
     productData.colorVariants.some(
@@ -58,9 +52,8 @@ export default function ProductPage({
 
   const handleVariantChange = (newVariant: string) => {
     setSelectedColorVariant(newVariant);
-    setSelectedSize(""); // Reset wyboru rozmiaru przy zmianie koloru
+    setSelectedSize("");
 
-    // Aktualizuj URL
     const params = new URLSearchParams(searchParams);
     params.set("colorVariantName", newVariant);
     router.replace(`/product/${productData.id}?${params.toString()}`, {
@@ -68,7 +61,6 @@ export default function ProductPage({
     });
   };
 
-  // Pobierz aktualną ofertę dla wybranego wariantu kolorystycznego
   const currentOffer = offersData[selectedColorVariant];
 
   const price = Number(
@@ -77,7 +69,10 @@ export default function ProductPage({
 
   return (
     <div className="flex gap-8">
-      <ProductImagesSlider imagesUrls={imagesUrls[selectedColorVariant]} />
+      <div className="flex flex-col gap-8">
+        <ProductImagesSlider imagesUrls={imagesUrls[selectedColorVariant]} />
+        <ProductSpecifications productParameters={productData.parameters} />
+      </div>
       <div className="w-full flex flex-col gap-6">
         <article className="bg-primary/50 rounded-sm px-4 py-2">
           <h2 className="capitalize font-bold text-xl text-white">
@@ -120,26 +115,7 @@ export default function ProductPage({
             {getShippingInfo()}
           </p>
         </article>
-        <article>
-          <ul className="flex flex-col gap-2 border-secondary border-1 px-4 py-3 rounded-sm w-fit">
-            <li className="flex items-center gap-2 font-medium brightness-150">
-              <TruckIcon className="size-5 text-success" />
-              {price > 55 ? "Darmowa dostawa" : "Darmowa dostawa od 55 zł"}
-            </li>
-            <li className="flex items-center gap-2 font-medium brightness-150">
-              <UndoIcon className="size-5 text-success" />
-              30 dni na darmowy zwrot przez Paczkomat
-            </li>
-            <li className="flex items-center gap-2 font-medium brightness-150">
-              <PackageIcon className="size-5 text-success" />
-              Dostawa do Paczkomatu lub kurierem
-            </li>
-            <li className="flex items-center gap-2 font-medium brightness-150">
-              <CreditCardIcon className="size-5 text-success" />
-              Płatność online lub przy odbiorze
-            </li>
-          </ul>
-        </article>
+        <AdvantagesBox price={price} />
       </div>
     </div>
   );

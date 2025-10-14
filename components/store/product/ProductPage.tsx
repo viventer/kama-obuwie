@@ -3,11 +3,13 @@
 import {
   CategoryWithId,
   ProductWithId,
+  SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import ProductImagesSlider from "./ProductImagesSlider";
 import SelectProductVariant from "./SelectProductVariant";
 import SelectSize from "./SelectSize";
+import SizingTableDialog from "./SizingTableDialog";
 import { useState } from "react";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { notFound, useRouter, useSearchParams } from "next/navigation";
@@ -16,6 +18,7 @@ import { getShippingInfo } from "@/helpers/store";
 import { ClockIcon, TagIcon } from "lucide-react";
 import AdvantagesBox from "./AdvantagesBox";
 import ProductSpecifications from "./ProductSpecifications";
+import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
 
 export default function ProductPage({
   imagesUrls,
@@ -23,12 +26,16 @@ export default function ProductPage({
   category,
   initialColorVariantName,
   offersData,
+  sizingTable,
+  choosingSizeImageUrl,
 }: {
   imagesUrls: Record<string, string[]>;
   productData: ProductWithId;
   category: CategoryWithId;
   initialColorVariantName?: string;
   offersData: Record<string, OfferWithId>;
+  sizingTable?: SizingTableWithId;
+  choosingSizeImageUrl?: string;
 }) {
   if (!productData.colorVariants) {
     notFound();
@@ -67,6 +74,23 @@ export default function ProductPage({
     offersData[selectedColorVariant].sellingPrices.DTC
   ) as number;
 
+  const { openDialog } = useDialogWindow();
+
+  const showSizingTable = () => {
+    if (!sizingTable) return;
+
+    openDialog({
+      title: "Tabela rozmiarów",
+      content: (
+        <SizingTableDialog
+          sizingTable={sizingTable}
+          choosingSizeImageUrl={choosingSizeImageUrl}
+        />
+      ),
+      hasCancelButton: false,
+    });
+  };
+
   return (
     <div className="flex gap-8">
       <div className="flex flex-col gap-8">
@@ -99,13 +123,24 @@ export default function ProductPage({
           selectedColorVariant={selectedColorVariant}
           onVariantChange={handleVariantChange}
         />
-        {currentOffer && currentOffer.availability && (
-          <SelectSize
-            availability={currentOffer.availability}
-            selectedSize={selectedSize}
-            onSizeChange={setSelectedSize}
-          />
-        )}
+        <section>
+          {currentOffer && currentOffer.availability && (
+            <SelectSize
+              availability={currentOffer.availability}
+              selectedSize={selectedSize}
+              onSizeChange={setSelectedSize}
+            />
+          )}
+          {sizingTable && (
+            <Button
+              variant={"outline"}
+              className="w-fit "
+              onClick={showSizingTable}
+            >
+              Tabela rozmiarów
+            </Button>
+          )}
+        </section>
         <article>
           <Button className="w-full max-w-[300px] text-xl font-bold px-8 py-6 bg-primary text-white hover:brightness-125 hover:bg-primary mb-2">
             Dodaj do koszyka

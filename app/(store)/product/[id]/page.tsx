@@ -3,10 +3,12 @@ import { getDocumentFromAdminDB } from "@/firebase/getters";
 import {
   CategoryWithId,
   ProductWithId,
+  SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
-import { getImagesUrls } from "@/server-actions/files/files";
+import { getImagesUrls, getImageUrl } from "@/server-actions/files/files";
 import { notFound } from "next/navigation";
+import { choosingSizeImageFilePath } from "@/lib/constants";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -82,6 +84,28 @@ export default async function ProductDetails(props: Props) {
     }
   }
 
+  // Pobierz tabelę rozmiarów jeśli istnieje
+  let sizingTable: SizingTableWithId | undefined;
+  if (data.sizingTableId) {
+    const { data: sizingTableData } =
+      await getDocumentFromAdminDB<SizingTableWithId>(
+        "sizingTables",
+        data.sizingTableId
+      );
+    if (sizingTableData) {
+      sizingTable = sizingTableData;
+    }
+  }
+
+  // Pobierz URL obrazka z instrukcją dobierania rozmiaru
+  let choosingSizeImageUrl: string | undefined;
+  try {
+    const imageUrl = await getImageUrl(choosingSizeImageFilePath);
+    choosingSizeImageUrl = imageUrl || undefined;
+  } catch (error) {
+    console.error("Błąd podczas pobierania obrazka z instrukcją:", error);
+  }
+
   return (
     <ProductPage
       imagesUrls={imagesUrls}
@@ -89,6 +113,8 @@ export default async function ProductDetails(props: Props) {
       category={category}
       initialColorVariantName={colorVariantName}
       offersData={offersData}
+      sizingTable={sizingTable}
+      choosingSizeImageUrl={choosingSizeImageUrl}
     />
   );
 }

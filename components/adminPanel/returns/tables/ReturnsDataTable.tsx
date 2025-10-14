@@ -241,7 +241,7 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
         orderDate: order.createdAt,
         buyerData: {
           name: `${order.buyer.firstName} ${order.buyer.lastName}`,
-          allegroLogin: order.buyer.login,
+          allegroLogin: order.buyer.login as string,
           companyName: order.buyer.companyName || undefined,
           street: order.delivery?.address?.street || "",
           city: order.delivery?.address?.city || "",

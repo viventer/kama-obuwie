@@ -30,7 +30,7 @@ export default function SelectSize({
   };
 
   return (
-    <article>
+    <article className="mb-2">
       <h3 className="text-lg mb-1">Rozmiar</h3>
       <Tabs
         value={selectedSize}

@@ -63,14 +63,16 @@ export default function CreateLabelForm({
   const form = useForm<CreateLabelFormValues>({
     defaultValues: {
       receiver: {
-        name: `${orderDeliveryData.address.firstName} ${orderDeliveryData.address.lastName}`,
-        company: orderDeliveryData.address.companyName || undefined,
-        street: orderDeliveryData.address.street,
-        postalCode: orderDeliveryData.address.zipCode,
-        city: orderDeliveryData.address.city,
-        countryCode: orderDeliveryData.address.countryCode,
+        name: `${orderDeliveryData!.address!.firstName} ${
+          orderDeliveryData.address!.lastName
+        }`,
+        company: orderDeliveryData.address!.companyName || undefined,
+        street: orderDeliveryData.address!.street,
+        postalCode: orderDeliveryData.address!.zipCode,
+        city: orderDeliveryData.address!.city,
+        countryCode: orderDeliveryData.address!.countryCode,
         email: buyer.email,
-        phone: orderDeliveryData.address.phoneNumber || undefined,
+        phone: orderDeliveryData.address!.phoneNumber || undefined,
         point: orderDeliveryData?.pickupPoint?.id || undefined,
       },
       referenceNumber: orderNumber,

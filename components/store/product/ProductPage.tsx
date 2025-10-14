@@ -101,16 +101,16 @@ export default function ProductPage({
         />
       </div>
       <div className="w-full flex flex-col gap-6">
-        <article className="bg-primary/50 rounded-sm px-4 py-2">
+        <article className="bg-primary/75 rounded-sm px-4 py-2">
           <h2 className="capitalize font-bold text-xl text-white">
             {category.name}
           </h2>
-          <p className="text-lg">
+          <p className="text-lg text-white">
             {productData?.brand}{" "}
             <span className="font-thin">{productData.manufacturerCode}</span>
           </p>
         </article>
-        <div className="border-2 border-success brightness-150 w-fit px-4 py-3 rounded-sm flex gap-2 items-center">
+        <div className="border-2 border-success w-fit px-4 py-3 rounded-sm flex gap-2 items-center">
           <TagIcon className="text-success" />
           <p className="text-2xl font-medium">
             {new Intl.NumberFormat("pl-PL", {
@@ -149,7 +149,7 @@ export default function ProductPage({
             Dodaj do koszyka
           </Button>
           <p className="flex items-center gap-2 font-medium">
-            <ClockIcon className="size-5 text-success brightness-150" />
+            <ClockIcon className="size-5 text-success" />
             {getShippingInfo()}
           </p>
         </article>

@@ -59,11 +59,11 @@ export default function SelectSize({
                   hover:bg-transparent
                   relative
                   border-1 
-                  border-text/50
+                  border-text/25
                   ${
                     available
                       ? isSelected
-                        ? "border-2 border-success brightness-150"
+                        ? "border-2 border-success"
                         : "  hover:border-text"
                       : "border-destructive border-2 cursor-not-allowed opacity-50"
                   }
@@ -90,7 +90,7 @@ export default function SelectSize({
 
                 if (available && sizeAvailability) {
                   return (
-                    <span className="ml-2 text-success brightness-150">
+                    <span className="ml-2 text-success font-medium">
                       (dostępne: {sizeAvailability.value})
                     </span>
                   );

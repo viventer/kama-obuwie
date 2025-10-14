@@ -51,7 +51,7 @@ export default function SelectProductVariant({
                     className={`object-contain aspect-square bg-white rounded-xl transition-all duration-200 ${
                       isSelected
                         ? "ring-4 ring-brand opacity-100"
-                        : "opacity-75 hover:opacity-90"
+                        : "opacity-75 hover:opacity-100"
                     }`}
                   />
                   {isSelected && (

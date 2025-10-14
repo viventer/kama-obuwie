@@ -92,7 +92,7 @@ export default function ProductImagesSlider({
               <Image
                 src={image}
                 alt={""}
-                className="block w-full object-cover bg-white opacity-75 rounded-lg hover:opacity-100 transition-opacity cursor-pointer aspect-square"
+                className="block w-full object-cover bg-white opacity-50 rounded-lg hover:opacity-100 transition-opacity cursor-pointer aspect-square"
                 height={200}
                 width={200}
               />

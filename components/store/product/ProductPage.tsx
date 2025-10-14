@@ -92,10 +92,13 @@ export default function ProductPage({
   };
 
   return (
-    <div className="flex gap-8">
+    <div className="flex flex-col gap-4 md:flex-row sm:gap-8">
       <div className="flex flex-col gap-8">
         <ProductImagesSlider imagesUrls={imagesUrls[selectedColorVariant]} />
-        <ProductSpecifications productParameters={productData.parameters} />
+        <ProductSpecifications
+          productParameters={productData.parameters}
+          className="hidden md:flex"
+        />
       </div>
       <div className="w-full flex flex-col gap-6">
         <article className="bg-primary/50 rounded-sm px-4 py-2">
@@ -151,6 +154,10 @@ export default function ProductPage({
           </p>
         </article>
         <AdvantagesBox price={price} />
+        <ProductSpecifications
+          productParameters={productData.parameters}
+          className="md:hidden"
+        />
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ import "swiper/css/navigation";
 import "swiper/css/thumbs";
 import "swiper/css/effect-fade";
 import { Swiper as SwiperType } from "swiper/types";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function ProductImagesSlider({
@@ -24,7 +24,7 @@ export default function ProductImagesSlider({
   const swiperRef = useRef<SwiperType | null>(null);
 
   return (
-    <section className="container w-[50vw] max-w-[600px] select-none">
+    <section className="container w-full max-w-full md:w-[50vw] md:max-w-[600px] select-none">
       <div className="relative">
         <Swiper
           onSwiper={(swiper) => {
@@ -84,7 +84,7 @@ export default function ProductImagesSlider({
         slidesPerView={4}
         watchSlidesProgress={true}
         modules={[FreeMode, Navigation, Thumbs]}
-        className="thumbs mt-3 h-32 w-full "
+        className="thumbs mt-3 h-fit w-full "
       >
         {imagesUrls.map((image, index) => (
           <SwiperSlide key={index}>
@@ -92,7 +92,7 @@ export default function ProductImagesSlider({
               <Image
                 src={image}
                 alt={""}
-                className="block h-full w-full object-cover bg-white opacity-75 rounded-lg hover:opacity-100 transition-opacity cursor-pointer"
+                className="block w-full object-cover bg-white opacity-75 rounded-lg hover:opacity-100 transition-opacity cursor-pointer aspect-square"
                 height={200}
                 width={200}
               />

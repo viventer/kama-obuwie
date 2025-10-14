@@ -41,7 +41,7 @@ export default function SelectSize({
         }}
         className="w-full"
       >
-        <TabsList className="flex gap-2 h-auto bg-transparent flex-wrap">
+        <TabsList className="flex gap-2 h-fit bg-transparent flex-wrap justify-start">
           {availableSizes.map((size) => {
             const available = isAvailable(size);
             const isSelected = selectedSize === size;
@@ -52,7 +52,7 @@ export default function SelectSize({
                 value={size}
                 disabled={!available}
                 className={`
-                  p-3 h-auto min-w-[3rem] aspect-square
+                  p-3 w-[3rem] h-auto max-w-[3rem] aspect-square
                   data-[state=active]:bg-transparent data-[state=active]:shadow-none 
                   bg-transparent rounded-lg
                   transition-all font-medium

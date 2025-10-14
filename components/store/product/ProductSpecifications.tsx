@@ -1,9 +1,12 @@
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import { cn } from "@/lib/utils";
 
 export default function ProductSpecifications({
   productParameters,
+  className,
 }: {
   productParameters: ProductWithId["parameters"];
+  className?: string;
 }) {
   const renderParameterValue = (value: any): string => {
     if (Array.isArray(value)) {
@@ -22,7 +25,12 @@ export default function ProductSpecifications({
 
   if (allParameters.length === 0) {
     return (
-      <article className="flex flex-col gap-2 border-secondary border-1 px-4 py-3 rounded-sm w-full">
+      <article
+        className={cn(
+          "flex flex-col gap-2 border-secondary border-1 px-4 py-3 rounded-sm w-full",
+          className
+        )}
+      >
         <p className="text-muted-foreground text-sm">
           Brak specyfikacji produktu
         </p>
@@ -31,7 +39,12 @@ export default function ProductSpecifications({
   }
 
   return (
-    <article className="flex flex-col gap-2 border-secondary border-1 px-4 py-3 rounded-sm w-full">
+    <article
+      className={cn(
+        "flex flex-col gap-2 border-secondary border-1 px-4 py-3 rounded-sm w-full",
+        className
+      )}
+    >
       <h3 className="text-xl font-bold mb-2">Specyfikacja</h3>
       <ul className="flex flex-col gap-2">
         {allParameters.map(([key, value]) => (

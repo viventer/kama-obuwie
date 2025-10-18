@@ -6,7 +6,7 @@ import { z } from "zod";
 
 type ShoppingCartItem = z.infer<typeof shoppingCartItemSchema>;
 
-const BASKET_KEY = "basket";
+const SHOPPING_CART_KEY = "shopping-cart";
 
 export function useShoppingCart() {
   const [cart, setCart] = useState<ShoppingCartItem[]>([]);
@@ -16,7 +16,7 @@ export function useShoppingCart() {
   // Load cart from localStorage on mount
   useEffect(() => {
     try {
-      const savedCart = localStorage.getItem(BASKET_KEY);
+      const savedCart = localStorage.getItem(SHOPPING_CART_KEY);
       if (savedCart) {
         const parsedCart = JSON.parse(savedCart);
         // Validate the cart data against schema
@@ -26,7 +26,7 @@ export function useShoppingCart() {
     } catch (error) {
       console.error("Error loading cart from localStorage:", error);
       // Clear invalid cart data
-      localStorage.removeItem(BASKET_KEY);
+      localStorage.removeItem(SHOPPING_CART_KEY);
     } finally {
       setIsLoading(false);
     }
@@ -36,7 +36,7 @@ export function useShoppingCart() {
   useEffect(() => {
     if (!isLoading) {
       try {
-        localStorage.setItem(BASKET_KEY, JSON.stringify(cart));
+        localStorage.setItem(SHOPPING_CART_KEY, JSON.stringify(cart));
       } catch (error) {
         console.error("Error saving cart to localStorage:", error);
       }

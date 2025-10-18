@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import HashLoader from "react-spinners/HashLoader";
 
 export default function Loader() {
-  const [spinnerColor, setSpinnerColor] = useState("#000");
+  const [spinnerColor, setSpinnerColor] = useState("#fff");
   const containerRef = useRef(null);
 
   useEffect(() => {

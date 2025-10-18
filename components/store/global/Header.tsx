@@ -2,6 +2,7 @@ import Image from "next/image";
 import HeaderBanner from "./HeaderBanner";
 import IconButton from "@/components/adminPanel/global/IconButton";
 import { ShoppingBasketIcon } from "lucide-react";
+import ShoppingCartButton from "../shopping-cart/ShoppingCartButton";
 
 export default function Header() {
   return (
@@ -19,14 +20,10 @@ export default function Header() {
             />
             <h1 className="text-lg font-bold">KAMA</h1>
           </a>
-          <IconButton className="sm:hidden">
-            <ShoppingBasketIcon />
-          </IconButton>
+          <ShoppingCartButton className="sm:hidden" />
         </section>
         <div className="hidden sm:flex items-center justify-end flex-1">
-          <IconButton>
-            <ShoppingBasketIcon />
-          </IconButton>
+          <ShoppingCartButton />
         </div>
       </div>
     </header>

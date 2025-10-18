@@ -19,6 +19,8 @@ import { ClockIcon, TagIcon } from "lucide-react";
 import AdvantagesBox from "./AdvantagesBox";
 import ProductSpecifications from "./ProductSpecifications";
 import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
+import { useShoppingCart } from "@/hooks/useShoppingCart";
+import { useToast } from "@/hooks/useToast";
 
 export default function ProductPage({
   imagesUrls,
@@ -75,6 +77,51 @@ export default function ProductPage({
   ) as number;
 
   const { openDialog } = useDialogWindow();
+  const { addToCart, findExistingItem } = useShoppingCart();
+  const { showToast } = useToast();
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      showToast("Proszę wybrać rozmiar", "error");
+      return;
+    }
+
+    if (!currentOffer) {
+      showToast("Oferta nie jest dostępna", "error");
+      return;
+    }
+
+    // Sprawdź czy produkt już istnieje w koszyku
+    const existingItem = findExistingItem(
+      currentOffer.id,
+      productData.id,
+      selectedSize
+    );
+
+    if (existingItem) {
+      // Jeśli produkt już istnieje, wyświetl tylko informację
+      showToast("Ten produkt już znajduje się w koszyku", "default");
+    } else {
+      // Dodaj nowy produkt do koszyka
+      try {
+        addToCart({
+          offerId: currentOffer.id,
+          productId: productData.id,
+          thumbnailUrl: imagesUrls[selectedColorVariant][0],
+          categoryName: category.name,
+          brand: productData.brand,
+          price: price,
+          size: selectedSize,
+          formattedMainColor: selectedColorVariant,
+        });
+
+        showToast("Produkt został dodany do koszyka", "success");
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        showToast("Wystąpił błąd podczas dodawania do koszyka", "error");
+      }
+    }
+  };
 
   const showSizingTable = () => {
     if (!sizingTable) return;
@@ -145,7 +192,11 @@ export default function ProductPage({
           )}
         </section>
         <article>
-          <Button className="w-full max-w-[300px] text-xl font-bold px-8 py-6 bg-primary text-white hover:brightness-125 hover:bg-primary mb-2">
+          <Button
+            className="w-full max-w-[300px] text-xl font-bold px-8 py-6 bg-primary text-white hover:brightness-125 hover:bg-primary mb-2"
+            onClick={handleAddToCart}
+            disabled={!selectedSize}
+          >
             Dodaj do koszyka
           </Button>
           <p className="flex items-center gap-2 font-medium">

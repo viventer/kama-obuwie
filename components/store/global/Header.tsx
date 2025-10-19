@@ -1,13 +1,11 @@
 import Image from "next/image";
 import HeaderBanner from "./HeaderBanner";
-import IconButton from "@/components/adminPanel/global/IconButton";
-import { ShoppingBasketIcon } from "lucide-react";
 import ShoppingCartButton from "../shopping-cart/ShoppingCartButton";
 
 export default function Header() {
   return (
     <header className=" bg-background border-b-1 border-border sm:flex sm:justify-center">
-      <div className="flex flex-col sm:flex-row  items-center gap-x-8 w-full sm:w-[90%] sm:max-w-[1440px]">
+      <div className="flex flex-col sm:flex-row  items-center gap-x-8 w-full sm:w-[90%] sm:max-w-[1440px] relative">
         <HeaderBanner />
         <section className="w-[90%] my-2 flex items-center gap-2 sm:order-first sm:w-fit  justify-between">
           <a className="flex items-center gap-2" href="/">

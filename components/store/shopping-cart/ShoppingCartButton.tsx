@@ -3,6 +3,12 @@
 import IconButton from "@/components/adminPanel/global/IconButton";
 import { ShoppingBasketIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import ShoppingCartPreview from "./ShoppingCartPreview";
 
 export default function ShoppingCartButton({
   className,
@@ -12,11 +18,18 @@ export default function ShoppingCartButton({
   const router = useRouter();
 
   return (
-    <IconButton
-      className={className}
-      onClick={() => router.push("/shopping-cart")}
-    >
-      <ShoppingBasketIcon />
-    </IconButton>
+    <HoverCard>
+      <IconButton
+        className={className}
+        onClick={() => router.push("/shopping-cart")}
+      >
+        <HoverCardTrigger>
+          <ShoppingBasketIcon />
+        </HoverCardTrigger>
+      </IconButton>
+      <HoverCardContent className="absolute right-0 top-4 w-fit hidden sm:block">
+        <ShoppingCartPreview />
+      </HoverCardContent>
+    </HoverCard>
   );
 }

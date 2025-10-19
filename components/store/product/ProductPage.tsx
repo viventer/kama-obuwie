@@ -19,7 +19,7 @@ import { ClockIcon, TagIcon } from "lucide-react";
 import AdvantagesBox from "./AdvantagesBox";
 import ProductSpecifications from "./ProductSpecifications";
 import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
-import { useShoppingCart } from "@/hooks/useShoppingCart";
+import { useShoppingCart } from "@/contexts/ShoppingCartContext";
 import { useToast } from "@/hooks/useToast";
 
 export default function ProductPage({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useShoppingCart } from "@/hooks/useShoppingCart";
+import { useShoppingCart } from "@/contexts/ShoppingCartContext";
 import { useToast } from "@/hooks/useToast";
 import Image from "next/image";
 import IconButton from "@/components/adminPanel/global/IconButton";
@@ -8,7 +8,7 @@ import { EditIcon, TrashIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Loader from "@/components/adminPanel/global/Loader";
 import EditCartItemDialog from "./EditCartItemDialog";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 
@@ -19,39 +19,52 @@ export default function ShoppingCartPage() {
   const [loadingOffers, setLoadingOffers] = useState(false);
 
   // Fetch offers data for cart items
+  const fetchOffersData = useCallback(async () => {
+    if (cart.length === 0) {
+      setOffersData({});
+      return;
+    }
+
+    const uniqueOfferIds = [...new Set(cart.map((item) => item.item.offerId))];
+
+    // Check which offers we need to fetch (only new ones)
+    const missingOfferIds = uniqueOfferIds.filter(
+      (offerId) => !offersData[offerId]
+    );
+
+    if (missingOfferIds.length === 0) {
+      // We already have all the data we need
+      return;
+    }
+
+    setLoadingOffers(true);
+    try {
+      const offersPromises = missingOfferIds.map(async (offerId) => {
+        const response = await axios.get(`/api/offers/${offerId}`);
+        // API zwraca dane bezpośrednio przez apiResponse spread operator
+        return { id: offerId, ...response.data.data };
+      });
+
+      const newOffers = await Promise.all(offersPromises);
+
+      const newOffersMap = newOffers.reduce((acc, offer) => {
+        acc[offer.id] = offer;
+        return acc;
+      }, {} as Record<string, OfferWithId>);
+
+      // Merge with existing offers data
+      setOffersData((prevData) => ({ ...prevData, ...newOffersMap }));
+    } catch (error) {
+      console.error("Error fetching offers data:", error);
+      showToast("Wystąpił błąd podczas pobierania danych produktów", "error");
+    } finally {
+      setLoadingOffers(false);
+    }
+  }, [cart, Object.keys(offersData).join(","), showToast]);
+
   useEffect(() => {
-    const fetchOffersData = async () => {
-      if (cart.length === 0) return;
-
-      setLoadingOffers(true);
-      try {
-        const uniqueOfferIds = [
-          ...new Set(cart.map((item) => item.item.offerId)),
-        ];
-        const offersPromises = uniqueOfferIds.map(async (offerId) => {
-          const response = await axios.get(`/api/offers/${offerId}`);
-          // API zwraca dane bezpośrednio przez apiResponse spread operator
-          return { id: offerId, ...response.data.data };
-        });
-
-        const offers = await Promise.all(offersPromises);
-
-        const offersMap = offers.reduce((acc, offer) => {
-          acc[offer.id] = offer;
-          return acc;
-        }, {} as Record<string, OfferWithId>);
-
-        setOffersData(offersMap);
-      } catch (error) {
-        console.error("Error fetching offers data:", error);
-        showToast("Wystąpił błąd podczas pobierania danych produktów", "error");
-      } finally {
-        setLoadingOffers(false);
-      }
-    };
-
     fetchOffersData();
-  }, [cart]);
+  }, [fetchOffersData]);
 
   const handleRemoveItem = (itemId: string, itemName: string) => {
     removeFromCart(itemId);

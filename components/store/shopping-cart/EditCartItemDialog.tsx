@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/useToast";
-import { useShoppingCart } from "@/hooks/useShoppingCart";
+import { useShoppingCart } from "@/contexts/ShoppingCartContext";
 import SelectSize from "../product/SelectSize";
 import { Availability } from "@/firebase/schemas/offersSchemas";
 import { z } from "zod";
@@ -36,8 +36,13 @@ export default function EditCartItemDialog({
   const [selectedSize, setSelectedSize] = useState(cartItem.item.size);
   const [quantity, setQuantity] = useState(cartItem.item.quantity);
   const { showToast } = useToast();
-  const { updateQuantity, removeFromCart, findExistingItem, addToCart } =
-    useShoppingCart();
+  const {
+    updateQuantity,
+    removeFromCart,
+    findExistingItem,
+    addToCart,
+    replaceCartItem,
+  } = useShoppingCart();
 
   useEffect(() => {
     if (open) {
@@ -114,7 +119,8 @@ export default function EditCartItemDialog({
         );
       } else {
         try {
-          addToCart({
+          // Użyj atomowej operacji zastąpienia elementu
+          replaceCartItem(cartItem.id, {
             offerId: cartItem.item.offerId,
             productId: cartItem.item.productId,
             thumbnailUrl: cartItem.item.thumbnailUrl,
@@ -126,7 +132,6 @@ export default function EditCartItemDialog({
             formattedAdditionalColor: cartItem.item.formattedAdditionalColor,
             quantity: quantity,
           });
-          removeFromCart(cartItem.id);
           showToast(
             `Zaktualizowano produkt - rozmiar zmieniony na ${selectedSize}`,
             "success"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useId } from "react";
+import { flushSync } from "react-dom";
 import { shoppingCartItemSchema } from "@/firebase/schemas/shoppingCartSchemas";
 import { z } from "zod";
 
@@ -68,7 +69,9 @@ export function useShoppingCart() {
       try {
         // Validate the new item
         shoppingCartItemSchema.parse(newItem);
-        setCart((prevCart) => [...prevCart, newItem]);
+        flushSync(() => {
+          setCart((prevCart) => [...prevCart, newItem]);
+        });
         return newItem.id;
       } catch (error) {
         console.error("Error adding item to cart:", error);
@@ -80,7 +83,9 @@ export function useShoppingCart() {
 
   // Remove item from cart by ID
   const removeFromCart = useCallback((itemId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.id !== itemId));
+    flushSync(() => {
+      setCart((prevCart) => prevCart.filter((item) => item.id !== itemId));
+    });
   }, []);
 
   // Update item quantity
@@ -91,13 +96,15 @@ export function useShoppingCart() {
         return;
       }
 
-      setCart((prevCart) =>
-        prevCart.map((item) =>
-          item.id === itemId
-            ? { ...item, item: { ...item.item, quantity: newQuantity } }
-            : item
-        )
-      );
+      flushSync(() => {
+        setCart((prevCart) =>
+          prevCart.map((item) =>
+            item.id === itemId
+              ? { ...item, item: { ...item.item, quantity: newQuantity } }
+              : item
+          )
+        );
+      });
     },
     [removeFromCart]
   );
@@ -143,6 +150,43 @@ export function useShoppingCart() {
     };
   }, [cart]);
 
+  // Replace cart item atomically (for editing existing items)
+  const replaceCartItem = useCallback(
+    (
+      oldItemId: string,
+      newItemData: Omit<ShoppingCartItem["item"], "quantity"> & {
+        quantity?: number;
+      }
+    ) => {
+      flushSync(() => {
+        setCart((prevCart) => {
+          const newItem: ShoppingCartItem = {
+            id: generateId(),
+            item: {
+              ...newItemData,
+              quantity: newItemData.quantity || 1,
+            },
+          };
+
+          try {
+            // Validate the new item
+            shoppingCartItemSchema.parse(newItem);
+
+            // Replace old item with new one in single operation
+            return prevCart.map((item) =>
+              item.id === oldItemId ? newItem : item
+            );
+          } catch (error) {
+            console.error("Error replacing cart item:", error);
+            // Return original cart if validation fails
+            return prevCart;
+          }
+        });
+      });
+    },
+    [generateId]
+  );
+
   return {
     cart,
     isLoading,
@@ -153,5 +197,6 @@ export function useShoppingCart() {
     getItem,
     findExistingItem,
     getCartStats,
+    replaceCartItem,
   };
 }

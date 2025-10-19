@@ -7,7 +7,6 @@ import IconButton from "@/components/adminPanel/global/IconButton";
 import { EditIcon, TrashIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import EditCartItemDialog from "./EditCartItemDialog";
-import { useRouter } from "next/navigation";
 import LinkText from "@/components/adminPanel/global/LinkText";
 
 interface ShoppingCartItemProps {
@@ -43,7 +42,9 @@ export default function ShoppingCartItem({
           </div>
 
           <div className="flex-1 min-w-0">
-            <LinkText href={`/product/${cartItem.item.productId}`}>
+            <LinkText
+              href={`/product/${cartItem.item.productId}?colorVariantName=${cartItem.item.formattedMainColor}`}
+            >
               <h3 className="font-medium text-lg sm:text-xl truncate text-card-foreground capitalize">
                 {cartItem.item.categoryName} {cartItem.item.brand}
               </h3>
@@ -55,9 +56,14 @@ export default function ShoppingCartItem({
                 minimumFractionDigits: 2,
               }).format(cartItem.item.price)}
             </p>
-            <div className="flex items-center gap-4 text-muted-foreground text-sm sm:text-base">
-              <span>r. {cartItem.item.size}</span>
-              <span>ilość: {cartItem.item.quantity}</span>
+            <div className="flex items-center gap-x-4 text-muted-foreground text-sm sm:text-base flex-wrap">
+              <span className="whitespace-nowrap">r. {cartItem.item.size}</span>
+              <span className="whitespace-nowrap">
+                ilość: {cartItem.item.quantity}
+              </span>
+              <span className="break-words">
+                {cartItem.item.formattedMainColor}
+              </span>
             </div>
           </div>
 

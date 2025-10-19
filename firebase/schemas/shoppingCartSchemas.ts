@@ -15,3 +15,5 @@ export const shoppingCartItemSchema = z.object({
     formattedAdditionalColor: z.string().optional(),
   }),
 });
+
+export type ShoppingCartItem = z.infer<typeof shoppingCartItemSchema>;

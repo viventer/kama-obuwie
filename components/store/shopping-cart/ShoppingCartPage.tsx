@@ -2,15 +2,12 @@
 
 import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import { useToast } from "@/hooks/useToast";
-import Image from "next/image";
-import IconButton from "@/components/adminPanel/global/IconButton";
-import { EditIcon, TrashIcon } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import Loader from "@/components/adminPanel/global/Loader";
-import EditCartItemDialog from "./EditCartItemDialog";
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
+import ShoppingCartItem from "./ShoppingCartItem";
+import { Button } from "@/components/ui/button";
 
 export default function ShoppingCartPage() {
   const { cart, removeFromCart, isLoading } = useShoppingCart();
@@ -92,77 +89,40 @@ export default function ShoppingCartPage() {
     );
   }
 
+  // Calculate total price
+  const totalPrice = cart.reduce((sum, cartItem) => {
+    return sum + cartItem.item.price * cartItem.item.quantity;
+  }, 0);
+
   return (
     <div className="max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-6 text-foreground">Koszyk</h1>
 
       <div className="space-y-4">
         {cart.map((cartItem) => (
-          <Card key={cartItem.id} className="p-2 sm:p-4">
-            <CardContent className="px-2">
-              <div className="flex items-center gap-4">
-                <div className="flex-shrink-0 w-20 sm:w-24 aspect-square relative">
-                  <Image
-                    src={cartItem.item.thumbnailUrl}
-                    alt={`${cartItem.item.brand || ""} ${
-                      cartItem.item.categoryName
-                    }`}
-                    fill
-                    className="object-contain rounded-xl bg-white"
-                    sizes="80px"
-                  />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-lg sm:text-xl truncate text-card-foreground capitalize">
-                    {cartItem.item.categoryName} {cartItem.item.brand}
-                  </h3>
-                  <p className="text-text text-base sm:text-lg mb-1">
-                    {new Intl.NumberFormat("pl-PL", {
-                      style: "currency",
-                      currency: "PLN",
-                      minimumFractionDigits: 2,
-                    }).format(cartItem.item.price)}
-                  </p>
-                  <div className="flex items-center gap-4 text-muted-foreground text-sm sm:text-base">
-                    <span>r. {cartItem.item.size}</span>
-                    <span>ilość: {cartItem.item.quantity}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 sm:gap-6 flex-col xs:flex-row">
-                  {offersData[cartItem.item.offerId] && (
-                    <EditCartItemDialog
-                      cartItem={cartItem}
-                      availability={
-                        offersData[cartItem.item.offerId].availability
-                      }
-                    >
-                      <IconButton title="Edytuj">
-                        <EditIcon className="size-5 sm:size-6" />
-                      </IconButton>
-                    </EditCartItemDialog>
-                  )}
-
-                  <IconButton
-                    title="Usuń z koszyka"
-                    className="text-destructive hover:text-text"
-                    onClick={() =>
-                      handleRemoveItem(
-                        cartItem.id,
-                        `${cartItem.item.categoryName} ${
-                          cartItem.item.brand || ""
-                        }`
-                      )
-                    }
-                  >
-                    <TrashIcon className="size-5 sm:size-6" />
-                  </IconButton>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <ShoppingCartItem
+            key={cartItem.id}
+            cartItem={cartItem}
+            offerData={offersData[cartItem.item.offerId]}
+            onRemove={handleRemoveItem}
+          />
         ))}
+      </div>
+
+      <div className="mt-6 pt-4 border-t border-border">
+        <div className="flex items-center mb-4">
+          <p className="text-xl font-bold text-foreground">
+            Do zapłaty:{" "}
+            {new Intl.NumberFormat("pl-PL", {
+              style: "currency",
+              currency: "PLN",
+              minimumFractionDigits: 2,
+            }).format(totalPrice)}
+          </p>
+        </div>
+        <Button variant={"important"} className="text-xl px-6">
+          Do kasy
+        </Button>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import Footer from "@/components/store/global/Footer";
 import Header from "@/components/store/global/Header";
 import MainNav from "@/components/store/global/MainNav";
-import { ShoppingCartProvider } from "@/contexts/ShoppingCartContext";
+import { ShoppingCartProvider } from "@/app/providers/ShoppingCartProvider";
 
 export default async function layout({
   children,

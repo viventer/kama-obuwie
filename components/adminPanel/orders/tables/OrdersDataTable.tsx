@@ -47,7 +47,7 @@ import {
 import { useOrderActions } from "@/hooks/useOrderActions";
 import OrderCostDisplay from "./OrderCostDisplay";
 import { useRouter } from "next/navigation";
-import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
+import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import ShipmentsDialogContent from "../ShipmentsDialogContent";
 import axios from "axios";
 import InvoiceInfo from "../InvoiceInfo";

@@ -36,7 +36,7 @@ import { ReturnInfoDisplay } from "./ReturnInfoDisplay";
 import { ReturnBuyerDataDisplay } from "./ReturnBuyerDataDisplay";
 import { ReturnItemsDisplay } from "./ReturnItemsDisplay";
 import IconButton from "../../global/IconButton";
-import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
+import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import { useToast } from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";

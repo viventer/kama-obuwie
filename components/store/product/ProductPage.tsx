@@ -18,8 +18,8 @@ import { getShippingInfo } from "@/helpers/store";
 import { ClockIcon, TagIcon } from "lucide-react";
 import AdvantagesBox from "./AdvantagesBox";
 import ProductSpecifications from "./ProductSpecifications";
-import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
-import { useShoppingCart } from "@/contexts/ShoppingCartContext";
+import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
+import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import { useToast } from "@/hooks/useToast";
 
 export default function ProductPage({

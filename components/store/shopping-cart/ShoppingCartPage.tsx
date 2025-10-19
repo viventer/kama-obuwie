@@ -1,6 +1,6 @@
 "use client";
 
-import { useShoppingCart } from "@/contexts/ShoppingCartContext";
+import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import { useToast } from "@/hooks/useToast";
 import Image from "next/image";
 import IconButton from "@/components/adminPanel/global/IconButton";

@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/useToast";
-import { useShoppingCart } from "@/contexts/ShoppingCartContext";
+import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import SelectSize from "../product/SelectSize";
 import { Availability } from "@/firebase/schemas/offersSchemas";
 import { z } from "zod";

@@ -5,7 +5,7 @@ import { Order } from "@/firebase/schemas/ordersSchemas";
 import { formatDate } from "@/lib/utils";
 import LinkText from "../global/LinkText";
 import { useToast } from "@/hooks/useToast";
-import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
+import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import { useRouter } from "next/navigation";
 
 export default function ShipmentsDialogContent({

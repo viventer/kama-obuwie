@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import { ConfirmDialogProvider } from "@/app/providers/ConfirmDialogProvider";
 import { AuthProvider } from "./providers/AuthProvider";
 import { FullPageLoaderProvider } from "@/components/adminPanel/global/FullPageLoader";
-import { DialogWindowProvider } from "@/components/providers/DialogWindowProvider";
+import { DialogWindowProvider } from "@/app/providers/DialogWindowProvider";
 import GlobalDialogWindow from "@/components/adminPanel/global/GlobalDialogWindow";
 
 const ubuntuSans = Ubuntu({

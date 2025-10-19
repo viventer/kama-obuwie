@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useDialogWindow } from "@/components/providers/DialogWindowProvider";
+import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 
 export default function GlobalDialogWindow() {
   const { isOpen, config, closeDialog } = useDialogWindow();

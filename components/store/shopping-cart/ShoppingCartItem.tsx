@@ -7,6 +7,8 @@ import IconButton from "@/components/adminPanel/global/IconButton";
 import { EditIcon, TrashIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import EditCartItemDialog from "./EditCartItemDialog";
+import { useRouter } from "next/navigation";
+import LinkText from "@/components/adminPanel/global/LinkText";
 
 interface ShoppingCartItemProps {
   cartItem: ShoppingCartItemType;
@@ -41,9 +43,11 @@ export default function ShoppingCartItem({
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-lg sm:text-xl truncate text-card-foreground capitalize">
-              {cartItem.item.categoryName} {cartItem.item.brand}
-            </h3>
+            <LinkText href={`/product/${cartItem.item.productId}`}>
+              <h3 className="font-medium text-lg sm:text-xl truncate text-card-foreground capitalize">
+                {cartItem.item.categoryName} {cartItem.item.brand}
+              </h3>
+            </LinkText>
             <p className="text-text text-base sm:text-lg mb-1">
               {new Intl.NumberFormat("pl-PL", {
                 style: "currency",

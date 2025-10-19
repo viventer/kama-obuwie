@@ -8,6 +8,7 @@ import axios from "axios";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import ShoppingCartItem from "./ShoppingCartItem";
 import { Button } from "@/components/ui/button";
+import AdvantagesBox from "../product/AdvantagesBox";
 
 export default function ShoppingCartPage() {
   const { cart, removeFromCart, isLoading } = useShoppingCart();
@@ -89,7 +90,6 @@ export default function ShoppingCartPage() {
     );
   }
 
-  // Calculate total price
   const totalPrice = cart.reduce((sum, cartItem) => {
     return sum + cartItem.item.price * cartItem.item.quantity;
   }, 0);
@@ -109,20 +109,23 @@ export default function ShoppingCartPage() {
         ))}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-border">
-        <div className="flex items-center mb-4">
-          <p className="text-xl font-bold text-foreground">
-            Do zapłaty:{" "}
-            {new Intl.NumberFormat("pl-PL", {
-              style: "currency",
-              currency: "PLN",
-              minimumFractionDigits: 2,
-            }).format(totalPrice)}
-          </p>
+      <div className="mt-6 pt-4 border-t border-border flex flex-col md:flex-row md:justify-between gap-4">
+        <div>
+          <div className="flex items-center mb-4">
+            <p className="text-xl font-bold text-foreground">
+              Do zapłaty:{" "}
+              {new Intl.NumberFormat("pl-PL", {
+                style: "currency",
+                currency: "PLN",
+                minimumFractionDigits: 2,
+              }).format(totalPrice)}
+            </p>
+          </div>
+          <Button variant={"important"} className="text-xl px-6 w-fit">
+            Do kasy
+          </Button>
         </div>
-        <Button variant={"important"} className="text-xl px-6">
-          Do kasy
-        </Button>
+        <AdvantagesBox price={totalPrice} />
       </div>
     </div>
   );

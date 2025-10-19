@@ -93,15 +93,15 @@ export default function ShoppingCartPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-4">
+    <div className="max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-6 text-foreground">Koszyk</h1>
 
       <div className="space-y-4">
         {cart.map((cartItem) => (
-          <Card key={cartItem.id}>
-            <CardContent>
+          <Card key={cartItem.id} className="p-2 sm:p-4">
+            <CardContent className="px-2">
               <div className="flex items-center gap-4">
-                <div className="flex-shrink-0 w-24 h-24 relative">
+                <div className="flex-shrink-0 w-20 sm:w-24 aspect-square relative">
                   <Image
                     src={cartItem.item.thumbnailUrl}
                     alt={`${cartItem.item.brand || ""} ${
@@ -114,23 +114,23 @@ export default function ShoppingCartPage() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-xl truncate text-card-foreground capitalize">
+                  <h3 className="font-medium text-lg sm:text-xl truncate text-card-foreground capitalize">
                     {cartItem.item.categoryName} {cartItem.item.brand}
                   </h3>
-                  <p className="text-text text-lg mb-1">
+                  <p className="text-text text-base sm:text-lg mb-1">
                     {new Intl.NumberFormat("pl-PL", {
                       style: "currency",
                       currency: "PLN",
                       minimumFractionDigits: 2,
                     }).format(cartItem.item.price)}
                   </p>
-                  <div className="flex items-center gap-4 text-muted-foreground">
+                  <div className="flex items-center gap-4 text-muted-foreground text-sm sm:text-base">
                     <span>r. {cartItem.item.size}</span>
                     <span>ilość: {cartItem.item.quantity}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4 sm:gap-6 flex-col xs:flex-row">
                   {offersData[cartItem.item.offerId] && (
                     <EditCartItemDialog
                       cartItem={cartItem}
@@ -139,7 +139,7 @@ export default function ShoppingCartPage() {
                       }
                     >
                       <IconButton title="Edytuj">
-                        <EditIcon size={20} />
+                        <EditIcon className="size-5 sm:size-6" />
                       </IconButton>
                     </EditCartItemDialog>
                   )}
@@ -156,7 +156,7 @@ export default function ShoppingCartPage() {
                       )
                     }
                   >
-                    <TrashIcon size={20} />
+                    <TrashIcon className="size-5 sm:size-6" />
                   </IconButton>
                 </div>
               </div>

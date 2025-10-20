@@ -21,6 +21,8 @@ import ProductSpecifications from "./ProductSpecifications";
 import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import { useToast } from "@/hooks/useToast";
+import Image from "next/image";
+import ShoppingCartPreviewItem from "../shopping-cart/ShoppingCartPreviewItem";
 
 export default function ProductPage({
   imagesUrls,
@@ -104,7 +106,7 @@ export default function ProductPage({
     } else {
       // Dodaj nowy produkt do koszyka
       try {
-        addToCart({
+        const item = {
           offerId: currentOffer.id,
           productId: productData.id,
           thumbnailUrl: imagesUrls[selectedColorVariant][0],
@@ -113,9 +115,19 @@ export default function ProductPage({
           price: price,
           size: selectedSize,
           formattedMainColor: selectedColorVariant,
-        });
+          quantity: 1,
+        };
 
-        showToast("Produkt został dodany do koszyka", "success");
+        addToCart(item);
+
+        openDialog({
+          title: "Produkt dodany do koszyka",
+          content: <ShoppingCartPreviewItem item={item} />,
+          hasCancelButton: true,
+          cancelText: "Kontynuuj zakupy",
+          confirmText: "Przejdź do koszyka",
+          onConfirm: () => router.push("/shopping-cart"),
+        });
       } catch (error) {
         console.error("Error adding to cart:", error);
         showToast("Wystąpił błąd podczas dodawania do koszyka", "error");

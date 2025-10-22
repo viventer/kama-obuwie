@@ -27,7 +27,6 @@ export const getAllAllegroOffers = async (
   channel: "AL1" | "AL2",
   userId?: string // Opcjonalny userId dla zadań w tle
 ): Promise<AllegroOfferFromListing[]> => {
-  // Pomiń weryfikację użytkownika jeśli mamy userId (zadanie w tle)
   if (!userId) {
     await verifyUser(["ADMIN", "VERIFIED"]);
   }
@@ -36,11 +35,9 @@ export const getAllAllegroOffers = async (
 
   let accessToken: string;
   if (userId) {
-    // Zadanie w tle - użyj funkcji bez sesji
     const tokens = await getAllegroAccessTokensForBackgroundJob(userId);
     accessToken = tokens[channel];
   } else {
-    // Normalny request - użyj sesji
     accessToken = await getAllegroUserAccessToken(channel);
   }
 
@@ -48,7 +45,7 @@ export const getAllAllegroOffers = async (
 
   let allOffers: AllegroOfferFromListing[] = [];
   let offset = 0;
-  const limit = 500; // Maksymalna liczba ofert na żądanie
+  const limit = 100; // Maksymalna liczba ofert na żądanie
   let hasMore = true;
 
   while (hasMore) {
@@ -81,7 +78,6 @@ export const getAllAllegroOffers = async (
         allOffers = [...allOffers, ...offers];
         offset += offers.length;
 
-        // Jeśli otrzymaliśmy mniej ofert niż limit, to koniec
         if (offers.length < limit) {
           hasMore = false;
         }
@@ -114,7 +110,6 @@ export const transformAllegroAL1OfferToOffer = async (
   const size = extractSizeFromTitle(offer.name) as string;
   const cleanedTitle = removeSizeFromTitle(offer.name);
 
-  // Sprawdź czy oferta ma external.id
   const externalId = offer.external?.id || "";
   const cleanedExternalId = cleanOldExternalId(externalId);
   const { signature } = parseExternalId(cleanedExternalId);
@@ -732,7 +727,6 @@ export const syncAllegroOffers = async (userId?: string) => {
     AL2: { success: false, error: null as string | null, offersCount: 0 },
   };
 
-  // Synchronizuj AL1
   try {
     console.log(`📥 Fetching AL1 offers...`);
     const AL1Offers = await getAllAllegroOffers("AL1", userId);

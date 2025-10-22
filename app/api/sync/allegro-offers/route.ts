@@ -3,12 +3,10 @@ import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/upstash/redis";
 
-// Handler synchronizacji - zostanie wywołany przez QStash
 async function handler(req: NextRequest) {
   try {
     console.log("🚀 Starting background Allegro sync job...");
 
-    // Pobierz userId z body
     const body = await req.json();
     const userId = body.userId;
 
@@ -25,21 +23,17 @@ async function handler(req: NextRequest) {
 
     console.log(`👤 Running sync for user: ${userId}`);
 
-    // Ustaw status w Redis
     await redis.set("allegro:sync:status", "running");
     await redis.set("allegro:sync:started", new Date().toISOString());
 
-    // Wykonaj synchronizację z userId
     const results = await syncAllegroOffers(userId);
 
-    // Zaktualizuj status - sprawdź czy była całkowita porażka
     const hasAnySuccess = results.AL1.success || results.AL2.success;
     const status = hasAnySuccess ? "completed" : "error";
 
     await redis.set("allegro:sync:status", status);
     await redis.set("allegro:sync:completed", new Date().toISOString());
 
-    // Zapisz szczegóły wyników
     await redis.set("allegro:sync:results", JSON.stringify(results));
 
     console.log("✅ Background Allegro sync job completed successfully");
@@ -54,7 +48,6 @@ async function handler(req: NextRequest) {
   } catch (error) {
     console.error("❌ Background Allegro sync job failed:", error);
 
-    // Zapisz błąd w Redis
     await redis.set("allegro:sync:status", "error");
     await redis.set(
       "allegro:sync:error",
@@ -77,6 +70,3 @@ export const POST =
   process.env.NODE_ENV === "production"
     ? verifySignatureAppRouter(handler)
     : handler;
-
-// Pozwól na długie wykonywanie (dla Vercel)
-export const maxDuration = 300; // 5 minut (dostosuj w zależności od planu Vercel)

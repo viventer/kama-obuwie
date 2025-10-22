@@ -7,6 +7,7 @@ import {
 } from "@/server-actions/allegro/syncOffersBackground";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 export default function Page() {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,13 +15,11 @@ export default function Page() {
   const [message, setMessage] = useState<string>("");
   const [lastUpdate, setLastUpdate] = useState<string>("");
 
-  // Funkcja do pobierania statusu
   const fetchStatus = async () => {
     try {
       const syncStatus = await getAllegroSyncStatus();
       setStatus(syncStatus.status);
 
-      // Ustaw komunikat na podstawie statusu
       if (syncStatus.status === "running") {
         setMessage(
           `🔄 Synchronizacja w toku... (rozpoczęta: ${new Date(
@@ -32,7 +31,6 @@ export default function Page() {
           syncStatus.completed || ""
         ).toLocaleString("pl-PL")})`;
 
-        // Dodaj szczegóły jeśli są dostępne
         if (syncStatus.results) {
           const { AL1, AL2 } = syncStatus.results;
           detailsMsg += `\n\n📊 Szczegóły:\n`;
@@ -65,7 +63,6 @@ export default function Page() {
     }
   };
 
-  // Pobieraj status co 5 sekund jeśli synchronizacja jest w toku lub w kolejce
   useEffect(() => {
     fetchStatus();
 
@@ -91,7 +88,6 @@ export default function Page() {
       );
       setStatus("queued");
 
-      // Zacznij sprawdzać status
       setTimeout(fetchStatus, 2000);
     } catch (error) {
       console.error("Błąd podczas uruchamiania synchronizacji:", error);
@@ -125,15 +121,15 @@ export default function Page() {
         </Button>
 
         {message && (
-          <div
-            className={`p-4 rounded-lg ${
+          <Card
+            className={`px-6 border ${
               status === "error"
-                ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+                ? "border-destructive"
                 : status === "completed"
-                ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+                ? "border-success"
                 : status === "running" || status === "queued"
-                ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
-                : "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400"
+                ? "border-accent"
+                : "border-primary"
             }`}
           >
             <p className="font-medium whitespace-pre-line">{message}</p>
@@ -142,7 +138,7 @@ export default function Page() {
                 Ostatnia aktualizacja: {lastUpdate}
               </p>
             )}
-          </div>
+          </Card>
         )}
 
         {(status === "running" || status === "queued") && (

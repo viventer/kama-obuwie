@@ -195,10 +195,6 @@ export async function checkAccountInfo(
   }
 }
 
-/**
- * Pobiera access tokeny Allegro dla zadań w tle (bez sesji użytkownika)
- * Używa bezpośrednio userId z parametru zamiast sesji cookie
- */
 export async function getAllegroAccessTokensForBackgroundJob(
   userId: string
 ): Promise<{
@@ -208,7 +204,6 @@ export async function getAllegroAccessTokensForBackgroundJob(
   const now = Math.floor(Date.now() / 1000);
   const result = { AL1: "", AL2: "" };
 
-  // Pobierz dane użytkownika z Firestore
   const userDoc = await adminDB.collection("users").doc(userId).get();
   const userData = userDoc.data();
 
@@ -216,9 +211,7 @@ export async function getAllegroAccessTokensForBackgroundJob(
     throw new Error(`Nie znaleziono użytkownika o ID: ${userId}`);
   }
 
-  // Przetwórz oba konta
   for (const account of ["AL1", "AL2"] as const) {
-    // Pobierz refreshToken z Firestore
     const refreshToken = userData?.allegro?.[account]?.refreshToken as
       | string
       | undefined;
@@ -226,7 +219,6 @@ export async function getAllegroAccessTokensForBackgroundJob(
       throw new Error(`Brak refresh tokena Allegro dla konta ${account}`);
     }
 
-    // Sprawdź czy mamy zapisany access token i jego ważność
     const cachedToken = userData?.allegro?.[account]?.accessToken as
       | string
       | undefined;
@@ -234,13 +226,11 @@ export async function getAllegroAccessTokensForBackgroundJob(
       | number
       | undefined;
 
-    // Jeśli mamy ważny token w cache, użyj go
     if (cachedToken && cachedExpiry && now + REFRESH_BUFFER < cachedExpiry) {
       result[account] = cachedToken;
       continue;
     }
 
-    // Odśwież token w Allegro
     const params = new URLSearchParams({
       grant_type: "refresh_token",
       refresh_token: refreshToken,
@@ -269,7 +259,6 @@ export async function getAllegroAccessTokensForBackgroundJob(
     const { access_token, refresh_token, expires_in } = resp.data;
     const newExpiry = now + expires_in;
 
-    // Zapisz nowy token w Firestore dla przyszłych wywołań
     await adminDB
       .collection("users")
       .doc(userId)

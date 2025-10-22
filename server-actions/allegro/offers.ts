@@ -14,7 +14,11 @@ import {
   Product,
   ProductParameters,
 } from "@/firebase/schemas/productsSchemas";
-import { getAllegroUserAccessTokens, getAllegroUserAccessToken } from "./auth";
+import {
+  getAllegroUserAccessTokens,
+  getAllegroUserAccessToken,
+  getAllegroAccessTokensForBackgroundJob,
+} from "./auth";
 import {
   AllegroHeaders,
   getAllegroHeaders,
@@ -57,11 +61,24 @@ type AllegroIndividualOffer = {
 export const editAllegroOffer = async (
   id: string,
   channel: "AL1" | "AL2",
-  data: Partial<AllegroOffer>
+  data: Partial<AllegroOffer>,
+  options?: { userId?: string; skipAuth?: boolean }
 ): Promise<void> => {
-  await verifyUser(["ADMIN", "VERIFIED"]);
+  // Pomiń weryfikację jeśli mamy userId (zadanie w tle) lub skipAuth
+  if (!options?.userId && !options?.skipAuth) {
+    await verifyUser(["ADMIN", "VERIFIED"]);
+  }
 
-  const accessToken = await getAllegroUserAccessToken(channel);
+  let accessToken: string;
+  if (options?.userId) {
+    // Zadanie w tle - użyj funkcji bez sesji
+    const tokens = await getAllegroAccessTokensForBackgroundJob(options.userId);
+    accessToken = tokens[channel];
+  } else {
+    // Normalny request - użyj sesji
+    accessToken = await getAllegroUserAccessToken(channel);
+  }
+
   const headers = getSingleAllegroHeaders(accessToken);
 
   const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers/${id}`;

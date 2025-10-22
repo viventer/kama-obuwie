@@ -44,3 +44,17 @@ export async function verifyUser(roles?: string[]) {
 
   return true;
 }
+
+/**
+ * Pobiera userId aktualnie zalogowanego użytkownika
+ */
+export async function getCurrentUserId(): Promise<string | null> {
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get("sessionId")?.value;
+  if (!sessionId) return null;
+
+  const key = `session:${sessionId}`;
+  const sess = await redis.hgetall(key);
+
+  return (sess?.userId as string) || null;
+}

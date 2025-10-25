@@ -67,3 +67,6 @@ env:
 
   - variable: QSTASH_TOKEN
     secret: QSTASH_TOKEN
+
+  - variable: NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+    secret: NEXT_SERVER_ACTIONS_ENCRYPTION_KEY

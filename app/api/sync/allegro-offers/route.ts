@@ -1,9 +1,8 @@
 import { syncAllegroOffers } from "@/server-actions/allegro/syncOffers";
-import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/upstash/redis";
 
-async function handler(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     console.log("🚀 Starting background Allegro sync job...");
 

@@ -64,3 +64,6 @@ env:
 
   - variable: RESPONSIBLE_PERSON_NAME
     secret: RESPONSIBLE_PERSON_NAME
+
+  - variable: QSTASH_TOKEN
+    secret: QSTASH_TOKEN

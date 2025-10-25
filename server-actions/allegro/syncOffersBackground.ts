@@ -14,7 +14,6 @@ const qstashClient = new Client({
  */
 export const triggerAllegroSync = async () => {
   await verifyUser(["ADMIN", "VERIFIED"]);
-  console.log("Klucz qstash:", process.env.QSTASH_TOKEN);
 
   const userId = await getCurrentUserId();
   if (!userId) {

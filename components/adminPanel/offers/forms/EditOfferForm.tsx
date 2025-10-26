@@ -84,35 +84,11 @@ function convertOfferPartialToAllegroOfferPartial(
   return allegroOffer;
 }
 
-export default function EditOfferForm({
-  oldData,
-  productData,
-}: {
-  oldData: OfferWithId;
-  productData: ProductWithId;
-}) {
-  const [sizes, setSizes] = useState<string[]>([]);
+export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
   const { startLoading, stopLoading } = useFullPageLoading();
   const { showToast } = useToast();
   const { handleError } = useErrorHandler();
   const router = useRouter();
-
-  useEffect(() => {
-    (async () => {
-      const { data }: { data: SizingTableWithId } = await axios.get(
-        `/api/sizing-tables/${productData.sizingTableId}`
-      );
-      const respSizes = data.insoleLengths.map((item) => item.size.toString());
-      setSizes(respSizes);
-
-      respSizes.forEach((size) => {
-        const current = form.getValues(`availability.${size}.value`);
-        if (current == null) {
-          form.setValue(`availability.${size}.value`, "1");
-        }
-      });
-    })();
-  }, [productData.sizingTableId]);
 
   const form = useForm<Partial<OfferWithId>>({
     defaultValues: {
@@ -126,6 +102,16 @@ export default function EditOfferForm({
     },
     mode: "onChange",
   });
+
+  const sizes = Object.keys(oldData.availability);
+  useEffect(() => {
+    sizes.forEach((size) => {
+      const current = form.getValues(`availability.${size}.value`);
+      if (current == null) {
+        form.setValue(`availability.${size}.value`, "1");
+      }
+    });
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -171,17 +157,17 @@ export default function EditOfferForm({
     }
 
     try {
-      allegroSalesChannels.forEach(async (salesChannel) => {
+      const updatePromises = allegroSalesChannels.flatMap((salesChannel) => {
         const offersIds = oldData.allegroOffersIds?.[salesChannel] as Record<
           string,
           string
         >;
-        Object.entries(offersIds).forEach(async ([size, offerId]) => {
+        return Object.entries(offersIds).map(async ([size, offerId]) => {
           const availability = Number(
             form.getValues(`availability.${size}.value`)
           );
 
-          await axios.patch(`/api/allegro/offers/${offerId}`, {
+          return axios.patch(`/api/allegro/offers/${offerId}`, {
             offerPartial: {
               ...offersPartials[salesChannel],
               stock: {
@@ -197,6 +183,8 @@ export default function EditOfferForm({
           });
         });
       });
+
+      await Promise.all(updatePromises);
       showToast("Oferty zostały zaaktualizowane.", "success");
       router.push("/admin-panel/offers");
     } catch (err) {

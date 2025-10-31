@@ -136,18 +136,21 @@ export const InvoiceInfoSchema = z.object({
     city: z.string(),
     zipCode: z.string(),
     countryCode: z.string().length(2),
-    company: z.object({
-      name: z.string(),
-      ids: z
-        .array(
-          z.object({
-            type: z.enum(["PL_NIP", "VAT_EU", "OTHER"]),
-            value: z.string(),
-          })
-        )
-        .nullable(),
-      vatPayerStatus: z.enum(["ACTIVE", "NON_ACTIVE", "NOT_APPLICABLE"]),
-    }),
+    company: z
+      .object({
+        name: z.string(),
+        ids: z
+          .array(
+            z.object({
+              type: z.enum(["PL_NIP", "VAT_EU", "OTHER"]),
+              value: z.string(),
+            })
+          )
+          .nullable(),
+        vatPayerStatus: z.enum(["ACTIVE", "NON_ACTIVE", "NOT_APPLICABLE"]),
+      })
+      .optional()
+      .nullable(),
     naturalPerson: z
       .object({
         firstName: z.string(),

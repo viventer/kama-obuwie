@@ -115,7 +115,7 @@ export const transformAllegroAL1OfferToOffer = async (
 
   const finalSignature = signature.trim() || "";
 
-  return {
+  const transformedOffer: Offer = {
     title: cleanedTitle,
     productId: productId || null,
     thumbnail: offer.primaryImage.url,
@@ -138,9 +138,6 @@ export const transformAllegroAL1OfferToOffer = async (
     impliedWarranty: {
       AL1: offer.afterSalesServices.impliedWarranty.id,
     },
-    warranty: {
-      AL1: offer.afterSalesServices.warranty.id,
-    },
     availability: {
       [size]: {
         value: offer.stock.available.toString(),
@@ -153,6 +150,14 @@ export const transformAllegroAL1OfferToOffer = async (
     },
     SKU,
   };
+
+  if (offer.afterSalesServices?.warranty?.id) {
+    transformedOffer.warranty = {
+      AL1: offer.afterSalesServices.warranty.id,
+    };
+  }
+
+  return transformedOffer;
 };
 
 const getOfferFromDBBySignature = async (
@@ -335,7 +340,7 @@ const updateOfferInDB = async (
     };
   } else {
     // Dla AL2 dodajemy też właściwości z oferty Allegro
-    const al2Updates = allegroOffer
+    const al2Updates: Partial<Offer> = allegroOffer
       ? {
           sellingPrices: {
             ...offerData.sellingPrices,
@@ -359,12 +364,15 @@ const updateOfferInDB = async (
             ...offerData.impliedWarranty,
             AL2: allegroOffer.afterSalesServices.impliedWarranty.id,
           },
-          warranty: {
-            ...offerData.warranty,
-            AL2: allegroOffer.afterSalesServices.warranty.id,
-          },
         }
       : {};
+
+    if (allegroOffer && allegroOffer.afterSalesServices?.warranty?.id) {
+      al2Updates.warranty = {
+        ...offerData.warranty,
+        AL2: allegroOffer.afterSalesServices.warranty.id,
+      };
+    }
 
     updatedOffer = {
       ...offerData,

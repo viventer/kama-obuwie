@@ -7,7 +7,10 @@ import {
   Offer,
 } from "@/firebase/schemas/offersSchemas";
 import { verifyUser } from "../auth/auth";
-import { getAllegroUserAccessToken } from "./auth";
+import {
+  getAllegroUserAccessToken,
+  getAllegroAccessTokensForBackgroundJob,
+} from "./auth";
 import { getSingleAllegroHeaders } from "./global";
 import axios from "axios";
 import { editAllegroOffer } from "./offers";
@@ -21,18 +24,28 @@ import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
 export const getAllAllegroOffers = async (
-  channel: "AL1" | "AL2"
+  channel: "AL1" | "AL2",
+  userId?: string // Opcjonalny userId dla zadań w tle
 ): Promise<AllegroOfferFromListing[]> => {
-  await verifyUser(["ADMIN", "VERIFIED"]);
+  if (!userId) {
+    await verifyUser(["ADMIN", "VERIFIED"]);
+  }
 
   console.log(`🔄 Fetching all offers for ${channel}...`);
 
-  const accessToken = await getAllegroUserAccessToken(channel);
+  let accessToken: string;
+  if (userId) {
+    const tokens = await getAllegroAccessTokensForBackgroundJob(userId);
+    accessToken = tokens[channel];
+  } else {
+    accessToken = await getAllegroUserAccessToken(channel);
+  }
+
   const headers = getSingleAllegroHeaders(accessToken);
 
   let allOffers: AllegroOfferFromListing[] = [];
   let offset = 0;
-  const limit = 500; // Maksymalna liczba ofert na żądanie
+  const limit = 100; // Maksymalna liczba ofert na żądanie
   let hasMore = true;
 
   while (hasMore) {
@@ -46,7 +59,7 @@ export const getAllAllegroOffers = async (
           limit: limit,
           offset: offset,
           "sellingMode.price.amount.gte": "29",
-          // "sellingMode.price.amount.lte": "46",
+          "sellingMode.price.amount.lt": "50",
         },
         headers,
       });
@@ -65,7 +78,6 @@ export const getAllAllegroOffers = async (
         allOffers = [...allOffers, ...offers];
         offset += offers.length;
 
-        // Jeśli otrzymaliśmy mniej ofert niż limit, to koniec
         if (offers.length < limit) {
           hasMore = false;
         }
@@ -82,7 +94,9 @@ export const getAllAllegroOffers = async (
   console.log(`🎉 Total offers fetched for ${channel}: ${allOffers.length}`);
 
   if (allOffers.length === 0) {
-    throw new Error("Nie znaleziono oferty na Allegro.");
+    console.warn(
+      `⚠️  No offers found for ${channel} in the specified price range`
+    );
   }
 
   return allOffers;
@@ -96,14 +110,13 @@ export const transformAllegroAL1OfferToOffer = async (
   const size = extractSizeFromTitle(offer.name) as string;
   const cleanedTitle = removeSizeFromTitle(offer.name);
 
-  // Sprawdź czy oferta ma external.id
   const externalId = offer.external?.id || "";
   const cleanedExternalId = cleanOldExternalId(externalId);
   const { signature } = parseExternalId(cleanedExternalId);
 
   const finalSignature = signature.trim() || "";
 
-  return {
+  const transformedOffer: Offer = {
     title: cleanedTitle,
     productId: productId || null,
     thumbnail: offer.primaryImage.url,
@@ -126,9 +139,6 @@ export const transformAllegroAL1OfferToOffer = async (
     impliedWarranty: {
       AL1: offer.afterSalesServices.impliedWarranty.id,
     },
-    warranty: {
-      AL1: offer.afterSalesServices.warranty.id,
-    },
     availability: {
       [size]: {
         value: offer.stock.available.toString(),
@@ -141,6 +151,14 @@ export const transformAllegroAL1OfferToOffer = async (
     },
     SKU,
   };
+
+  if (offer.afterSalesServices?.warranty?.id) {
+    transformedOffer.warranty = {
+      AL1: offer.afterSalesServices.warranty.id,
+    };
+  }
+
+  return transformedOffer;
 };
 
 const getOfferFromDBBySignature = async (
@@ -323,7 +341,7 @@ const updateOfferInDB = async (
     };
   } else {
     // Dla AL2 dodajemy też właściwości z oferty Allegro
-    const al2Updates = allegroOffer
+    const al2Updates: Partial<Offer> = allegroOffer
       ? {
           sellingPrices: {
             ...offerData.sellingPrices,
@@ -347,12 +365,15 @@ const updateOfferInDB = async (
             ...offerData.impliedWarranty,
             AL2: allegroOffer.afterSalesServices.impliedWarranty.id,
           },
-          warranty: {
-            ...offerData.warranty,
-            AL2: allegroOffer.afterSalesServices.warranty.id,
-          },
         }
       : {};
+
+    if (allegroOffer && allegroOffer.afterSalesServices?.warranty?.id) {
+      al2Updates.warranty = {
+        ...offerData.warranty,
+        AL2: allegroOffer.afterSalesServices.warranty.id,
+      };
+    }
 
     updatedOffer = {
       ...offerData,
@@ -372,7 +393,10 @@ const updateOfferInDB = async (
   await updateOffer(offerData.id as string, updatedOffer);
 };
 
-const syncAL1Offers = async (offers: AllegroOfferFromListing[]) => {
+const syncAL1Offers = async (
+  offers: AllegroOfferFromListing[],
+  userId?: string
+) => {
   // Grupuj oferty po signature
   const offersBySignature = new Map<string, AllegroOfferFromListing[]>();
 
@@ -445,11 +469,16 @@ const syncAL1Offers = async (offers: AllegroOfferFromListing[]) => {
       console.log(`📦 Processing size ${size} for ${signature}`);
 
       try {
-        await editAllegroOffer(offer.id, "AL1", {
-          external: {
-            id: `${signature} [${SKU}r${size}]`,
+        await editAllegroOffer(
+          offer.id,
+          "AL1",
+          {
+            external: {
+              id: `${signature} [${SKU}r${size}]`,
+            },
           },
-        });
+          { userId }
+        );
 
         if (existingOffer?.id) {
           // Aktualizuj istniejącą ofertę z nowym rozmiarem
@@ -552,7 +581,10 @@ const syncAL1Offers = async (offers: AllegroOfferFromListing[]) => {
   }
 };
 
-const syncAL2Offers = async (offers: AllegroOfferFromListing[]) => {
+const syncAL2Offers = async (
+  offers: AllegroOfferFromListing[],
+  userId?: string
+) => {
   console.log(`🚀 AL2: Starting synchronization of ${offers.length} offers`);
 
   // Grupuj oferty po signature
@@ -635,11 +667,16 @@ const syncAL2Offers = async (offers: AllegroOfferFromListing[]) => {
 
         try {
           // Aktualizuj external.id na Allegro dla AL2
-          await editAllegroOffer(offer.id, "AL2", {
-            external: {
-              id: `${signature} [${existingOffer.SKU}r${size}]`,
+          await editAllegroOffer(
+            offer.id,
+            "AL2",
+            {
+              external: {
+                id: `${signature} [${existingOffer.SKU}r${size}]`,
+              },
             },
-          });
+            { userId }
+          );
 
           // Aktualizuj istniejącą ofertę z nowym rozmiarem dla AL2
           await updateOfferInDB(
@@ -687,29 +724,83 @@ const syncAL2Offers = async (offers: AllegroOfferFromListing[]) => {
   console.log(`❌ Errors: ${errorCount}`);
 };
 
-export const syncAllegroOffers = async () => {
+export const syncAllegroOffers = async (userId?: string) => {
   console.log(`🚀 Starting Allegro offers synchronization...`);
+  if (userId) {
+    console.log(`👤 Running as background job for user: ${userId}`);
+  }
+
+  const results = {
+    AL1: { success: false, error: null as string | null, offersCount: 0 },
+    AL2: { success: false, error: null as string | null, offersCount: 0 },
+  };
 
   try {
     console.log(`📥 Fetching AL1 offers...`);
-    const AL1Offers = await getAllAllegroOffers("AL1");
+    const AL1Offers = await getAllAllegroOffers("AL1", userId);
     console.log(`✅ Found ${AL1Offers.length} AL1 offers`);
+    results.AL1.offersCount = AL1Offers.length;
 
-    console.log(`📥 Fetching AL2 offers...`);
-    const AL2Offers = await getAllAllegroOffers("AL2");
-    console.log(`✅ Found ${AL2Offers.length} AL2 offers`);
-
-    console.log(`🔄 Starting AL1 synchronization...`);
-    await syncAL1Offers(AL1Offers);
-    console.log(`✅ AL1 synchronization completed`);
-
-    console.log(`🔄 Starting AL2 synchronization...`);
-    await syncAL2Offers(AL2Offers);
-    console.log(`✅ AL2 synchronization completed`);
-
-    console.log(`🎉 All synchronization completed successfully!`);
+    if (AL1Offers.length > 0) {
+      console.log(`🔄 Starting AL1 synchronization...`);
+      await syncAL1Offers(AL1Offers, userId);
+      console.log(`✅ AL1 synchronization completed`);
+      results.AL1.success = true;
+    } else {
+      console.log(`⚠️  Skipping AL1 synchronization - no offers found`);
+      results.AL1.success = true; // Not an error, just no offers
+    }
   } catch (error) {
-    console.error(`❌ Synchronization failed:`, error);
-    throw error;
+    console.error(`❌ AL1 synchronization failed:`, error);
+    results.AL1.error =
+      error instanceof Error ? error.message : "Unknown error";
+    // Nie przerywaj - kontynuuj z AL2
   }
+
+  // Synchronizuj AL2
+  try {
+    console.log(`�📥 Fetching AL2 offers...`);
+    const AL2Offers = await getAllAllegroOffers("AL2", userId);
+    console.log(`✅ Found ${AL2Offers.length} AL2 offers`);
+    results.AL2.offersCount = AL2Offers.length;
+
+    if (AL2Offers.length > 0) {
+      console.log(`🔄 Starting AL2 synchronization...`);
+      await syncAL2Offers(AL2Offers, userId);
+      console.log(`✅ AL2 synchronization completed`);
+      results.AL2.success = true;
+    } else {
+      console.log(`⚠️  Skipping AL2 synchronization - no offers found`);
+      results.AL2.success = true; // Not an error, just no offers
+    }
+  } catch (error) {
+    console.error(`❌ AL2 synchronization failed:`, error);
+    results.AL2.error =
+      error instanceof Error ? error.message : "Unknown error";
+  }
+
+  // Podsumowanie
+  console.log(`\n📊 Synchronization Summary:`);
+  console.log(
+    `   AL1: ${results.AL1.success ? "✅ Success" : "❌ Failed"} (${
+      results.AL1.offersCount
+    } offers)`
+  );
+  if (results.AL1.error) console.log(`        Error: ${results.AL1.error}`);
+  console.log(
+    `   AL2: ${results.AL2.success ? "✅ Success" : "❌ Failed"} (${
+      results.AL2.offersCount
+    } offers)`
+  );
+  if (results.AL2.error) console.log(`        Error: ${results.AL2.error}`);
+
+  // Rzuć błąd tylko jeśli OBA zawiodły
+  if (!results.AL1.success && !results.AL2.success) {
+    throw new Error(
+      `Synchronizacja nie powiodła się dla obu kont. AL1: ${results.AL1.error}, AL2: ${results.AL2.error}`
+    );
+  }
+
+  console.log(`🎉 Synchronization completed!`);
+  return results;
 };

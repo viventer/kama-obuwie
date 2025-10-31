@@ -1,6 +1,4 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
-import EditProductParametersForm from "@/components/adminPanel/assortment/parameters/EditProductParametersForm";
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { notFound } from "next/navigation";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
@@ -28,14 +26,10 @@ export default async function OfferEditPage(props: Props) {
   if (!oldData?.SKU) {
     notFound();
   }
-  const productData = await getProductBySKU(oldData.SKU);
-  if (!productData) {
-    notFound();
-  }
 
   return (
     <FormWrapper headingText="Edytuj ofertę">
-      <EditOfferForm oldData={oldData} productData={productData} />
+      <EditOfferForm oldData={oldData} />
     </FormWrapper>
   );
 }

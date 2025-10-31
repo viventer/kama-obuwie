@@ -194,3 +194,89 @@ export async function checkAccountInfo(
     return false;
   }
 }
+
+export async function getAllegroAccessTokensForBackgroundJob(
+  userId: string
+): Promise<{
+  AL1: string;
+  AL2: string;
+}> {
+  const now = Math.floor(Date.now() / 1000);
+  const result = { AL1: "", AL2: "" };
+
+  const userDoc = await adminDB.collection("users").doc(userId).get();
+  const userData = userDoc.data();
+
+  if (!userData) {
+    throw new Error(`Nie znaleziono użytkownika o ID: ${userId}`);
+  }
+
+  for (const account of ["AL1", "AL2"] as const) {
+    const refreshToken = userData?.allegro?.[account]?.refreshToken as
+      | string
+      | undefined;
+    if (!refreshToken) {
+      throw new Error(`Brak refresh tokena Allegro dla konta ${account}`);
+    }
+
+    const cachedToken = userData?.allegro?.[account]?.accessToken as
+      | string
+      | undefined;
+    const cachedExpiry = userData?.allegro?.[account]?.tokenExpiry as
+      | number
+      | undefined;
+
+    if (cachedToken && cachedExpiry && now + REFRESH_BUFFER < cachedExpiry) {
+      result[account] = cachedToken;
+      continue;
+    }
+
+    const params = new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+    });
+
+    const clientId =
+      account === "AL1"
+        ? process.env.AL1_CLIENT_ID!
+        : process.env.AL2_CLIENT_ID!;
+    const clientSecret =
+      account === "AL1"
+        ? process.env.AL1_CLIENT_SECRET!
+        : process.env.AL2_CLIENT_SECRET!;
+
+    const basic = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+    const tokenEndpoint = `${ALLEGRO_BASE_URL}/auth/oauth/token`;
+
+    const resp = await axios.post(
+      `${tokenEndpoint}?${params.toString()}`,
+      null,
+      {
+        headers: { Authorization: `Basic ${basic}` },
+      }
+    );
+
+    const { access_token, refresh_token, expires_in } = resp.data;
+    const newExpiry = now + expires_in;
+
+    await adminDB
+      .collection("users")
+      .doc(userId)
+      .set(
+        {
+          allegro: {
+            [account]: {
+              accessToken: access_token,
+              refreshToken: refresh_token,
+              tokenExpiry: newExpiry,
+            },
+          },
+        },
+        { merge: true }
+      );
+
+    result[account] = access_token;
+  }
+
+  return result;
+}

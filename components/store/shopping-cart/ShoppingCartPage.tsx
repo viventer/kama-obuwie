@@ -9,12 +9,14 @@ import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import ShoppingCartItem from "./ShoppingCartItem";
 import { Button } from "@/components/ui/button";
 import AdvantagesBox from "../product/AdvantagesBox";
+import { useRouter } from "next/navigation";
 
 export default function ShoppingCartPage() {
   const { cart, removeFromCart, isLoading } = useShoppingCart();
   const { showToast } = useToast();
   const [offersData, setOffersData] = useState<Record<string, OfferWithId>>({});
   const [loadingOffers, setLoadingOffers] = useState(false);
+  const router = useRouter();
 
   // Fetch offers data for cart items
   const fetchOffersData = useCallback(async () => {
@@ -121,7 +123,11 @@ export default function ShoppingCartPage() {
               }).format(totalPrice)}
             </p>
           </div>
-          <Button variant={"important"} className="text-xl px-6 w-fit">
+          <Button
+            variant={"important"}
+            className="text-xl px-6 w-fit"
+            onClick={() => router.push("/checkout/customer-details")}
+          >
             Do kasy
           </Button>
         </div>

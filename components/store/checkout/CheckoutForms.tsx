@@ -3,8 +3,30 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FirstStepForm from "./FirstStepForm";
 import SecondStepForm from "./SecondStepForm";
+import { Form } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { CheckoutDataSchema } from "@/firebase/schemas/checkoutSchemas";
 
 export default function CheckoutForms() {
+  const form = useForm({
+    resolver: zodResolver(CheckoutDataSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      deliveryData: {
+        city: "",
+        postalCode: "",
+        address: "",
+        method: "courier",
+      },
+      paymentMethod: "quickTransfer",
+      pickupPoint: undefined,
+    },
+  });
+
   return (
     <Tabs defaultValue="firstStep">
       <TabsList>
@@ -21,12 +43,14 @@ export default function CheckoutForms() {
           Dostawa i płatność
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="firstStep">
-        <FirstStepForm />
-      </TabsContent>
-      <TabsContent value="secondStep">
-        <SecondStepForm />
-      </TabsContent>
+      <Form {...form}>
+        <TabsContent value="firstStep">
+          <FirstStepForm />
+        </TabsContent>
+        <TabsContent value="secondStep">
+          <SecondStepForm />
+        </TabsContent>
+      </Form>
     </Tabs>
   );
 }

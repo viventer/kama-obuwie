@@ -10,11 +10,7 @@ import ReturnPolicySelector from "./ReturnPolicySelector";
 import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
 import WarrantySelector from "./WarrantySelector";
 import AvailabilityField from "./AvailabilityField";
-import { FormEvent, useEffect, useState } from "react";
-import {
-  ProductWithId,
-  SizingTableWithId,
-} from "@/firebase/schemas/productsSchemas";
+import { FormEvent, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { useFullPageLoading } from "../../global/FullPageLoader";

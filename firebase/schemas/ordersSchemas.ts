@@ -103,6 +103,18 @@ export const AddressSchema = z.object({
   phoneNumber: z.string().nullable(),
 });
 
+export const PickupPointSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable(),
+  address: z.object({
+    street: z.string(),
+    city: z.string(),
+    zipCode: z.string(),
+    countryCode: z.string().length(2),
+  }),
+});
+
 export const OrderDeliveryDataSchema = z.object({
   address: AddressSchema.optional(),
   method: z
@@ -111,19 +123,7 @@ export const OrderDeliveryDataSchema = z.object({
       name: z.string(),
     })
     .nullable(),
-  pickupPoint: z
-    .object({
-      id: z.string(),
-      name: z.string(),
-      description: z.string().nullable(),
-      address: z.object({
-        street: z.string(),
-        city: z.string(),
-        zipCode: z.string(),
-        countryCode: z.string().length(2),
-      }),
-    })
-    .nullable(),
+  pickupPoint: PickupPointSchema.nullable(),
   cost: PriceSchema.nullable(),
   smart: z.boolean().nullable(),
   calculatedNumberOfPackages: z.number().nullable(),

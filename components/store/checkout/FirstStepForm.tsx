@@ -39,6 +39,18 @@ export default function FirstStepForm({
     }
   };
 
+  // Funkcja do obsługi zmian w polach z automatycznym czyszczeniem błędów
+  const handleFieldChange =
+    (fieldName: "firstName" | "lastName" | "phoneNumber" | "email") =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Aktualizuj wartość pola
+      form.setValue(fieldName, e.target.value);
+      // Usuń błąd dla tego pola jeśli istnieje
+      if (form.formState.errors[fieldName]) {
+        form.clearErrors(fieldName);
+      }
+    };
+
   return (
     <div className="flex flex-col gap-4">
       <FormField
@@ -48,14 +60,7 @@ export default function FirstStepForm({
           <FormItem className="max-w-2xs">
             <FormLabel>Imię</FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                onChange={(e) => {
-                  field.onChange(e);
-                  // Usuwamy błąd dla tego pola po rozpoczęciu edycji
-                  form.clearErrors("firstName");
-                }}
-              />
+              <Input {...field} onChange={handleFieldChange("firstName")} />
             </FormControl>
             <FormMessage className="text-text" />
           </FormItem>
@@ -68,13 +73,7 @@ export default function FirstStepForm({
           <FormItem className="max-w-2xs">
             <FormLabel>Nazwisko</FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                onChange={(e) => {
-                  field.onChange(e);
-                  form.clearErrors("lastName");
-                }}
-              />
+              <Input {...field} onChange={handleFieldChange("lastName")} />
             </FormControl>
             <FormMessage className="text-text" />
           </FormItem>
@@ -90,10 +89,7 @@ export default function FirstStepForm({
               <Input
                 {...field}
                 maxLength={9}
-                onChange={(e) => {
-                  field.onChange(e);
-                  form.clearErrors("phoneNumber");
-                }}
+                onChange={handleFieldChange("phoneNumber")}
               />
             </FormControl>
             <FormMessage className="text-text" />
@@ -107,13 +103,7 @@ export default function FirstStepForm({
           <FormItem className="max-w-2xs">
             <FormLabel>E-mail</FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                onChange={(e) => {
-                  field.onChange(e);
-                  form.clearErrors("email");
-                }}
-              />
+              <Input {...field} onChange={handleFieldChange("email")} />
             </FormControl>
             <FormMessage className="text-text" />
           </FormItem>

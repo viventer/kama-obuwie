@@ -14,6 +14,8 @@ export default function CheckoutForms() {
 
   const form = useForm({
     resolver: zodResolver(CheckoutDataSchema),
+    mode: "onSubmit", // Walidacja tylko przy submit
+    reValidateMode: "onChange", // Ale ponowna walidacja podczas wpisywania po pierwszym błędzie
     defaultValues: {
       firstName: "",
       lastName: "",

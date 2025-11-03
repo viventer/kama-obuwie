@@ -14,8 +14,8 @@ export const CheckoutDataSchema = z.object({
   lastName: z.string().min(3, "Nazwisko jest wymagane."),
   email: z
     .string()
-    .min(5, "Email jest wymagany.")
-    .email("Nieprawidłowy format emaila."),
+    .min(1, "Email jest wymagany.")
+    .email("Nieprawidłowy format e-maila."),
   phoneNumber: z
     .string()
     .min(1, "Numer telefonu jest wymagany.")
@@ -26,7 +26,13 @@ export const CheckoutDataSchema = z.object({
   address: z
     .object({
       city: z.string().min(2, "Miasto jest wymagane."),
-      postalCode: z.string().min(5, "Kod pocztowy jest wymagany."),
+      postalCode: z
+        .string()
+        .min(1, "Kod pocztowy jest wymagany.")
+        .regex(
+          /^\d{2}-\d{3}$/,
+          "Kod pocztowy musi być w formacie dd-ddd (np. 00-000)."
+        ),
       street: z.string().min(3, "Ulica jest wymagana."),
       buildingNumber: z.string().min(1, "Numer budynku jest wymagany."),
       apartmentNumber: z.string().min(1, "Numer mieszkania jest wymagany."),

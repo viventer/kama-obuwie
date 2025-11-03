@@ -126,7 +126,7 @@ export default function ShoppingCartPage() {
           <Button
             variant={"important"}
             className="text-xl px-6 w-fit"
-            onClick={() => router.push("/checkout/customer-details")}
+            onClick={() => router.push("/checkout")}
           >
             Do kasy
           </Button>

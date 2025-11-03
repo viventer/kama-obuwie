@@ -166,7 +166,7 @@ export const OrderItemSchema = z.object({
   id: z.string(),
   offer: z.object({
     thumbnail: z.string().url(),
-    id: z.string(),
+    id: z.string().nullable(), // null in case of accessories
     allegroId: z.string().nullable(),
     name: z.string().nullable(),
     signature: z.string(),

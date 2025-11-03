@@ -7,8 +7,11 @@ import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CheckoutDataSchema } from "@/firebase/schemas/checkoutSchemas";
+import { useState } from "react";
 
 export default function CheckoutForms() {
+  const [activeTab, setActiveTab] = useState("firstStep");
+
   const form = useForm({
     resolver: zodResolver(CheckoutDataSchema),
     defaultValues: {
@@ -16,20 +19,26 @@ export default function CheckoutForms() {
       lastName: "",
       email: "",
       phoneNumber: "",
-      deliveryData: {
+      address: {
         city: "",
         postalCode: "",
-        address: "",
-        method: "courier",
+        street: "",
+        buildingNumber: "",
+        apartmentNumber: "",
       },
+      deliveryMethod: "courier",
       paymentMethod: "quickTransfer",
       pickupPoint: undefined,
     },
   });
 
+  const goToNextStep = () => {
+    setActiveTab("secondStep");
+  };
+
   return (
-    <Tabs defaultValue="firstStep">
-      <TabsList>
+    <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <TabsList className="mb-4">
         <TabsTrigger value="firstStep" className="text-xl font-normal">
           <span className="mr-1 aspect-square text-text bg-brand h-full flex items-center justify-center rounded-xs font-bold text-normal">
             1
@@ -45,10 +54,10 @@ export default function CheckoutForms() {
       </TabsList>
       <Form {...form}>
         <TabsContent value="firstStep">
-          <FirstStepForm />
+          <FirstStepForm form={form} onNext={goToNextStep} />
         </TabsContent>
         <TabsContent value="secondStep">
-          <SecondStepForm />
+          <SecondStepForm form={form} />
         </TabsContent>
       </Form>
     </Tabs>

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { PickupPointSchema } from "./ordersSchemas";
 
-export const DeliveryMethodSchema = z.enum(["courier", "pickupPoint"]);
+export const DeliveryMethodSchema = z.enum(["courier", "parcelLocker"]);
 export const PaymentMethodSchema = z.enum([
   "BLIK",
   "quickTransfer",

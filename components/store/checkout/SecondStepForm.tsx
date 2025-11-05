@@ -1,10 +1,17 @@
 import { CheckoutData } from "@/firebase/schemas/checkoutSchemas";
 import { UseFormReturn } from "react-hook-form";
+import DeliveryMethodSelector from "./DeliveryMethodSelector";
+import DeliveryAddressFields from "./DeliveryAddressFields";
 
 export default function SecondStepForm({
   form,
 }: {
   form: UseFormReturn<CheckoutData>;
 }) {
-  return <div>SecondStepForm</div>;
+  return (
+    <div className="flex flex-col gap-8">
+      <DeliveryMethodSelector form={form} />
+      <DeliveryAddressFields form={form} />
+    </div>
+  );
 }

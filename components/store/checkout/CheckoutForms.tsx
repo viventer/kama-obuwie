@@ -8,6 +8,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CheckoutDataSchema } from "@/firebase/schemas/checkoutSchemas";
 import { useState } from "react";
+import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
+import {
+  InpostGeowidgetReact,
+  InpostGeowidgetReactProps,
+} from "inpost-geowidget-react";
 
 export default function CheckoutForms() {
   const [activeTab, setActiveTab] = useState("firstStep");

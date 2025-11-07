@@ -1,3 +1,5 @@
+"use client";
+
 import { CheckoutData } from "@/firebase/schemas/checkoutSchemas";
 import { UseFormReturn } from "react-hook-form";
 import DeliveryMethodSelector from "./DeliveryMethodSelector";
@@ -15,7 +17,7 @@ export default function SecondStepForm({
     <div className="flex flex-col gap-8">
       <DeliveryMethodSelector form={form} />
       {deliveryMethod === "courier" && <DeliveryAddressFields form={form} />}
-      {deliveryMethod === "parcelLocker" && <InPostSelector form={form} />}
+      <InPostSelector form={form} />
     </div>
   );
 }

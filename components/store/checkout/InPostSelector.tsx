@@ -44,6 +44,8 @@ export default function InPostSelector({
   const [selectedPickupPoint, setSelectedPickupPoint] =
     useState<PickupPoint | null>(null);
 
+  const deliveryMethod = form.watch("deliveryMethod");
+
   const widgetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -122,7 +124,10 @@ export default function InPostSelector({
   };
 
   return (
-    <div className="space-y-4" ref={widgetRef}>
+    <div
+      className={`space-y-4 ${deliveryMethod == "courier" ? "hidden" : ""}`}
+      ref={widgetRef}
+    >
       <h3 className="text-xl">Punkt odbioru InPost</h3>
 
       {selectedPickupPoint && !showWidget ? (

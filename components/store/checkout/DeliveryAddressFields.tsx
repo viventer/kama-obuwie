@@ -7,7 +7,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { CheckoutData } from "@/firebase/schemas/checkoutSchemas";
-import { CircleDotIcon, DotIcon, DotSquareIcon } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 export default function DeliveryAddressFields({

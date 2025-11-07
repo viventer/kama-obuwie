@@ -41,6 +41,7 @@ export const CheckoutDataSchema = z.object({
   deliveryMethod: DeliveryMethodSchema,
   paymentMethod: PaymentMethodSchema,
   pickupPoint: PickupPointSchema.optional(),
+  activeTab: z.enum(["firstStep", "secondStep"]),
 });
 
 export type CheckoutData = z.infer<typeof CheckoutDataSchema>;

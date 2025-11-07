@@ -8,15 +8,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CheckoutDataSchema } from "@/firebase/schemas/checkoutSchemas";
 import { useState } from "react";
-import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
-import {
-  InpostGeowidgetReact,
-  InpostGeowidgetReactProps,
-} from "inpost-geowidget-react";
+import InPostSelector from "./InPostSelector";
 
 export default function CheckoutForms() {
-  const [activeTab, setActiveTab] = useState("firstStep");
-
   const form = useForm({
     resolver: zodResolver(CheckoutDataSchema),
     mode: "onSubmit", // Walidacja tylko przy submit
@@ -36,15 +30,23 @@ export default function CheckoutForms() {
       deliveryMethod: "courier",
       paymentMethod: "quickTransfer",
       pickupPoint: undefined,
+      activeTab: "firstStep",
     },
   });
 
   const goToNextStep = () => {
-    setActiveTab("secondStep");
+    form.setValue("activeTab", "secondStep");
   };
 
+  const activeTab = form.watch("activeTab");
+
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab}>
+    <Tabs
+      value={activeTab}
+      onValueChange={(value) =>
+        form.setValue("activeTab", value as "firstStep" | "secondStep")
+      }
+    >
       <TabsList className="mb-4">
         <TabsTrigger value="firstStep" className="text-xl font-normal">
           <span className="mr-1 aspect-square text-text bg-brand h-full flex items-center justify-center rounded-xs font-bold text-normal">
@@ -66,6 +68,7 @@ export default function CheckoutForms() {
         <TabsContent value="secondStep">
           <SecondStepForm form={form} />
         </TabsContent>
+        <InPostSelector form={form} />
       </Form>
     </Tabs>
   );

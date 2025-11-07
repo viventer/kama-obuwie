@@ -45,6 +45,7 @@ export default function InPostSelector({
     useState<PickupPoint | null>(null);
 
   const deliveryMethod = form.watch("deliveryMethod");
+  const activeTab = form.watch("activeTab");
 
   const widgetRef = useRef<HTMLDivElement>(null);
 
@@ -125,7 +126,9 @@ export default function InPostSelector({
 
   return (
     <div
-      className={`space-y-4 ${deliveryMethod == "courier" ? "hidden" : ""}`}
+      className={`space-y-4 ${
+        deliveryMethod == "courier" || activeTab === "firstStep" ? "hidden" : ""
+      }`}
       ref={widgetRef}
     >
       <h3 className="text-xl">Punkt odbioru InPost</h3>

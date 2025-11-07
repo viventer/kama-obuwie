@@ -7,10 +7,12 @@ import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { CheckoutDataSchema } from "@/firebase/schemas/checkoutSchemas";
-import { useState } from "react";
 import InPostSelector from "./InPostSelector";
+import { useToast } from "@/hooks/useToast";
 
 export default function CheckoutForms() {
+  const { showToast } = useToast();
+
   const form = useForm({
     resolver: zodResolver(CheckoutDataSchema),
     mode: "onSubmit", // Walidacja tylko przy submit
@@ -34,19 +36,47 @@ export default function CheckoutForms() {
     },
   });
 
-  const goToNextStep = () => {
-    form.setValue("activeTab", "secondStep");
+  // Wyodrębniona funkcja walidacji pierwszego etapu
+  const validateFirstStep = async (): Promise<boolean> => {
+    return await form.trigger([
+      "firstName",
+      "lastName",
+      "phoneNumber",
+      "email",
+    ]);
+  };
+
+  const goToNextStep = async () => {
+    const isValid = await validateFirstStep();
+
+    if (isValid) {
+      form.setValue("activeTab", "secondStep");
+    }
   };
 
   const activeTab = form.watch("activeTab");
 
-  return (
-    <Tabs
-      value={activeTab}
-      onValueChange={(value) =>
-        form.setValue("activeTab", value as "firstStep" | "secondStep")
+  const handleTabChange = async (value: string) => {
+    if (value === "secondStep") {
+      const isValid = await validateFirstStep();
+
+      if (isValid) {
+        form.setValue("activeTab", value as "firstStep" | "secondStep");
+      } else {
+        // Wyświetl toast z komunikatem błędu
+        showToast(
+          "Proszę uzupełnić wszystkie wymagane pola w pierwszym etapie",
+          "error"
+        );
       }
-    >
+    } else {
+      // Zawsze pozwól na powrót do pierwszego etapu
+      form.setValue("activeTab", value as "firstStep" | "secondStep");
+    }
+  };
+
+  return (
+    <Tabs value={activeTab} onValueChange={handleTabChange}>
       <TabsList className="mb-4">
         <TabsTrigger value="firstStep" className="text-xl font-normal">
           <span className="mr-1 aspect-square text-text bg-brand h-full flex items-center justify-center rounded-xs font-bold text-normal">

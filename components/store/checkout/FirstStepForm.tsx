@@ -22,21 +22,8 @@ export default function FirstStepForm({
 }) {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    // Walidacja tylko pól z pierwszego etapu
-    const isValid = await form.trigger([
-      "firstName",
-      "lastName",
-      "phoneNumber",
-      "email",
-    ]);
-
-    if (isValid) {
-      // Przejście do następnego etapu
-      onNext?.();
-    } else {
-      console.log("Niektóre pola zawierają błędy");
-    }
+    // Delegacja walidacji i przełączania do rodzica
+    onNext?.();
   };
 
   // Funkcja do obsługi zmian w polach z automatycznym czyszczeniem błędów
@@ -60,7 +47,11 @@ export default function FirstStepForm({
           <FormItem className="max-w-2xs">
             <FormLabel>Imię</FormLabel>
             <FormControl>
-              <Input {...field} onChange={handleFieldChange("firstName")} />
+              <Input
+                {...field}
+                onChange={handleFieldChange("firstName")}
+                maxLength={24}
+              />
             </FormControl>
             <FormMessage className="text-text" />
           </FormItem>
@@ -73,7 +64,11 @@ export default function FirstStepForm({
           <FormItem className="max-w-2xs">
             <FormLabel>Nazwisko</FormLabel>
             <FormControl>
-              <Input {...field} onChange={handleFieldChange("lastName")} />
+              <Input
+                {...field}
+                onChange={handleFieldChange("lastName")}
+                maxLength={36}
+              />
             </FormControl>
             <FormMessage className="text-text" />
           </FormItem>
@@ -103,7 +98,11 @@ export default function FirstStepForm({
           <FormItem className="max-w-2xs">
             <FormLabel>E-mail</FormLabel>
             <FormControl>
-              <Input {...field} onChange={handleFieldChange("email")} />
+              <Input
+                {...field}
+                onChange={handleFieldChange("email")}
+                maxLength={254}
+              />
             </FormControl>
             <FormMessage className="text-text" />
           </FormItem>

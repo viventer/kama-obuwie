@@ -18,19 +18,30 @@ export default function PaymentMethodSelector({
 }: {
   form: UseFormReturn<CheckoutData>;
 }) {
+  const deliveryMethod = form.watch("deliveryMethod");
+  const filteredPaymentMethods =
+    deliveryMethod === "parcelLocker"
+      ? paymentMethods.filter((method) => method !== "COD")
+      : paymentMethods;
+
+  const activeTab = form.watch("activeTab");
+
   return (
     <FormField
       control={form.control}
       name="paymentMethod"
       render={({ field }) => (
-        <FormItem className="max-w-2xs">
+        <FormItem
+          className={`${activeTab != "secondStep" ? "hidden" : ""} max-w-2xs`}
+        >
           <h2 className="text-xl mb-1">Metoda płatności</h2>
           <RadioGroup onValueChange={field.onChange} value={field.value}>
-            {paymentMethods.map((method) => (
+            {filteredPaymentMethods.map((method, index) => (
               <div
                 className={`flex items-center gap-2 border-2 px-2 py-1 rounded-sm transition-colors ${
                   field.value === method ? "border-brand" : "border-border"
                 }`}
+                key={index}
               >
                 <FormControl>
                   <RadioGroupItem value={method} id={method} />

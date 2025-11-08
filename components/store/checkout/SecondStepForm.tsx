@@ -4,7 +4,6 @@ import { CheckoutData } from "@/firebase/schemas/checkoutSchemas";
 import { UseFormReturn } from "react-hook-form";
 import DeliveryMethodSelector from "./DeliveryMethodSelector";
 import DeliveryAddressFields from "./DeliveryAddressFields";
-import PaymentMethodSelector from "./PaymentMethodSelector";
 
 export default function SecondStepForm({
   form,
@@ -17,7 +16,6 @@ export default function SecondStepForm({
     <div className="flex flex-col gap-8">
       <DeliveryMethodSelector form={form} />
       {deliveryMethod === "courier" && <DeliveryAddressFields form={form} />}
-      <PaymentMethodSelector form={form} />
     </div>
   );
 }

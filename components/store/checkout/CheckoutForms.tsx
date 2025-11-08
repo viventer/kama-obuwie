@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { CheckoutDataSchema } from "@/firebase/schemas/checkoutSchemas";
 import InPostSelector from "./InPostSelector";
 import { useToast } from "@/hooks/useToast";
+import PaymentMethodSelector from "./PaymentMethodSelector";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
@@ -95,10 +96,13 @@ export default function CheckoutForms() {
         <TabsContent value="firstStep">
           <FirstStepForm form={form} onNext={goToNextStep} />
         </TabsContent>
-        <TabsContent value="secondStep">
-          <SecondStepForm form={form} />
-        </TabsContent>
-        <InPostSelector form={form} />
+        <div className="flex flex-col gap-8">
+          <TabsContent value="secondStep">
+            <SecondStepForm form={form} />
+          </TabsContent>
+          <InPostSelector form={form} />
+          <PaymentMethodSelector form={form} />
+        </div>
       </Form>
     </Tabs>
   );

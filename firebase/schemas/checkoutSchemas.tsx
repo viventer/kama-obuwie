@@ -51,7 +51,7 @@ export const CheckoutDataSchema = z.object({
         ),
       street: z.string().min(3, "Ulica jest wymagana."),
       buildingNumber: z.string().min(1, "Numer budynku jest wymagany."),
-      apartmentNumber: z.string().min(1, "Numer mieszkania jest wymagany."),
+      apartmentNumber: z.string().optional(),
     })
     .optional(),
   deliveryMethod: DeliveryMethodSchema,

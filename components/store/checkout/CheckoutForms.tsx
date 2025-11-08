@@ -77,6 +77,8 @@ export default function CheckoutForms() {
     }
   };
 
+  const placeOrder = () => {};
+
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange}>
       <TabsList className="mb-4">
@@ -109,7 +111,7 @@ export default function CheckoutForms() {
             <InPostSelector form={form} />
             <PaymentMethodSelector form={form} />
           </div>
-          <OrderSummary />
+          <OrderSummary orderButtonHandler={placeOrder} form={form} />
         </div>
       </Form>
     </Tabs>

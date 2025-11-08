@@ -45,7 +45,6 @@ export default function InPostSelector({
     useState<PickupPoint | null>(null);
 
   const deliveryMethod = form.watch("deliveryMethod");
-  const activeTab = form.watch("activeTab");
 
   const widgetRef = useRef<HTMLDivElement>(null);
 
@@ -114,6 +113,8 @@ export default function InPostSelector({
 
   const handleChangePoint = () => {
     setShowWidget(true);
+
+    form.setValue("pickupPoint", undefined);
 
     setTimeout(() => {
       widgetRef.current?.scrollIntoView({

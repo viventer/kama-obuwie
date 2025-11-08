@@ -67,7 +67,7 @@ export default function OrderSummary({
   return (
     <section className="w-fit overflow-hidden">
       <Accordion type="single" collapsible>
-        <AccordionItem value="order-summary" className="max-w-xl w-xl">
+        <AccordionItem value="order-summary" className="max-w-md w-md">
           <AccordionTrigger className="cursor-pointer">
             <h2 className="text-xl">Podsumowanie zamówienia</h2>
           </AccordionTrigger>

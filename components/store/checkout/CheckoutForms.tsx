@@ -81,15 +81,24 @@ export default function CheckoutForms() {
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange}>
-      <TabsList className="mb-4">
-        <TabsTrigger value="firstStep" className="text-xl font-normal">
-          <span className="mr-1 aspect-square text-text bg-brand h-full flex items-center justify-center rounded-xs font-bold text-normal">
+      <TabsList className="mb-4 gap-0 2xs:gap-2">
+        <TabsTrigger
+          value="firstStep"
+          className="text-sm font-normal xs:text-base sm:text-lg"
+        >
+          <span className="mr-1 aspect-square text-text bg-brand h-full items-center justify-center rounded-xs font-bold text-normal hidden xs:flex">
             1
           </span>
-          Dane podstawowe
+          Dane{" "}
+          <span className="max-w-[60px] overflow-hidden whitespace-nowrap text-ellipsis 2xs:max-w-full">
+            podstawowe
+          </span>
         </TabsTrigger>
-        <TabsTrigger value="secondStep" className="text-xl font-normal">
-          <span className="aspect-square mr-1 text-text bg-brand h-full flex items-center justify-center rounded-xs font-bold text-normal">
+        <TabsTrigger
+          value="secondStep"
+          className="text-sm font-normal xs:text-base sm:text-lg"
+        >
+          <span className="aspect-square mr-1 text-text bg-brand h-full items-center justify-center rounded-xs font-bold text-normal hidden xs:flex">
             2
           </span>
           Dostawa i płatność
@@ -102,7 +111,7 @@ export default function CheckoutForms() {
         <div
           className={`${
             activeTab != "secondStep" ? "hidden" : ""
-          } flex gap-8 justify-between`}
+          } flex flex-col gap-8 justify-between xl:flex-row`}
         >
           <div className="space-y-8 flex-1">
             <TabsContent value="secondStep">

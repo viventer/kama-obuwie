@@ -126,8 +126,8 @@ export default function InPostSelector({
 
   return (
     <div
-      className={`space-y-4 ${
-        deliveryMethod == "courier" || activeTab === "firstStep" ? "hidden" : ""
+      className={`space-y-4 w-full ${
+        deliveryMethod == "courier" ? "hidden" : ""
       }`}
       ref={widgetRef}
     >
@@ -147,7 +147,7 @@ export default function InPostSelector({
         </Card>
       ) : (
         // Wyświetl widget do wyboru punktu
-        <div className="rounded-md overflow-hidden h-[75vh] flex items-center justify-center relative">
+        <div className="rounded-md overflow-hidden aspect-[3/2] flex items-center justify-center relative w-full">
           <div className="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]">
             <Loader />
           </div>

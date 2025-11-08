@@ -10,6 +10,7 @@ import ShoppingCartItem from "./ShoppingCartItem";
 import { Button } from "@/components/ui/button";
 import AdvantagesBox from "../product/AdvantagesBox";
 import { useRouter } from "next/navigation";
+import ShippingInfo from "../global/ShippingInfo";
 
 export default function ShoppingCartPage() {
   const { cart, removeFromCart, isLoading } = useShoppingCart();
@@ -125,11 +126,12 @@ export default function ShoppingCartPage() {
           </div>
           <Button
             variant={"important"}
-            className="text-xl px-6 w-fit"
+            className="text-xl px-6 w-fit mb-2"
             onClick={() => router.push("/checkout")}
           >
             Do kasy
           </Button>
+          <ShippingInfo />
         </div>
         <AdvantagesBox price={totalPrice} />
       </div>

@@ -21,8 +21,8 @@ import ProductSpecifications from "./ProductSpecifications";
 import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import { useToast } from "@/hooks/useToast";
-import Image from "next/image";
 import ShoppingCartPreviewItem from "../shopping-cart/ShoppingCartPreviewItem";
+import ShippingInfo from "../global/ShippingInfo";
 
 export default function ProductPage({
   imagesUrls,
@@ -211,10 +211,7 @@ export default function ProductPage({
           >
             Dodaj do koszyka
           </Button>
-          <p className="flex items-center gap-2 font-medium">
-            <ClockIcon className="size-5 text-success" />
-            {getShippingInfo()}
-          </p>
+          <ShippingInfo />
         </article>
         <AdvantagesBox price={price} />
         <ProductSpecifications

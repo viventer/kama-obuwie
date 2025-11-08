@@ -1,3 +1,5 @@
+"use client";
+
 import {
   FormControl,
   FormField,
@@ -31,9 +33,7 @@ export default function PaymentMethodSelector({
       control={form.control}
       name="paymentMethod"
       render={({ field }) => (
-        <FormItem
-          className={`${activeTab != "secondStep" ? "hidden" : ""} max-w-2xs`}
-        >
+        <FormItem className={`max-w-2xs`}>
           <h2 className="text-xl mb-1">Metoda płatności</h2>
           <RadioGroup onValueChange={field.onChange} value={field.value}>
             {filteredPaymentMethods.map((method, index) => (

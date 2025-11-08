@@ -12,7 +12,7 @@ import LinkText from "@/components/adminPanel/global/LinkText";
 interface ShoppingCartItemProps {
   cartItem: ShoppingCartItemType;
   offerData?: OfferWithId;
-  onRemove: (itemId: string, itemName: string) => void;
+  onRemove?: (itemId: string, itemName: string) => void;
 }
 
 export default function ShoppingCartItem({
@@ -24,7 +24,9 @@ export default function ShoppingCartItem({
     const itemName = `${cartItem.item.categoryName} ${
       cartItem.item.brand || ""
     }`;
-    onRemove(cartItem.id, itemName);
+    if (onRemove) {
+      onRemove(cartItem.id, itemName);
+    }
   };
 
   return (
@@ -44,6 +46,7 @@ export default function ShoppingCartItem({
           <div className="flex-1 min-w-0">
             <LinkText
               href={`/product/${cartItem.item.productId}?colorVariantName=${cartItem.item.formattedMainColor}`}
+              target="_blank"
             >
               <h3 className="font-medium text-lg sm:text-xl truncate text-card-foreground capitalize">
                 {cartItem.item.categoryName} {cartItem.item.brand}
@@ -79,13 +82,15 @@ export default function ShoppingCartItem({
               </EditCartItemDialog>
             )}
 
-            <IconButton
-              title="Usuń z koszyka"
-              className="text-destructive hover:text-text"
-              onClick={handleRemove}
-            >
-              <TrashIcon className="size-5 sm:size-6" />
-            </IconButton>
+            {onRemove && (
+              <IconButton
+                title="Usuń z koszyka"
+                className="text-destructive hover:text-text"
+                onClick={handleRemove}
+              >
+                <TrashIcon className="size-5 sm:size-6" />
+              </IconButton>
+            )}
           </div>
         </div>
       </CardContent>

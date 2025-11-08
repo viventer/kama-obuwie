@@ -10,6 +10,7 @@ import { CheckoutDataSchema } from "@/firebase/schemas/checkoutSchemas";
 import InPostSelector from "./InPostSelector";
 import { useToast } from "@/hooks/useToast";
 import PaymentMethodSelector from "./PaymentMethodSelector";
+import OrderSummary from "./OrderSummary";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
@@ -96,12 +97,19 @@ export default function CheckoutForms() {
         <TabsContent value="firstStep">
           <FirstStepForm form={form} onNext={goToNextStep} />
         </TabsContent>
-        <div className="flex flex-col gap-8">
-          <TabsContent value="secondStep">
-            <SecondStepForm form={form} />
-          </TabsContent>
-          <InPostSelector form={form} />
-          <PaymentMethodSelector form={form} />
+        <div
+          className={`${
+            activeTab != "secondStep" ? "hidden" : ""
+          } flex gap-8 justify-between`}
+        >
+          <div className="space-y-8 flex-1">
+            <TabsContent value="secondStep">
+              <SecondStepForm form={form} />
+            </TabsContent>
+            <InPostSelector form={form} />
+            <PaymentMethodSelector form={form} />
+          </div>
+          <OrderSummary />
         </div>
       </Form>
     </Tabs>

@@ -7,7 +7,7 @@ import { CheckoutData } from "@/firebase/schemas/checkoutSchemas";
 import Loader from "@/components/adminPanel/global/Loader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CrossIcon, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
 import IconButton from "@/components/adminPanel/global/IconButton";
 
 interface InPostSelectorProps {

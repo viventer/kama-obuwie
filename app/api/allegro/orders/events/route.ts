@@ -1,5 +1,5 @@
 import { getAllegroOrderEvents } from "@/server-actions/allegro/orders";
-import { apiResponse, apiErrorResponse } from "@/server-actions/helpers";
+import { apiResponse, apiErrorResponse } from "@/server-actions/errorHandlers";
 
 export async function GET() {
   try {

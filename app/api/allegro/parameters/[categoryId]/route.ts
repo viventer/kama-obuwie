@@ -1,5 +1,5 @@
 import { getProductParameters } from "@/server-actions/allegro/products";
-import { apiResponse } from "@/server-actions/helpers";
+import { apiResponse } from "@/server-actions/errorHandlers";
 import { NextRequest } from "next/server";
 
 export async function GET(

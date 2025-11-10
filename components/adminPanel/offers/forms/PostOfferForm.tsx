@@ -29,7 +29,7 @@ import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { useRouter } from "next/navigation";
 import MiniLoader from "../../global/MiniLoader";
 import ReturnPolicySelector from "./ReturnPolicySelector";
-import { handleApiError } from "@/server-actions/helpers";
+import { handleApiError } from "@/server-actions/errorHandlers";
 import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
 import WarrantySelector from "./WarrantySelector";
 import TitlesField from "./TitlesField";

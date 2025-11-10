@@ -31,7 +31,7 @@ import AllegroParametersSection from "./AllegroParametersSection";
 import {
   DocumentDataWithRef,
   formatAllegroError,
-} from "@/server-actions/helpers";
+} from "@/server-actions/errorHandlers";
 import RangeSizesFormItem, { RangeSizeString } from "./RangeSizesFormItem";
 import MatchingCategoriesSelector from "../categories/MatchingCategoriesSelector";
 import MultipleSearchSelect from "../../global/form/MultipleSearchSelect";

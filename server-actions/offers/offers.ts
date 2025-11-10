@@ -13,7 +13,7 @@ import {
 } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
-import { AllegroSalesChannel } from "@/lib/constants";
+import { AllegroSalesChannel, SalesChannel } from "@/lib/constants";
 import { editAllegroOffer } from "../allegro/offers";
 
 export const createOffer = async function (newOffer: Partial<Offer>) {
@@ -87,14 +87,18 @@ export const getPostOfferBody = async ({
 
 export const syncOffersAvailability = async function (
   orderItems: Order["lineItems"],
-  salesChannel: AllegroSalesChannel,
+  salesChannel: SalesChannel,
   eventType: "order" | "return"
 ) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
   // Określ przeciwny kanał Allegro
-  const otherChannel: AllegroSalesChannel =
-    salesChannel === "AL1" ? "AL2" : "AL1";
+  const otherChannels: AllegroSalesChannel[] =
+    salesChannel === "AL1"
+      ? ["AL2"]
+      : salesChannel === "AL2"
+      ? ["AL1"]
+      : ["AL1", "AL2"];
 
   for (const item of orderItems) {
     const { SKU, size, allegroId: mainChannelOfferId } = item.offer;
@@ -141,49 +145,58 @@ export const syncOffersAvailability = async function (
           [`availability.${size}.value`]: newAvailability.toString(),
         });
 
-      // Zaktualizuj dostępność na przeciwnym kanale Allegro
-      const otherChannelOfferId =
-        offer.allegroOffersIds?.[otherChannel]?.[size];
+      // Zaktualizuj dostępność na wszystkich przeciwnych kanałach Allegro
+      const updateOfferData = {
+        stock: {
+          available: newAvailability,
+          unit: "PAIR" as const,
+        },
+        publication: {
+          status: newAvailability > 0 ? "ACTIVE" : "INACTIVE",
+        },
+      };
 
-      if (otherChannelOfferId) {
+      for (const channel of otherChannels) {
+        const channelOfferId = offer.allegroOffersIds?.[channel]?.[size];
+
+        if (channelOfferId) {
+          try {
+            await editAllegroOffer(channelOfferId, channel, updateOfferData);
+          } catch (error) {
+            console.error(
+              `Błąd podczas aktualizacji oferty Allegro ${channelOfferId} na kanale ${channel}:`,
+              error
+            );
+            // Nie przerywamy wykonywania funkcji, tylko logujemy błąd
+          }
+        } else {
+          console.warn(
+            `Brak ID oferty Allegro dla SKU: ${SKU}, rozmiar: ${size}, kanał: ${channel}`
+          );
+        }
+      }
+
+      // W przypadku zwrotu, zaktualizuj również główny kanał (tylko jeśli to kanał Allegro)
+      if (
+        eventType === "return" &&
+        mainChannelOfferId &&
+        (salesChannel === "AL1" || salesChannel === "AL2")
+      ) {
         try {
-          const updateOfferData = {
-            stock: {
-              available: newAvailability,
-              unit: "PAIR" as const,
-            },
-            publication: {
-              status: newAvailability > 0 ? "ACTIVE" : "INACTIVE",
-            },
-          };
-
           await editAllegroOffer(
-            otherChannelOfferId,
-            otherChannel,
+            mainChannelOfferId,
+            salesChannel,
             updateOfferData
           );
-          if (eventType === "return" && mainChannelOfferId) {
-            await editAllegroOffer(
-              mainChannelOfferId,
-              salesChannel,
-              updateOfferData
-            );
-          }
         } catch (error) {
           console.error(
-            `Błąd podczas aktualizacji oferty Allegro ${otherChannelOfferId} na kanale ${otherChannel}:`,
+            `Błąd podczas aktualizacji oferty Allegro ${mainChannelOfferId} na głównym kanale ${salesChannel}:`,
             error
           );
-          // Nie przerywamy wykonywania funkcji, tylko logujemy błąd
         }
-      } else {
-        console.warn(
-          `Brak ID oferty Allegro dla SKU: ${SKU}, rozmiar: ${size}, kanał: ${otherChannel}`
-        );
       }
     } catch (error) {
       console.error(`Błąd podczas przetwarzania produktu ${SKU}:`, error);
-      // Kontynuuj przetwarzanie pozostałych produktów
     }
   }
 };

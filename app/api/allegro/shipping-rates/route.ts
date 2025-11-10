@@ -1,5 +1,5 @@
 import { getAllegroShippingRates } from "@/server-actions/allegro/shippingRates";
-import { apiResponse } from "@/server-actions/helpers";
+import { apiResponse } from "@/server-actions/errorHandlers";
 
 export async function GET() {
   const data = await getAllegroShippingRates();

@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback, useId } from "react";
 import { flushSync } from "react-dom";
-import { shoppingCartItemSchema } from "@/firebase/schemas/shoppingCartSchemas";
+import { ShoppingCartItemSchema } from "@/firebase/schemas/shoppingCartSchemas";
 import { z } from "zod";
 
-type ShoppingCartItem = z.infer<typeof shoppingCartItemSchema>;
+type ShoppingCartItem = z.infer<typeof ShoppingCartItemSchema>;
 
 const SHOPPING_CART_KEY = "shopping-cart";
 
@@ -21,7 +21,7 @@ export function useShoppingCart() {
       if (savedCart) {
         const parsedCart = JSON.parse(savedCart);
         // Validate the cart data against schema
-        const validatedCart = z.array(shoppingCartItemSchema).parse(parsedCart);
+        const validatedCart = z.array(ShoppingCartItemSchema).parse(parsedCart);
         setCart(validatedCart);
       }
     } catch (error) {
@@ -68,7 +68,7 @@ export function useShoppingCart() {
 
       try {
         // Validate the new item
-        shoppingCartItemSchema.parse(newItem);
+        ShoppingCartItemSchema.parse(newItem);
         flushSync(() => {
           setCart((prevCart) => [...prevCart, newItem]);
         });
@@ -170,7 +170,7 @@ export function useShoppingCart() {
 
           try {
             // Validate the new item
-            shoppingCartItemSchema.parse(newItem);
+            ShoppingCartItemSchema.parse(newItem);
 
             // Replace old item with new one in single operation
             return prevCart.map((item) =>

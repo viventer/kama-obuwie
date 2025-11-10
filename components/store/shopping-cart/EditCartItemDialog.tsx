@@ -19,9 +19,9 @@ import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import SelectSize from "../product/SelectSize";
 import { Availability } from "@/firebase/schemas/offersSchemas";
 import { z } from "zod";
-import { shoppingCartItemSchema } from "@/firebase/schemas/shoppingCartSchemas";
+import { ShoppingCartItemSchema } from "@/firebase/schemas/shoppingCartSchemas";
 
-type ShoppingCartItem = z.infer<typeof shoppingCartItemSchema>;
+type ShoppingCartItem = z.infer<typeof ShoppingCartItemSchema>;
 
 export default function EditCartItemDialog({
   cartItem,

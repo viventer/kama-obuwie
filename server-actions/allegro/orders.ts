@@ -1,6 +1,6 @@
 "use server";
 
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { getAllegroUserAccessToken, getAllegroUserAccessTokens } from "./auth";
 import { getAllegroHeaders, getSingleAllegroHeaders } from "./global";
 import { redis } from "@/upstash/redis";
@@ -11,8 +11,9 @@ import { Order } from "@/firebase/schemas/ordersSchemas";
 import { Offer } from "@/firebase/schemas/offersSchemas";
 import { AllegroSalesChannel } from "@/lib/constants";
 import { getAllegroOffer } from "./offers";
-import { handleAxiosError } from "../helpers";
+import { handleAxiosError } from "../errorHandlers";
 import { parseExternalId } from "@/helpers/externalId";
+import { generateOrderNumber } from "../helpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -369,7 +370,11 @@ async function transformAllegroToOrder(
       isRead: false,
     },
     buyer: allegroOrder.buyer,
-    payment: allegroOrder.payment,
+    allegroPayment: allegroOrder.payment,
+    paymentType:
+      allegroOrder?.payment?.type === "CASH_ON_DELIVERY"
+        ? "COD"
+        : "ALLEGRO_ONLINE",
     allegroStatus: allegroOrder.status,
     fulfillment: allegroOrder.fulfillment,
     delivery: allegroOrder.delivery,
@@ -381,7 +386,7 @@ async function transformAllegroToOrder(
         }
       : null,
     lineItems: lineItems,
-    surcharges: allegroOrder.surcharges,
+    allegroSurcharges: allegroOrder.surcharges,
     summary: allegroOrder.summary,
     createdAt: allegroOrder.updatedAt || new Date().toISOString(),
     updatedAt: allegroOrder.updatedAt,
@@ -399,7 +404,7 @@ function transformAllegroToOrderUpdate(
       content: allegroOrder.messageToSeller,
       isRead: existingOrder.messageToSeller?.isRead || false,
     },
-    payment: allegroOrder.payment,
+    allegroPayment: allegroOrder.payment,
     allegroStatus: allegroOrder.status,
     fulfillment: {
       status:
@@ -439,7 +444,7 @@ function transformAllegroToOrderUpdate(
         discount: item.discount || null,
       };
     }),
-    surcharges: allegroOrder.surcharges,
+    allegroSurcharges: allegroOrder.surcharges,
     summary: allegroOrder.summary,
     updatedAt: new Date().toISOString(),
   };
@@ -487,52 +492,4 @@ export async function getOfferIdByAllegroId(
     );
     return null;
   }
-}
-
-/**
- * Generuje unikalny numer zamówienia w formacie base32
- * Format: XXXXXXXY gdzie Y to cyfra kanału sprzedaży (1-4)
- * - AL1 = 1, AL2 = 2, POS = 3, DTC = 4
- * - Maksymalnie 8 znaków
- * - Tylko duże litery i cyfry (bez O, 0, 1, I)
- * - Obsługuje 50k zamówień dziennie bez powtórzeń
- */
-function generateOrderNumber(
-  salesChannel: "AL1" | "AL2" | "POS" | "DTC"
-): string {
-  // Alfabet base32 bez niejednoznacznych znaków (bez O, 0, 1, I)
-  const ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // 32 znaki
-
-  // Mapowanie kanałów na cyfry
-  const channelMap = {
-    AL1: "1",
-    AL2: "2",
-    POS: "3",
-    DTC: "4",
-  };
-
-  // Timestamp w sekundach (zmniejsza rozmiar)
-  const timestamp = Math.floor(Date.now() / 1000);
-
-  // Losowa część (3 znaki) - dla 32^3 = 32,768 kombinacji na sekundę
-  const randomPart = Array.from(
-    { length: 3 },
-    () => ALPHABET[Math.floor(Math.random() * ALPHABET.length)]
-  ).join("");
-
-  // Konwersja timestamp na base32 (około 3-4 znaki)
-  let timestampBase32 = "";
-  let num = timestamp;
-  while (num > 0 && timestampBase32.length < 4) {
-    timestampBase32 = ALPHABET[num % 32] + timestampBase32;
-    num = Math.floor(num / 32);
-  }
-
-  // Skróć timestamp do maksymalnie 3 znaków (bierz ostatnie 3)
-  const shortTimestamp = timestampBase32.slice(-3);
-
-  // Format: [timestamp-3][random-3][channel-1] = 7 znaków
-  const orderNumber = shortTimestamp + randomPart + channelMap[salesChannel];
-
-  return orderNumber;
 }

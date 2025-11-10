@@ -3,7 +3,7 @@
 import axios from "axios";
 import { getAllegroUserAccessTokens } from "./auth";
 import { getAllegroHeaders } from "./global";
-import { handleAxiosError } from "../helpers";
+import { handleAxiosError } from "../errorHandlers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 

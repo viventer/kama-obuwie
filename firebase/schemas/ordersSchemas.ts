@@ -1,13 +1,18 @@
 import { z } from "zod";
 import { SalesChannelSchema } from "./otherSchemas";
+import { CheckoutDataSchema, PaymentMethodSchema } from "./checkoutSchemas";
+import { ShoppingCartItemSchema } from "./shoppingCartSchemas";
+import { AddressSchema, PickupPointSchema, PriceSchema } from "./commonSchemas";
 
-export const PaymentTypeSchema = z.enum([
+export const AllegroPaymentTypeSchema = z.enum([
   "CASH_ON_DELIVERY",
   "WIRE_TRANSFER",
   "ONLINE",
   "SPLIT_PAYMENT",
   "EXTENDED_TERM",
 ]);
+
+export const PaymentTypeSchema = z.enum(["COD", "P24", "ALLEGRO_ONLINE"]);
 
 export const PaymentProviderSchema = z.enum([
   "PAYU",
@@ -66,13 +71,8 @@ const RefundReasonSchema = z.enum([
   "NOT_COLLECTED",
 ]);
 
-export const PriceSchema = z.object({
-  amount: z.string(),
-  currency: z.enum(["PLN"]),
-});
-
 export const BuyerSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   email: z.string().email(),
   login: z.string().optional(),
   firstName: z.string().nullable(),
@@ -85,36 +85,13 @@ export const BuyerSchema = z.object({
   }),
 });
 
-export const PaymentSchema = z.object({
+export const AllegroPaymentSchema = z.object({
   id: z.string(),
-  type: PaymentTypeSchema,
+  type: AllegroPaymentTypeSchema,
   provider: PaymentProviderSchema.nullable().optional(),
   finishedAt: z.string().nullable(),
   paidAmount: PriceSchema.nullable(),
   reconcilation: PriceSchema.nullable().optional(),
-});
-
-export const AddressSchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  street: z.string(),
-  city: z.string(),
-  zipCode: z.string(), // postal code
-  countryCode: z.string().length(2), // ISO 3166-1 alpha-2
-  companyName: z.string().nullable(),
-  phoneNumber: z.string().nullable(),
-});
-
-export const PickupPointSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string().nullable(),
-  address: z.object({
-    street: z.string(),
-    city: z.string(),
-    zipCode: z.string(),
-    countryCode: z.string().length(2),
-  }),
 });
 
 export const OrderDeliveryDataSchema = z.object({
@@ -256,7 +233,8 @@ export const OrderSchema = z.object({
     })
     .nullable(),
   buyer: BuyerSchema,
-  payment: PaymentSchema.nullable(),
+  allegroPayment: AllegroPaymentSchema.nullable().optional(),
+  paymentType: PaymentTypeSchema,
   allegroStatus: AllegroOrderStatusSchema.optional(),
   fulfillment: z
     .object({
@@ -266,11 +244,11 @@ export const OrderSchema = z.object({
   delivery: OrderDeliveryDataSchema.nullable(),
   invoice: InvoiceInfoSchema.nullable(),
   lineItems: z.array(OrderItemSchema).min(1),
-  surcharges: z.array(PaymentSchema),
+  allegroSurcharges: z.array(AllegroPaymentSchema),
   summary: z.object({
     totalToPay: PriceSchema,
   }),
-  DTCTransaction: z
+  P24Transaction: z
     .object({
       sessionId: z.string(),
       amount: z.number(), // kwota w groszach
@@ -314,7 +292,7 @@ export const AllegroOrderSchema = z.object({
   id: z.string(), // order id, not checkout form id
   messageToSeller: z.string().nullable(),
   buyer: BuyerSchema,
-  payment: PaymentSchema.nullable(),
+  payment: AllegroPaymentSchema.nullable(),
   status: AllegroOrderStatusSchema,
   fulfillment: z
     .object({
@@ -324,11 +302,16 @@ export const AllegroOrderSchema = z.object({
   delivery: OrderDeliveryDataSchema.nullable(),
   invoice: InvoiceInfoSchema.nullable().optional(),
   lineItems: z.array(AllegroOrderItemSchema).min(1),
-  surcharges: z.array(PaymentSchema),
+  surcharges: z.array(AllegroPaymentSchema),
   summary: z.object({
     totalToPay: PriceSchema,
   }),
   updatedAt: z.string().nullable(),
+});
+
+export const FrontendOrderSchema = z.object({
+  checkoutData: CheckoutDataSchema,
+  shoppingCartItems: z.array(ShoppingCartItemSchema.shape.item),
 });
 
 export type PaymentType = z.infer<typeof PaymentTypeSchema>;
@@ -342,3 +325,4 @@ export type OrderPhase = z.infer<typeof OrderPhaseSchema>;
 export type Refund = z.infer<typeof RefundSchema>;
 export type RefundReason = z.infer<typeof RefundReasonSchema>;
 export type AllegroRefund = z.infer<typeof AllegroRefundSchema>;
+export type FrontendOrder = z.infer<typeof FrontendOrderSchema>;

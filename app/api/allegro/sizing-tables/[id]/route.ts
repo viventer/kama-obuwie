@@ -1,6 +1,6 @@
 import { AllegroSizingTable } from "@/firebase/schemas/productsSchemas";
 import { updateAllegroSizingTable } from "@/server-actions/allegro/sizingTables";
-import { apiResponse } from "@/server-actions/helpers";
+import { apiResponse } from "@/server-actions/errorHandlers";
 import { NextRequest } from "next/server";
 
 export async function PUT(

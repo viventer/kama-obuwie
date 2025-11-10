@@ -1,5 +1,5 @@
 import { getAllegroResponsibleProducers } from "@/server-actions/allegro/responsibleProducers";
-import { apiResponse } from "@/server-actions/helpers";
+import { apiResponse } from "@/server-actions/errorHandlers";
 
 export async function GET() {
   const data = await getAllegroResponsibleProducers();

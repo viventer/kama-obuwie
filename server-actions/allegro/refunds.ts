@@ -7,7 +7,7 @@ import {
 import { getAllegroUserAccessToken } from "./auth";
 import { getSingleAllegroHeaders } from "./global";
 import { verifyUser } from "../auth/auth";
-import { handleAxiosError } from "../helpers";
+import { handleAxiosError } from "../errorHandlers";
 import axios from "axios";
 import { allegroSalesChannels } from "@/lib/constants";
 

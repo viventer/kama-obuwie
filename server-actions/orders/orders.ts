@@ -2,10 +2,14 @@
 
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { verifyUser } from "../auth/auth";
-import { Order, OrderSchema } from "@/firebase/schemas/ordersSchemas";
+import {
+  FrontendOrder,
+  Order,
+  OrderSchema,
+} from "@/firebase/schemas/ordersSchemas";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
-import { AllegroSalesChannel } from "@/lib/constants";
 import { syncOffersAvailability } from "../offers/offers";
+import { generateOrderNumber } from "../helpers";
 
 export const createOrder = async function (newOrder: Order) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -18,7 +22,7 @@ export const createOrder = async function (newOrder: Order) {
 
   await syncOffersAvailability(
     newOrder.lineItems,
-    newOrder.salesChannel as AllegroSalesChannel,
+    newOrder.salesChannel,
     "order"
   );
 
@@ -82,4 +86,27 @@ export const getOrderByAllegroId = async function (allegroId: string) {
   }
 
   return orders[0];
+};
+
+export const transformFrontendOrderToOrder = function (
+  frontendOrder: FrontendOrder
+): Order {
+  const checkoutData = frontendOrder.checkoutData;
+  const shoppingCartItems = frontendOrder.shoppingCartItems;
+
+  return {
+    number: generateOrderNumber("DTC"),
+    messageToSeller: null,
+    buyer: {
+      email: checkoutData.email,
+      firstName: checkoutData.firstName,
+      lastName: checkoutData.lastName,
+      phoneNumber: checkoutData.phoneNumber,
+      guest: true,
+      preferences: {
+        language: "PL",
+      },
+      companyName: null,
+    },
+  };
 };

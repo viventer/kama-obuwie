@@ -8,10 +8,10 @@ import React, {
   useCallback,
   useId,
 } from "react";
-import { shoppingCartItemSchema } from "@/firebase/schemas/shoppingCartSchemas";
+import { ShoppingCartItemSchema } from "@/firebase/schemas/shoppingCartSchemas";
 import { z } from "zod";
 
-type ShoppingCartItem = z.infer<typeof shoppingCartItemSchema>;
+type ShoppingCartItem = z.infer<typeof ShoppingCartItemSchema>;
 
 const SHOPPING_CART_KEY = "shopping-cart";
 
@@ -72,7 +72,7 @@ export function ShoppingCartProvider({
       const savedCart = localStorage.getItem(SHOPPING_CART_KEY);
       if (savedCart) {
         const parsedCart = JSON.parse(savedCart);
-        const validatedCart = z.array(shoppingCartItemSchema).parse(parsedCart);
+        const validatedCart = z.array(ShoppingCartItemSchema).parse(parsedCart);
         setCart(validatedCart);
       }
     } catch (error) {
@@ -117,7 +117,7 @@ export function ShoppingCartProvider({
       };
 
       try {
-        shoppingCartItemSchema.parse(newItem);
+        ShoppingCartItemSchema.parse(newItem);
         setCart((prevCart) => [...prevCart, newItem]);
         return newItem.id;
       } catch (error) {
@@ -210,7 +210,7 @@ export function ShoppingCartProvider({
       };
 
       try {
-        shoppingCartItemSchema.parse(newItem);
+        ShoppingCartItemSchema.parse(newItem);
         setCart((prevCart) =>
           prevCart.map((item) => (item.id === oldItemId ? newItem : item))
         );

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PickupPointSchema } from "./ordersSchemas";
+import { PickupPointSchema } from "./commonSchemas";
 
 export const paymentMethods = ["BLIK", "quickTransfer", "card", "COD"] as const;
 

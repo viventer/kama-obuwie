@@ -1,7 +1,7 @@
 "use server";
 
 import { adminDB } from "@/firebase/firebaseAdmin";
-import { DocumentDataWithRef } from "@/server-actions/helpers";
+import { DocumentDataWithRef } from "@/server-actions/errorHandlers";
 
 export const getDocumentFromAdminDB = async function <T>(
   collection: string,

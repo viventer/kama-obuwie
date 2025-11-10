@@ -1,5 +1,5 @@
 import { getAllegroImpliedWarranties } from "@/server-actions/allegro/afterSalesServices";
-import { apiResponse } from "@/server-actions/helpers";
+import { apiResponse } from "@/server-actions/errorHandlers";
 
 export async function GET() {
   const data = await getAllegroImpliedWarranties();

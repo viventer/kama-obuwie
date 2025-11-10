@@ -29,7 +29,7 @@ import { getImageUrl } from "../files/files";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath, safetyInformation } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
-import { handleAxiosError } from "../helpers";
+import { handleAxiosError } from "../errorHandlers";
 import { addMissingAllegroParameters } from "@/components/adminPanel/assortment/helpers/allegroParameters";
 import { getFormattedSizingTable } from "@/lib/utils";
 

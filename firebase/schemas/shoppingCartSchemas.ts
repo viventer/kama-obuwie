@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const shoppingCartItemSchema = z.object({
+export const ShoppingCartItemSchema = z.object({
   id: z.string(), // Unique identifier for the cart item
   item: z.object({
     offerId: z.string(),
@@ -16,4 +16,4 @@ export const shoppingCartItemSchema = z.object({
   }),
 });
 
-export type ShoppingCartItem = z.infer<typeof shoppingCartItemSchema>;
+export type ShoppingCartItem = z.infer<typeof ShoppingCartItemSchema>;

@@ -4,7 +4,7 @@ import {
   SerializedAllegroCategory,
 } from "@/server-actions/allegro/categories";
 import { getProductParameters } from "@/server-actions/allegro/products";
-import { apiResponse } from "@/server-actions/helpers";
+import { apiResponse } from "@/server-actions/errorHandlers";
 
 export type AllegroColorWithShades = {
   color: string;

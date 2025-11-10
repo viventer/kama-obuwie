@@ -8,7 +8,7 @@ import {
   AllegroSizingTableSchema,
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
-import { handleAxiosError } from "../helpers";
+import { handleAxiosError } from "../errorHandlers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 

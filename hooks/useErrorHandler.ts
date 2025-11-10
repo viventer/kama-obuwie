@@ -1,5 +1,5 @@
 import { useToast } from "./useToast";
-import { handleApiError } from "@/server-actions/helpers";
+import { handleApiError } from "@/server-actions/errorHandlers";
 
 /**
  * Hook do obsługi błędów API w komponentach React

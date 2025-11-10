@@ -7,6 +7,8 @@ import { CheckoutData } from "@/firebase/schemas/checkoutSchemas";
 import Loader from "@/components/adminPanel/global/Loader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { CrossIcon, XIcon } from "lucide-react";
+import IconButton from "@/components/adminPanel/global/IconButton";
 
 interface InPostSelectorProps {
   form: UseFormReturn<CheckoutData>;
@@ -146,9 +148,17 @@ export default function InPostSelector({
             <Button onClick={handleChangePoint}>Zmień</Button>
           </div>
         </Card>
+      ) : !showWidget ? (
+        <Card className="p-4 max-w-xl border-destructive">
+          <div className="flex flex-col items-start gap-4">
+            <h2 className="font-medium">Nie wybrano punktu odbioru</h2>
+            <Button variant={"important"} onClick={() => setShowWidget(true)}>
+              Wybierz
+            </Button>
+          </div>
+        </Card>
       ) : (
-        // Wyświetl widget do wyboru punktu
-        <div className="rounded-md overflow-hidden aspect-[3/2] flex items-center justify-center relative w-full">
+        <div className="md:rounded-md overflow-hidden md:aspect-[3/2] md:h-auto flex items-center justify-center fixed top-0 left-0 h-screen md:relative w-full z-100 backdrop-blur-md">
           <div className="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]">
             <Loader />
           </div>
@@ -161,12 +171,24 @@ export default function InPostSelector({
               Nie udało się załadować tokena InPost
             </p>
           ) : (
-            <div className="z-10 w-full h-full">
-              <InpostGeowidgetReact
-                token={token}
-                pointSelect={handlePointSelect}
-                sandbox={true}
-              />
+            <div className="z-10 w-full h-full ">
+              <div className="flex justify-between w-full h-10 px-2 items-center bg-background fixed top-0 left-0 md:hidden">
+                <h2 className="font-medium text-lg">Wybierz Paczkomat</h2>
+                <IconButton
+                  onClick={() => {
+                    setShowWidget(false);
+                  }}
+                >
+                  <XIcon className="size-6 text-destructive cursor-pointer hover:brightness-150 transition-all" />
+                </IconButton>
+              </div>
+              <div className="pt-10 h-full md:pt-0">
+                <InpostGeowidgetReact
+                  token={token}
+                  pointSelect={handlePointSelect}
+                  sandbox={true}
+                />
+              </div>
             </div>
           )}
         </div>

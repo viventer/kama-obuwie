@@ -256,6 +256,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
   ];
 
   const actions: OrderActions = {
+    unpaid: [],
     new: newActions,
     processing: processingActions,
     ready_for_shipment: readyForShipmentActions,

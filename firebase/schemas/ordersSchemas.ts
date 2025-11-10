@@ -25,6 +25,7 @@ export const AllegroOrderStatusSchema = z.enum([
 ]);
 
 export const FulfillmentStatusSchema = z.enum([
+  "UNPAID",
   "NEW",
   "PROCESSING",
   "READY_FOR_SHIPMENT",
@@ -37,6 +38,7 @@ export const FulfillmentStatusSchema = z.enum([
 ]);
 
 export const OrderPhaseSchema = z.enum([
+  "unpaid",
   "new",
   "processing",
   "ready_for_shipment",
@@ -230,6 +232,7 @@ export const AllegroRefundSchema = z.object({
 });
 
 export const OrderShipmentSchema = z.object({
+  DTCShipmentId: z.string().optional(),
   isCreated: z.boolean(),
   isPickupOrdered: z.boolean(),
   parcelNumbers: z.array(z.string()),
@@ -267,6 +270,13 @@ export const OrderSchema = z.object({
   summary: z.object({
     totalToPay: PriceSchema,
   }),
+  DTCTransaction: z
+    .object({
+      sessionId: z.string(),
+      amount: z.number(), // kwota w groszach
+      status: z.enum(["INITIATED", "COMPLETED", "FAILED", "UNAUTHORIZED"]),
+    })
+    .optional(),
   updatedAt: z.string().nullable(),
   createdAt: z.string(),
   salesChannel: SalesChannelSchema,

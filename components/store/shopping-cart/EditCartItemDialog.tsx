@@ -18,17 +18,14 @@ import { useToast } from "@/hooks/useToast";
 import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import SelectSize from "../product/SelectSize";
 import { Availability } from "@/firebase/schemas/offersSchemas";
-import { z } from "zod";
-import { ShoppingCartItemSchema } from "@/firebase/schemas/shoppingCartSchemas";
-
-type ShoppingCartItem = z.infer<typeof ShoppingCartItemSchema>;
+import { ShoppingCartItemType } from "@/firebase/schemas/shoppingCartSchemas";
 
 export default function EditCartItemDialog({
   cartItem,
   availability,
   children,
 }: {
-  cartItem: ShoppingCartItem;
+  cartItem: ShoppingCartItemType;
   availability: Record<string, Availability>;
   children: React.ReactNode;
 }) {

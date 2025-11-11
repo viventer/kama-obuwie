@@ -1,6 +1,6 @@
 "use client";
 
-import type { ShoppingCartItem as ShoppingCartItemType } from "@/firebase/schemas/shoppingCartSchemas";
+import type { ShoppingCartItemType } from "@/firebase/schemas/shoppingCartSchemas";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import Image from "next/image";
 import IconButton from "@/components/adminPanel/global/IconButton";

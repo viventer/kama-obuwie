@@ -16,4 +16,4 @@ export const ShoppingCartItemSchema = z.object({
   }),
 });
 
-export type ShoppingCartItem = z.infer<typeof ShoppingCartItemSchema>;
+export type ShoppingCartItemType = z.infer<typeof ShoppingCartItemSchema>;

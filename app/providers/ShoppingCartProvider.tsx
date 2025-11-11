@@ -8,28 +8,31 @@ import React, {
   useCallback,
   useId,
 } from "react";
-import { ShoppingCartItemSchema } from "@/firebase/schemas/shoppingCartSchemas";
+import {
+  ShoppingCartItemSchema,
+  ShoppingCartItemType,
+} from "@/firebase/schemas/shoppingCartSchemas";
 import { z } from "zod";
-
-type ShoppingCartItem = z.infer<typeof ShoppingCartItemSchema>;
 
 const SHOPPING_CART_KEY = "shopping-cart";
 
 interface ShoppingCartContextType {
-  cart: ShoppingCartItem[];
+  cart: ShoppingCartItemType[];
   isLoading: boolean;
   addToCart: (
-    itemData: Omit<ShoppingCartItem["item"], "quantity"> & { quantity?: number }
+    itemData: Omit<ShoppingCartItemType["item"], "quantity"> & {
+      quantity?: number;
+    }
   ) => string;
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, newQuantity: number) => void;
   clearCart: () => void;
-  getItem: (itemId: string) => ShoppingCartItem | undefined;
+  getItem: (itemId: string) => ShoppingCartItemType | undefined;
   findExistingItem: (
     offerId: string,
     productId: string,
     size: string
-  ) => ShoppingCartItem | undefined;
+  ) => ShoppingCartItemType | undefined;
   getCartStats: () => {
     itemCount: number;
     totalItems: number;
@@ -37,7 +40,7 @@ interface ShoppingCartContextType {
   };
   replaceCartItem: (
     oldItemId: string,
-    newItemData: Omit<ShoppingCartItem["item"], "quantity"> & {
+    newItemData: Omit<ShoppingCartItemType["item"], "quantity"> & {
       quantity?: number;
     }
   ) => void;
@@ -62,7 +65,7 @@ export function ShoppingCartProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [cart, setCart] = useState<ShoppingCartItem[]>([]);
+  const [cart, setCart] = useState<ShoppingCartItemType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const baseId = useId();
 
@@ -104,11 +107,11 @@ export function ShoppingCartProvider({
   // Add item to cart
   const addToCart = useCallback(
     (
-      itemData: Omit<ShoppingCartItem["item"], "quantity"> & {
+      itemData: Omit<ShoppingCartItemType["item"], "quantity"> & {
         quantity?: number;
       }
     ) => {
-      const newItem: ShoppingCartItem = {
+      const newItem: ShoppingCartItemType = {
         id: generateId(),
         item: {
           ...itemData,
@@ -197,11 +200,11 @@ export function ShoppingCartProvider({
   const replaceCartItem = useCallback(
     (
       oldItemId: string,
-      newItemData: Omit<ShoppingCartItem["item"], "quantity"> & {
+      newItemData: Omit<ShoppingCartItemType["item"], "quantity"> & {
         quantity?: number;
       }
     ) => {
-      const newItem: ShoppingCartItem = {
+      const newItem: ShoppingCartItemType = {
         id: generateId(),
         item: {
           ...newItemData,

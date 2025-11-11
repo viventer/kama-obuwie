@@ -1,10 +1,10 @@
-import { ShoppingCartItem } from "@/firebase/schemas/shoppingCartSchemas";
+import { ShoppingCartItemType } from "@/firebase/schemas/shoppingCartSchemas";
 import Image from "next/image";
 
 export default function ShoppingCartPreviewItem({
   item,
 }: {
-  item: ShoppingCartItem["item"];
+  item: ShoppingCartItemType["item"];
 }) {
   const totalItemPrice = item.price * item.quantity;
 

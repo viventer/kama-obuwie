@@ -11,9 +11,17 @@ import InPostSelector from "./InPostSelector";
 import { useToast } from "@/hooks/useToast";
 import PaymentMethodSelector from "./PaymentMethodSelector";
 import OrderSummary from "./OrderSummary";
+import { FrontendOrder } from "@/firebase/schemas/ordersSchemas";
+import { useShoppingCart } from "@/hooks/useShoppingCart";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
+  const { cart, clearCart } = useShoppingCart();
+  const router = useRouter();
+  const { handleError } = useErrorHandler();
 
   const form = useForm({
     resolver: zodResolver(CheckoutDataSchema),
@@ -85,6 +93,23 @@ export default function CheckoutForms() {
     if (!isValid) {
       showToast("Proszę uzupełnić wszystkie wymagane pola", "error");
       return;
+    }
+
+    const checkoutData = form.getValues();
+    const orderData: FrontendOrder = {
+      checkoutData,
+      shoppingCartItems: cart.map((cartItem) => ({ ...cartItem.item })),
+    };
+
+    try {
+      const response = await axios.post("/api/orders", orderData);
+
+      if (response.status === 201) {
+        clearCart();
+        router.replace(`/thank-you/${response.data.id}`);
+      }
+    } catch (err: any) {
+      handleError(err, "Błąd podczas składania zamówienia.");
     }
   };
 

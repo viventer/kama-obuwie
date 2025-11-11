@@ -2,15 +2,16 @@
 
 import { useState, useEffect, useCallback, useId } from "react";
 import { flushSync } from "react-dom";
-import { ShoppingCartItemSchema } from "@/firebase/schemas/shoppingCartSchemas";
+import {
+  ShoppingCartItemSchema,
+  ShoppingCartItemType,
+} from "@/firebase/schemas/shoppingCartSchemas";
 import { z } from "zod";
-
-type ShoppingCartItem = z.infer<typeof ShoppingCartItemSchema>;
 
 const SHOPPING_CART_KEY = "shopping-cart";
 
 export function useShoppingCart() {
-  const [cart, setCart] = useState<ShoppingCartItem[]>([]);
+  const [cart, setCart] = useState<ShoppingCartItemType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const baseId = useId();
 
@@ -54,11 +55,11 @@ export function useShoppingCart() {
   // Add item to cart
   const addToCart = useCallback(
     (
-      itemData: Omit<ShoppingCartItem["item"], "quantity"> & {
+      itemData: Omit<ShoppingCartItemType["item"], "quantity"> & {
         quantity?: number;
       }
     ) => {
-      const newItem: ShoppingCartItem = {
+      const newItem: ShoppingCartItemType = {
         id: generateId(),
         item: {
           ...itemData,
@@ -154,13 +155,13 @@ export function useShoppingCart() {
   const replaceCartItem = useCallback(
     (
       oldItemId: string,
-      newItemData: Omit<ShoppingCartItem["item"], "quantity"> & {
+      newItemData: Omit<ShoppingCartItemType["item"], "quantity"> & {
         quantity?: number;
       }
     ) => {
       flushSync(() => {
         setCart((prevCart) => {
-          const newItem: ShoppingCartItem = {
+          const newItem: ShoppingCartItemType = {
             id: generateId(),
             item: {
               ...newItemData,

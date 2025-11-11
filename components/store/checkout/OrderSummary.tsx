@@ -12,6 +12,8 @@ import ShippingInfo from "../global/ShippingInfo";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
 import { CheckoutData } from "@/firebase/schemas/checkoutSchemas";
+import { useEffect } from "react";
+import ShoppingCartItemsAccordion from "./ShoppingCartItemsAccordion";
 
 export default function OrderSummary({
   orderButtonHandler,
@@ -28,11 +30,13 @@ export default function OrderSummary({
 
   const freeDelivery = totalPrice >= 55;
 
-  form.setValue("deliveryCost", (freeDelivery ? 0 : 9.99).toFixed(2));
-  form.setValue(
-    "totalToPay",
-    (totalPrice + (freeDelivery ? 0 : 9.99)).toFixed(2)
-  );
+  useEffect(() => {
+    form.setValue("deliveryCost", (freeDelivery ? 0 : 9.99).toFixed(2));
+    form.setValue(
+      "totalToPay",
+      (totalPrice + (freeDelivery ? 0 : 9.99)).toFixed(2)
+    );
+  }, []);
 
   const formValues = form.watch();
   const deliveryMethod = formValues.deliveryMethod;
@@ -72,22 +76,7 @@ export default function OrderSummary({
 
   return (
     <section className="w-fit overflow-hidden max-w-full">
-      <Accordion type="single" collapsible>
-        <AccordionItem value="order-summary" className="max-w-full w-md">
-          <AccordionTrigger className="cursor-pointer">
-            <h2 className="text-xl">
-              Podsumowanie <span className="hidden 2xs:inline">zamówienia</span>
-            </h2>
-          </AccordionTrigger>
-          <AccordionContent>
-            <article className="space-y-4 max-w-xl">
-              {cart.map((cartItem) => (
-                <ShoppingCartItem key={cartItem.id} cartItem={cartItem} />
-              ))}
-            </article>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+      <ShoppingCartItemsAccordion cart={cart} />
       <section className="text-lg border-t-2 pt-4 mb-4">
         <p className={`${freeDelivery ? "underline decoration-success" : ""} `}>
           Koszty wysyłki: {freeDelivery ? "0,00 zł" : "9,99 zł"}

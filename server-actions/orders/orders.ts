@@ -15,6 +15,7 @@ import { syncOffersAvailability } from "../offers/offers";
 import { generateOrderNumber } from "../helpers";
 import { Offer } from "@/firebase/schemas/offersSchemas";
 import { randomUUID } from "crypto";
+import { PickupPointSchema } from "@/firebase/schemas/commonSchemas";
 
 export const createOrder = async function (newOrder: Order) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -101,6 +102,8 @@ export const transformFrontendOrderToOrder = async function (
   const isCOD = checkoutData.paymentMethod === "COD";
   const isCourier = checkoutData.deliveryMethod === "courier";
 
+  let totalPrice = 0;
+
   const lineItems: Order["lineItems"] = await Promise.all(
     shoppingCartItems.map(async (item) => {
       const { data } = await getDocumentFromAdminDB<Offer>(
@@ -114,6 +117,12 @@ export const transformFrontendOrderToOrder = async function (
       if (!data.SKU) {
         throw new Error("Oferta nie ma przypisanego SKU.");
       }
+
+      if (!data.sellingPrices.DTC) {
+        throw new Error("Oferta nie ma przypisanej ceny sprzedaży DTC.");
+      }
+
+      totalPrice += parseFloat(data.sellingPrices.DTC) * item.quantity;
 
       const isValidQuantity =
         Number(data.availability[item.size].value) >= item.quantity;
@@ -145,6 +154,19 @@ export const transformFrontendOrderToOrder = async function (
       };
     })
   );
+
+  if (!isCourier) {
+    try {
+      PickupPointSchema.parse(checkoutData.pickupPoint);
+    } catch (error) {
+      throw new Error("Nieprawidłowe dane punktu odbioru.");
+    }
+  }
+
+  const totalToPay =
+    totalPrice >= 55
+      ? totalPrice.toFixed(2)
+      : (Number(totalPrice) + 9.99).toFixed(2);
 
   const formattedOrder: Order = {
     number: generateOrderNumber("DTC"),
@@ -180,7 +202,7 @@ export const transformFrontendOrderToOrder = async function (
     lineItems: lineItems,
     summary: {
       totalToPay: {
-        amount: checkoutData.totalToPay,
+        amount: totalToPay,
         currency: "PLN",
       },
     },

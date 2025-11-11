@@ -79,7 +79,14 @@ export default function CheckoutForms() {
     }
   };
 
-  const placeOrder = () => {};
+  const placeOrder = async () => {
+    const isValid = await form.trigger();
+
+    if (!isValid) {
+      showToast("Proszę uzupełnić wszystkie wymagane pola", "error");
+      return;
+    }
+  };
 
   return (
     <Tabs value={activeTab} onValueChange={handleTabChange}>

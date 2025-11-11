@@ -31,7 +31,6 @@ export default function OrderSummary({
   const freeDelivery = totalPrice >= 55;
 
   useEffect(() => {
-    form.setValue("deliveryCost", (freeDelivery ? 0 : 9.99).toFixed(2));
     form.setValue(
       "totalToPay",
       (totalPrice + (freeDelivery ? 0 : 9.99)).toFixed(2)
@@ -82,7 +81,14 @@ export default function OrderSummary({
           Koszty wysyłki: {freeDelivery ? "0,00 zł" : "9,99 zł"}
         </p>
         {!freeDelivery && (
-          <p>Do darmowej dostawy brakuje {55 - totalPrice} zł</p>
+          <p>
+            Do darmowej dostawy brakuje{" "}
+            {new Intl.NumberFormat("pl-PL", {
+              style: "currency",
+              currency: "PLN",
+              minimumFractionDigits: 2,
+            }).format(55 - totalPrice)}
+          </p>
         )}
         <p className="font-medium">
           Do zapłaty:{" "}

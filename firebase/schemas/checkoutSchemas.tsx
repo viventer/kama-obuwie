@@ -57,7 +57,6 @@ export const CheckoutDataSchema = z.object({
   deliveryMethod: DeliveryMethodSchema,
   paymentMethod: PaymentMethodSchema,
   pickupPoint: PickupPointSchema.optional(),
-  deliveryCost: z.string(),
   totalToPay: z.string(),
   activeTab: z.enum(["firstStep", "secondStep"]),
 });

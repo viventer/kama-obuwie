@@ -12,7 +12,7 @@ export default function ShoppingCartPreview() {
   if (isLoading) {
     return (
       <div className="p-4">
-        <p className="text-muted-foreground text-center">Ładowanie...</p>
+        <p className="text-center min-w-[200px]">Ładowanie...</p>
       </div>
     );
   }
@@ -20,9 +20,7 @@ export default function ShoppingCartPreview() {
   if (cart.length === 0) {
     return (
       <div className="p-4">
-        <p className="text-muted-foreground text-center">
-          Twój koszyk jest pusty
-        </p>
+        <p className="text-center min-w-[200px]">Twój koszyk jest pusty</p>
       </div>
     );
   }

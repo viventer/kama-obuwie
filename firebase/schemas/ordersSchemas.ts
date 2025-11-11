@@ -326,3 +326,4 @@ export type Refund = z.infer<typeof RefundSchema>;
 export type RefundReason = z.infer<typeof RefundReasonSchema>;
 export type AllegroRefund = z.infer<typeof AllegroRefundSchema>;
 export type FrontendOrder = z.infer<typeof FrontendOrderSchema>;
+export type OrderItemType = z.infer<typeof OrderItemSchema>;

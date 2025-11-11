@@ -64,7 +64,7 @@ export default function SelectSize({
                     available
                       ? isSelected
                         ? "border-2 border-success"
-                        : "  hover:border-text"
+                        : "hover:border-text"
                       : "border-destructive border-2 cursor-not-allowed opacity-50"
                   }
                 `}

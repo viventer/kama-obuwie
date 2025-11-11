@@ -43,7 +43,6 @@ export default function CheckoutForms() {
       paymentMethod: "quickTransfer",
       pickupPoint: undefined,
       activeTab: "firstStep",
-      deliveryCost: "0",
       totalToPay: "0",
     },
   });

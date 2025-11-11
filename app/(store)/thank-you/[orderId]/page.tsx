@@ -1,5 +1,4 @@
 import CustomerOrderDetails from "@/components/store/checkout/CustomerOrderDetails";
-import OrderSummary from "@/components/store/checkout/OrderSummary";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { notFound } from "next/navigation";
@@ -26,7 +25,11 @@ export default async function ThankYouPage(props: Props) {
   }
 
   return (
-    <div>
+    <div className="space-y-8">
+      <section>
+        <h2 className="font-medium text-2xl">Dziękujemy za zamówienie</h2>
+        <p>Informacje o dostawie otrzymasz na podany adres e-mail.</p>
+      </section>
       <CustomerOrderDetails orderData={orderData} />
     </div>
   );

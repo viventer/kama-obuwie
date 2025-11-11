@@ -192,7 +192,7 @@ export const transformFrontendOrderToOrder = async function (
       method: null,
       pickupPoint: checkoutData.pickupPoint || null,
       cost: {
-        amount: checkoutData.deliveryCost,
+        amount: totalPrice >= 55 ? "0.00" : "9.99",
         currency: "PLN",
       },
       smart: null,

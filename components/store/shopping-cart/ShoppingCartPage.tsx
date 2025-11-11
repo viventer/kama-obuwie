@@ -65,7 +65,7 @@ export default function ShoppingCartPage() {
 
   useEffect(() => {
     fetchOffersData();
-  }, [fetchOffersData]);
+  }, []);
 
   const handleRemoveItem = (itemId: string, itemName: string) => {
     removeFromCart(itemId);

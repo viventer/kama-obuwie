@@ -2,10 +2,12 @@ import {
   FrontendOrder,
   FrontendOrderSchema,
   Order,
-  OrderSchema,
 } from "@/firebase/schemas/ordersSchemas";
 import { apiResponse } from "@/server-actions/errorHandlers";
-import { createOrder } from "@/server-actions/orders/orders";
+import {
+  createOrder,
+  transformFrontendOrderToOrder,
+} from "@/server-actions/orders/orders";
 import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -16,8 +18,11 @@ export async function POST(request: NextRequest) {
     return apiResponse("Nieprawidłowe dane zamówienia.", 400);
   }
 
-  const order: Order = transformFrontendOrderToOrder(body);
-
-  const id = await createOrder(body);
-  return apiResponse("Zamówienie zostało utworzone.", 201, { id });
+  try {
+    const order: Order = await transformFrontendOrderToOrder(body);
+    const id = await createOrder(order);
+    return apiResponse("Zamówienie zostało utworzone.", 201, { id });
+  } catch (error) {
+    return apiResponse("Błąd podczas przetwarzania zamówienia.", 500);
+  }
 }

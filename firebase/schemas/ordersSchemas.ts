@@ -153,7 +153,7 @@ export const OrderItemSchema = z.object({
     SKU: z.string().nullable(),
   }),
   quantity: z.number().min(1),
-  originalPrice: PriceSchema,
+  originalPrice: PriceSchema.optional(),
   price: PriceSchema,
   reconcilation: z
     .object({
@@ -244,7 +244,7 @@ export const OrderSchema = z.object({
   delivery: OrderDeliveryDataSchema.nullable(),
   invoice: InvoiceInfoSchema.nullable(),
   lineItems: z.array(OrderItemSchema).min(1),
-  allegroSurcharges: z.array(AllegroPaymentSchema),
+  allegroSurcharges: z.array(AllegroPaymentSchema).optional(),
   summary: z.object({
     totalToPay: PriceSchema,
   }),

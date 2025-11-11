@@ -28,6 +28,12 @@ export default function OrderSummary({
 
   const freeDelivery = totalPrice >= 55;
 
+  form.setValue("deliveryCost", (freeDelivery ? 0 : 9.99).toFixed(2));
+  form.setValue(
+    "totalToPay",
+    (totalPrice + (freeDelivery ? 0 : 9.99)).toFixed(2)
+  );
+
   const formValues = form.watch();
   const deliveryMethod = formValues.deliveryMethod;
   const formErrors = form.formState.errors;

@@ -7,9 +7,14 @@ import {
   Order,
   OrderSchema,
 } from "@/firebase/schemas/ordersSchemas";
-import { getDocumentsFromAdminDB } from "@/firebase/getters";
+import {
+  getDocumentFromAdminDB,
+  getDocumentsFromAdminDB,
+} from "@/firebase/getters";
 import { syncOffersAvailability } from "../offers/offers";
 import { generateOrderNumber } from "../helpers";
+import { Offer } from "@/firebase/schemas/offersSchemas";
+import { randomUUID } from "crypto";
 
 export const createOrder = async function (newOrder: Order) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -88,15 +93,63 @@ export const getOrderByAllegroId = async function (allegroId: string) {
   return orders[0];
 };
 
-export const transformFrontendOrderToOrder = function (
+export const transformFrontendOrderToOrder = async function (
   frontendOrder: FrontendOrder
-): Order {
+): Promise<Order> {
   const checkoutData = frontendOrder.checkoutData;
   const shoppingCartItems = frontendOrder.shoppingCartItems;
+  const isCOD = checkoutData.paymentMethod === "COD";
+  const isCourier = checkoutData.deliveryMethod === "courier";
 
-  return {
+  const lineItems: Order["lineItems"] = await Promise.all(
+    shoppingCartItems.map(async (item) => {
+      const { data } = await getDocumentFromAdminDB<Offer>(
+        "offers",
+        item.offerId
+      );
+      if (!data) {
+        throw new Error("Oferta nie istnieje.");
+      }
+
+      if (!data.SKU) {
+        throw new Error("Oferta nie ma przypisanego SKU.");
+      }
+
+      const isValidQuantity =
+        Number(data.availability[item.size].value) >= item.quantity;
+
+      if (!isValidQuantity) {
+        throw new Error(
+          `Niewystarczająca ilość produktu ${data.SKU} w rozmiarze ${item.size}.`
+        );
+      }
+
+      return {
+        id: randomUUID(),
+        offer: {
+          id: item.offerId,
+          thumbnail: item.thumbnailUrl,
+          allegroId: null,
+          name: `${item.categoryName} ${item.brand ? item.brand : ""}`.trim(),
+          signature: data.signature,
+          size: item.size,
+          SKU: data.SKU,
+        },
+        quantity: item.quantity,
+        price: {
+          amount: item.price.toFixed(2),
+          currency: "PLN",
+        },
+        reconcilation: null,
+        discount: null,
+      };
+    })
+  );
+
+  const formattedOrder: Order = {
     number: generateOrderNumber("DTC"),
     messageToSeller: null,
+    allegroId: null,
     buyer: {
       email: checkoutData.email,
       firstName: checkoutData.firstName,
@@ -108,5 +161,46 @@ export const transformFrontendOrderToOrder = function (
       },
       companyName: null,
     },
+    paymentType: isCOD ? "COD" : "P24",
+    fulfillment: {
+      status: isCOD ? "NEW" : "UNPAID",
+    },
+    delivery: {
+      address: undefined,
+      method: null,
+      pickupPoint: checkoutData.pickupPoint || null,
+      cost: {
+        amount: checkoutData.deliveryCost,
+        currency: "PLN",
+      },
+      smart: null,
+      calculatedNumberOfPackages: null,
+    },
+    invoice: null,
+    lineItems: lineItems,
+    summary: {
+      totalToPay: {
+        amount: checkoutData.totalToPay,
+        currency: "PLN",
+      },
+    },
+    updatedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    salesChannel: "DTC",
   };
+
+  if (isCourier) {
+    formattedOrder.delivery!.address = {
+      firstName: checkoutData.firstName,
+      lastName: checkoutData.lastName,
+      street: checkoutData.address!.street,
+      city: checkoutData.address!.city,
+      zipCode: checkoutData.address!.postalCode,
+      countryCode: "PL",
+      companyName: null,
+      phoneNumber: checkoutData.phoneNumber,
+    };
+  }
+
+  return formattedOrder;
 };

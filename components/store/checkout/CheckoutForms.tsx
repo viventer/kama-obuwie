@@ -95,6 +95,16 @@ export default function CheckoutForms() {
       checkoutData.address = null;
     }
 
+    if (checkoutData.paymentMethod !== "COD") {
+      showToast(
+        "Przyjmowanie płatności online jest obecnie niedostępne, skorzystaj z płatności przy odbiorze.",
+        "error"
+      );
+
+      stopLoading();
+      return;
+    }
+
     const orderData: FrontendOrder = {
       checkoutData,
       shoppingCartItems: cart.map((cartItem) => ({ ...cartItem.item })),

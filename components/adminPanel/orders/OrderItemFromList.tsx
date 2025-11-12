@@ -76,11 +76,12 @@ export default function OrderItemFromList({
           <div>
             {item.quantity}x {item.price.amount} {item.price.currency}
           </div>
-          {item.originalPrice.amount !== item.price.amount && (
-            <div className="text-xs text-foreground/85 line-through">
-              {item.originalPrice.amount} {item.originalPrice.currency}
-            </div>
-          )}
+          {item.originalPrice?.amount &&
+            item.originalPrice.amount !== item.price.amount && (
+              <div className="text-xs text-foreground/85 line-through">
+                {item.originalPrice.amount} {item.originalPrice.currency}
+              </div>
+            )}
           {refundedAmount > 0 && (
             <div className="text-xs opacity-80">
               Zwrócono: {refundedAmount} {item.price.currency}

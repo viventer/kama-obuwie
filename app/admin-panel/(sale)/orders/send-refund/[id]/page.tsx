@@ -24,7 +24,7 @@ export default async function SendRefundPage(props: Props) {
     return notFound();
   }
 
-  if (!data.payment?.paidAmount || !data.payment?.id) {
+  if (!data.allegroPayment?.paidAmount || !data.allegroPayment?.id) {
     return notFound();
   }
 
@@ -33,7 +33,7 @@ export default async function SendRefundPage(props: Props) {
       <OrderDataWidget data={data as OrderWithId} />
       <SendRefundForm
         refund={data?.refund}
-        paymentId={data.payment?.id}
+        paymentId={data.allegroPayment?.id}
         lineItems={data.lineItems}
         salesChannel={data.salesChannel}
         allegroOrderId={data.allegroId}

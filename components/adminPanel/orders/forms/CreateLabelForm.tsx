@@ -138,7 +138,7 @@ export default function CreateLabelForm({
     }
 
     if (
-      orderData!.payment!.type === "CASH_ON_DELIVERY" &&
+      orderData!.allegroPayment!.type === "CASH_ON_DELIVERY" &&
       deliveryService.cashOnDelivery?.forceRequireIban === false
     ) {
       data.cashOnDelivery = {
@@ -146,7 +146,7 @@ export default function CreateLabelForm({
         currency: "PLN",
       };
     } else if (
-      orderData!.payment!.type === "CASH_ON_DELIVERY" &&
+      orderData!.allegroPayment!.type === "CASH_ON_DELIVERY" &&
       deliveryService.cashOnDelivery?.forceRequireIban === true
     ) {
       data.cashOnDelivery = {

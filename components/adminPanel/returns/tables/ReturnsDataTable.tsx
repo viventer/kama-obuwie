@@ -87,12 +87,12 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
         return;
       }
       const order: OrderWithId = await getOrderByAllegroId(returnData.orderId);
-      const paidAmount = Number(order.payment?.paidAmount?.amount) || 0;
+      const paidAmount = Number(order.allegroPayment?.paidAmount?.amount) || 0;
       const deliveryCost = Number(order.delivery?.cost?.amount) || 0;
       const refundAmount = Number(order.refund?.amount?.amount) || 0;
       const isAllRefunded = refundAmount >= paidAmount - deliveryCost;
 
-      if (order?.payment?.type === "CASH_ON_DELIVERY") {
+      if (order?.allegroPayment?.type === "CASH_ON_DELIVERY") {
         openDialog({
           title: "Zwróć wpłatę przelewem",
           content: (
@@ -199,7 +199,7 @@ export default function ReturnsDataTable({ returns }: ReturnsDataTableProps) {
         return;
       }
 
-      if (!paidAmount || !order.payment?.id || isAllRefunded) {
+      if (!paidAmount || !order.allegroPayment?.id || isAllRefunded) {
         showToast(
           "Nie można zwrócić wpłaty, ponieważ zamówienie nie ma opłaconej kwoty lub jest to zamówienie za pobraniem.",
           "error"

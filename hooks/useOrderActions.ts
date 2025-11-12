@@ -50,8 +50,8 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     onClick: async (id) => {
       const { data } = await axios.get(`/api/orders/${id}`);
       if (
-        !data.payment?.paidAmount ||
-        !data.payment?.id ||
+        !data.allegroPayment?.paidAmount ||
+        !data.allegroPayment?.id ||
         (data?.refund?.type && data.refund.type !== "NONE")
       ) {
         showToast("Brak wpłaty do zwrotu", "error");
@@ -85,10 +85,10 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
         showToast("Zamówienie odrzucone", "default");
 
         if (
-          !data.payment?.paidAmount ||
-          !data.payment?.id ||
+          !data.allegroPayment?.paidAmount ||
+          !data.allegroPayment?.id ||
           (data?.refund?.type && data.refund.type !== "NONE") ||
-          data.payment.type === "CASH_ON_DELIVERY"
+          data.allegroPayment.type === "CASH_ON_DELIVERY"
         ) {
           showToast("Brak wpłaty do zwrotu", "default");
           router.refresh();

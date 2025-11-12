@@ -123,6 +123,7 @@ export default function EditCartItemDialog({
             formattedMainColor: cartItem.item.formattedMainColor,
             formattedAdditionalColor: cartItem.item.formattedAdditionalColor,
             quantity: quantity,
+            isAvailable: cartItem.item.isAvailable,
           });
           showToast(
             `Zaktualizowano produkt - rozmiar zmieniony na ${selectedSize}`,

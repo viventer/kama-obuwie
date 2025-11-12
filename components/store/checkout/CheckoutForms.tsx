@@ -16,12 +16,14 @@ import { useShoppingCart } from "@/hooks/useShoppingCart";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
   const { cart, clearCart } = useShoppingCart();
   const router = useRouter();
   const { handleError } = useErrorHandler();
+  const { startLoading, stopLoading } = useFullPageLoading();
 
   const form = useForm({
     resolver: zodResolver(CheckoutDataSchema),
@@ -87,6 +89,7 @@ export default function CheckoutForms() {
   };
 
   const placeOrder = async () => {
+    startLoading();
     const checkoutData = form.getValues();
     if (checkoutData.deliveryMethod === "parcelLocker") {
       checkoutData.address = null;
@@ -99,12 +102,11 @@ export default function CheckoutForms() {
 
     try {
       const response = await axios.post("/api/orders", orderData);
-
-      if (response.status === 201) {
-        clearCart();
-        router.replace(`/thank-you/${response.data.id}`);
-      }
+      clearCart();
+      stopLoading();
+      router.replace(`/thank-you/${response.data.id}`);
     } catch (err: any) {
+      stopLoading();
       handleError(err, "Błąd podczas składania zamówienia.");
     }
   };

@@ -24,12 +24,7 @@ export const createOrder = async function (newOrder: Order) {
 
   const orderRef = adminDB.collection("orders").doc();
 
-  try {
-    console.log(newOrder);
-    await orderRef.set(newOrder);
-  } catch (err) {
-    throw new Error("Błąd podczas tworzenia zamówienia.");
-  }
+  await orderRef.set(newOrder);
 
   await syncOffersAvailability(
     newOrder.lineItems,

@@ -33,13 +33,8 @@ export default function EditCartItemDialog({
   const [selectedSize, setSelectedSize] = useState(cartItem.item.size);
   const [quantity, setQuantity] = useState(cartItem.item.quantity);
   const { showToast } = useToast();
-  const {
-    updateQuantity,
-    removeFromCart,
-    findExistingItem,
-    addToCart,
-    replaceCartItem,
-  } = useShoppingCart();
+  const { updateQuantity, removeFromCart, findExistingItem, replaceCartItem } =
+    useShoppingCart();
 
   useEffect(() => {
     if (open) {

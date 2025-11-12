@@ -44,6 +44,11 @@ interface ShoppingCartContextType {
       quantity?: number;
     }
   ) => void;
+  updateItemAvailability: (itemId: string, isAvailable: boolean) => void;
+  hasUnavailableItems: () => {
+    hasUnavailable: boolean;
+    unavailableItemIds: string[];
+  };
 }
 
 const ShoppingCartContext = createContext<ShoppingCartContextType | undefined>(
@@ -224,6 +229,29 @@ export function ShoppingCartProvider({
     [generateId]
   );
 
+  // Update availability status for cart items
+  const updateItemAvailability = useCallback(
+    (itemId: string, isAvailable: boolean) => {
+      setCart((prevCart) =>
+        prevCart.map((item) =>
+          item.id === itemId
+            ? { ...item, item: { ...item.item, isAvailable } }
+            : item
+        )
+      );
+    },
+    []
+  );
+
+  // Check if cart has unavailable items and return their IDs
+  const hasUnavailableItems = useCallback(() => {
+    const unavailableItems = cart.filter((item) => !item.item.isAvailable);
+    return {
+      hasUnavailable: unavailableItems.length > 0,
+      unavailableItemIds: unavailableItems.map((item) => item.id),
+    };
+  }, [cart]);
+
   const contextValue: ShoppingCartContextType = {
     cart,
     isLoading,
@@ -235,6 +263,8 @@ export function ShoppingCartProvider({
     findExistingItem,
     getCartStats,
     replaceCartItem,
+    updateItemAvailability,
+    hasUnavailableItems,
   };
 
   return (

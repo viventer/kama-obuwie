@@ -23,6 +23,7 @@ import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import { useToast } from "@/hooks/useToast";
 import ShoppingCartPreviewItem from "../shopping-cart/ShoppingCartPreviewItem";
 import ShippingInfo from "../global/ShippingInfo";
+import { ShoppingCartItemType } from "@/firebase/schemas/shoppingCartSchemas";
 
 export default function ProductPage({
   imagesUrls,
@@ -106,7 +107,7 @@ export default function ProductPage({
     } else {
       // Dodaj nowy produkt do koszyka
       try {
-        const item = {
+        const item: ShoppingCartItemType["item"] = {
           offerId: currentOffer.id,
           productId: productData.id,
           thumbnailUrl: imagesUrls[selectedColorVariant][0],
@@ -116,6 +117,7 @@ export default function ProductPage({
           size: selectedSize,
           formattedMainColor: selectedColorVariant,
           quantity: 1,
+          isAvailable: true,
         };
 
         addToCart(item);

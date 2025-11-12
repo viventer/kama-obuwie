@@ -13,6 +13,7 @@ export const ShoppingCartItemSchema = z.object({
     quantity: z.number().min(1),
     formattedMainColor: z.string(),
     formattedAdditionalColor: z.string().optional(),
+    isAvailable: z.boolean(),
   }),
 });
 

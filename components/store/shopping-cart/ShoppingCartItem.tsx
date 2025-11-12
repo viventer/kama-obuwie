@@ -4,7 +4,7 @@ import type { ShoppingCartItemType } from "@/firebase/schemas/shoppingCartSchema
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import Image from "next/image";
 import IconButton from "@/components/adminPanel/global/IconButton";
-import { EditIcon, TrashIcon } from "lucide-react";
+import { EditIcon, InfoIcon, TrashIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import EditCartItemDialog from "./EditCartItemDialog";
 import LinkText from "@/components/adminPanel/global/LinkText";
@@ -29,16 +29,30 @@ export default function ShoppingCartItem({
     }
   };
 
+  const isAvailable = cartItem.item.isAvailable;
+
   return (
-    <Card className="p-2 sm:p-4">
-      <CardContent className="px-2">
+    <Card
+      className={`p-2 sm:p-4 gap-4 ${
+        isAvailable ? "" : "border-destructive/50"
+      }`}
+    >
+      {!isAvailable && (
+        <div className="flex items-center gap-2">
+          <InfoIcon className="size-5 text-destructive" />
+          <p>Produkt niedostępny</p>
+        </div>
+      )}
+      <CardContent
+        className={`px-2  ${isAvailable ? "" : "border-destructive/50"}`}
+      >
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0 w-20 sm:w-24 aspect-square relative">
             <Image
               src={cartItem.item.thumbnailUrl}
               alt={`${cartItem.item.brand || ""} ${cartItem.item.categoryName}`}
               fill
-              className="object-contain rounded-xl bg-white"
+              className={`object-contain rounded-xl bg-white`}
               sizes="80px"
             />
           </div>
@@ -48,7 +62,9 @@ export default function ShoppingCartItem({
               href={`/product/${cartItem.item.productId}?colorVariantName=${cartItem.item.formattedMainColor}`}
               target="_blank"
             >
-              <h3 className="font-medium text-lg sm:text-xl truncate text-card-foreground capitalize">
+              <h3
+                className={`font-medium text-lg sm:text-xl truncate text-card-foreground capitalize`}
+              >
                 {cartItem.item.categoryName} {cartItem.item.brand}
               </h3>
             </LinkText>
@@ -61,7 +77,11 @@ export default function ShoppingCartItem({
             </p>
             <div className="flex items-center gap-x-4 text-muted-foreground text-sm sm:text-base flex-wrap">
               <span className="whitespace-nowrap">r. {cartItem.item.size}</span>
-              <span className="whitespace-nowrap">
+              <span
+                className={`whitespace-nowrap ${
+                  isAvailable ? "" : "text-destructive"
+                }`}
+              >
                 ilość: {cartItem.item.quantity}
               </span>
               <span className="break-words">

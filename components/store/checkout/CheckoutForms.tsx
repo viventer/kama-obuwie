@@ -20,7 +20,7 @@ import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoade
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
-  const { cart, clearCart } = useShoppingCart();
+  const { cart, clearCart, isLoading } = useShoppingCart();
   const router = useRouter();
   const { handleError } = useErrorHandler();
   const { startLoading, stopLoading } = useFullPageLoading();
@@ -112,7 +112,13 @@ export default function CheckoutForms() {
 
     try {
       const response = await axios.post("/api/orders", orderData);
+
       clearCart();
+
+      while (isLoading) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+
       stopLoading();
       router.replace(`/thank-you/${response.data.id}`);
     } catch (err: any) {

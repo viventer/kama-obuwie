@@ -113,6 +113,7 @@ export function useShoppingCart() {
   // Clear entire cart
   const clearCart = useCallback(() => {
     setCart([]);
+    localStorage.setItem(SHOPPING_CART_KEY, JSON.stringify([]));
   }, []);
 
   // Get item by ID

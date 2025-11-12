@@ -87,14 +87,11 @@ export default function CheckoutForms() {
   };
 
   const placeOrder = async () => {
-    const isValid = await form.trigger();
-
-    if (!isValid) {
-      showToast("Proszę uzupełnić wszystkie wymagane pola", "error");
-      return;
+    const checkoutData = form.getValues();
+    if (checkoutData.deliveryMethod === "parcelLocker") {
+      checkoutData.address = null;
     }
 
-    const checkoutData = form.getValues();
     const orderData: FrontendOrder = {
       checkoutData,
       shoppingCartItems: cart.map((cartItem) => ({ ...cartItem.item })),

@@ -95,7 +95,7 @@ export const AllegroPaymentSchema = z.object({
 });
 
 export const OrderDeliveryDataSchema = z.object({
-  address: AddressSchema.optional(),
+  address: AddressSchema.optional().nullable(),
   method: z
     .object({
       id: z.string(),

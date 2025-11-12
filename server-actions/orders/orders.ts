@@ -24,7 +24,12 @@ export const createOrder = async function (newOrder: Order) {
 
   const orderRef = adminDB.collection("orders").doc();
 
-  await orderRef.set(newOrder);
+  try {
+    console.log(newOrder);
+    await orderRef.set(newOrder);
+  } catch (err) {
+    throw new Error("Błąd podczas tworzenia zamówienia.");
+  }
 
   await syncOffersAvailability(
     newOrder.lineItems,
@@ -188,7 +193,7 @@ export const transformFrontendOrderToOrder = async function (
       status: isCOD ? "NEW" : "UNPAID",
     },
     delivery: {
-      address: undefined,
+      address: null,
       method: null,
       pickupPoint: checkoutData.pickupPoint || null,
       cost: {

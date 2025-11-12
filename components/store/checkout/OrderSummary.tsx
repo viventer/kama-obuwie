@@ -11,7 +11,11 @@ import {
 import ShippingInfo from "../global/ShippingInfo";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
-import { CheckoutData } from "@/firebase/schemas/checkoutSchemas";
+import {
+  CheckoutData,
+  CheckoutDataForPickupPointSchema,
+  CheckoutDataSchema,
+} from "@/firebase/schemas/checkoutSchemas";
 import { useEffect } from "react";
 import ShoppingCartItemsAccordion from "./ShoppingCartItemsAccordion";
 
@@ -39,10 +43,15 @@ export default function OrderSummary({
 
   const formValues = form.watch();
   const deliveryMethod = formValues.deliveryMethod;
-  const formErrors = form.formState.errors;
 
   const isFormValid = (() => {
-    if (Object.keys(formErrors).length > 0) {
+    try {
+      if (deliveryMethod === "parcelLocker") {
+        CheckoutDataForPickupPointSchema.parse(formValues);
+      } else {
+        CheckoutDataSchema.parse(formValues);
+      }
+    } catch (err) {
       return false;
     }
 

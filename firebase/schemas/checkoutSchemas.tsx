@@ -53,7 +53,8 @@ export const CheckoutDataSchema = z.object({
       buildingNumber: z.string().min(1, "Numer budynku jest wymagany."),
       apartmentNumber: z.string().optional(),
     })
-    .optional(),
+    .optional()
+    .nullable(),
   deliveryMethod: DeliveryMethodSchema,
   paymentMethod: PaymentMethodSchema,
   pickupPoint: PickupPointSchema.optional(),
@@ -61,4 +62,12 @@ export const CheckoutDataSchema = z.object({
   activeTab: z.enum(["firstStep", "secondStep"]),
 });
 
+export const CheckoutDataForPickupPointSchema = CheckoutDataSchema.omit({
+  address: true,
+});
+
 export type CheckoutData = z.infer<typeof CheckoutDataSchema>;
+
+export type CheckoutDataForPickupPoint = z.infer<
+  typeof CheckoutDataForPickupPointSchema
+>;

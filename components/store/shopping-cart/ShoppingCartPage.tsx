@@ -4,15 +4,18 @@ import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import { useToast } from "@/hooks/useToast";
 import Loader from "@/components/adminPanel/global/Loader";
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import ShoppingCartItem from "./ShoppingCartItem";
 import { Button } from "@/components/ui/button";
 import AdvantagesBox from "../product/AdvantagesBox";
 import { useRouter } from "next/navigation";
 import ShippingInfo from "../global/ShippingInfo";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { InfoIcon } from "lucide-react";
+import {
+  fetchOffersData,
+  checkCartItemsAvailability,
+} from "@/helpers/checkCartAvailability";
 
 export default function ShoppingCartPage() {
   const {
@@ -27,37 +30,16 @@ export default function ShoppingCartPage() {
   const [loadingOffers, setLoadingOffers] = useState(false);
   const router = useRouter();
 
-  const fetchOffersData = async () => {
+  const fetchOffers = async () => {
     if (cart.length === 0) {
       setOffersData({});
       return;
     }
 
-    const uniqueOfferIds = [...new Set(cart.map((item) => item.item.offerId))];
-
-    const missingOfferIds = uniqueOfferIds.filter(
-      (offerId) => !offersData[offerId]
-    );
-
-    if (missingOfferIds.length === 0) {
-      return;
-    }
-
     setLoadingOffers(true);
     try {
-      const offersPromises = missingOfferIds.map(async (offerId) => {
-        const response = await axios.get(`/api/offers/${offerId}`);
-        return { id: offerId, ...response.data.data };
-      });
-
-      const newOffers: OfferWithId[] = await Promise.all(offersPromises);
-
-      const newOffersMap = newOffers.reduce((acc, offer) => {
-        acc[offer.id] = offer;
-        return acc;
-      }, {} as Record<string, OfferWithId>);
-
-      setOffersData((prevData) => ({ ...prevData, ...newOffersMap }));
+      const newOffersData = await fetchOffersData(cart, offersData);
+      setOffersData(newOffersData);
     } catch (error) {
       console.error("Error fetching offers data:", error);
       showToast("Wystąpił błąd podczas pobierania danych produktów", "error");
@@ -69,34 +51,19 @@ export default function ShoppingCartPage() {
   const checkAvailability = useCallback(async () => {
     if (cart.length === 0) return;
 
-    // Check availability for each cart item
-    for (const cartItem of cart) {
-      const offer = offersData[cartItem.item.offerId];
-      console.log(offersData);
-      if (offer && offer.availability[cartItem.item.size]) {
-        const availableQuantity = parseInt(
-          offer.availability[cartItem.item.size].value || "0"
-        );
-        const isAvailable = availableQuantity >= cartItem.item.quantity;
-
-        // Update availability status if it has changed
-        if (cartItem.item.isAvailable !== isAvailable) {
-          updateItemAvailability(cartItem.id, isAvailable);
-        }
-      }
-    }
+    checkCartItemsAvailability(cart, offersData, updateItemAvailability);
   }, [cart, offersData]);
 
   useEffect(() => {
     if (isLoading) return;
     (async () => {
-      await fetchOffersData();
+      await fetchOffers();
     })();
-  }, [isLoading]);
+  }, [isLoading, cart]);
 
   useEffect(() => {
     checkAvailability();
-  }, [offersData, cart]);
+  }, [offersData]);
 
   const handleRemoveItem = (itemId: string, itemName: string) => {
     removeFromCart(itemId);

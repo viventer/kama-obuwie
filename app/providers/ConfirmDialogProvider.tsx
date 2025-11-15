@@ -8,6 +8,8 @@ type DialogOptions = {
   description?: string;
   confirmText?: string;
   cancelText?: string;
+  hasCancelButton?: boolean;
+  variant?: "success" | "error" | "info";
   onConfirm: () => void;
   onCancel?: () => void;
 };
@@ -51,6 +53,8 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
           message={dialogOptions.message}
           confirmText={dialogOptions.confirmText || "Tak"}
           cancelText={dialogOptions.cancelText || "Nie"}
+          hasCancelButton={dialogOptions.hasCancelButton}
+          variant={dialogOptions.variant || "info"}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />

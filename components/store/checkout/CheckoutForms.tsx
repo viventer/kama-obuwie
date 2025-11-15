@@ -17,13 +17,22 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
+import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
+import {
+  fetchOffersData,
+  checkCartItemsAvailability,
+} from "@/helpers/checkCartAvailability";
+import { Button as UIButton } from "@/components/ui/button";
+import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
-  const { cart, clearCart, isLoading } = useShoppingCart();
+  const { cart, clearCart, isLoading, updateItemAvailability } =
+    useShoppingCart();
   const router = useRouter();
   const { handleError } = useErrorHandler();
   const { startLoading, stopLoading } = useFullPageLoading();
+  const { showDialog } = useConfirmDialog();
 
   const form = useForm({
     resolver: zodResolver(CheckoutDataSchema),
@@ -90,27 +99,53 @@ export default function CheckoutForms() {
 
   const placeOrder = async () => {
     startLoading();
-    const checkoutData = form.getValues();
-    if (checkoutData.deliveryMethod === "parcelLocker") {
-      checkoutData.address = null;
-    }
-
-    if (checkoutData.paymentMethod !== "COD") {
-      showToast(
-        "Przyjmowanie płatności online jest obecnie niedostępne, skorzystaj z płatności przy odbiorze.",
-        "error"
-      );
-
-      stopLoading();
-      return;
-    }
-
-    const orderData: FrontendOrder = {
-      checkoutData,
-      shoppingCartItems: cart.map((cartItem) => ({ ...cartItem.item })),
-    };
 
     try {
+      const offersData = await fetchOffersData(cart);
+      const availabilityCheck = checkCartItemsAvailability(
+        cart,
+        offersData,
+        updateItemAvailability
+      );
+
+      if (availabilityCheck.hasUnavailable) {
+        stopLoading();
+
+        showDialog({
+          message: "Niektóre produkty są już niedostępne.",
+          description: "Usuń je z koszyka przed złożeniem zamówienia.",
+          onConfirm: () => {
+            router.push("/shopping-cart");
+          },
+          hasCancelButton: false,
+          variant: "error",
+          confirmText: "Przejdź do koszyka",
+        });
+
+        return;
+      }
+
+      // Proceed with order placement
+      const checkoutData = form.getValues();
+      if (checkoutData.deliveryMethod === "parcelLocker") {
+        checkoutData.address = null;
+      }
+
+      if (checkoutData.paymentMethod !== "COD") {
+        showToast(
+          "Przyjmowanie płatności online jest obecnie niedostępne, skorzystaj z płatności przy odbiorze.",
+          "error"
+        );
+
+        stopLoading();
+        return;
+      }
+
+      const orderData: FrontendOrder = {
+        checkoutData,
+        shoppingCartItems: cart.map((cartItem) => ({ ...cartItem.item })),
+      };
+
       const response = await axios.post("/api/orders", orderData);
 
       clearCart();

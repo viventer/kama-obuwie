@@ -18,6 +18,8 @@ interface AlertConfirmProps {
   description?: string;
   confirmText?: string;
   cancelText?: string;
+  hasCancelButton?: boolean;
+  variant?: "success" | "error" | "info";
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -28,12 +30,23 @@ export function ConfirmDialog({
   description,
   confirmText = "Tak",
   cancelText = "Nie",
+  hasCancelButton = true,
+  variant = "info",
   onConfirm,
   onCancel,
 }: AlertConfirmProps) {
+  const borderColorClass =
+    variant === "success"
+      ? "border-green-500"
+      : variant === "error"
+      ? "border-destructive"
+      : "border-primary";
+
   return (
     <AlertDialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
-      <AlertDialogContent className="border-primary max-w-[90%] lg:max-w-[600px]">
+      <AlertDialogContent
+        className={`${borderColorClass} max-w-[90%] lg:max-w-[600px]`}
+      >
         <AlertDialogHeader>
           <AlertDialogTitle className="flex">{message}</AlertDialogTitle>
           {description && (
@@ -43,13 +56,15 @@ export function ConfirmDialog({
           )}
         </AlertDialogHeader>
         <AlertDialogFooter className="flex items-center flex-row gap-4">
-          <AlertDialogCancel
-            onClick={onCancel}
-            className="border-[0.1rem] border-solid border-primary bg-transparent m-0 hover:bg-primary"
-          >
-            {cancelText}
-          </AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} className="bg-secondary">
+          {hasCancelButton && (
+            <AlertDialogCancel
+              onClick={onCancel}
+              className="border-[0.1rem] border-solid border-primary bg-transparent m-0 hover:bg-primary"
+            >
+              {cancelText}
+            </AlertDialogCancel>
+          )}
+          <AlertDialogAction onClick={onConfirm} className="bg-primary">
             {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -96,7 +96,7 @@ export default function ShoppingCartPage() {
 
   useEffect(() => {
     checkAvailability();
-  }, [offersData]);
+  }, [offersData, cart]);
 
   const handleRemoveItem = (itemId: string, itemName: string) => {
     removeFromCart(itemId);

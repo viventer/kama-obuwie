@@ -72,6 +72,7 @@ export default function ShoppingCartPage() {
     // Check availability for each cart item
     for (const cartItem of cart) {
       const offer = offersData[cartItem.item.offerId];
+      console.log(offersData);
       if (offer && offer.availability[cartItem.item.size]) {
         const availableQuantity = parseInt(
           offer.availability[cartItem.item.size].value || "0"
@@ -87,9 +88,15 @@ export default function ShoppingCartPage() {
   }, [cart, offersData]);
 
   useEffect(() => {
-    fetchOffersData();
+    if (isLoading) return;
+    (async () => {
+      await fetchOffersData();
+    })();
+  }, [isLoading]);
+
+  useEffect(() => {
     checkAvailability();
-  }, []);
+  }, [offersData]);
 
   const handleRemoveItem = (itemId: string, itemName: string) => {
     removeFromCart(itemId);

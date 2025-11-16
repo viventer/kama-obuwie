@@ -4,7 +4,7 @@ import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
-export default function page() {
+export default function ReturnsPage() {
   const { showDialog } = useConfirmDialog();
 
   return (

@@ -86,7 +86,7 @@ export default async function Page() {
 
   return (
     <>
-      <HomeGrid />
+      {/* <HomeGrid /> */}
       <div className="flex flex-col gap-12">
         {Object.entries(products).map(([categoryId, productsInCategory]) => (
           <ProductsList

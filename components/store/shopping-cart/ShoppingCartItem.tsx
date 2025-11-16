@@ -91,7 +91,7 @@ export default function ShoppingCartItem({
           </div>
 
           <div className="flex items-center gap-4 sm:gap-6 flex-col xs:flex-row">
-            {offerData && (
+            {offerData && cartItem.item.isAvailable && (
               <EditCartItemDialog
                 cartItem={cartItem}
                 availability={offerData.availability}

@@ -1,7 +1,12 @@
+"use client";
+
+import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function page() {
+  const { showDialog } = useConfirmDialog();
+
   return (
     <section>
       <h2 className="text-xl font-bold mb-2">Jak zwrócić produkt?</h2>
@@ -18,7 +23,21 @@ export default function page() {
         </li>
       </ol>
 
-      <Button variant={"important"} className="mt-4" asChild>
+      <Button
+        variant={"important"}
+        className="mt-4"
+        asChild
+        onClick={() =>
+          showDialog({
+            message: "Zwroty są tymczasowo niedostępne.",
+            description:
+              "Zwroty poprzez sklep internetowy będziemy będą możliwe po uruchomieniu na nim sprzedaży. Obecnie przyjmujemy zamówienia tylko przez Allegro.",
+            confirmText: "OK",
+            onConfirm: () => {},
+            hasCancelButton: false,
+          })
+        }
+      >
         <a href="#">Wypełnij formularz zwrotu</a>
       </Button>
 

@@ -70,3 +70,9 @@ env:
 
   - variable: NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
     secret: NEXT_SERVER_ACTIONS_ENCRYPTION_KEY
+
+  - variable: INPOST_GEOWIDGET
+    secret: INPOST_GEOWIDGET
+
+  - variable: INPOST_API_SHIPX
+    secret: INPOST_API_SHIPX

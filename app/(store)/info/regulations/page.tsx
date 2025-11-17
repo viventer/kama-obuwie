@@ -5,11 +5,11 @@ export default function RegulationsPage() {
   return (
     <section>
       <h1 className="text-2xl font-bold mb-4">
-        Regulamin sklepu internetowego Kama-obuwie
+        Regulamin sklepu internetowego kama-obuwie
       </h1>
       <p className="text-muted-foreground mb-8">
         Niniejszy regulamin określa zasady korzystania ze sklepu internetowego
-        Kama-obuwie, dostępnego pod adresem internetowym{" "}
+        kama-obuwie, dostępnego pod adresem internetowym{" "}
         <LinkText href="/" className="text-foreground">
           kama-obuwie.pl
         </LinkText>
@@ -23,20 +23,14 @@ export default function RegulationsPage() {
             <h2>Informacje o sprzedawcy</h2>
           </CardHeader>
           <CardContent>
-            Sklep prowadzi działalność pod nazwą{" "}
-            <span className="font-semibold">Kama-obuwie</span>. W sprawach
-            związanych ze sklepem możesz kontaktować się z nami poprzez e-mail:{" "}
-            <LinkText
-              className="font-medium"
-              href="mailto:kontakt.obuwie.kama@gmail.com"
-            >
-              kontakt.obuwie.kama@gmail.com
-            </LinkText>
-            .
+            <p>Anna Kamińska - "KAM-A"</p>
+            <p>ul. Krzęczków 42a</p>
+            <p>32-700 Bochnia</p>
+            <p>NIP: 8681255945</p>
           </CardContent>
         </Card>
 
-        <Card className="gap-0">
+        {/* <Card className="gap-0">
           <CardHeader className="font-bold text-lg">
             <h2>Płatności</h2>
           </CardHeader>
@@ -71,7 +65,7 @@ export default function RegulationsPage() {
               .
             </p>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card className="gap-0">
           <CardHeader className="font-bold text-lg">
@@ -96,7 +90,7 @@ export default function RegulationsPage() {
               Szczegółowe informacje na temat kosztów i metod dostawy dostępne
               są na stronie:{" "}
               <LinkText
-                href="/info/shipping-and-payments"
+                href="/info/shipping-and-payments-methods"
                 className="font-medium"
               >
                 Informacje o płatnościach i dostawie
@@ -145,7 +139,7 @@ export default function RegulationsPage() {
           </CardHeader>
           <CardContent>
             <p className="mb-3">
-              Wszystkie produkty sprzedawane w sklepie Kama-Obuwie są objęte{" "}
+              Wszystkie produkty sprzedawane w sklepie kama-obuwie są objęte{" "}
               <span className="font-semibold">2-letnią odpowiedzialnością</span>{" "}
               sprzedawcy za wady (tzw. rękojmia) zgodnie z obowiązującymi
               przepisami prawa. Klient może zgłosić reklamację w ciągu 2 lat od

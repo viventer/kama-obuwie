@@ -11,7 +11,10 @@ export default function ComplaintsPage() {
           <strong>Pobierz formularz reklamacyjny</strong>
           <br />
           Formularz dostępny jest{" "}
-          <LinkText href="https://drive.google.com/file/d/1FvlLTh2uHiBdff6wxFvy4kyATACqdT0A/view?usp=sharing">
+          <LinkText
+            href="https://drive.google.com/file/d/1FvlLTh2uHiBdff6wxFvy4kyATACqdT0A/view?usp=sharing"
+            target="_blank"
+          >
             tutaj
           </LinkText>
           . Wydrukuj go i wypełnij czytelnie.
@@ -65,7 +68,10 @@ export default function ComplaintsPage() {
       </ol>
 
       <Button variant={"important"} className="mt-6" asChild>
-        <a href="https://drive.google.com/file/d/1FvlLTh2uHiBdff6wxFvy4kyATACqdT0A/view?usp=sharing">
+        <a
+          href="https://drive.google.com/file/d/1FvlLTh2uHiBdff6wxFvy4kyATACqdT0A/view?usp=sharing"
+          target="_blank"
+        >
           Pobierz formularz reklamacyjny
         </a>
       </Button>

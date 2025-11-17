@@ -2,7 +2,13 @@
 
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function ReturnsPage() {
   const { showDialog } = useConfirmDialog();
@@ -75,6 +81,43 @@ export default function ReturnsPage() {
             zwracamy w ciągu <span className="font-semibold">24 godzin</span> od
             otrzymania przesyłki zwrotnej. Na koncie mogą pojawić się w ciągu
             kilku dni roboczych.
+          </CardContent>
+        </Card>
+
+        <Card className="gap-0">
+          <CardHeader className="font-bold text-lg">
+            <h3>Czy mogę zwrócić produkt inną metodą?</h3>
+          </CardHeader>
+          <CardContent>
+            <p>
+              Tak, możesz zwrócić zamówienie dowolnym innym przewoźnikiem na
+              adres podany poniżej. W takim przypadku pokrywasz koszty zwrotu
+              samodzielnie. Nie przyjmujemy zwrotów nadanych za pobraniem.
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="gap-2">
+          <CardHeader className="text-lg">
+            <CardTitle>Adres do zwrotów</CardTitle>
+            <CardDescription>
+              W przypadku zwrotu metodą własną, użyj tego adresu.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <p>Anna Kamińska - "KAM-A"</p>
+              <p>ul. Plac Gazaris 11</p>
+              <p>
+                <b>nr lokalu:</b> stoisko nr 39
+              </p>
+              <p>32-700 Bochnia</p>
+              <p>
+                <b>nr tel.:</b> 664097737
+              </p>
+              <p>
+                <b>email:</b> kontakt.obuwie.kama@gmail.com
+              </p>
+            </div>
           </CardContent>
         </Card>
       </section>

@@ -5,7 +5,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { MapPinIcon, ClockIcon, ShoppingBagIcon, StarIcon } from "lucide-react";
+import {
+  MapPinIcon,
+  ClockIcon,
+  ShoppingBagIcon,
+  StarIcon,
+  InfoIcon,
+} from "lucide-react";
 
 export default function AboutPage() {
   return (
@@ -245,6 +251,28 @@ export default function AboutPage() {
             </div>
           </div>
         </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <InfoIcon className="text-brand" />
+            <h2>Dane firmy</h2>
+          </CardTitle>
+          <CardDescription>
+            Informacje prawne o firmie. Podany adres <b>nie</b> służy do
+            zwrotów. Adres do zwrotów znajdziesz{" "}
+            <a href="/info/returns" className="underline hover:text-brand">
+              tutaj
+            </a>
+            .
+          </CardDescription>
+          <CardContent>
+            <p>Anna Kamińska - "KAM-A"</p>
+            <p>ul. Krzęczków 42a</p>
+            <p>32-700 Bochnia</p>
+            <p>NIP: 8681255945</p>
+          </CardContent>
+        </CardHeader>
       </Card>
     </div>
   );

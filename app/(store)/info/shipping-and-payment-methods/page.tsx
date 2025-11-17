@@ -34,7 +34,7 @@ export default function ShippingAndPaymentMethods() {
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
               <Image
-                src={"/InPost Paczkomat logo kwadrat.svg"}
+                src={"/InpostPaczkomatRect.svg"}
                 alt="logo InPost Paczkomat"
                 width={64}
                 height={64}
@@ -102,8 +102,20 @@ export default function ShippingAndPaymentMethods() {
         </CardContent>
       </Card>
 
-      {/* Sekcja płatności */}
       <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">
+            Płatności nie są obecnie obsługiwane.
+          </CardTitle>
+          <CardDescription>
+            Oczekujemy na integrację z dostawcą płatności w najbliższej
+            przyszłości.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      {/* Sekcja płatności */}
+      {/* <Card>
         <CardHeader>
           <CardTitle className="text-lg">Metody płatności</CardTitle>
           <CardDescription>
@@ -162,7 +174,7 @@ export default function ShippingAndPaymentMethods() {
 
           <Separator className="my-6" />
 
-          {/* Dodatkowa opcja płatności */}
+          
           <div className="bg-accent/10 p-6 rounded-lg border border-accent/20">
             <div className="flex items-center space-x-3">
               <div className="text-accent text-2xl">💰</div>
@@ -177,7 +189,7 @@ export default function ShippingAndPaymentMethods() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Dodatkowe informacje */}
       <Card className="gap-2">
@@ -186,10 +198,10 @@ export default function ShippingAndPaymentMethods() {
         </CardHeader>
         <CardContent>
           <ul className="space-y-4 list-disc list-inside">
-            <li>
+            {/* <li>
               Wszystkie płatności są zabezpieczone i przetwarzane przez
               zaufanych partnerów płatniczych
-            </li>
+            </li> */}
             <li>
               Twoje dane dostawy i kontaktowe trafiają bezpośrednio do InPost,
               nie posłużą do celów marketingowych.

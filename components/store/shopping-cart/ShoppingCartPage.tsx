@@ -16,6 +16,9 @@ import {
   fetchOffersData,
   checkCartItemsAvailability,
 } from "@/helpers/checkCartAvailability";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import LinkText from "@/components/adminPanel/global/LinkText";
 
 export default function ShoppingCartPage() {
   const {
@@ -28,6 +31,7 @@ export default function ShoppingCartPage() {
   const { showToast } = useToast();
   const [offersData, setOffersData] = useState<Record<string, OfferWithId>>({});
   const [loadingOffers, setLoadingOffers] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const router = useRouter();
 
   const fetchOffers = async () => {
@@ -96,7 +100,7 @@ export default function ShoppingCartPage() {
   }, 0);
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6 text-foreground">Koszyk</h1>
 
       <div className="space-y-4">
@@ -111,7 +115,7 @@ export default function ShoppingCartPage() {
       </div>
 
       <div className="mt-6 pt-4 border-t border-border flex flex-col md:flex-row md:justify-between gap-4">
-        <div>
+        <div className="flex-1">
           <div className="flex items-center mb-4">
             <p className="text-xl font-bold text-foreground">
               Do zapłaty:{" "}
@@ -122,22 +126,43 @@ export default function ShoppingCartPage() {
               }).format(totalPrice)}
             </p>
           </div>
+          <div className="flex items-center mb-4 gap-2">
+            <Checkbox
+              id="terms"
+              className="size-4"
+              checked={termsAccepted}
+              onCheckedChange={(value) => setTermsAccepted(value as boolean)}
+            />
+            <Label htmlFor="terms" className="gap-1">
+              Akceptuję{" "}
+              <LinkText href={"/info/regulations"}>regulamin sklepu</LinkText> i{" "}
+              <LinkText href={"/info/privacy"}>politykę prywatności</LinkText>.
+            </Label>
+          </div>
+          {hasUnavailableItems().hasUnavailable ? (
+            <Card className="py-0 border-destructive mb-4 max-w-fit">
+              <CardContent className="px-4 py-3 flex items-start gap-2">
+                <InfoIcon className="size-6 text-destructive" />
+                Aby dokonać zakupu usuń niedostępne produkty z koszyka.
+              </CardContent>
+            </Card>
+          ) : !termsAccepted ? (
+            <Card className="py-0 border-destructive mb-4 max-w-fit">
+              <CardContent className="px-4 py-3 flex items-start gap-2">
+                <InfoIcon className="size-6 text-destructive" />
+                Aby przejść do kasy, zaakceptuj regulamin sklepu i politykę
+                prywatności.
+              </CardContent>
+            </Card>
+          ) : null}
           <Button
             variant={"important"}
             className="text-xl px-6 w-fit mb-2"
-            disabled={hasUnavailableItems().hasUnavailable}
+            disabled={hasUnavailableItems().hasUnavailable || !termsAccepted}
             onClick={() => router.push("/checkout")}
           >
             Do kasy
           </Button>
-          {hasUnavailableItems().hasUnavailable && (
-            <Card className="py-0 border-accent mb-4 max-w-fit">
-              <CardContent className="px-4 py-3 flex items-start gap-2">
-                <InfoIcon className="size-6 text-accent" />
-                Aby dokonać zakupu usuń niedostępne produkty z koszyka.
-              </CardContent>
-            </Card>
-          )}
           <ShippingInfo />
         </div>
         <AdvantagesBox price={totalPrice} />

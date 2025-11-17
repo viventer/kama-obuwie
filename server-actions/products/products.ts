@@ -115,6 +115,14 @@ export const getProductsListingData = async function (
           const imageUrl = await getImageUrl(offer.thumbnail);
           thumbnailUrl = imageUrl || "";
         }
+      } else if (product?.editedPhotos) {
+        const editedPhotoForVariant = product.editedPhotos.find(
+          (photo) => photo.colorVariantName === colorVariantName
+        );
+        if (editedPhotoForVariant) {
+          const imageUrl = await getImageUrl(editedPhotoForVariant.filePath);
+          thumbnailUrl = imageUrl || "";
+        }
       }
 
       productListingDataArray.push({

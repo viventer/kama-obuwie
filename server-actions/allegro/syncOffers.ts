@@ -59,7 +59,7 @@ export const getAllAllegroOffers = async (
           limit: limit,
           offset: offset,
           "sellingMode.price.amount.gte": "60",
-          "sellingMode.price.amount.lt": "70",
+          "sellingMode.price.amount.lte": "70",
         },
         headers,
       });

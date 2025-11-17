@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { Category } from "@/firebase/schemas/productsSchemas";
+import { getProductsListingData } from "@/server-actions/products/products";
 
 const mainCategories = [
   { label: "Męskie", rootCategory: "obuwie męskie" },
@@ -28,6 +29,34 @@ export default async function MainNav() {
       return acc;
     }, {} as Record<string, (Category & { id: string })[]>) || {};
 
+  // Pobierz produkty dla wszystkich kategorii
+  const allCategoryIds = categories?.map((category) => category.id) || [];
+  const productsData =
+    allCategoryIds.length > 0
+      ? await getProductsListingData(allCategoryIds)
+      : {};
+
+  // Filtruj kategorie, które mają aktywne produkty
+  const categoriesWithProducts = Object.keys(categoriesByRoot).reduce(
+    (acc, rootCategory) => {
+      const subcategories = categoriesByRoot[rootCategory].filter(
+        (category) => {
+          const productsInCategory = productsData[category.id] || [];
+          const hasActiveProducts = productsInCategory.some(
+            (product) => product.isActive
+          );
+          return hasActiveProducts;
+        }
+      );
+
+      if (subcategories.length > 0) {
+        acc[rootCategory] = subcategories;
+      }
+      return acc;
+    },
+    {} as Record<string, (Category & { id: string })[]>
+  );
+
   return (
     <div className="w-[90%] max-w-[1440px] flex justify-start ">
       <NavigationMenu>
@@ -35,7 +64,12 @@ export default async function MainNav() {
         <NavigationMenuList className="gap-2">
           {mainCategories.map((mainCategory) => {
             const subcategories =
-              categoriesByRoot[mainCategory.rootCategory] || [];
+              categoriesWithProducts[mainCategory.rootCategory] || [];
+
+            // Nie wyświetlaj kategorii głównej jeśli nie ma podkategorii z produktami
+            if (subcategories.length === 0) {
+              return null;
+            }
 
             return (
               <NavigationMenuItem
@@ -46,7 +80,7 @@ export default async function MainNav() {
                   {mainCategory.label}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-background w-full">
-                  <div className="grid w-full max-w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                  <div className="grid w-full max-w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] text-wrap">
                     {subcategories.map((category) => (
                       <NavigationMenuLink key={category.id} asChild>
                         <LinkText
@@ -58,11 +92,6 @@ export default async function MainNav() {
                         </LinkText>
                       </NavigationMenuLink>
                     ))}
-                    {subcategories.length === 0 && (
-                      <div className="col-span-2 text-center text-muted-foreground py-8">
-                        Brak dostępnych kategorii
-                      </div>
-                    )}
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>

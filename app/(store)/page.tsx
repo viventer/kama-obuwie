@@ -1,4 +1,3 @@
-import HomeGrid from "@/components/store/home/HomeGrid";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import {
   RootCategory,

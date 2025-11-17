@@ -115,6 +115,7 @@ export const transformAllegroAL1OfferToOffer = async (
   const { signature } = parseExternalId(cleanedExternalId);
 
   const finalSignature = signature.trim() || "";
+  console.log("Offer primary image URL:", offer.primaryImage.url);
 
   const transformedOffer: Offer = {
     title: cleanedTitle,

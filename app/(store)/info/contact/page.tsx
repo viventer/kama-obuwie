@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { MailIcon, PhoneIcon, ClockIcon } from "lucide-react";
+import { MailIcon, PhoneIcon, ClockIcon, InfoIcon } from "lucide-react";
 import LinkText from "@/components/adminPanel/global/LinkText";
 
 export default function ContactPage() {
@@ -69,6 +69,29 @@ export default function ContactPage() {
             </div>
           </div>
         </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <InfoIcon className="text-brand" />
+            <h2>Dane firmy</h2>
+          </CardTitle>
+          <CardDescription>
+            Informacje prawne o firmie. Podany adres <b>nie</b> służy do
+            zwrotów. Adres do zwrotów znajdziesz{" "}
+            <a href="/info/returns" className="underline hover:text-brand">
+              tutaj
+            </a>
+            .
+          </CardDescription>
+          <CardContent>
+            <p>Anna Kamińska - "KAM-A"</p>
+            <p>ul. Krzęczków 42a</p>
+            <p>32-700 Bochnia</p>
+            <p>NIP: 8681255945</p>
+          </CardContent>
+        </CardHeader>
       </Card>
 
       {/* Sekcja FAQ */}

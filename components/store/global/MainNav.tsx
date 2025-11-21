@@ -20,6 +20,8 @@ const mainCategories = [
 export default async function MainNav() {
   const categories = await getDocumentsFromAdminDB<Category>("categories");
 
+  console.log("Fetched categories for MainNav:", categories);
+
   const categoriesByRoot =
     categories?.reduce((acc, category) => {
       if (!acc[category.rootCategory]) {
@@ -31,6 +33,7 @@ export default async function MainNav() {
 
   // Pobierz produkty dla wszystkich kategorii
   const allCategoryIds = categories?.map((category) => category.id) || [];
+  console.log("All category IDs for MainNav:", allCategoryIds);
   const productsData =
     allCategoryIds.length > 0
       ? await getProductsListingData(allCategoryIds)
@@ -45,6 +48,13 @@ export default async function MainNav() {
           const hasActiveProducts = productsInCategory.some(
             (product) => product.isActive
           );
+          if (rootCategory === "obuwie damskie") {
+            console.log("Checking category:", category.id, category.name);
+            console.log(
+              `Category ${category.name} has active products:`,
+              hasActiveProducts
+            );
+          }
           return hasActiveProducts;
         }
       );

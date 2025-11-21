@@ -80,7 +80,7 @@ export default async function MainNav() {
                   {mainCategory.label}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-background w-full">
-                  <div className="grid w-full max-w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] text-wrap">
+                  <div className="grid w-full max-w-[600px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] text-wrap">
                     {subcategories.map((category) => (
                       <NavigationMenuLink key={category.id} asChild>
                         <LinkText

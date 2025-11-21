@@ -87,16 +87,23 @@ export default async function Page() {
     <>
       {/* <HomeGrid /> */}
       <div className="flex flex-col gap-12">
-        {Object.entries(products).map(([categoryId, productsInCategory]) => (
-          <ProductsList
-            key={categoryId}
-            products={productsInCategory}
-            categoryId={categoryId}
-            displayName={
-              categories.find((cat) => cat.id === categoryId)?.displayName || ""
-            }
-          />
-        ))}
+        {Object.entries(products).map(([categoryId, productsInCategory]) => {
+          if (productsInCategory.length < 4) {
+            return null;
+          }
+
+          return (
+            <ProductsList
+              key={categoryId}
+              products={productsInCategory}
+              categoryId={categoryId}
+              displayName={
+                categories.find((cat) => cat.id === categoryId)?.displayName ||
+                ""
+              }
+            />
+          );
+        })}
       </div>
     </>
   );

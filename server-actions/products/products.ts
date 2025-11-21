@@ -152,7 +152,6 @@ export const getProductsListingData = async function (
       productsListingData.push(...productListingDataArray);
     }
 
-    if (productsListingData.length < 4) continue;
     products[categoryId] = productsListingData;
   }
 

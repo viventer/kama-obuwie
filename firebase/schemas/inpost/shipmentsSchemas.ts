@@ -22,7 +22,7 @@ export const PeerSchema = z.object({
 
 export const ServiceSchema = z.object({
   id: z.string(),
-  name: z.string(),
+  name: z.enum(["inpost_locker_standard", "inpost_courier_standard"]),
   description: z.string().optional(),
 });
 

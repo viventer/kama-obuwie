@@ -122,7 +122,9 @@ export const InpostShipmentSchema = z.object({
   comments: z.string().optional(),
   mpk: z.string().optional(),
 
-  additional_services: z.array(z.string()).optional(),
+  additional_services: z
+    .array(z.enum(["insurance", "cod", "sms", "email", "saturday"]))
+    .optional(),
 
   custom_attributes: CustomAttributesSchema.optional(),
   cod: MoneyDataSchema.optional(),

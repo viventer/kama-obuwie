@@ -72,7 +72,7 @@ export default function InPostSelector({
     const fetchToken = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/inpost/token");
+        const response = await fetch("/api/inpost/geowidget/token");
         const data = await response.json();
 
         if (response.ok) {

@@ -275,33 +275,35 @@ export default function OrdersDataTable({
                     return;
                   }
 
-                  const { data: returnsForOrder } = await axios.get(
-                    `/api/allegro/returns?allegroOrderId=${row.original.allegroId}`
-                  );
+                  if (row.original.salesChannel.includes("AL")) {
+                    const { data: returnsForOrder } = await axios.get(
+                      `/api/allegro/returns?allegroOrderId=${row.original.allegroId}`
+                    );
 
-                  if (
-                    returnsForOrder.AL1.length > 0 ||
-                    returnsForOrder.AL2.length > 0
-                  ) {
-                    openDialog({
-                      title: "Zamówienie ma zwroty",
-                      content: (
-                        <p>
-                          Do tego zamówienia został już zgłoszony zwrot. Czy na
-                          pewno chcesz wygenerować etykietę?
-                        </p>
-                      ),
-                      cancelText: "Anuluj tworzenie etykiety",
-                      hasCancelButton: true,
-                      onCancel: () => {
-                        showToast(
-                          "Etykieta nie została wygenerowana.",
-                          "default"
-                        );
-                        router.back();
-                        return;
-                      },
-                    });
+                    if (
+                      returnsForOrder.AL1.length > 0 ||
+                      returnsForOrder.AL2.length > 0
+                    ) {
+                      openDialog({
+                        title: "Zamówienie ma zwroty",
+                        content: (
+                          <p>
+                            Do tego zamówienia został już zgłoszony zwrot. Czy
+                            na pewno chcesz wygenerować etykietę?
+                          </p>
+                        ),
+                        cancelText: "Anuluj tworzenie etykiety",
+                        hasCancelButton: true,
+                        onCancel: () => {
+                          showToast(
+                            "Etykieta nie została wygenerowana.",
+                            "default"
+                          );
+                          router.back();
+                          return;
+                        },
+                      });
+                    }
                   }
 
                   router.push(

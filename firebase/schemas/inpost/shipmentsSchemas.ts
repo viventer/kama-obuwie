@@ -141,6 +141,53 @@ export const InpostShipmentSchema = z.object({
   updated_at: z.string().datetime(),
 });
 
+export const PickupPointCustomAttributesSchema = CustomAttributesSchema.extend({
+  target_point: z.string(),
+});
+
+export const PickupPointParcelSchema = InpostParcelSchema.extend({
+  template: z.enum(["small", "medium", "large"]),
+});
+
+export const PickupPointInpostShipmentSchema = InpostShipmentSchema.extend({
+  custom_attributes: PickupPointCustomAttributesSchema.optional(),
+  parcels: z.array(PickupPointParcelSchema),
+});
+
+export const CourierPeerSchema = PeerSchema.extend({
+  address: InpostAddressSchema,
+  first_name: z.string(),
+  last_name: z.string(),
+});
+
+export const CourierParcelSchema = InpostParcelSchema.extend({
+  dimensions: z.object({
+    length: z.number(),
+    width: z.number(),
+    height: z.number(),
+    unit: z.literal("mm"),
+  }),
+  weight: z.object({
+    amount: z.number(),
+    unit: z.literal("kg"),
+  }),
+});
+
+export const CourierInpostShipmentSchema = InpostShipmentSchema.extend({
+  receiver: CourierPeerSchema,
+  parcels: z.array(CourierParcelSchema),
+});
+
 export type InpostShipment = z.infer<typeof InpostShipmentSchema>;
 export type InpostParcel = z.infer<typeof InpostParcelSchema>;
 export type InpostOffer = z.infer<typeof InpostOfferSchema>;
+export type PickupPointInpostShipment = z.infer<
+  typeof PickupPointInpostShipmentSchema
+>;
+export type PickupPointParcel = z.infer<typeof PickupPointParcelSchema>;
+export type PickupPointCustomAttributes = z.infer<
+  typeof PickupPointCustomAttributesSchema
+>;
+export type CourierInpostShipment = z.infer<typeof CourierInpostShipmentSchema>;
+export type CourierPeer = z.infer<typeof CourierPeerSchema>;
+export type CourierParcel = z.infer<typeof CourierParcelSchema>;

@@ -11,7 +11,7 @@ import { Order } from "@/firebase/schemas/ordersSchemas";
 import { Offer } from "@/firebase/schemas/offersSchemas";
 import { AllegroSalesChannel } from "@/lib/constants";
 import { getAllegroOffer } from "./offers";
-import { handleAxiosError } from "../errorHandlers";
+import { handleAllegroApiError } from "../errorHandlers";
 import { parseExternalId } from "@/helpers/externalId";
 import { generateOrderNumber } from "../helpers";
 
@@ -102,7 +102,7 @@ export async function getAllegroOrderEvents() {
     };
   } catch (error) {
     console.error("Error fetching Allegro order events:", error);
-    handleAxiosError(error, "Błąd podczas pobierania zdarzeń z Allegro");
+    handleAllegroApiError(error, "Błąd podczas pobierania zdarzeń z Allegro");
     // Zwróć pustą strukturę w przypadku błędu, aby nie przerywać synchronizacji
     return {
       AL1: [],
@@ -123,7 +123,7 @@ export async function getAllegroOrderDetails(
     const response = await axios.get(url, { headers: headers });
     return response.data;
   } catch (err) {
-    handleAxiosError(
+    handleAllegroApiError(
       err,
       "Błąd podczas pobierania szczegółów zamówienia z Allegro"
     );

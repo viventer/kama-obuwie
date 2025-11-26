@@ -8,6 +8,8 @@ export const InpostErrorResponseSchema = z.object({
     "invalid_parameter",
     "validation_failed",
     "offer_expired",
+    "no_carriers",
+    "carrier_unavailable",
   ]),
   description: z.string().optional().nullable(),
   details: z

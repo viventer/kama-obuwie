@@ -3,7 +3,7 @@
 import axios from "axios";
 import { getAllegroUserAccessTokens } from "./auth";
 import { getAllegroHeaders } from "./global";
-import { handleAxiosError } from "../errorHandlers";
+import { handleAllegroApiError } from "../errorHandlers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -24,6 +24,9 @@ export async function getAllegroShippingRates() {
       AL2: AL2Response.data,
     };
   } catch (error) {
-    handleAxiosError(error, "Błąd podczas pobierania stawek dostawy z Allegro");
+    handleAllegroApiError(
+      error,
+      "Błąd podczas pobierania stawek dostawy z Allegro"
+    );
   }
 }

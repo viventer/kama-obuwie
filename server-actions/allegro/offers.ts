@@ -29,7 +29,7 @@ import { getImageUrl } from "../files/files";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath, safetyInformation } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
-import { handleAxiosError } from "../errorHandlers";
+import { handleAllegroApiError } from "../errorHandlers";
 import { addMissingAllegroParameters } from "@/components/adminPanel/assortment/helpers/allegroParameters";
 import { getFormattedSizingTable } from "@/lib/utils";
 
@@ -86,7 +86,7 @@ export const editAllegroOffer = async (
   try {
     await axios.patch(url, data, { headers });
   } catch (error) {
-    handleAxiosError(error, "Błąd podczas edytowania oferty Allegro");
+    handleAllegroApiError(error, "Błąd podczas edytowania oferty Allegro");
   }
 };
 
@@ -110,7 +110,7 @@ export const getAllegroOffer = async (
 
     return data as AllegroOffer;
   } catch (error) {
-    handleAxiosError(error, "Błąd podczas pobierania oferty z Allegro");
+    handleAllegroApiError(error, "Błąd podczas pobierania oferty z Allegro");
   }
 };
 
@@ -323,7 +323,10 @@ export async function postIndividualAllegroOffer(
     });
     return resp.data.id! as string;
   } catch (err) {
-    return handleAxiosError(err, "Błąd podczas tworzenia oferty na Allegro");
+    return handleAllegroApiError(
+      err,
+      "Błąd podczas tworzenia oferty na Allegro"
+    );
   }
 }
 

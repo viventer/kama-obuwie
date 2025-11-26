@@ -4,7 +4,7 @@ import axios from "axios";
 import { getAllegroUserAccessTokens } from "./auth";
 import { getAllegroHeaders } from "./global";
 import { AllegroReturn } from "@/firebase/schemas/returnsSchemas";
-import { handleAxiosError } from "../errorHandlers";
+import { handleAllegroApiError } from "../errorHandlers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -64,6 +64,6 @@ export async function getAllegroReturns(
       AL2: sortedAL2,
     };
   } catch (error) {
-    handleAxiosError(error, "Błąd podczas pobierania zwrotów z Allegro");
+    handleAllegroApiError(error, "Błąd podczas pobierania zwrotów z Allegro");
   }
 }

@@ -1,4 +1,3 @@
-import { DocumentReference } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
 import { AllegroAuthError } from "@/firebase/schemas/shipmentsSchemas";
 
@@ -131,7 +130,10 @@ export function handleApiError(error: any, defaultMessage: string): string {
  * @param defaultMessage - domyślny komunikat błędu
  * @throws Error z properties allegroErrors i status dla błędów Allegro
  */
-export function handleAxiosError(error: any, defaultMessage: string): never {
+export function handleAllegroApiError(
+  error: any,
+  defaultMessage: string
+): never {
   if (error.response) {
     console.error("Status:", error.response.status);
     console.error("Body:", JSON.stringify(error.response.data, null, 2));
@@ -183,7 +185,86 @@ export function handleAxiosError(error: any, defaultMessage: string): never {
   }
 }
 
-export type DocumentDataWithRef<T> = {
-  data: T | null;
-  ref: DocumentReference;
-};
+/**
+ * Uniwersalna funkcja do obsługi błędów Axios w server actions dla InPost API
+ * Automatycznie przekształca błędy z InPost API na format z inpostErrors i status
+ *
+ * @param error - obiekt błędu z axios (AxiosError)
+ * @param defaultMessage - domyślny komunikat błędu
+ * @throws Error z properties inpostErrors i status dla błędów InPost
+ */
+export function handleInpostApiError(
+  error: any,
+  defaultMessage: string
+): never {
+  if (error.response) {
+    console.error("InPost Status:", error.response.status);
+    console.error("InPost Body:", JSON.stringify(error.response.data, null, 2));
+
+    // Sprawdź czy to struktura błędu InPost (error, description, details)
+    if ("error" in error.response.data) {
+      const inpostErrorData = error.response.data;
+
+      const errorTranslations: Record<string, string> = {
+        resource_not_found: "Zasób nie został znaleziony",
+        access_forbidden: "Brak dostępu",
+        invalid_parameter: "Nieprawidłowy parametr",
+        validation_failed: "Walidacja nie powiodła się",
+        offer_expired: "Oferta wygasła",
+        no_carriers: "Nie masz podpisanej umowy z przewoźnikiem",
+        carrier_unavailable:
+          "Nie masz podpisanej umowy z przewoźnikiem świadczącym wybraną usługę wskazaną w atrybucie service",
+      };
+
+      const userMessage =
+        errorTranslations[inpostErrorData.error] || inpostErrorData.error;
+      let fullMessage = userMessage;
+
+      if (inpostErrorData.description) {
+        fullMessage += `: ${inpostErrorData.description}`;
+      }
+
+      // Dodaj szczegóły walidacji jeśli istnieją
+      if (inpostErrorData.details) {
+        const detailsMessages = Object.entries(inpostErrorData.details)
+          .map(
+            ([field, errors]) => `${field}: ${(errors as string[]).join(", ")}`
+          )
+          .join("; ");
+
+        if (detailsMessages) {
+          fullMessage += ` (${detailsMessages})`;
+        }
+      }
+
+      const inpostError = new Error(`Błąd InPost: ${fullMessage}`);
+      (inpostError as any).inpostErrors = [
+        {
+          code: inpostErrorData.error,
+          message: inpostErrorData.description || userMessage,
+          userMessage: fullMessage,
+          details: inpostErrorData.details || null,
+        },
+      ];
+      (inpostError as any).status = error.response.status;
+      throw inpostError;
+    }
+
+    // Nieznana struktura błędu
+    const inpostError = new Error(`Błąd InPost: ${error.response.status}`);
+    (inpostError as any).inpostErrors = [
+      {
+        code: "UNKNOWN_ERROR",
+        message: "Nieznany błąd API",
+        userMessage: "Wystąpił nieoczekiwany błąd w API InPost",
+        details: JSON.stringify(error.response.data),
+      },
+    ];
+    (inpostError as any).status = error.response.status;
+    throw inpostError;
+  } else if (error.request) {
+    throw new Error("Brak odpowiedzi z serwera InPost");
+  } else {
+    throw new Error(`Nieoczekiwany błąd: ${error.message}`);
+  }
+}

@@ -7,7 +7,7 @@ import {
 import { getAllegroUserAccessToken } from "./auth";
 import { getSingleAllegroHeaders } from "./global";
 import { verifyUser } from "../auth/auth";
-import { handleAxiosError } from "../errorHandlers";
+import { handleAllegroApiError } from "../errorHandlers";
 import axios from "axios";
 import { allegroSalesChannels } from "@/lib/constants";
 
@@ -34,6 +34,6 @@ export async function createAllegroRefund(
       headers,
     });
   } catch (error) {
-    handleAxiosError(error, "Błąd podczas tworzenia zwrotu w Allegro");
+    handleAllegroApiError(error, "Błąd podczas tworzenia zwrotu w Allegro");
   }
 }

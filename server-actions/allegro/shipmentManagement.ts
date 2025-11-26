@@ -13,7 +13,7 @@ import {
   PickupProposal,
   PickupCreationCommandStatus,
 } from "@/firebase/schemas/shipmentsSchemas";
-import { handleAxiosError } from "../errorHandlers";
+import { handleAllegroApiError } from "../errorHandlers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -41,7 +41,7 @@ export async function getAllegroDeliveryServices(): Promise<
       AL2: AL2Response.data.services,
     };
   } catch (error) {
-    handleAxiosError(error, "Błąd podczas pobierania usług przewoźników");
+    handleAllegroApiError(error, "Błąd podczas pobierania usług przewoźników");
   }
 }
 
@@ -57,7 +57,7 @@ export async function createAllegroShipment(
     const response = await axios.post(url, { input: data }, { headers });
     return response.data.commandId;
   } catch (err) {
-    handleAxiosError(err, "Błąd podczas tworzenia przesyłki Allegro");
+    handleAllegroApiError(err, "Błąd podczas tworzenia przesyłki Allegro");
   }
 }
 
@@ -73,7 +73,10 @@ export async function getShipmentStatus(
     const response = await axios.get(url, { headers });
     return response.data;
   } catch (err) {
-    handleAxiosError(err, "Błąd podczas pobierania statusu przesyłki Allegro");
+    handleAllegroApiError(
+      err,
+      "Błąd podczas pobierania statusu przesyłki Allegro"
+    );
   }
 }
 
@@ -102,7 +105,10 @@ export async function getShipmentLabel(
 
     return buffer;
   } catch (err) {
-    handleAxiosError(err, "Błąd podczas pobierania etykiety przesyłki Allegro");
+    handleAllegroApiError(
+      err,
+      "Błąd podczas pobierania etykiety przesyłki Allegro"
+    );
   }
 }
 
@@ -118,7 +124,7 @@ export async function getShipmentDetails(
     const response = await axios.get(url, { headers });
     return response.data;
   } catch (err) {
-    handleAxiosError(err, "Błąd podczas pobierania danych przesyłki");
+    handleAllegroApiError(err, "Błąd podczas pobierania danych przesyłki");
   }
 }
 
@@ -138,7 +144,7 @@ export async function getPickupProposals(
     );
     return response.data[0].proposals[0].proposalItems;
   } catch (err) {
-    handleAxiosError(err, "Błąd podczas pobierania propozycji odbioru");
+    handleAllegroApiError(err, "Błąd podczas pobierania propozycji odbioru");
   }
 }
 
@@ -164,7 +170,7 @@ export async function requestPickup(
     );
     return response.data.commandId;
   } catch (err) {
-    handleAxiosError(err, "Błąd podczas zamawiania podjazdu");
+    handleAllegroApiError(err, "Błąd podczas zamawiania podjazdu");
   }
 }
 
@@ -180,6 +186,6 @@ export async function getCreatePickupStatus(
     const response = await axios.get(url, { headers });
     return response.data;
   } catch (err) {
-    handleAxiosError(err, "Błąd podczas pobierania statusu podjazdu");
+    handleAllegroApiError(err, "Błąd podczas pobierania statusu podjazdu");
   }
 }

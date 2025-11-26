@@ -28,10 +28,7 @@ import RootCategorySelector from "../categories/RootCategorySelector";
 import SizingTableSelector from "../sizing-tables/SizingTableSelector";
 import ImageUploader from "../../global/uploaders/ImageUploader";
 import AllegroParametersSection from "./AllegroParametersSection";
-import {
-  DocumentDataWithRef,
-  formatAllegroError,
-} from "@/server-actions/errorHandlers";
+import { DocumentDataWithRef } from "@/firebase/getters";
 import RangeSizesFormItem, { RangeSizeString } from "./RangeSizesFormItem";
 import MatchingCategoriesSelector from "../categories/MatchingCategoriesSelector";
 import MultipleSearchSelect from "../../global/form/MultipleSearchSelect";

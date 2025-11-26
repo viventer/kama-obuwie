@@ -103,6 +103,7 @@ export const CustomAttributesSchema = z.object({
 });
 
 export const InpostShipmentSchema = z.object({
+  href: z.string().optional(),
   id: z.number().int(),
   status: z.string(),
   tracking_number: z.string(),

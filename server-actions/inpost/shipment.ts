@@ -32,3 +32,24 @@ export async function createInPostShipment(
     handleInpostApiError(error, "Błąd podczas tworzenia przesyłki InPost.");
   }
 }
+
+export async function getInpostShipmentData(
+  shipmentId: string
+): Promise<InpostShipment> {
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
+  const url = `${INPOST_API_BASE_URL}/v1/shipments/${shipmentId}`;
+
+  try {
+    const response = await axios.get(url, {
+      headers: getInpostHeaders(),
+    });
+
+    return response.data;
+  } catch (error) {
+    handleInpostApiError(
+      error,
+      "Nie udało się pobrać danych przesyłki InPost."
+    );
+  }
+}

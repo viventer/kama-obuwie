@@ -214,6 +214,9 @@ export function handleInpostApiError(
         no_carriers: "Nie masz podpisanej umowy z przewoźnikiem",
         carrier_unavailable:
           "Nie masz podpisanej umowy z przewoźnikiem świadczącym wybraną usługę wskazaną w atrybucie service",
+        label_generation_failed: "Błąd generowania etykiety",
+        label_template_not_found: "Nie znaleziono szablonu etykiety",
+        invalid_action: "Przesyłka nie została opłacona",
       };
 
       const userMessage =

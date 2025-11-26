@@ -53,3 +53,24 @@ export async function getInpostShipmentData(
     );
   }
 }
+
+export async function getInpostShipmentLabel(
+  shipmentId: string
+): Promise<string> {
+  await verifyUser(["ADMIN", "VERIFIED"]);
+
+  const url = `${INPOST_API_BASE_URL}/v1/shipments/${shipmentId}/label`;
+
+  try {
+    const response = await axios.get(url, {
+      headers: getInpostHeaders(),
+      responseType: "arraybuffer",
+    });
+
+    const base64 = Buffer.from(response.data).toString();
+
+    return base64;
+  } catch (error) {
+    handleInpostApiError(error, "Nie udało się pobrać etykiety InPost.");
+  }
+}

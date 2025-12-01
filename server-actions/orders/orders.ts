@@ -221,6 +221,8 @@ export const transformFrontendOrderToOrder = async function (
       countryCode: "PL",
       companyName: null,
       phoneNumber: checkoutData.phoneNumber,
+      buildingNumber: checkoutData.address!.buildingNumber,
+      apartmentNumber: checkoutData.address?.apartmentNumber,
     };
   }
 

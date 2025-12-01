@@ -4,6 +4,8 @@ export const AddressSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   street: z.string(),
+  buildingNumber: z.string(),
+  apartmentNumber: z.string().optional(),
   city: z.string(),
   zipCode: z.string(), // postal code
   countryCode: z.string().length(2), // ISO 3166-1 alpha-2

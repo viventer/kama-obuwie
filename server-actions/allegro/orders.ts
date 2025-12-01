@@ -4,10 +4,14 @@ import axios from "axios";
 import { getAllegroUserAccessToken, getAllegroUserAccessTokens } from "./auth";
 import { getAllegroHeaders, getSingleAllegroHeaders } from "./global";
 import { redis } from "@/upstash/redis";
-import { AllegroOrder } from "@/firebase/schemas/ordersSchemas";
+import {
+  AllegroOrder,
+  OrderDeliveryData,
+  AllegroDeliveryData,
+  Order,
+} from "@/firebase/schemas/ordersSchemas";
 import { createOrder, updateOrder } from "@/server-actions/orders/orders";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
-import { Order } from "@/firebase/schemas/ordersSchemas";
 import { Offer } from "@/firebase/schemas/offersSchemas";
 import { AllegroSalesChannel } from "@/lib/constants";
 import { getAllegroOffer } from "./offers";
@@ -316,6 +320,79 @@ async function executeInBatches<T>(
   return results;
 }
 
+/**
+ * Konwertuje dane dostawy z Allegro na format Order, przekształcając adres
+ * @param allegroDelivery - Dane dostawy z Allegro
+ * @returns Dane dostawy w formacie Order lub null
+ */
+function convertAllegroDeliveryToOrderDelivery(
+  allegroDelivery: AllegroDeliveryData | null
+): OrderDeliveryData | null {
+  if (!allegroDelivery) return null;
+
+  const method = allegroDelivery.pickupPoint?.name ? "parcelLocker" : "courier";
+
+  if (!allegroDelivery.address) {
+    return {
+      ...allegroDelivery,
+      method,
+    } as OrderDeliveryData;
+  }
+
+  const { street, buildingNumber, apartmentNumber } = parseAllegroStreet(
+    allegroDelivery.address.street
+  );
+
+  return {
+    ...allegroDelivery,
+    method,
+    allegroMethod: allegroDelivery.method,
+    address: {
+      ...allegroDelivery.address,
+      street,
+      buildingNumber,
+      apartmentNumber,
+    },
+  };
+}
+
+/**
+ * Parsuje adres z Allegro, wyodrębniając nazwę ulicy, numer budynku i numer mieszkania
+ * @param streetWithNumber - Pełna nazwa ulicy z numerem z Allegro (np. "Kwiatowa 14" lub "Kwiatowa 14B / 39")
+ * @returns Obiekt z wyodrębnionymi danymi: street, buildingNumber, apartmentNumber
+ */
+function parseAllegroStreet(streetWithNumber: string): {
+  street: string;
+  buildingNumber: string;
+  apartmentNumber?: string;
+} {
+  // Usuń nadmiarowe białe znaki
+  const normalized = streetWithNumber.trim().replace(/\s+/g, " ");
+
+  // Wzorzec: nazwa ulicy, następnie numer budynku (może zawierać litery), opcjonalnie / numer mieszkania
+  // Przykłady: "Kwiatowa 14", "Kwiatowa 14B", "Kwiatowa 14 / 39", "Kwiatowa 14B / 39"
+  const match = normalized.match(
+    /^(.+?)\s+(\d+[A-Za-z]?)(?:\s*\/\s*(\d+[A-Za-z]?))?$/
+  );
+
+  if (match) {
+    const [, street, buildingNumber, apartmentNumber] = match;
+    return {
+      street: street.trim(),
+      buildingNumber: buildingNumber.trim(),
+      apartmentNumber: apartmentNumber?.trim(),
+    };
+  }
+
+  // Jeśli nie udało się sparsować, zwróć całą wartość jako nazwę ulicy
+  // (na wypadek nietypowych formatów)
+  return {
+    street: normalized,
+    buildingNumber: "",
+    apartmentNumber: undefined,
+  };
+}
+
 async function transformAllegroToOrder(
   allegroOrder: AllegroOrder,
   salesChannel: "AL1" | "AL2"
@@ -363,6 +440,9 @@ async function transformAllegroToOrder(
 
   const lineItems = await Promise.all(lineItemsPromises);
 
+  // Przekształć adres Allegro na format Order
+  const delivery = convertAllegroDeliveryToOrderDelivery(allegroOrder.delivery);
+
   return {
     allegroId: allegroOrder.id,
     messageToSeller: {
@@ -377,7 +457,7 @@ async function transformAllegroToOrder(
         : "ALLEGRO_ONLINE",
     allegroStatus: allegroOrder.status,
     fulfillment: allegroOrder.fulfillment,
-    delivery: allegroOrder.delivery,
+    delivery: delivery,
     invoice: allegroOrder.invoice?.required
       ? {
           ...allegroOrder.invoice,
@@ -399,6 +479,9 @@ function transformAllegroToOrderUpdate(
   allegroOrder: AllegroOrder,
   existingOrder: Order
 ): Partial<Order> {
+  // Przekształć adres Allegro na format Order
+  const delivery = convertAllegroDeliveryToOrderDelivery(allegroOrder.delivery);
+
   return {
     messageToSeller: {
       content: allegroOrder.messageToSeller,
@@ -412,7 +495,7 @@ function transformAllegroToOrderUpdate(
           ? "CANCELLED"
           : existingOrder.fulfillment?.status || "NEW",
     },
-    delivery: allegroOrder.delivery,
+    delivery: delivery,
     invoice: allegroOrder.invoice?.required
       ? {
           ...allegroOrder.invoice,

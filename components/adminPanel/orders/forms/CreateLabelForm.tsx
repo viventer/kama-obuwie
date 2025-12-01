@@ -5,28 +5,24 @@ import { Order, OrderWithId } from "@/firebase/schemas/ordersSchemas";
 import {
   availableInpostSendingMethods,
   CreateShipmentData,
-  DeliveryService,
   inpostSendingMethodsTranslation,
   PackageData,
 } from "@/firebase/schemas/shipmentsSchemas";
 import { useToast } from "@/hooks/useToast";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
-import {
-  AllegroSalesChannel,
-  bankAccountData,
-  senderAddress,
-} from "@/lib/constants";
+import { bankAccountData, senderAddress } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import ReceiverAddressField from "./ReceiverAddressField";
-import PackageDataFormSection from "./PackageDataFormSection";
 import SingleSelect from "../../global/form/SingleSelect";
 import { Button } from "@/components/ui/button";
 import { FormEvent } from "react";
 import axios from "axios";
 import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
+import { CreateInpostShipmentData } from "@/firebase/schemas/inpost/shipmentsSchemas";
+import ReceiverAddressField from "./ReceiverAddressField";
+import PackageDataFormSection from "./PackageDataFormSection";
 
-export type CreateLabelFormValues = Pick<
+export type CreateAllegroLabelFormValues = Pick<
   CreateShipmentData,
   "receiver" | "referenceNumber" | "additionalProperties"
 > & {
@@ -35,19 +31,17 @@ export type CreateLabelFormValues = Pick<
 
 export default function CreateLabelForm({
   orderData,
-  deliveryService,
 }: {
   orderData: OrderWithId;
-  deliveryService: DeliveryService;
 }) {
   const {
     number: orderNumber,
     buyer,
     delivery: orderDeliveryData,
     salesChannel,
+    summary: orderSummary,
   } = orderData as OrderWithId & {
     delivery: NonNullable<Order["delivery"]>;
-    salesChannel: AllegroSalesChannel;
   };
 
   const router = useRouter();
@@ -60,43 +54,37 @@ export default function CreateLabelForm({
     showToast("Nie znaleziono danych adresowych zamówienia", "error");
   }
 
-  const form = useForm<CreateLabelFormValues>({
+  const form = useForm<CreateInpostShipmentData>({
     defaultValues: {
       receiver: {
-        name: `${orderDeliveryData!.address!.firstName} ${
-          orderDeliveryData.address!.lastName
-        }`,
-        company: orderDeliveryData.address!.companyName || undefined,
-        street: orderDeliveryData.address!.street,
-        postalCode: orderDeliveryData.address!.zipCode,
-        city: orderDeliveryData.address!.city,
-        countryCode: orderDeliveryData.address!.countryCode,
+        company_name: orderDeliveryData.address?.companyName || undefined,
+        first_name: orderDeliveryData.address?.firstName || undefined,
+        last_name: orderDeliveryData.address?.firstName || undefined,
         email: buyer.email,
-        phone: orderDeliveryData.address!.phoneNumber || undefined,
-        point: orderDeliveryData?.pickupPoint?.id || undefined,
+        phone: buyer.phoneNumber!,
+        address: {
+          street: orderDeliveryData.address?.street || "",
+          building_number:
+            orderDeliveryData.address?.buildingNumber ||
+            "" + orderDeliveryData.address?.apartmentNumber
+              ? ` / ${orderDeliveryData.address?.apartmentNumber}`
+              : "",
+          city: orderDeliveryData.address?.city || "",
+          post_code: orderDeliveryData.address?.zipCode || "",
+          country_code: "PL",
+        },
       },
-      referenceNumber: orderNumber,
-      package: {
-        type: "PACKAGE" as const,
-        length: {
-          value: 64,
-          unit: "CENTIMETER",
+      parcels: [
+        {
+          template: "medium",
         },
-        width: {
-          value: 38,
-          unit: "CENTIMETER",
-        },
-        height: {
-          value: 19,
-          unit: "CENTIMETER",
-        },
-        weight: {
-          value: 1,
-          unit: "KILOGRAMS",
-        },
-        textOnLabel: orderNumber,
-      },
-      additionalProperties: {},
+      ],
+      reference: orderNumber,
+      service:
+        orderDeliveryData.method == "courier"
+          ? "inpost_courier_standard"
+          : "inpost_locker_standard",
+      additional_services: ["sms", "email"],
     },
   });
 
@@ -114,45 +102,29 @@ export default function CreateLabelForm({
 
     const deliveryPrice = Number(orderDeliveryData?.cost?.amount) || 0;
     const refundAmount = Number(orderData.refund?.amount?.amount) || 0;
-    const totalToPay = Number(orderData.summary.totalToPay.amount);
+    const totalToPay = Number(orderSummary.totalToPay.amount);
 
     const insuranceAmount = totalToPay - deliveryPrice - refundAmount;
 
     const formData = form.getValues();
-    const data: CreateShipmentData = {
-      deliveryMethodId: orderDeliveryData!.method!.id,
-      credentialsId: deliveryService.id?.credentialsId,
-      sender: senderAddress,
-      receiver: formData.receiver,
-      referenceNumber: formData.referenceNumber,
-      packages: [formData.package],
+    const data: CreateInpostShipmentData = {
+      ...formData,
       insurance: {
-        amount: insuranceAmount.toFixed(2),
+        amount: insuranceAmount,
         currency: "PLN",
       },
-      labelFormat: "PDF",
     };
 
-    if (deliveryService.carrierId === "INPOST") {
-      data.additionalProperties = formData.additionalProperties;
-    }
-
-    if (
-      orderData!.allegroPayment!.type === "CASH_ON_DELIVERY" &&
-      deliveryService.cashOnDelivery?.forceRequireIban === false
-    ) {
-      data.cashOnDelivery = {
-        amount: totalToPay.toFixed(2),
+    if (orderData.paymentType == "COD") {
+      data.cod = {
+        amount: totalToPay,
         currency: "PLN",
       };
-    } else if (
-      orderData!.allegroPayment!.type === "CASH_ON_DELIVERY" &&
-      deliveryService.cashOnDelivery?.forceRequireIban === true
-    ) {
-      data.cashOnDelivery = {
-        ...bankAccountData,
-        amount: totalToPay.toFixed(2),
-        currency: "PLN",
+    }
+
+    if (orderDeliveryData.method == "parcelLocker") {
+      data.custom_attributes = {
+        target_point: orderDeliveryData.pickupPoint!.name,
       };
     }
 
@@ -232,28 +204,6 @@ export default function CreateLabelForm({
       <div className="flex flex-col gap-6 mt-6">
         <ReceiverAddressField />
         <PackageDataFormSection />
-        {deliveryService.carrierId == "INPOST" && (
-          <FormField
-            control={form.control}
-            name="additionalProperties.inpost#sendingMethod"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Sposób nadania</FormLabel>
-                <SingleSelect
-                  value={field.value}
-                  onChange={field.onChange}
-                  availableOptions={availableInpostSendingMethods.map(
-                    (method) => ({
-                      name: inpostSendingMethodsTranslation[method],
-                      value: method,
-                    })
-                  )}
-                  defaultValue="dispatch_order"
-                />
-              </FormItem>
-            )}
-          />
-        )}
       </div>
       <div className="flex mt-8 gap-4">
         <Button onClick={(e) => handleSubmit(e)} className="w-fit">

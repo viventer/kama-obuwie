@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const InpostAddressSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   street: z.string(),
   building_number: z.string(),
   city: z.string(),
@@ -10,7 +10,7 @@ export const InpostAddressSchema = z.object({
 });
 
 export const PeerSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   name: z.string().optional(),
   company_name: z.string().optional(),
   first_name: z.string().optional(),
@@ -20,9 +20,14 @@ export const PeerSchema = z.object({
   address: InpostAddressSchema.optional(),
 });
 
+export const ServiceNameSchema = z.enum([
+  "inpost_locker_standard",
+  "inpost_courier_standard",
+]);
+
 export const ServiceSchema = z.object({
   id: z.string(),
-  name: z.enum(["inpost_locker_standard", "inpost_courier_standard"]),
+  name: ServiceNameSchema,
   description: z.string().optional(),
 });
 
@@ -39,6 +44,13 @@ export const TransactionSchema = z.object({
   updated_at: z.string().datetime(),
   offer_id: z.number().int(),
 });
+
+export const parcelSizeTemplateSchema = z.enum([
+  "small",
+  "medium",
+  "large",
+  "xlarge",
+]);
 
 export const InpostOfferSchema = z.object({
   id: z.number().int(),
@@ -67,7 +79,7 @@ export const InpostOfferSchema = z.object({
 export const InpostParcelSchema = z.object({
   id: z.string().optional(),
 
-  template: z.string().optional(),
+  template: parcelSizeTemplateSchema.optional(),
 
   dimensions: z
     .object({
@@ -109,7 +121,7 @@ export const InpostShipmentSchema = z.object({
   tracking_number: z.string(),
   return_tracking_number: z.string().optional(),
 
-  service: z.string(),
+  service: ServiceNameSchema,
   reference: z.string().optional(),
   is_return: z.boolean().optional(),
 
@@ -181,6 +193,23 @@ export const CourierInpostShipmentSchema = InpostShipmentSchema.extend({
   parcels: z.array(CourierParcelSchema),
 });
 
+export const CreateInpostShipmentDataSchema = z.object({
+  receiver: PeerSchema,
+  sender: PeerSchema.optional(),
+  parcels: z.array(InpostParcelSchema).min(1).max(99),
+  custom_attributes: CustomAttributesSchema.optional(),
+  cod: MoneyDataSchema.optional(),
+  insurance: MoneyDataSchema.optional(),
+  reference: z.string().min(3).max(100).optional().or(z.literal("")),
+  is_return: z.boolean().optional(),
+  service: ServiceNameSchema,
+  additional_services: z.array(z.enum(["sms", "email", "saturday"])).optional(),
+  external_customer_id: z.string().optional(),
+  only_choice_of_offer: z.boolean().optional(),
+  mpk: z.string().max(255).optional().or(z.literal("")),
+  comments: z.string().min(3).max(100).optional().or(z.literal("")),
+});
+
 export type InpostShipment = z.infer<typeof InpostShipmentSchema>;
 export type InpostParcel = z.infer<typeof InpostParcelSchema>;
 export type InpostOffer = z.infer<typeof InpostOfferSchema>;
@@ -194,3 +223,8 @@ export type PickupPointCustomAttributes = z.infer<
 export type CourierInpostShipment = z.infer<typeof CourierInpostShipmentSchema>;
 export type CourierPeer = z.infer<typeof CourierPeerSchema>;
 export type CourierParcel = z.infer<typeof CourierParcelSchema>;
+export type InpostServiceName = z.infer<typeof ServiceNameSchema>;
+
+export type CreateInpostShipmentData = z.infer<
+  typeof CreateInpostShipmentDataSchema
+>;

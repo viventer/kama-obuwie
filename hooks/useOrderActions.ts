@@ -39,6 +39,10 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
           status: newPhase.toUpperCase(),
           account: salesChannel,
         });
+
+        router.push(`/admin-panel/orders/allegro/create-label/${id}`);
+      } else {
+        router.push(`/admin-panel/orders/create-label/${id}`);
       }
     } catch (err) {
       showToast(`Błąd podczas zmiany statusu zamówienia: ${err}`, "error");
@@ -158,8 +162,6 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
       onClick: async (id) => {
         await changeOrderPhase(id, "processing");
         showToast("Zamówienie zatwierdzone", "success");
-        router.refresh();
-        router.push(`/admin-panel/orders/create-label/${id}`);
       },
     },
     cancelOrderAction,

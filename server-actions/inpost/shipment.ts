@@ -1,6 +1,8 @@
 "use server";
 
 import {
+  CreateInpostShipmentData,
+  CreateInpostShipmentDataSchema,
   InpostShipment,
   InpostShipmentSchema,
 } from "@/firebase/schemas/inpost/shipmentsSchemas";
@@ -12,17 +14,17 @@ import { handleInpostApiError } from "../errorHandlers";
 const INPOST_API_BASE_URL = process.env.NEXT_PUBLIC_INPOST_API_BASE_URL!;
 const INPOST_ORGANIZATION_ID = process.env.NEXT_PUBLIC_INPOST_ORGANIZATION_ID!;
 
-export async function createInPostShipment(
-  shipment: InpostShipment
+export async function createInpostShipment(
+  createShipmentData: CreateInpostShipmentData
 ): Promise<InpostShipment> {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
-  InpostShipmentSchema.parse(shipment);
+  CreateInpostShipmentDataSchema.parse(createShipmentData);
 
   try {
     const response = await axios.post(
       `${INPOST_API_BASE_URL}/v1/organizations/${INPOST_ORGANIZATION_ID}/shipments`,
-      shipment,
+      createShipmentData,
       {
         headers: getInpostHeaders(),
       }
@@ -34,7 +36,7 @@ export async function createInPostShipment(
 }
 
 export async function getInpostShipmentData(
-  shipmentId: string
+  shipmentId: number
 ): Promise<InpostShipment> {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
@@ -55,8 +57,8 @@ export async function getInpostShipmentData(
 }
 
 export async function getInpostShipmentLabel(
-  shipmentId: string
-): Promise<string> {
+  shipmentId: number
+): Promise<Buffer> {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
   const url = `${INPOST_API_BASE_URL}/v1/shipments/${shipmentId}/label`;
@@ -67,9 +69,7 @@ export async function getInpostShipmentLabel(
       responseType: "arraybuffer",
     });
 
-    const base64 = Buffer.from(response.data).toString();
-
-    return base64;
+    return Buffer.from(response.data);
   } catch (error) {
     handleInpostApiError(error, "Nie udało się pobrać etykiety InPost.");
   }

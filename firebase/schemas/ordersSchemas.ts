@@ -1,8 +1,19 @@
 import { z } from "zod";
 import { SalesChannelSchema } from "./otherSchemas";
-import { CheckoutDataSchema, PaymentMethodSchema } from "./checkoutSchemas";
+import { CheckoutDataSchema, DeliveryMethodSchema } from "./checkoutSchemas";
 import { ShoppingCartItemSchema } from "./shoppingCartSchemas";
 import { AddressSchema, PickupPointSchema, PriceSchema } from "./commonSchemas";
+
+export const AllegroAddressSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  street: z.string(),
+  city: z.string(),
+  zipCode: z.string(),
+  countryCode: z.string().length(2),
+  companyName: z.string().nullable(),
+  phoneNumber: z.string().nullable(),
+});
 
 export const AllegroPaymentTypeSchema = z.enum([
   "CASH_ON_DELIVERY",
@@ -96,6 +107,22 @@ export const AllegroPaymentSchema = z.object({
 
 export const OrderDeliveryDataSchema = z.object({
   address: AddressSchema.optional().nullable(),
+  method: DeliveryMethodSchema,
+  allegroMethod: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+    })
+    .nullable()
+    .optional(),
+  pickupPoint: PickupPointSchema.nullable(),
+  cost: PriceSchema.nullable(),
+  smart: z.boolean().nullable(),
+  calculatedNumberOfPackages: z.number().nullable(),
+});
+
+export const AllegroDeliveryDataSchema = z.object({
+  address: AllegroAddressSchema.optional().nullable(),
   method: z
     .object({
       id: z.string(),
@@ -299,7 +326,7 @@ export const AllegroOrderSchema = z.object({
       status: FulfillmentStatusSchema,
     })
     .nullable(),
-  delivery: OrderDeliveryDataSchema.nullable(),
+  delivery: AllegroDeliveryDataSchema.nullable(),
   invoice: InvoiceInfoSchema.nullable().optional(),
   lineItems: z.array(AllegroOrderItemSchema).min(1),
   surcharges: z.array(AllegroPaymentSchema),
@@ -327,3 +354,5 @@ export type RefundReason = z.infer<typeof RefundReasonSchema>;
 export type AllegroRefund = z.infer<typeof AllegroRefundSchema>;
 export type FrontendOrder = z.infer<typeof FrontendOrderSchema>;
 export type OrderItemType = z.infer<typeof OrderItemSchema>;
+export type AllegroDeliveryData = z.infer<typeof AllegroDeliveryDataSchema>;
+export type OrderDeliveryData = z.infer<typeof OrderDeliveryDataSchema>;

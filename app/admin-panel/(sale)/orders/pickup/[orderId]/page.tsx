@@ -1,5 +1,5 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
-import CreateLabelForm from "@/components/adminPanel/orders/forms/CreateLabelForm";
+import CreateAllegroLabelForm from "@/components/adminPanel/orders/allegro/CreateAllegroLabelForm";
 import RequestPickupForm from "@/components/adminPanel/orders/forms/RequestPickupForm";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";

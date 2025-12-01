@@ -258,7 +258,7 @@ export function handleInpostApiError(
     (inpostError as any).inpostErrors = [
       {
         code: "UNKNOWN_ERROR",
-        message: "Nieznany błąd API",
+        message: defaultMessage,
         userMessage: "Wystąpił nieoczekiwany błąd w API InPost",
         details: JSON.stringify(error.response.data),
       },

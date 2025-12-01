@@ -1,5 +1,5 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
-import CreateLabelForm from "@/components/adminPanel/orders/forms/CreateLabelForm";
+import CreateAllegroLabelForm from "@/components/adminPanel/orders/allegro/CreateAllegroLabelForm";
 import OrderDataWidget from "@/components/adminPanel/orders/OrderDataWidget";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";
@@ -22,32 +22,13 @@ export default async function CreateLabelPage(props: Props) {
   const { orderId } = await props.params;
   const { data } = await getDocumentFromAdminDB<OrderWithId>("orders", orderId);
 
-  if (!data || !data?.delivery || !data.allegroId) {
-    return notFound();
-  }
-
-  const deliveryServices = await getAllegroDeliveryServices();
-  if (!deliveryServices || !deliveryServices.AL1 || !deliveryServices.AL2) {
-    return notFound();
-  }
-
-  const selectedService = deliveryServices[
-    data.salesChannel as AllegroSalesChannel
-  ].find(
-    (service: any) => service.id.deliveryMethodId === data!.delivery!.method!.id
-  );
-
-  if (!selectedService) {
+  if (!data || !data?.delivery) {
     return notFound();
   }
 
   return (
     <FormWrapper headingText="Utwórz etykietę">
       <OrderDataWidget data={data as OrderWithId} />
-      <CreateLabelForm
-        orderData={data as OrderWithId}
-        deliveryService={selectedService}
-      />
     </FormWrapper>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { CreateLabelFormValues } from "./CreateLabelForm";
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,9 +9,10 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { CreateInpostShipmentData } from "@/firebase/schemas/inpost/shipmentsSchemas";
 
 export default function ReceiverAddressField() {
-  const { control } = useFormContext<CreateLabelFormValues>();
+  const { control } = useFormContext<CreateInpostShipmentData>();
 
   return (
     <Accordion
@@ -28,17 +28,27 @@ export default function ReceiverAddressField() {
         <AccordionContent className="mt-2 flex flex-col gap-3 max-w-md">
           <FormField
             control={control}
-            name="receiver.name"
+            name="receiver.first_name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Imię i nazwisko</FormLabel>
+                <FormLabel>Imię</FormLabel>
                 <Input {...field} />
               </FormItem>
             )}
           />
           <FormField
             control={control}
-            name="receiver.company"
+            name="receiver.last_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nazwisko</FormLabel>
+                <Input {...field} />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="receiver.company_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nazwa firmy</FormLabel>
@@ -48,7 +58,7 @@ export default function ReceiverAddressField() {
           />
           <FormField
             control={control}
-            name="receiver.street"
+            name="receiver.address.street"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Ulica</FormLabel>
@@ -58,20 +68,30 @@ export default function ReceiverAddressField() {
           />
           <FormField
             control={control}
-            name="receiver.postalCode"
+            name="receiver.address.building_number"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Kod pocztowy</FormLabel>
+                <FormLabel>Numer budynku</FormLabel>
                 <Input {...field} />
               </FormItem>
             )}
           />
           <FormField
             control={control}
-            name="receiver.city"
+            name="receiver.address.city"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Miasto</FormLabel>
+                <Input {...field} />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={control}
+            name="receiver.address.post_code"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Kod pocztowy</FormLabel>
                 <Input {...field} />
               </FormItem>
             )}

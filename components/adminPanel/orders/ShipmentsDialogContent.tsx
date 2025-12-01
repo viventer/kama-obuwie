@@ -17,7 +17,7 @@ export default function ShipmentsDialogContent({
 }) {
   const router = useRouter();
   const addParcel = () => {
-    router.push(`/admin-panel/orders/create-label/${orderId}`);
+    router.push(`/admin-panel/orders/allegro/create-label/${orderId}`);
     closeDialog();
   };
   const { showToast } = useToast();

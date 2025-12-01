@@ -19,12 +19,12 @@ import {
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import AllegroReceiverAddressField from "./AllegroReceiverAddressField";
-import AllegroPackageDataFormSection from "./AllegroAllegroPackageDataFormSection";
 import SingleSelect from "../../global/form/SingleSelect";
 import { Button } from "@/components/ui/button";
 import { FormEvent } from "react";
 import axios from "axios";
 import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
+import AllegroPackageDataFormSection from "./AllegroPackageDataFormSection";
 
 export type CreateAllegroLabelFormValues = Pick<
   CreateShipmentData,

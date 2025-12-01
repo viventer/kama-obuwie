@@ -304,11 +304,16 @@ export default function OrdersDataTable({
                         },
                       });
                     }
+
+                    router.push(
+                      `/admin-panel/orders/allegro/create-label/${row.original.id}`
+                    );
                   }
 
                   router.push(
-                    `/admin-panel/orders/allegro/create-label/${row.original.id}`
+                    `/admin-panel/orders/create-label/${row.original.id}`
                   );
+
                   return;
                 }}
               >

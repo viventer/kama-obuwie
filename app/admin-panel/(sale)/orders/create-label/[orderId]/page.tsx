@@ -1,5 +1,6 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import CreateAllegroLabelForm from "@/components/adminPanel/orders/allegro/CreateAllegroLabelForm";
+import CreateLabelForm from "@/components/adminPanel/orders/forms/CreateLabelForm";
 import OrderDataWidget from "@/components/adminPanel/orders/OrderDataWidget";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";
@@ -29,6 +30,7 @@ export default async function CreateLabelPage(props: Props) {
   return (
     <FormWrapper headingText="Utwórz etykietę">
       <OrderDataWidget data={data as OrderWithId} />
+      <CreateLabelForm orderData={data as OrderWithId} />
     </FormWrapper>
   );
 }

@@ -52,6 +52,12 @@ export const parcelSizeTemplateSchema = z.enum([
   "xlarge",
 ]);
 
+export const availableParcelSizeTemplates = [
+  { value: "small", label: "A: 64x38x8cm" },
+  { value: "medium", label: "B: 64x38x19cm" },
+  { value: "large", label: "C: 64x38x41cm" },
+];
+
 export const InpostOfferSchema = z.object({
   id: z.number().int(),
   service: ServiceSchema,

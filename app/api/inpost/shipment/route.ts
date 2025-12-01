@@ -77,5 +77,8 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  return apiResponse("Przesyłka została utworzona.", 201, { shipmentId });
+  return apiResponse("Przesyłka została utworzona.", 201, {
+    shipmentId,
+    parcelNumber: shipmentData.tracking_number,
+  });
 }

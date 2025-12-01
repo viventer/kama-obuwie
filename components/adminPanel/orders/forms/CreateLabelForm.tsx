@@ -59,16 +59,15 @@ export default function CreateLabelForm({
       receiver: {
         company_name: orderDeliveryData.address?.companyName || undefined,
         first_name: orderDeliveryData.address?.firstName || undefined,
-        last_name: orderDeliveryData.address?.firstName || undefined,
+        last_name: orderDeliveryData.address?.lastName || undefined,
         email: buyer.email,
         phone: buyer.phoneNumber!,
         address: {
           street: orderDeliveryData.address?.street || "",
-          building_number:
-            orderDeliveryData.address?.buildingNumber ||
-            "" + orderDeliveryData.address?.apartmentNumber
-              ? ` / ${orderDeliveryData.address?.apartmentNumber}`
-              : "",
+          building_number: orderDeliveryData.address?.apartmentNumber
+            ? orderDeliveryData.address!.buildingNumber +
+              ` / ${orderDeliveryData.address?.apartmentNumber}`
+            : orderDeliveryData.address!.buildingNumber,
           city: orderDeliveryData.address?.city || "",
           post_code: orderDeliveryData.address?.zipCode || "",
           country_code: "PL",
@@ -128,67 +127,60 @@ export default function CreateLabelForm({
       };
     }
 
+    console.log(orderDeliveryData.method);
+
     try {
-      const response = await axios.post(
-        "/api/allegro/shipment-management/label",
-        {
-          data,
-          account: salesChannel,
-        }
-      );
+      const response = await axios.post("/api/inpost/shipment", data);
+      const shipmentId = response.data.shipmentId;
+      const parcelNumber = response.data.parcelNumber;
 
-      if (response.data.downloadUrl) {
-        window.open(response.data.downloadUrl, "_blank");
-
-        await axios.patch(`/api/orders/${orderData.id}`, {
-          shipment: {
-            isCreated: true,
-            isPickupOrdered:
-              deliveryService.carrierId === "INPOST" ||
-              orderData?.shipment?.isPickupOrdered ||
-              false,
-            parcelNumbers: [
-              ...(orderData?.shipment?.parcelNumbers || []),
-              response.data.parcelNumber,
-            ],
-            labelFilePath: response.data.storagePath,
-            shipmentIds: {
-              ...(orderData?.shipment?.shipmentIds || {}),
-              [response.data.parcelNumber]: response.data.shipmentId,
-            },
-            isPickupAvailable: response.data.isPickupAvailable,
-            createdAt:
-              orderData?.shipment?.createdAt || new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            carrier: deliveryService.carrierId,
-          },
-        });
-
+      if (!shipmentId || !parcelNumber) {
         stopLoading();
-
-        if (
-          response.data.isPickupAvailable &&
-          deliveryService.carrierId !== "INPOST"
-        ) {
-          router.replace(
-            `/admin-panel/orders/pickup/${orderData.id}?shipmentId=${response.data.shipmentId}`
-          );
-        } else {
-          router.back();
-        }
-
-        showToast(
-          `Etykieta została pomyślnie utworzona i zapisana w chmurze (${response.data.storagePath})`,
-          "success"
-        );
-      } else {
-        stopLoading();
-        console.error("Brak downloadUrl w odpowiedzi:", response.data);
-        showToast(
-          "Etykieta została utworzona, ale nie znaleziono linku do pobrania",
-          "error"
-        );
+        showToast("Nie udało się utworzyć przesyłki InPost", "error");
+        return;
       }
+
+      const labelResponse = await axios.get(
+        `/api/inpost/shipment/label/${shipmentId}`
+      );
+      const downloadUrl = labelResponse?.data?.downloadUrl;
+
+      if (!downloadUrl) {
+        stopLoading();
+        showToast("Nie udało się pobrać etykiety InPost", "error");
+        return;
+      }
+
+      window.open(downloadUrl, "_blank");
+
+      await axios.patch(`/api/orders/${orderData.id}`, {
+        shipment: {
+          isCreated: true,
+          isPickupOrdered: true,
+          parcelNumbers: [
+            ...(orderData?.shipment?.parcelNumbers || []),
+            parcelNumber,
+          ],
+          labelFilePath: labelResponse.data.storagePath,
+          shipmentIds: {
+            ...(orderData?.shipment?.shipmentIds || {}),
+            [parcelNumber]: shipmentId,
+          },
+          isPickupAvailable: false,
+          createdAt: orderData?.shipment?.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          carrier: "Inpost",
+        },
+      });
+
+      stopLoading();
+
+      router.back();
+
+      showToast(
+        `Etykieta została pomyślnie utworzona i zapisana w chmurze (${response.data.storagePath})`,
+        "success"
+      );
     } catch (err: any) {
       handleError(
         err,

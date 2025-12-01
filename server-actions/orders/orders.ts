@@ -189,7 +189,7 @@ export const transformFrontendOrderToOrder = async function (
     },
     delivery: {
       address: null,
-      method: null,
+      method: checkoutData.pickupPoint ? "parcelLocker" : "courier",
       pickupPoint: checkoutData.pickupPoint || null,
       cost: {
         amount: totalPrice >= 55 ? "0.00" : "9.99",

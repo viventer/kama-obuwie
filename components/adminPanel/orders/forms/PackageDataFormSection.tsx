@@ -4,9 +4,17 @@ import { useFormContext } from "react-hook-form";
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+  availableParcelSizeTemplates,
   CreateInpostShipmentData,
   InpostServiceName,
 } from "@/firebase/schemas/inpost/shipmentsSchemas";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function PackageDataFormSection() {
   const { control, watch } = useFormContext<CreateInpostShipmentData>();
@@ -34,7 +42,26 @@ export default function PackageDataFormSection() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Rozmiar przesyłki</FormLabel>
-                <Input {...field} />
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value}
+                  defaultValue={"medium"}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableParcelSizeTemplates.map((option) => (
+                      <SelectItem
+                        className="text-base"
+                        key={option.value}
+                        value={option.value}
+                      >
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormItem>
             )}
           />

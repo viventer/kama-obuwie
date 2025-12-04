@@ -146,15 +146,15 @@ export default function CheckoutForms() {
       //   },
       // });
 
-      if (checkoutData.paymentMethod !== "COD") {
-        showToast(
-          "Przyjmowanie płatności online jest obecnie niedostępne, skorzystaj z płatności przy odbiorze.",
-          "error"
-        );
+      // if (checkoutData.paymentMethod !== "COD") {
+      //   showToast(
+      //     "Przyjmowanie płatności online jest obecnie niedostępne, skorzystaj z płatności przy odbiorze.",
+      //     "error"
+      //   );
 
-        stopLoading();
-        return;
-      }
+      //   stopLoading();
+      //   return;
+      // }
 
       const orderData: FrontendOrder = {
         checkoutData,

@@ -49,11 +49,6 @@ export default function CreateLabelForm({
   const { handleError } = useErrorHandler();
   const { startLoading, stopLoading } = useFullPageLoading();
 
-  if (!orderDeliveryData?.address) {
-    router.replace("/admin-panel/orders/new");
-    showToast("Nie znaleziono danych adresowych zamówienia", "error");
-  }
-
   const form = useForm<CreateInpostShipmentData>({
     defaultValues: {
       receiver: {
@@ -67,7 +62,9 @@ export default function CreateLabelForm({
           building_number: orderDeliveryData.address?.apartmentNumber
             ? orderDeliveryData.address!.buildingNumber +
               ` / ${orderDeliveryData.address?.apartmentNumber}`
-            : orderDeliveryData.address!.buildingNumber,
+            : orderDeliveryData.address?.buildingNumber
+            ? orderDeliveryData.address.buildingNumber
+            : "",
           city: orderDeliveryData.address?.city || "",
           post_code: orderDeliveryData.address?.zipCode || "",
           country_code: "PL",
@@ -129,8 +126,15 @@ export default function CreateLabelForm({
       return convertedParcel;
     });
 
+    // Usuń adres odbiorcy dla przesyłek do paczkomatu
+    const receiver = { ...formData.receiver };
+    if (orderDeliveryData.method === "parcelLocker") {
+      delete receiver.address;
+    }
+
     const data: CreateInpostShipmentData = {
       ...formData,
+      receiver,
       parcels,
       insurance: {
         amount: insuranceAmount,

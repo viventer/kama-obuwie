@@ -106,8 +106,32 @@ export default function CreateLabelForm({
     const insuranceAmount = totalToPay - deliveryPrice - refundAmount;
 
     const formData = form.getValues();
+
+    const parcels = formData.parcels.map((parcel) => {
+      const convertedParcel = { ...parcel };
+
+      if (convertedParcel.dimensions) {
+        convertedParcel.dimensions = {
+          length: Number(convertedParcel.dimensions.length),
+          width: Number(convertedParcel.dimensions.width),
+          height: Number(convertedParcel.dimensions.height),
+          unit: "mm" as const,
+        };
+      }
+
+      if (convertedParcel.weight) {
+        convertedParcel.weight = {
+          amount: Number(convertedParcel.weight.amount),
+          unit: "kg" as const,
+        };
+      }
+
+      return convertedParcel;
+    });
+
     const data: CreateInpostShipmentData = {
       ...formData,
+      parcels,
       insurance: {
         amount: insuranceAmount,
         currency: "PLN",

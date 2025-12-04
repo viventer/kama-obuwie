@@ -80,7 +80,7 @@ export default function CreateLabelForm({
         orderDeliveryData.method == "courier"
           ? "inpost_courier_standard"
           : "inpost_locker_standard",
-      additional_services: ["sms", "email"],
+      // additional_services: ["sms", "email"],
     },
   });
 

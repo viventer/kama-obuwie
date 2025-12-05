@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         throw new Error();
       }
 
-      if (shipmentData.status !== "created") {
+      if (shipmentData.status !== "offer_selected") {
         break;
       }
 

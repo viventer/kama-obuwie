@@ -155,11 +155,9 @@ export default function CreateLabelForm({
       };
     }
 
-    console.log(orderDeliveryData.method);
-
     try {
       const response = await axios.post("/api/inpost/shipment", data);
-      const shipmentId = response.data.shipmentId;
+      const shipmentId = String(response.data.shipmentId);
       const parcelNumber = response.data.parcelNumber;
 
       if (!shipmentId || !parcelNumber) {

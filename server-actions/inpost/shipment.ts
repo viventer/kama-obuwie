@@ -63,14 +63,27 @@ export async function getInpostShipmentLabel(
 
   const url = `${INPOST_API_BASE_URL}/v1/shipments/${shipmentId}/label`;
 
+  const headers = getInpostHeaders();
+
   try {
     const response = await axios.get(url, {
-      headers: getInpostHeaders(),
+      headers,
       responseType: "arraybuffer",
     });
 
     return Buffer.from(response.data);
-  } catch (error) {
+  } catch (error: any) {
+    // Konwertuj buffer na JSON jeśli error.response.data to Buffer
+    if (error.response?.data && Buffer.isBuffer(error.response.data)) {
+      const errorText = error.response.data.toString("utf-8");
+      try {
+        error.response.data = JSON.parse(errorText);
+      } catch {
+        // Jeśli nie da się sparsować jako JSON, zostaw jako string
+        error.response.data = errorText;
+      }
+    }
+
     handleInpostApiError(error, "Nie udało się pobrać etykiety InPost.");
   }
 }

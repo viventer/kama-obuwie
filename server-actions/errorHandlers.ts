@@ -199,7 +199,8 @@ export function handleInpostApiError(
 ): never {
   if (error.response) {
     console.error("InPost Status:", error.response.status);
-    console.error("InPost Body:", JSON.stringify(error.response.data, null, 2));
+    console.error("InPost Status:", error.response.data);
+    // console.error("InPost Body:", JSON.stringify(error.response.data, null, 2));
 
     // Sprawdź czy to struktura błędu InPost (error, description, details)
     if ("error" in error.response.data) {

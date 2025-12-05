@@ -152,6 +152,11 @@ export default function CreateLabelForm({
     if (orderDeliveryData.method == "parcelLocker") {
       data.custom_attributes = {
         target_point: orderDeliveryData.pickupPoint!.name,
+        sending_method: "dispatch_order",
+      };
+    } else {
+      data.custom_attributes = {
+        sending_method: "dispatch_order",
       };
     }
 
@@ -204,7 +209,7 @@ export default function CreateLabelForm({
       router.back();
 
       showToast(
-        `Etykieta została pomyślnie utworzona i zapisana w chmurze (${response.data.storagePath})`,
+        `Etykieta została pomyślnie utworzona i zapisana w chmurze (${labelResponse.data.storagePath})`,
         "success"
       );
     } catch (err: any) {

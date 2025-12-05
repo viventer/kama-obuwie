@@ -7,12 +7,18 @@ export default function OrderCostDisplay({ order }: { order: Order }) {
     0
   );
 
+  const allegroMethodName = order.delivery?.allegroMethod?.name;
+
+  const DTCMethodName =
+    "Inpost" +
+    (order.delivery?.method === "courier" ? " Kurier" : " Paczkomat");
+
   return (
     <div>
       {" "}
       {order?.delivery?.method && order.delivery?.cost && (
         <div>
-          {order.delivery.method.name}{" "}
+          {allegroMethodName ? allegroMethodName : DTCMethodName}{" "}
           <span className="font-medium">
             {order.delivery.cost.amount} {order.delivery.cost.currency}
           </span>

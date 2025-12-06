@@ -4,7 +4,6 @@ import {
   CreateInpostShipmentData,
   CreateInpostShipmentDataSchema,
   InpostShipment,
-  InpostShipmentSchema,
 } from "@/firebase/schemas/inpost/shipmentsSchemas";
 import { verifyUser } from "../auth/auth";
 import { getInpostHeaders } from "./global";

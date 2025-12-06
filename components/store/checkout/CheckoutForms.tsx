@@ -131,31 +131,6 @@ export default function CheckoutForms() {
         checkoutData.address = null;
       }
 
-      // showDialog({
-      //   message: "Obecnie nie przyjmujemy zamówień poprzez sklep internetowy.",
-      //   description:
-      //     "Zamówienie możesz złożyć przez Allegro. Oczekujemy na podłączenie płatności online w naszym sklepie.",
-      //   confirmText: "Kup przez Allegro",
-      //   cancelText: "Anuluj",
-      //   onConfirm: () => {
-      //     window.location.href = "https://allegro.pl/uzytkownik/kama-obuwie_pl";
-      //   },
-      //   onCancel: () => {
-      //     router.push("/");
-      //     stopLoading();
-      //   },
-      // });
-
-      // if (checkoutData.paymentMethod !== "COD") {
-      //   showToast(
-      //     "Przyjmowanie płatności online jest obecnie niedostępne, skorzystaj z płatności przy odbiorze.",
-      //     "error"
-      //   );
-
-      //   stopLoading();
-      //   return;
-      // }
-
       const orderData: FrontendOrder = {
         checkoutData,
         shoppingCartItems: cart.map((cartItem) => ({ ...cartItem.item })),
@@ -163,10 +138,14 @@ export default function CheckoutForms() {
 
       const response = await axios.post("/api/orders", orderData);
 
-      clearCart();
-
-      while (isLoading) {
-        await new Promise((resolve) => setTimeout(resolve, 100));
+      if (checkoutData.paymentMethod === "COD") {
+        clearCart();
+        while (isLoading) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+        stopLoading();
+        router.replace(`/thank-you/${response.data.id}`);
+        return;
       }
 
       stopLoading();

@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { Offer } from "@/firebase/schemas/offersSchemas";
 import { updateOffer } from "@/server-actions/offers/offers";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 
 export async function GET(
   request: NextRequest,

@@ -1,6 +1,6 @@
 import { AllegroOrderStatus } from "@/firebase/schemas/ordersSchemas";
 import { updateAllegroOrderStatus } from "@/server-actions/allegro/orders";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 import { NextRequest } from "next/server";
 
 export type AllegroStatusUpdateData = {

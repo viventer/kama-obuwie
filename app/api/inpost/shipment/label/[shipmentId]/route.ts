@@ -1,5 +1,5 @@
 import { adminStorage } from "@/firebase/firebaseAdmin";
-import { apiErrorResponse, apiResponse } from "@/server-actions/errorHandlers";
+import { apiErrorResponse, apiResponse } from "@/server-actions/helpers";
 import { getInpostShipmentLabel } from "@/server-actions/inpost/shipment";
 import { NextRequest } from "next/server";
 

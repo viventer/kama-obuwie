@@ -2,7 +2,7 @@ import { Offer } from "@/firebase/schemas/offersSchemas";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { createOffer } from "@/server-actions/offers/offers";
 import { NextRequest } from "next/server";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 
 export async function POST(request: NextRequest) {
   const body: Partial<Offer> = await request.json();

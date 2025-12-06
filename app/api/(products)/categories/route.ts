@@ -2,7 +2,7 @@ import { Category } from "@/firebase/schemas/productsSchemas";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { createCategory } from "@/server-actions/products/categories";
 import { NextRequest } from "next/server";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();

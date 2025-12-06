@@ -5,7 +5,7 @@ import {
   SizingTable,
 } from "@/firebase/schemas/productsSchemas";
 import { postAllegroOffer } from "@/server-actions/allegro/offers";
-import { apiResponse, apiErrorResponse } from "@/server-actions/errorHandlers";
+import { apiResponse, apiErrorResponse } from "@/server-actions/helpers";
 import { NextRequest } from "next/server";
 
 export type PostOfferBody = {

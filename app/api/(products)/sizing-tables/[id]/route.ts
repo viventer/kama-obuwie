@@ -5,7 +5,7 @@ import {
 } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { updateSizingTable } from "@/server-actions/products/sizingTables";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 import { revalidatePath } from "next/cache";
 
 export async function GET(

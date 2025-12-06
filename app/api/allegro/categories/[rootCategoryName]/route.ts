@@ -1,6 +1,6 @@
 import { RootCategory } from "@/firebase/schemas/productsSchemas";
 import { getAllegroCategories } from "@/server-actions/allegro/categories";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 import { NextRequest } from "next/server";
 
 export async function GET(

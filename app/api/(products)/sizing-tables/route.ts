@@ -2,7 +2,7 @@ import { SizingTable } from "@/firebase/schemas/productsSchemas";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { createSizingTable } from "@/server-actions/products/sizingTables";
 import { NextRequest } from "next/server";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();

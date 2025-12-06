@@ -4,7 +4,7 @@ import {
   getCreatePickupStatus,
 } from "@/server-actions/allegro/shipmentManagement";
 import { PickupCreationCommandStatus } from "@/firebase/schemas/shipmentsSchemas";
-import { apiResponse, apiErrorResponse } from "@/server-actions/errorHandlers";
+import { apiResponse, apiErrorResponse } from "@/server-actions/helpers";
 
 export type PickupRequestBody = {
   shipmentId: string;

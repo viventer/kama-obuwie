@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { updateOrder } from "@/server-actions/orders/orders";
 

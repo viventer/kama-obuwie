@@ -1,49 +1,4 @@
-import { NextResponse } from "next/server";
 import { AllegroAuthError } from "@/firebase/schemas/shipmentsSchemas";
-
-export interface ApiErrorResponse {
-  message: string;
-  status: number;
-  errors?: any[];
-  details?: Record<string, any>;
-}
-
-export function apiResponse(
-  message: string,
-  status: number,
-  data?: Record<string, any>
-): Response {
-  if (status === 204) {
-    return new NextResponse(null, { status });
-  }
-
-  if (status >= 200 && status < 400) {
-    return NextResponse.json({ ...data }, { status });
-  }
-  return NextResponse.json({ message }, { status });
-}
-
-export function apiErrorResponse(
-  message: string,
-  status: number,
-  errors?: any,
-  details?: Record<string, any>
-): Response {
-  const errorResponse: any = {
-    message,
-    status,
-  };
-
-  if (errors) {
-    errorResponse.errors = errors;
-  }
-
-  if (details) {
-    errorResponse.details = details;
-  }
-
-  return NextResponse.json(errorResponse, { status });
-}
 
 export function formatAllegroError(
   baseMessage: string,
@@ -268,6 +223,61 @@ export function handleInpostApiError(
     throw inpostError;
   } else if (error.request) {
     throw new Error("Brak odpowiedzi z serwera InPost");
+  } else {
+    throw new Error(`Nieoczekiwany błąd: ${error.message}`);
+  }
+}
+
+/**
+ * Uniwersalna funkcja do obsługi błędów Axios w server actions dla Przelewy24 API
+ * Automatycznie przekształca błędy z P24 API na format z p24Errors i status
+ *
+ * @param error - obiekt błędu z axios (AxiosError)
+ * @param defaultMessage - domyślny komunikat błędu
+ * @throws Error z properties p24Errors i status dla błędów Przelewy24
+ */
+export function handleP24ApiError(error: any, defaultMessage: string): never {
+  if (error.response) {
+    console.error("P24 Status:", error.response.status);
+    console.error("P24 Body:", JSON.stringify(error.response.data, null, 2));
+
+    // Sprawdź czy to struktura błędu P24 (error, code)
+    if ("error" in error.response.data) {
+      const p24ErrorData = error.response.data;
+
+      const errorTranslations: Record<string, string> = {
+        "Invalid input data": "Nieprawidłowe dane wejściowe",
+        "Incorrect authentication": "Błąd autoryzacji",
+      };
+
+      const userMessage =
+        errorTranslations[p24ErrorData.error] || p24ErrorData.error;
+
+      const p24Error = new Error(`Błąd Przelewy24: ${userMessage}`);
+      (p24Error as any).p24Errors = [
+        {
+          code: p24ErrorData.code,
+          message: p24ErrorData.error,
+          userMessage: userMessage,
+        },
+      ];
+      (p24Error as any).status = error.response.status;
+      throw p24Error;
+    }
+
+    // Nieznana struktura błędu
+    const p24Error = new Error(`Błąd Przelewy24: ${error.response.status}`);
+    (p24Error as any).p24Errors = [
+      {
+        code: error.response.status,
+        message: defaultMessage,
+        userMessage: "Wystąpił nieoczekiwany błąd w API Przelewy24",
+      },
+    ];
+    (p24Error as any).status = error.response.status;
+    throw p24Error;
+  } else if (error.request) {
+    throw new Error("Brak odpowiedzi z serwera Przelewy24");
   } else {
     throw new Error(`Nieoczekiwany błąd: ${error.message}`);
   }

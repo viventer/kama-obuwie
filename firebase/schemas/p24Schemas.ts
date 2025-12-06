@@ -249,6 +249,44 @@ export const TransactionNotificationDataSchema = z.object({
     ),
 });
 
+// Słownik kodów błędów Przelewy24
+export const P24ErrorCodes = {
+  err00: "Nieprawidłowe wywołanie skryptu",
+  err01:
+    "Nie uzyskano od sklepu potwierdzenia odebrania odpowiedzi autoryzacyjnej",
+  err02: "Nie uzyskano odpowiedzi autoryzacyjnej",
+  err03: "To zapytanie było już przetwarzane",
+  err04: "Zapytanie autoryzacyjne niekompletne lub niepoprawne",
+  err05: "Nie udało się odczytać konfiguracji sklepu internetowego",
+  err06: "Nieudany zapis zapytania autoryzacyjnego",
+  err07: "Inna osoba dokonuje płatności",
+  err08: "Nieustalony status połączenia ze sklepem.",
+  err09: "Przekroczono dozwoloną liczbę poprawek danych.",
+  err10: "Nieprawidłowa kwota transakcji!",
+  err49: "Zbyt wysoki wynik oceny ryzyka transakcji.",
+  err51: "Nieprawidłowe wywołanie strony",
+  err52: "Błędna informacja zwrotna o sesji!",
+  err53: "Błąd transakcji !",
+  err54: "Niezgodność kwoty transakcji!",
+  err55: "Nieprawidłowy kod odpowiedzi!",
+  err56: "Nieprawidłowa karta",
+  err57: "Niezgodność flagi TEST!",
+  err58: "Nieprawidłowy numer sekwencji!",
+  err59: "Nieprawidłowa waluta transakcji!",
+  err101:
+    "Błąd wywołania strony W żądaniu transakcji brakuje któregoś z wymaganych parametrów lub pojawiła się niedopuszczalna wartość.",
+  err102: "Minął czas na dokonanie transakcji",
+  err103: "Nieprawidłowa kwota przelewu",
+  err104: "Transakcja oczekuje na potwierdzenie.",
+  err105: "Transakcja dokonana po dopuszczalnym czasie",
+  err161:
+    'Żądanie transakcji przerwane przez użytkownika Klient przerwał procedurę płatności wybierając przycisk "Powrót" na stronie wyboru formy płatności.',
+  err162:
+    'Żądanie transakcji przerwane przez użytkownika Klient przerwał procedurę płatności wybierając przycisk "Rezygnuj" na stronie z instrukcją płatności.',
+} as const;
+
+export type P24ErrorCode = keyof typeof P24ErrorCodes;
+
 export type RegisterTransactionData = z.infer<
   typeof RegisterTransactionDataSchema
 >;

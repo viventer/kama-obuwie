@@ -1,5 +1,5 @@
 import { convertToAllegroDescription } from "@/server-actions/allegro/offers";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 import { NextRequest } from "next/server";
 import {
   Description,

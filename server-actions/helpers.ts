@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+
 /**
  * Validates if a string is a valid 4-character base32 SKU
  * @param sku - string to validate
@@ -56,4 +58,48 @@ export function generateOrderNumber(
   const orderNumber = shortTimestamp + randomPart + channelMap[salesChannel];
 
   return orderNumber;
+}
+
+export interface ApiErrorResponse {
+  message: string;
+  status: number;
+  errors?: any[];
+  details?: Record<string, any>;
+}
+
+export function apiResponse(
+  message: string,
+  status: number,
+  data?: Record<string, any>
+): Response {
+  if (status === 204) {
+    return new NextResponse(null, { status });
+  }
+
+  if (status >= 200 && status < 400) {
+    return NextResponse.json({ ...data }, { status });
+  }
+  return NextResponse.json({ message }, { status });
+}
+
+export function apiErrorResponse(
+  message: string,
+  status: number,
+  errors?: any,
+  details?: Record<string, any>
+): Response {
+  const errorResponse: any = {
+    message,
+    status,
+  };
+
+  if (errors) {
+    errorResponse.errors = errors;
+  }
+
+  if (details) {
+    errorResponse.details = details;
+  }
+
+  return NextResponse.json(errorResponse, { status });
 }

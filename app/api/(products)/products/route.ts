@@ -2,7 +2,7 @@ import { Product } from "@/firebase/schemas/productsSchemas";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { createProduct } from "@/server-actions/products/products";
 import { NextRequest } from "next/server";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 
 export async function POST(request: NextRequest) {
   const body: Product = await request.json();

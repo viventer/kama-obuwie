@@ -3,7 +3,7 @@ import {
   createAllegroSizingTable,
   getAllegroSizingTables,
 } from "@/server-actions/allegro/sizingTables";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 import { NextRequest } from "next/server";
 
 export async function GET() {

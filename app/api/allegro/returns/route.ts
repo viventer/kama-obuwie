@@ -1,5 +1,5 @@
 import { getAllegroReturns } from "@/server-actions/allegro/returns";
-import { apiResponse } from "@/server-actions/errorHandlers";
+import { apiResponse } from "@/server-actions/helpers";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

@@ -2,7 +2,7 @@ import {
   CreateInpostShipmentData,
   InpostShipment,
 } from "@/firebase/schemas/inpost/shipmentsSchemas";
-import { apiErrorResponse, apiResponse } from "@/server-actions/errorHandlers";
+import { apiErrorResponse, apiResponse } from "@/server-actions/helpers";
 import {
   createInpostShipment,
   getInpostShipmentData,

@@ -1,5 +1,23 @@
 import { z } from "zod";
 
+const SignParamsForRegistrationSchema = z.object({
+  sessionId: z.string(),
+  merchantId: z.string(),
+  amount: z.number().int(),
+  currency: z.string(),
+  crc: z.string(),
+});
+
+const SignParamsForVerificationSchema = z.object({
+  sessionId: z.string(),
+  orderId: z.number().int(),
+  amount: z.number().int(),
+  currency: z.string(),
+  crc: z.string(),
+});
+
+export { SignParamsForRegistrationSchema, SignParamsForVerificationSchema };
+
 const CartParametersSchema = z.object({
   sellerId: z.string().describe("ID Sklepu po stronie Partnera"),
   sellerCategory: z.string().describe("Kategoria sklepu"),
@@ -298,3 +316,9 @@ export type CartParameters = z.infer<typeof CartParametersSchema>;
 export type Shipping = z.infer<typeof ShippingSchema>;
 export type PSU = z.infer<typeof PSUSchema>;
 export type Additional = z.infer<typeof AdditionalSchema>;
+export type SignParamsForRegistration = z.infer<
+  typeof SignParamsForRegistrationSchema
+>;
+export type SignParamsForVerification = z.infer<
+  typeof SignParamsForVerificationSchema
+>;

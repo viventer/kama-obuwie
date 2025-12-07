@@ -278,7 +278,7 @@ export const OrderSchema = z.object({
   P24Transaction: z
     .object({
       sessionId: z.string(),
-      orderId: z.number(),
+      orderId: z.number().optional(),
       amount: z.number(), // kwota w groszach
       status: z.enum(["INITIATED", "COMPLETED", "FAILED", "UNAUTHORIZED"]),
     })

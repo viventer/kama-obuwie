@@ -14,7 +14,7 @@ import { handleP24ApiError } from "./errorHandlers";
 
 const P24_MERCHANT_ID = process.env.P24_MERCHANT_ID!;
 const P24_CRC = process.env.P24_CRC!;
-const P24_BASE_URL = process.env.P24_BASE_URL!;
+const P24_BASE_URL = process.env.NEXT_PUBLIC_P24_API_BASE_URL!;
 const P24_API_KEY = process.env.P24_API_KEY!;
 const APP_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
 

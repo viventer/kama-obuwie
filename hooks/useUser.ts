@@ -48,23 +48,23 @@ export function useUser() {
             return { user: null };
           }
 
-          if (retryRes.status === 403) {
-            router.push("/admin-auth/allegro-connect");
-            return { user: null };
-          }
+          // if (retryRes.status === 403) {
+          //   router.push("/admin-auth/allegro-connect");
+          //   return { user: null };
+          // }
 
           const retryData = await retryRes.json();
 
           // Sprawdź połączone konta Allegro po ponownym żądaniu
-          if (
-            retryData.user &&
-            (!retryData.user.connectedAccounts?.AL1 ||
-              !retryData.user.connectedAccounts?.AL2) &&
-            path.startsWith("/admin-panel")
-          ) {
-            router.push("/admin-auth/allegro-connect");
-            return retryData;
-          }
+          // if (
+          //   retryData.user &&
+          //   (!retryData.user.connectedAccounts?.AL1 ||
+          //     !retryData.user.connectedAccounts?.AL2) &&
+          //   path.startsWith("/admin-panel")
+          // ) {
+          //   router.push("/admin-auth/allegro-connect");
+          //   return retryData;
+          // }
 
           // Sprawdź status weryfikacji użytkownika po ponownym żądaniu
           if (
@@ -86,23 +86,23 @@ export function useUser() {
       }
     }
 
-    if (res.status === 403 && path.startsWith("/admin-panel")) {
-      router.push("/admin-auth/allegro-connect");
-      return { user: null };
-    }
+    // if (res.status === 403 && path.startsWith("/admin-panel")) {
+    //   router.push("/admin-auth/allegro-connect");
+    //   return { user: null };
+    // }
 
     const userData = await res.json();
 
     // Sprawdź połączone konta Allegro
-    if (
-      userData.user &&
-      (!userData.user.connectedAccounts?.AL1 ||
-        !userData.user.connectedAccounts?.AL2) &&
-      path.startsWith("/admin-panel")
-    ) {
-      router.push("/admin-auth/allegro-connect");
-      return userData;
-    }
+    // if (
+    //   userData.user &&
+    //   (!userData.user.connectedAccounts?.AL1 ||
+    //     !userData.user.connectedAccounts?.AL2) &&
+    //   path.startsWith("/admin-panel")
+    // ) {
+    //   router.push("/admin-auth/allegro-connect");
+    //   return userData;
+    // }
 
     // Sprawdź status weryfikacji użytkownika
     if (

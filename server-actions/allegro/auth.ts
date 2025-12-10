@@ -2,7 +2,7 @@ import axios from "axios";
 import { redis } from "@/upstash/redis";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { cookies } from "next/headers";
-import { getAllegroHeaders, getSingleAllegroHeaders } from "./global";
+import { getSingleAllegroHeaders } from "./global";
 import { redirect } from "next/navigation";
 
 // client access token jest używany do autoryzacji zapytań do Allegro API, które nie wymagają dostępu do danych użytkownika

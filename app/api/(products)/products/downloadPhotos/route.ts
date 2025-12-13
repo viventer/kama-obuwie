@@ -25,26 +25,52 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Brak plików" }, { status: 404 });
   }
 
-  const zipArchive = archiver("zip", { zlib: { level: 9 } });
-  const headers = new Headers({
-    "Content-Type": "application/zip",
-    "Content-Disposition": `attachment; filename="${downloadName}.zip"`,
-  });
-
-  const stream = new ReadableStream({
-    start(controller) {
-      zipArchive.on("data", (chunk) => controller.enqueue(chunk));
-      zipArchive.on("end", () => controller.close());
-      zipArchive.on("error", (err) => controller.error(err));
-
-      files.forEach((file) => {
-        const relativeName = file.name.replace(folderPath + "/", "");
-        zipArchive.append(file.createReadStream(), { name: relativeName });
-      });
-
-      zipArchive.finalize();
+  // Tworzymy tymczasowy plik ZIP w Firebase Storage
+  const tempZipPath = `temp-downloads/${downloadName}-${Date.now()}.zip`;
+  const tempFile = bucket.file(tempZipPath);
+  const writeStream = tempFile.createWriteStream({
+    metadata: {
+      contentType: "application/zip",
+      metadata: {
+        deleteAt: new Date(Date.now() + 3600000).toISOString(), // Usuń po 1h
+      },
     },
   });
 
-  return new NextResponse(stream, { headers });
+  const zipArchive = archiver("zip", {
+    zlib: { level: 6 },
+  });
+
+  // Pipe archiwum do Firebase Storage
+  zipArchive.pipe(writeStream);
+
+  // Dodaj wszystkie pliki do archiwum
+  for (const file of files) {
+    const relativeName = file.name.replace(folderPath + "/", "");
+    if (relativeName) {
+      const fileStream = file.createReadStream();
+      zipArchive.append(fileStream, { name: relativeName });
+    }
+  }
+
+  await zipArchive.finalize();
+
+  // Poczekaj na zakończenie uploadu
+  await new Promise((resolve, reject) => {
+    writeStream.on("finish", resolve);
+    writeStream.on("error", reject);
+  });
+
+  // Wygeneruj signed URL ważny przez 1 godzinę
+  const [signedUrl] = await tempFile.getSignedUrl({
+    action: "read",
+    expires: Date.now() + 3600000, // 1 godzina
+  });
+
+  // Zwróć URL do pobrania
+  return NextResponse.json({
+    downloadUrl: signedUrl,
+    filename: `${downloadName}.zip`,
+    message: "Plik ZIP został wygenerowany. Link jest ważny przez 1 godzinę.",
+  });
 }

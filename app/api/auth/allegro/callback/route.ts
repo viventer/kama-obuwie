@@ -52,29 +52,20 @@ export async function GET(request: Request) {
     // 3) Aktualizacja sesji w Redis (dodanie tokenu Allegro)
     const expiryTs = Math.floor(Date.now() / 1000) + expires_in;
 
-    if (account === "AL1") {
-      await redis.hset(key, {
-        AL1AccessToken: access_token,
-        AL1TokenExpiry: expiryTs.toString(),
-      });
-    } else {
-      await redis.hset(key, {
-        AL2AccessToken: access_token,
-        AL2TokenExpiry: expiryTs.toString(),
-      });
-    }
-    await redis.expire(key, 60 * 60 * 24 * 7);
+    await redis.hset("allegroAuthData", {
+      [`${account}AccessToken`]: access_token,
+      [`${account}TokenExpiry`]: expiryTs.toString(),
+    });
+    await redis.expire("allegroAuthData", 60 * 60 * 24 * 7);
 
-    // 4) Zapis refreshToken w Firestore pod users/<uid>.allegro.refreshToken
+    // 4) Zapis refreshToken w Firestore
     await adminDB
-      .collection("users")
-      .doc(userId)
+      .collection("allegroAuthData")
+      .doc("tokens")
       .set(
         {
-          allegro: {
-            [account]: {
-              refreshToken: refresh_token,
-            },
+          [account]: {
+            refreshToken: refresh_token,
           },
         },
         { merge: true }

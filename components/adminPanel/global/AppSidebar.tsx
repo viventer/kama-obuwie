@@ -19,16 +19,39 @@ import { useToast } from "@/hooks/useToast";
 import { useUser } from "@/hooks/useUser";
 import MiniLoader from "./MiniLoader";
 import { LinkIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function AppSidebar() {
   const router = useRouter();
   const { showToast } = useToast();
   const { user, loading } = useUser();
   const { setOpen } = useSidebar();
+  const [connectedAccounts, setConnectedAccounts] = useState<{
+    AL1: boolean;
+    AL2: boolean;
+  } | null>(null);
 
   const handleLinkClick = () => {
     setOpen(false);
   };
+
+  useEffect(() => {
+    const fetchAllegroStatus = async () => {
+      try {
+        const response = await fetch("/api/allegro/status");
+        if (response.ok) {
+          const data = await response.json();
+          setConnectedAccounts(data);
+        }
+      } catch (error) {
+        console.error("Error fetching Allegro status:", error);
+      }
+    };
+
+    if (user) {
+      fetchAllegroStatus();
+    }
+  }, [user]);
 
   const logout = async () => {
     try {
@@ -169,7 +192,7 @@ export default function AppSidebar() {
             <p className="opacity-75">
               Rola: {user.role?.toLowerCase() || "nieznana"}
             </p>
-            {user.connectedAccounts.AL1 && user.connectedAccounts.AL2 ? (
+            {connectedAccounts?.AL1 && connectedAccounts?.AL2 ? (
               <div className="flex items-center gap-2 mt-4">
                 <LinkIcon className="size-4 text-success" />
                 <p className="font-medium">Podłączono konta Allegro</p>

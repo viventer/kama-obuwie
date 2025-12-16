@@ -22,14 +22,3 @@ export const AllegroAuthDataSchema = z.object({
     refreshToken: z.string(),
   }),
 });
-
-export const RedisAllegroDataSchema = z.object({
-  AL1: z.object({
-    accessToken: z.string(),
-    tokenExpiry: z.number(),
-  }),
-  AL2: z.object({
-    accessToken: z.string(),
-    tokenExpiry: z.number(),
-  }),
-});

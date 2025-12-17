@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getAllegroUserAccessToken } from "./auth";
+import { getAllegroClientAccessToken } from "./auth";
 import { getSingleAllegroHeaders } from "./global";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
@@ -33,7 +33,7 @@ export type AllegroProductParametersResponse = {
 export async function getProductParameters(
   allegroCategoryId: string
 ): Promise<AllegroProductParametersResponse> {
-  const accessToken = await getAllegroUserAccessToken();
+  const accessToken = await getAllegroClientAccessToken();
   const allegroHeaders = getSingleAllegroHeaders(accessToken);
   const url = `${ALLEGRO_API_BASE_URL}/sale/categories/${allegroCategoryId}/product-parameters`;
   const response = await axios.get(url, {

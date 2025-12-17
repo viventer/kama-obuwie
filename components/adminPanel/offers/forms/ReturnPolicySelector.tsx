@@ -8,6 +8,7 @@ import { FormField, FormLabel } from "@/components/ui/form";
 import SingleSelect from "../../global/form/SingleSelect";
 import MiniLoader from "../../global/MiniLoader";
 import { allegroSalesChannels } from "@/lib/constants";
+import { redirect } from "next/navigation";
 
 export type ReturnPolicy = {
   id: string;
@@ -27,10 +28,14 @@ export default function ReturnPolicySelector() {
 
   useEffect(() => {
     (async () => {
-      const { data }: { data: ReturnPoliciesResponse } = await axios.get(
-        "/api/allegro/return-policies"
-      );
-      setAvailableReturnPolicies(data);
+      try {
+        const { data }: { data: ReturnPoliciesResponse } = await axios.get(
+          "/api/allegro/return-policies"
+        );
+        setAvailableReturnPolicies(data);
+      } catch (err) {
+        redirect("/admin-auth/allegro-connect");
+      }
     })();
   }, []);
 

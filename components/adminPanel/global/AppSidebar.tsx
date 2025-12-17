@@ -14,21 +14,48 @@ import {
 import LinkText from "./LinkText";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import { useUser } from "@/hooks/useUser";
 import MiniLoader from "./MiniLoader";
 import { LinkIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function AppSidebar() {
   const router = useRouter();
   const { showToast } = useToast();
   const { user, loading } = useUser();
   const { setOpen } = useSidebar();
+  const [connectedAccounts, setConnectedAccounts] = useState<{
+    AL1: boolean;
+    AL2: boolean;
+  } | null>(null);
 
   const handleLinkClick = () => {
     setOpen(false);
   };
+
+  useEffect(() => {
+    const fetchAllegroStatus = async () => {
+      try {
+        const response = await axios.get("/api/allegro/status");
+        setConnectedAccounts(response.data);
+
+        if (
+          (!response.data.AL1 || !response.data.AL2) &&
+          user?.role === "ADMIN"
+        ) {
+          redirect("/admin-auth/allegro-connect");
+        }
+      } catch (error) {
+        redirect("/admin-auth/allegro-connect");
+      }
+    };
+
+    if (user) {
+      fetchAllegroStatus();
+    }
+  }, [user]);
 
   const logout = async () => {
     try {
@@ -169,12 +196,12 @@ export default function AppSidebar() {
             <p className="opacity-75">
               Rola: {user.role?.toLowerCase() || "nieznana"}
             </p>
-            {user.connectedAccounts.AL1 && user.connectedAccounts.AL2 ? (
+            {connectedAccounts?.AL1 && connectedAccounts?.AL2 ? (
               <div className="flex items-center gap-2 mt-4">
                 <LinkIcon className="size-4 text-success" />
                 <p className="font-medium">Podłączono konta Allegro</p>
               </div>
-            ) : (
+            ) : user.role === "ADMIN" ? (
               <div className="flex items-center gap-2 mt-4">
                 <LinkIcon className="size-4 text-destructive" />
                 <LinkText
@@ -184,6 +211,16 @@ export default function AppSidebar() {
                 >
                   Połącz konta Allegro
                 </LinkText>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mt-4">
+                <LinkIcon className="text-destructive min-w-4" />
+                <p>
+                  <span className="font-medium">
+                    Konta Allegro nie są połączone.
+                  </span>{" "}
+                  Skontaktuj się z administratorem.
+                </p>
               </div>
             )}
           </div>

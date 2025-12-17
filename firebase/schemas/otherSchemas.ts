@@ -13,3 +13,12 @@ export const ImageUrlSchema = z
 export type ImageUrl = z.infer<typeof ImageUrlSchema>;
 
 export const SalesChannelSchema = z.enum(["AL1", "AL2", "POS", "DTC"]);
+
+export const AllegroAuthDataSchema = z.object({
+  AL1: z.object({
+    refreshToken: z.string(),
+  }),
+  AL2: z.object({
+    refreshToken: z.string(),
+  }),
+});

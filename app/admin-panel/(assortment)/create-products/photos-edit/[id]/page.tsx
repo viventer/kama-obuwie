@@ -5,9 +5,10 @@ import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { getImageUrl } from "@/server-actions/files/files";
 import Image from "next/image";
-import Link from "next/link";
 
 import { notFound } from "next/navigation";
+import axios from "axios";
+import RawPhotosDownloadButton from "@/components/adminPanel/assortment/products/RawPhotosDownloadButton";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -37,10 +38,10 @@ export default async function ProductEditPage(props: Props) {
     "-"
   );
   const downloadName = `raw-${serializedManufacturerCode}`;
-  const params = new URLSearchParams({
+  const params = {
     folderPath,
     downloadName,
-  });
+  };
 
   return (
     <FormWrapper headingText="Dodaj edytowane zdjęcia do produktu">
@@ -56,14 +57,7 @@ export default async function ProductEditPage(props: Props) {
           <p className="font-bold">{data.manufacturerCode}</p>
         </section>
       )}
-      <Button className="mb-8" asChild>
-        <Link
-          href={`/api/products/downloadPhotos?${params.toString()}`}
-          className="inline-block px-4 py-2 text-foreground rounded"
-        >
-          Pobierz surowe zdjęcia (ZIP)
-        </Link>
-      </Button>
+      <RawPhotosDownloadButton params={params} />
       <CreateProductsPhotosForm productData={data} creationStage="photosEdit" />
     </FormWrapper>
   );

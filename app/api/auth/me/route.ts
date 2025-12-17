@@ -16,8 +16,6 @@ export async function GET(request: Request) {
 
   const firebaseIdToken = sessionHash.firebaseIdToken as string;
   const userId = sessionHash.userId as string;
-  const isAL1Connected = Boolean(sessionHash?.AL1AccessToken);
-  const isAL2Connected = Boolean(sessionHash?.AL2AccessToken);
 
   try {
     await adminAuth.verifyIdToken(firebaseIdToken, true);
@@ -34,10 +32,6 @@ export async function GET(request: Request) {
         createdAt: data?.createdAt?.toDate().toISOString() || null,
         perms: data?.perms || {},
         role: data?.role || null,
-        connectedAccounts: {
-          AL1: isAL1Connected,
-          AL2: isAL2Connected,
-        },
       },
     });
   } catch (error) {
@@ -60,10 +54,6 @@ export async function GET(request: Request) {
         createdAt: data?.createdAt?.toDate().toISOString() || null,
         perms: data?.perms || {},
         role: data?.role || null,
-        connectedAccounts: {
-          AL1: isAL1Connected,
-          AL2: isAL2Connected,
-        },
       },
     });
   }

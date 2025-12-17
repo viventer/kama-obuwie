@@ -10,6 +10,7 @@ import { ProductParametersFormData } from "./EditProductParametersForm";
 import { ResponsibleProducersResponse } from "@/server-actions/allegro/responsibleProducers";
 import SingleSelect from "../../global/form/SingleSelect";
 import MiniLoader from "../../global/MiniLoader";
+import { redirect } from "next/navigation";
 
 export default function ResponsibleProducerSelector({
   disabled = false,
@@ -23,16 +24,19 @@ export default function ResponsibleProducerSelector({
 
   useEffect(() => {
     (async () => {
-      const { data }: { data: ResponsibleProducersResponse } = await axios.get(
-        "/api/allegro/responsible-producers"
-      );
-      setAvailableResponsibleProducers(data);
+      try {
+        const { data }: { data: ResponsibleProducersResponse } =
+          await axios.get("/api/allegro/responsible-producers");
+        setAvailableResponsibleProducers(data);
+      } catch (err) {
+        redirect("/admin-auth/allegro-connect");
+      }
     })();
   }, []);
 
   return availableResponsibleProducers &&
-    availableResponsibleProducers.AL1.length &&
-    availableResponsibleProducers.AL2.length > 0 ? (
+    availableResponsibleProducers.AL1?.length &&
+    availableResponsibleProducers.AL2?.length > 0 ? (
     <div>
       <h3 className="font-medium">Producent odpowiedzialny</h3>
       {allegroSalesChannels.map((channel) => (

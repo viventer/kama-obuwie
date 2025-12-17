@@ -24,7 +24,7 @@ export default function Page() {
       </CardHeader>
       <CardContent className="w-full  flex justify-end">
         <Button variant={"link"} asChild className="opacity-100">
-          <LinkText href={"/"} className="text-text">
+          <LinkText href={"/admin-panel"} className="text-text">
             Wróć na stronę główną
           </LinkText>
         </Button>

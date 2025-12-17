@@ -14,7 +14,7 @@ import {
 import LinkText from "./LinkText";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/useToast";
 import { useUser } from "@/hooks/useUser";
 import MiniLoader from "./MiniLoader";
@@ -38,13 +38,17 @@ export default function AppSidebar() {
   useEffect(() => {
     const fetchAllegroStatus = async () => {
       try {
-        const response = await fetch("/api/allegro/status");
-        if (response.ok) {
-          const data = await response.json();
-          setConnectedAccounts(data);
+        const response = await axios.get("/api/allegro/status");
+        setConnectedAccounts(response.data);
+
+        if (
+          (!response.data.AL1 || !response.data.AL2) &&
+          user?.role === "ADMIN"
+        ) {
+          redirect("/admin-auth/allegro-connect");
         }
       } catch (error) {
-        console.error("Error fetching Allegro status:", error);
+        redirect("/admin-auth/allegro-connect");
       }
     };
 
@@ -197,7 +201,7 @@ export default function AppSidebar() {
                 <LinkIcon className="size-4 text-success" />
                 <p className="font-medium">Podłączono konta Allegro</p>
               </div>
-            ) : (
+            ) : user.role === "ADMIN" ? (
               <div className="flex items-center gap-2 mt-4">
                 <LinkIcon className="size-4 text-destructive" />
                 <LinkText
@@ -207,6 +211,16 @@ export default function AppSidebar() {
                 >
                   Połącz konta Allegro
                 </LinkText>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mt-4">
+                <LinkIcon className="text-destructive min-w-4" />
+                <p>
+                  <span className="font-medium">
+                    Konta Allegro nie są połączone.
+                  </span>{" "}
+                  Skontaktuj się z administratorem.
+                </p>
               </div>
             )}
           </div>

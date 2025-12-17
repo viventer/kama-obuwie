@@ -20,7 +20,7 @@ export default function LinkText({
       onClick={onClick}
       target={target}
       className={cn(
-        "decoration-1 decoration-brand underline underline-offset-3 hover:decoration-accent/0 transition-all duration-150 font-medium",
+        "decoration-1 decoration-brand underline underline-offset-3 hover:decoration-accent/0 transition-all duration-150 font-medium text-text",
         className
       )}
     >

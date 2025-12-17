@@ -135,26 +135,19 @@ export default function SizingTableEditForm({
   const postChangesToAllegro = async (payload: SizingTable) => {
     const allegroSizingTable = getFormattedAllegroSizingTable(payload);
 
-    try {
-      if (!oldData.allegroId) {
-        const resp = await axios.post(
-          "/api/allegro/sizing-tables",
-          allegroSizingTable
-        );
-        await updateSizingTable(id, {
-          allegroId: resp.data.id,
-        });
-      } else {
-        await axios.put(`/api/allegro/sizing-tables/${oldData.allegroId}`, {
-          id: oldData.allegroId,
-          ...allegroSizingTable,
-        });
-      }
-    } catch (err) {
-      showToast(
-        `Błąd podczas aktualizacji tabeli rozmiarów na Allegro: ${err}`,
-        "error"
+    if (!oldData.allegroId) {
+      const resp = await axios.post(
+        "/api/allegro/sizing-tables",
+        allegroSizingTable
       );
+      await updateSizingTable(id, {
+        allegroId: resp.data.id,
+      });
+    } else {
+      await axios.put(`/api/allegro/sizing-tables/${oldData.allegroId}`, {
+        id: oldData.allegroId,
+        ...allegroSizingTable,
+      });
     }
   };
 

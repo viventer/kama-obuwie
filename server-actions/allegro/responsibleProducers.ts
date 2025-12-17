@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getAllegroUserAccessTokens } from "./auth";
 import { getAllegroHeaders } from "./global";
+import { redirect } from "next/navigation";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -31,6 +32,11 @@ export type ResponsibleProducersResponse = {
 export async function getAllegroResponsibleProducers() {
   const { AL1: AL1AccessToken, AL2: AL2AccessToken } =
     await getAllegroUserAccessTokens();
+
+  if (!AL1AccessToken || !AL2AccessToken) {
+    redirect("/admin-auth/allegro-connect");
+  }
+
   const headers = getAllegroHeaders(AL1AccessToken, AL2AccessToken);
   const url = `${ALLEGRO_API_BASE_URL}/sale/responsible-producers`;
 

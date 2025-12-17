@@ -8,6 +8,7 @@ import { FormField, FormLabel } from "@/components/ui/form";
 import SingleSelect from "../../global/form/SingleSelect";
 import MiniLoader from "../../global/MiniLoader";
 import { allegroSalesChannels } from "@/lib/constants";
+import { redirect } from "next/navigation";
 
 export type Warranty = {
   id: string;
@@ -27,10 +28,14 @@ export default function WarrantySelector() {
 
   useEffect(() => {
     (async () => {
-      const { data }: { data: WarrantiesResponse } = await axios.get(
-        "/api/allegro/warranties"
-      );
-      setAvailableWarranties(data);
+      try {
+        const { data }: { data: WarrantiesResponse } = await axios.get(
+          "/api/allegro/warranties"
+        );
+        setAvailableWarranties(data);
+      } catch (err) {
+        redirect("/admin-auth/allegro-connect");
+      }
     })();
   }, []);
 

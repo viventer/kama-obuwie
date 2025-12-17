@@ -72,7 +72,7 @@ export const editAllegroOffer = async (
   let accessToken: string;
   if (options?.userId) {
     // Zadanie w tle - użyj funkcji bez sesji
-    const tokens = await getAllegroAccessTokensForBackgroundJob(options.userId);
+    const tokens = await getAllegroAccessTokensForBackgroundJob();
     accessToken = tokens[channel];
   } else {
     // Normalny request - użyj sesji

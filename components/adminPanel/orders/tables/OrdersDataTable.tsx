@@ -46,7 +46,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useOrderActions } from "@/hooks/useOrderActions";
 import OrderCostDisplay from "./OrderCostDisplay";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import ShipmentsDialogContent from "../ShipmentsDialogContent";
 import axios from "axios";
@@ -275,9 +275,15 @@ export default function OrdersDataTable({
                     return;
                   }
 
-                  const { data: returnsForOrder } = await axios.get(
-                    `/api/allegro/returns?allegroOrderId=${row.original.allegroId}`
-                  );
+                  let returnsForOrder;
+                  try {
+                    const { data } = await axios.get(
+                      `/api/allegro/returns?allegroOrderId=${row.original.allegroId}`
+                    );
+                    returnsForOrder = data;
+                  } catch (err) {
+                    redirect("/admin-auth/allegro-connect");
+                  }
 
                   if (
                     returnsForOrder.AL1.length > 0 ||

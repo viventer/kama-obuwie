@@ -35,7 +35,7 @@ export const getAllAllegroOffers = async (
 
   let accessToken: string;
   if (userId) {
-    const tokens = await getAllegroAccessTokensForBackgroundJob(userId);
+    const tokens = await getAllegroAccessTokensForBackgroundJob();
     accessToken = tokens[channel];
   } else {
     accessToken = await getAllegroUserAccessToken(channel);

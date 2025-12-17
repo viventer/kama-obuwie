@@ -3,11 +3,17 @@ import OrdersDataTable from "@/components/adminPanel/orders/tables/OrdersDataTab
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { syncAllegroOrders } from "@/server-actions/allegro/orders";
+import { redirect } from "next/navigation";
 
 export const revalidate = 0;
 
 export default async function OrdersNewPage() {
-  await syncAllegroOrders();
+  try {
+    await syncAllegroOrders();
+  } catch (err) {
+    console.error("Błąd podczas synchronizacji zamówień z Allegro:", err);
+    redirect("/admin-auth/allegro-connect");
+  }
   const orders = await getDocumentsFromAdminDB<Order>("orders", (ref) =>
     ref
       .where("fulfillment.status", "==", "NEW")

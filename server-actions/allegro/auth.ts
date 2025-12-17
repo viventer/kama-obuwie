@@ -38,13 +38,13 @@ export async function getAllegroUserAccessTokens(): Promise<{
   // 1. Pobierz hash sesji z Redis (tylko do weryfikacji zalogowania)
   const sess = await redis.hgetall(key);
   if (!sess || !sess.userId) {
-    redirect("/admin-auth/login");
+    throw new Error("Użytkownik nie jest zalogowany");
   }
 
   // 2. Pobierz globalne tokeny Allegro z Redis
   const redisTokens = await redis.hgetall("allegroAuthData");
   if (!redisTokens) {
-    redirect("/admin-auth/allegro-connect");
+    throw new Error("Brak tokenów Allegro w Redis");
   }
 
   const now = Math.floor(Date.now() / 1000);
@@ -58,7 +58,7 @@ export async function getAllegroUserAccessTokens(): Promise<{
   const refreshTokensData = refreshTokensDoc.data();
 
   if (!refreshTokensData) {
-    redirect("/admin-auth/allegro-connect");
+    throw new Error("Brak tokenów Allegro w bazie danych");
   }
 
   // Przetwórz oba konta

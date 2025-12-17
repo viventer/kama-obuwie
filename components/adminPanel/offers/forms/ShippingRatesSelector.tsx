@@ -8,6 +8,7 @@ import { FormField, FormLabel } from "@/components/ui/form";
 import SingleSelect from "../../global/form/SingleSelect";
 import MiniLoader from "../../global/MiniLoader";
 import { allegroSalesChannels } from "@/lib/constants";
+import { redirect } from "next/navigation";
 
 export type ShippingRate = {
   id: string;
@@ -28,10 +29,14 @@ export default function ShippingRatesSelector() {
 
   useEffect(() => {
     (async () => {
-      const { data }: { data: ShippingRatesResponse } = await axios.get(
-        "/api/allegro/shipping-rates"
-      );
-      setAvailableShippingRates(data);
+      try {
+        const { data }: { data: ShippingRatesResponse } = await axios.get(
+          "/api/allegro/shipping-rates"
+        );
+        setAvailableShippingRates(data);
+      } catch (err) {
+        redirect("/admin-auth/allegro-connect");
+      }
     })();
   }, []);
 

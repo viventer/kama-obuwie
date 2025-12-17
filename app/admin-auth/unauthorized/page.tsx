@@ -1,3 +1,4 @@
+import LinkText from "@/components/adminPanel/global/LinkText";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TriangleAlertIcon } from "lucide-react";
-import Link from "next/link";
 
 export default function Page() {
   return (
@@ -24,7 +24,9 @@ export default function Page() {
       </CardHeader>
       <CardContent className="w-full  flex justify-end">
         <Button variant={"link"} asChild className="opacity-100">
-          <Link href={"/"}>Wróć na stronę główną</Link>
+          <LinkText href={"/"} className="text-text">
+            Wróć na stronę główną
+          </LinkText>
         </Button>
       </CardContent>
     </Card>

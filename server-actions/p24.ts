@@ -35,22 +35,30 @@ function getSign(
   amount: number,
   orderId?: number
 ): string {
-  const params = {
-    sessionId,
-    amount,
-    currency: "PLN",
-    crc: P24_CRC,
-  };
-  let fullParams: SignParamsForRegistration | SignParamsForVerification;
+  let params: SignParamsForRegistration | SignParamsForVerification;
   if (type === "verification" && orderId) {
-    fullParams = { ...params, orderId };
-    SignParamsForVerificationSchema.parse(fullParams);
+    params = {
+      sessionId,
+      orderId: orderId,
+      amount: amount,
+      currency: "PLN",
+      crc: P24_CRC,
+    };
+    SignParamsForVerificationSchema.parse(params);
   } else if (type === "registration") {
-    fullParams = { ...params, merchantId: P24_MERCHANT_ID };
-    SignParamsForRegistrationSchema.parse(fullParams);
+    params = {
+      sessionId,
+      merchantId: Number(P24_MERCHANT_ID),
+      amount: amount,
+      currency: "PLN",
+      crc: P24_CRC,
+    };
+    SignParamsForRegistrationSchema.parse(params);
   } else {
     throw new Error("Invalid parameters for sign generation");
   }
+
+  console.log(params);
   const combinedString = JSON.stringify(params);
   const hash = crypto.createHash("sha384").update(combinedString).digest("hex");
   return hash;
@@ -74,17 +82,18 @@ export async function registerTransaction(
     sessionId,
     amount: transactionData.amount,
     currency: "PLN",
-    description: "",
+    description: "Wpłata za zamówienie w sklepie Kama Obuwie",
     email: transactionData.email,
     country: "PL",
     language: "pl",
     urlReturn: `${APP_BASE_URL}/thank-you`,
     urlStatus: `${APP_BASE_URL}/api/p24/status`,
-    channel: transactionData.channel,
     waitForResult: false,
     regulationAccept: transactionData.regulationAccept,
     sign,
   };
+
+  console.log(requestBody);
 
   try {
     const response = await axios.post(

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const SignParamsForRegistrationSchema = z.object({
   sessionId: z.string(),
-  merchantId: z.string(),
+  merchantId: z.number().int(),
   amount: z.number().int(),
   currency: z.string(),
   crc: z.string(),

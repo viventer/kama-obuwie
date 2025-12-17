@@ -14,8 +14,8 @@ export default function Page() {
     <Card className="flex flex-col gap-2 justify-center max-w-[500px] mx-auto border-destructive bg-background w-[90%]">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <TriangleAlertIcon className="size-[3rem] text-destructive" />
-          <h2 className="text-[2rem] font-[500]">
+          <TriangleAlertIcon className="size-12 text-destructive" />
+          <h2 className="text-[2rem] font-medium">
             Konta Allegro nie są połączone
           </h2>
         </CardTitle>

@@ -14,16 +14,16 @@ import OrderSummary from "./OrderSummary";
 import { FrontendOrder } from "@/firebase/schemas/ordersSchemas";
 import { useShoppingCart } from "@/hooks/useShoppingCart";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
-import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import {
   fetchOffersData,
   checkCartItemsAvailability,
 } from "@/helpers/checkCartAvailability";
-import { Button as UIButton } from "@/components/ui/button";
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
+import { handleApiError } from "@/server-actions/errorHandlers";
+import { RegisterTransactionData } from "@/firebase/schemas/p24Schemas";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
@@ -137,9 +137,9 @@ export default function CheckoutForms() {
       };
 
       const response = await axios.post("/api/orders", orderData);
+      clearCart();
 
       if (checkoutData.paymentMethod === "COD") {
-        clearCart();
         while (isLoading) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
@@ -148,8 +148,34 @@ export default function CheckoutForms() {
         return;
       }
 
-      stopLoading();
-      router.replace(`/thank-you/${response.data.id}`);
+      const { data: createdOrder } = await axios.get(
+        `/api/orders/${response.data.id}`
+      );
+
+      const transactionData: Pick<
+        RegisterTransactionData,
+        "amount" | "email" | "channel" | "regulationAccept"
+      > = {
+        amount: Math.round(
+          parseFloat(createdOrder.summary.totalToPay.amount) * 100
+        ),
+        email: checkoutData.email,
+        regulationAccept: true,
+      };
+
+      try {
+        const { data: p24Response } = await axios.post("/api/p24/register", {
+          transactionData,
+          orderId: response.data.id,
+        });
+        console.log(p24Response.url);
+        window.location.href = p24Response.url;
+      } catch (err) {
+        handleApiError(err, "Błąd podczas rejestracji transakcji P24.");
+        return;
+      } finally {
+        stopLoading();
+      }
     } catch (err: any) {
       stopLoading();
       handleError(err, "Błąd podczas składania zamówienia.");

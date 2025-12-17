@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
   try {
     p24Response = await registerTransaction(transactionData);
   } catch (err: any) {
+    console.log("P24 Registration Error:", err);
     return apiErrorResponse(
       "Nie udało się zarejestrować transakcji",
       500,
@@ -42,6 +43,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (err) {
+    console.log("Order Update Error:", err);
     return apiErrorResponse(
       "Nie udało się zaktualizować zamówienia o dane transakcji",
       500,
@@ -52,7 +54,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  return NextResponse.redirect(
-    `${process.env.NEXT_PUBLIC_P24_URL}/trnRequest/${p24Response.token}`
-  );
+  return apiResponse("Transakcja zarejestrowana pomyślnie.", 200, {
+    url: `${process.env.NEXT_PUBLIC_P24_BASE_URL}/trnRequest/${p24Response.token}`,
+  });
 }

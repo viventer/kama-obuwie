@@ -131,6 +131,19 @@ export default function CheckoutForms() {
         checkoutData.address = null;
       }
 
+      showDialog({
+        message: "Obecnie nie przyjmujemy zamówień poprzez sklep internetowy.",
+        description:
+          "Zamówienie możesz złożyć przez Allegro. Oczekujemy na podłączenie płatności online w naszym sklepie.",
+        confirmText: "Kup przez Allegro",
+        cancelText: "Anuluj",
+        onConfirm: () => {
+          window.location.href = "https://allegro.pl/uzytkownik/kama-obuwie_pl";
+        },
+      });
+
+      return;
+
       const orderData: FrontendOrder = {
         checkoutData,
         shoppingCartItems: cart.map((cartItem) => ({ ...cartItem.item })),

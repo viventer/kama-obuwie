@@ -76,3 +76,24 @@ env:
 
   - variable: INPOST_API_SHIPX
     secret: INPOST_API_SHIPX
+
+  - variable: NEXT_PUBLIC_INPOST_API_BASE_URL
+    secret: NEXT_PUBLIC_INPOST_API_BASE_URL
+
+  - variable: NEXT_PUBLIC_INPOST_ORGANIZATION_ID
+    secret: NEXT_PUBLIC_INPOST_ORGANIZATION_ID
+
+  - variable: NEXT_PUBLIC_P24_API_BASE_URL
+    secret: NEXT_PUBLIC_P24_API_BASE_URL
+
+  - variable: NEXT_PUBLIC_P24_BASE_URL
+    secret: NEXT_PUBLIC_P24_BASE_URL
+
+  - variable: P24_MERCHANT_ID
+    secret: P24_MERCHANT_ID
+
+  - variable: P24_API_KEY
+    secret: P24_API_KEY
+
+  - variable: P24_CRC
+    secret: P24_CRC

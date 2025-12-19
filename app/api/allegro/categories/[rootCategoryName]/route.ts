@@ -8,10 +8,12 @@ export async function GET(
   {
     params,
   }: {
-    params: Promise<{ rootCategoryName: RootCategory }>;
+    params: Promise<{ rootCategoryName: string }>;
   }
 ) {
   const { rootCategoryName } = await params;
-  const categories = await getAllegroCategories(rootCategoryName);
+  const categories = await getAllegroCategories(
+    rootCategoryName as RootCategory
+  );
   return apiResponse("Pobrano kategorie.", 200, categories);
 }

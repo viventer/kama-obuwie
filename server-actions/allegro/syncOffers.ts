@@ -20,8 +20,12 @@ import { cleanOldExternalId, parseExternalId } from "@/helpers/externalId";
 import { updateProduct } from "../products/products";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
+import { redis } from "@/upstash/redis";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
+
+// Helper do delay między requestami
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const getAllAllegroOffers = async (
   channel: "AL1" | "AL2",
@@ -58,8 +62,6 @@ export const getAllAllegroOffers = async (
         params: {
           limit: limit,
           offset: offset,
-          "sellingMode.price.amount.gte": "60",
-          "sellingMode.price.amount.lte": "70",
         },
         headers,
       });
@@ -398,6 +400,8 @@ const syncAL1Offers = async (
   offers: AllegroOfferFromListing[],
   userId?: string
 ) => {
+  console.log(`🚀 AL1: Starting synchronization of ${offers.length} offers`);
+
   // Grupuj oferty po signature
   const offersBySignature = new Map<string, AllegroOfferFromListing[]>();
 
@@ -427,10 +431,17 @@ const syncAL1Offers = async (
 
   console.log(`🔍 Found ${offersBySignature.size} unique signatures`);
 
+  let processedSignatures = 0;
+  let skippedSignatures = 0;
+  let errorCount = 0;
+  const totalSignatures = offersBySignature.size;
+
   // Przetwarzaj każdą grupę signature sekwencyjnie
   for (const [signature, groupedOffers] of offersBySignature) {
     console.log(
-      `🔄 Processing signature: "${signature}" with ${groupedOffers.length} sizes`
+      `🔄 AL1: Processing signature ${
+        processedSignatures + 1
+      }/${totalSignatures}: "${signature}" with ${groupedOffers.length} sizes`
     );
 
     // Sprawdź czy oferta już istnieje
@@ -579,7 +590,31 @@ const syncAL1Offers = async (
         }
       }
     }
+
+    processedSignatures++;
+
+    // Progress tracking
+    const progress = Math.round((processedSignatures / totalSignatures) * 100);
+    await redis.set(
+      "allegro:sync:progress:AL1",
+      JSON.stringify({
+        processed: processedSignatures,
+        total: totalSignatures,
+        percentage: progress,
+        lastSignature: signature,
+      })
+    );
+
+    // Delay między signature aby uniknąć rate limiting (150ms)
+    if (processedSignatures < totalSignatures) {
+      await delay(150);
+    }
   }
+
+  console.log(`🏁 AL1: Synchronization completed!`);
+  console.log(`✅ Processed: ${processedSignatures} signatures`);
+  console.log(`⚠️  Skipped: ${skippedSignatures} signatures`);
+  console.log(`❌ Errors: ${errorCount}`);
 };
 
 const syncAL2Offers = async (
@@ -709,6 +744,25 @@ const syncAL2Offers = async (
 
       processedSignatures++;
       console.log(`🎉 AL2: Completed signature "${signature}"`);
+
+      // Progress tracking
+      const progress = Math.round(
+        (processedSignatures / offersBySignature.size) * 100
+      );
+      await redis.set(
+        "allegro:sync:progress:AL2",
+        JSON.stringify({
+          processed: processedSignatures,
+          total: offersBySignature.size,
+          percentage: progress,
+          lastSignature: signature,
+        })
+      );
+
+      // Delay między signature aby uniknąć rate limiting (150ms)
+      if (processedSignatures < offersBySignature.size) {
+        await delay(150);
+      }
     } catch (signatureError) {
       console.error(
         `❌ AL2: Error processing signature "${signature}":`,

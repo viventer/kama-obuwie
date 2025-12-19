@@ -1,10 +1,14 @@
-import { syncAllegroOffers } from "@/server-actions/allegro/syncOffers";
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/upstash/redis";
+import { Client } from "@upstash/qstash";
+
+const qstashClient = new Client({
+  token: process.env.QSTASH_TOKEN!,
+});
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("🚀 Starting background Allegro sync job...");
+    console.log("🚀 Queueing Allegro sync job to QStash...");
 
     const body = await req.json();
     const userId = body.userId;
@@ -20,32 +24,42 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log(`👤 Running sync for user: ${userId}`);
+    console.log(`👤 Queueing sync for user: ${userId}`);
 
-    await redis.set("allegro:sync:status", "running");
-    await redis.set("allegro:sync:started", new Date().toISOString());
+    // Ustaw status na "queued" zamiast "running"
+    await redis.set("allegro:sync:status", "queued");
+    await redis.set("allegro:sync:queued", new Date().toISOString());
+    await redis.del("allegro:sync:error");
+    await redis.del("allegro:sync:results");
 
-    const results = await syncAllegroOffers(userId);
+    // Zakolejkuj job do QStash - zwróć odpowiedź natychmiast
+    const workerUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/sync/allegro-offers/worker`;
 
-    const hasAnySuccess = results.AL1.success || results.AL2.success;
-    const status = hasAnySuccess ? "completed" : "error";
+    console.log(`📤 Publishing job to QStash: ${workerUrl}`);
 
-    await redis.set("allegro:sync:status", status);
-    await redis.set("allegro:sync:completed", new Date().toISOString());
+    const result = await qstashClient.publishJSON({
+      url: workerUrl,
+      body: { userId },
+      retries: 2, // Retry do 2 razy w przypadku błędu
+      timeout: "14m", // Maksymalnie 14 minut (limit free tier: 15 minut)
+    });
 
-    await redis.set("allegro:sync:results", JSON.stringify(results));
+    console.log(
+      `✅ Job queued successfully with messageId: ${result.messageId}`
+    );
 
-    console.log("✅ Background Allegro sync job completed successfully");
+    // Zapisz messageId do śledzenia
+    await redis.set("allegro:sync:messageId", result.messageId);
 
     return NextResponse.json({
-      success: hasAnySuccess,
-      message: hasAnySuccess
-        ? "Synchronization completed"
-        : "Synchronization failed for all accounts",
-      results,
+      success: true,
+      message:
+        "Synchronization job queued successfully. It will run in the background.",
+      messageId: result.messageId,
+      status: "queued",
     });
   } catch (error) {
-    console.error("❌ Background Allegro sync job failed:", error);
+    console.error("❌ Failed to queue Allegro sync job:", error);
 
     await redis.set("allegro:sync:status", "error");
     await redis.set(
@@ -62,10 +76,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-// W produkcji: weryfikuj podpis QStash
-// W deweloperze: pomiń weryfikację
-// export const POST =
-//   process.env.NODE_ENV === "production"
-//     ? verifySignatureAppRouter(handler)
-//     : handler;

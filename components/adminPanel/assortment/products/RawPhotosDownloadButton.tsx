@@ -16,7 +16,6 @@ export default function RawPhotosDownloadButton({
     startLoading();
     try {
       const queryString = new URLSearchParams(params).toString();
-      console.log(`/api/products/downloadPhotos?${queryString}`);
 
       const response = await axios.get(
         `/api/products/downloadPhotos?${queryString}`

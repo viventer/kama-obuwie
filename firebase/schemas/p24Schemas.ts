@@ -143,10 +143,6 @@ export const RegisterTransactionDataSchema = z.object({
     .describe(
       "Parametr determinuje, czy użytkownik zostanie przekierowany z powrotem do sklepu od razu po wykonaniu płatności"
     ),
-  regulationAccept: z
-    .boolean()
-    .default(false)
-    .describe("Akceptacja regulaminu Przelewy24"),
   shipping: z.number().int().optional().describe("Koszt dostawy/wysyłki"),
   transferLabel: z
     .string()

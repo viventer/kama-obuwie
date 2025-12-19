@@ -154,13 +154,12 @@ export default function CheckoutForms() {
 
       const transactionData: Pick<
         RegisterTransactionData,
-        "amount" | "email" | "channel" | "regulationAccept"
+        "amount" | "email" | "channel"
       > = {
         amount: Math.round(
           parseFloat(createdOrder.summary.totalToPay.amount) * 100
         ),
         email: checkoutData.email,
-        regulationAccept: true,
       };
 
       try {
@@ -168,7 +167,6 @@ export default function CheckoutForms() {
           transactionData,
           orderId: response.data.id,
         });
-        console.log(p24Response.url);
         window.location.href = p24Response.url;
       } catch (err) {
         handleApiError(err, "Błąd podczas rejestracji transakcji P24.");

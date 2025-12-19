@@ -2,7 +2,7 @@ import { RegisterTransactionData } from "@/firebase/schemas/p24Schemas";
 import { apiErrorResponse, apiResponse } from "@/server-actions/helpers";
 import { updateOrder } from "@/server-actions/orders/orders";
 import { registerTransaction } from "@/server-actions/p24";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export async function POST(request: NextRequest) {
   const {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   }: {
     transactionData: Pick<
       RegisterTransactionData,
-      "amount" | "email" | "channel" | "regulationAccept"
+      "amount" | "email" | "channel"
     >;
     orderId: string;
   } = await request.json();
@@ -21,9 +21,8 @@ export async function POST(request: NextRequest) {
     token: string;
   } | null = null;
   try {
-    p24Response = await registerTransaction(transactionData);
+    p24Response = await registerTransaction(transactionData, orderId);
   } catch (err: any) {
-    console.log("P24 Registration Error:", err);
     return apiErrorResponse(
       "Nie udało się zarejestrować transakcji",
       500,
@@ -43,7 +42,6 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (err) {
-    console.log("Order Update Error:", err);
     return apiErrorResponse(
       "Nie udało się zaktualizować zamówienia o dane transakcji",
       500,

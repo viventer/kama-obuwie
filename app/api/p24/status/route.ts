@@ -6,6 +6,7 @@ import { verifyTransaction } from "@/server-actions/p24";
 import { adminDB } from "@/firebase/firebaseAdmin";
 
 export async function POST(request: NextRequest) {
+  console.log("P24 status GET received");
   try {
     const notification: TransactionNotificationData = await request.json();
 
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
       !notification.amount ||
       !notification.orderId
     ) {
-      return new NextResponse(null, { status: 200 });
+      return new NextResponse(null, { status: 400 });
     }
 
     const orders = await getDocumentsFromAdminDB<Order>("orders", (ref) =>

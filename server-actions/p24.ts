@@ -58,7 +58,6 @@ function getSign(
     throw new Error("Invalid parameters for sign generation");
   }
 
-  console.log(params);
   const combinedString = JSON.stringify(params);
   const hash = crypto.createHash("sha384").update(combinedString).digest("hex");
   return hash;
@@ -67,8 +66,9 @@ function getSign(
 export async function registerTransaction(
   transactionData: Pick<
     RegisterTransactionData,
-    "amount" | "email" | "channel" | "regulationAccept"
-  >
+    "amount" | "email" | "channel"
+  >,
+  orderId: string
 ): Promise<{
   token: string;
   sessionId: string;
@@ -86,14 +86,11 @@ export async function registerTransaction(
     email: transactionData.email,
     country: "PL",
     language: "pl",
-    urlReturn: `${APP_BASE_URL}/thank-you`,
+    urlReturn: `${APP_BASE_URL}/thank-you/${orderId}`,
     urlStatus: `${APP_BASE_URL}/api/p24/status`,
     waitForResult: false,
-    regulationAccept: transactionData.regulationAccept,
     sign,
   };
-
-  console.log(requestBody);
 
   try {
     const response = await axios.post(

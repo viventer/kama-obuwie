@@ -1,4 +1,11 @@
 import CustomerOrderDetails from "@/components/store/checkout/CustomerOrderDetails";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { notFound } from "next/navigation";
@@ -24,12 +31,40 @@ export default async function ThankYouPage(props: Props) {
     notFound();
   }
 
+  console.log(orderData.P24Transaction);
+
   return (
     <div className="space-y-8">
       <section>
         <h2 className="font-medium text-2xl">Dziękujemy za zamówienie</h2>
-        <p>Informacje o dostawie otrzymasz na podany adres e-mail.</p>
+        <p>
+          Informacje o jego realizacji i dostawie otrzymasz na Twój adres
+          e-mail.
+        </p>
       </section>
+      <Card className="gap-2 max-w-xl">
+        <CardHeader className="mb-0">
+          <CardTitle className="font-medium text-xl">
+            Szczegóły płatności
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-2 font-medium">
+            <span className="text-muted-foreground">Status: </span>
+            {orderData.P24Transaction?.status === "INITIATED"
+              ? "rozpoczęta"
+              : orderData.P24Transaction?.status === "COMPLETED"
+              ? "zakończona pomyślnie"
+              : "nieznany"}
+          </p>
+          {orderData.P24Transaction?.status !== "INITIATED" ? (
+            <p>
+              Aktualny status płatności sprawdzisz klikając w link wysłany na
+              Twój adres e-mail.
+            </p>
+          ) : null}
+        </CardContent>
+      </Card>
       <CustomerOrderDetails orderData={orderData} />
     </div>
   );

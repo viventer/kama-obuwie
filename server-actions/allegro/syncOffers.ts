@@ -779,83 +779,89 @@ const syncAL2Offers = async (
   console.log(`❌ Errors: ${errorCount}`);
 };
 
-export const syncAllegroOffers = async (userId?: string) => {
-  console.log(`🚀 Starting Allegro offers synchronization...`);
+export const syncAllegroOffers = async (
+  userId?: string,
+  channel: "AL1" | "AL2" = "AL1",
+  batch: number = 0
+) => {
+  const BATCH_SIZE = 200; // Liczba ofert na batch (zmniejszona z uwagi na timeout)
+
+  console.log(
+    `🚀 Starting Allegro offers synchronization for ${channel}, batch ${batch}...`
+  );
   if (userId) {
     console.log(`👤 Running as background job for user: ${userId}`);
   }
 
-  const results = {
-    AL1: { success: false, error: null as string | null, offersCount: 0 },
-    AL2: { success: false, error: null as string | null, offersCount: 0 },
-  };
+  // Pobierz wszystkie oferty dla danego kanału
+  console.log(`📥 Fetching ${channel} offers...`);
+  const allOffers = await getAllAllegroOffers(channel, userId);
+  console.log(`✅ Found ${allOffers.length} ${channel} offers`);
+
+  // Oblicz zakres dla tego batcha
+  const startIndex = batch * BATCH_SIZE;
+  const endIndex = Math.min(startIndex + BATCH_SIZE, allOffers.length);
+  const batchOffers = allOffers.slice(startIndex, endIndex);
+
+  console.log(
+    `📦 Processing batch ${batch}: offers ${startIndex}-${endIndex} (${batchOffers.length} offers)`
+  );
+
+  // Zapisz channel jako string przed zawężeniem typu
+  const currentChannel: string = channel;
+
+  // Sprawdź czy są kolejne batche
+  const hasMoreInChannel = endIndex < allOffers.length;
+  const nextBatch = hasMoreInChannel ? batch + 1 : 0;
+  const nextChannel =
+    !hasMoreInChannel && currentChannel === "AL1" ? "AL2" : currentChannel;
+  const hasMore = hasMoreInChannel || currentChannel === "AL1"; // Jeśli to AL1, zawsze będzie AL2
 
   try {
-    console.log(`📥 Fetching AL1 offers...`);
-    const AL1Offers = await getAllAllegroOffers("AL1", userId);
-    console.log(`✅ Found ${AL1Offers.length} AL1 offers`);
-    results.AL1.offersCount = AL1Offers.length;
-
-    if (AL1Offers.length > 0) {
-      console.log(`🔄 Starting AL1 synchronization...`);
-      await syncAL1Offers(AL1Offers, userId);
-      console.log(`✅ AL1 synchronization completed`);
-      results.AL1.success = true;
+    if (channel === "AL1") {
+      if (batchOffers.length > 0) {
+        console.log(`🔄 Starting AL1 batch ${batch} synchronization...`);
+        await syncAL1Offers(batchOffers, userId);
+        console.log(`✅ AL1 batch ${batch} synchronization completed`);
+      }
     } else {
-      console.log(`⚠️  Skipping AL1 synchronization - no offers found`);
-      results.AL1.success = true; // Not an error, just no offers
+      if (batchOffers.length > 0) {
+        console.log(`🔄 Starting AL2 batch ${batch} synchronization...`);
+        await syncAL2Offers(batchOffers, userId);
+        console.log(`✅ AL2 batch ${batch} synchronization completed`);
+      }
     }
-  } catch (error) {
-    console.error(`❌ AL1 synchronization failed:`, error);
-    results.AL1.error =
-      error instanceof Error ? error.message : "Unknown error";
-    // Nie przerywaj - kontynuuj z AL2
-  }
 
-  // Synchronizuj AL2
-  try {
-    console.log(`�📥 Fetching AL2 offers...`);
-    const AL2Offers = await getAllAllegroOffers("AL2", userId);
-    console.log(`✅ Found ${AL2Offers.length} AL2 offers`);
-    results.AL2.offersCount = AL2Offers.length;
+    // Zwróć informacje o tym czy są kolejne batche
+    const result: any = {
+      success: true,
+      channel: currentChannel,
+      batch,
+      processedOffers: batchOffers.length,
+      totalOffers: allOffers.length,
+      hasMore,
+      nextBatch,
+      nextChannel,
+    };
 
-    if (AL2Offers.length > 0) {
-      console.log(`🔄 Starting AL2 synchronization...`);
-      await syncAL2Offers(AL2Offers, userId);
-      console.log(`✅ AL2 synchronization completed`);
-      results.AL2.success = true;
-    } else {
-      console.log(`⚠️  Skipping AL2 synchronization - no offers found`);
-      results.AL2.success = true; // Not an error, just no offers
+    // Tylko dla ostatniego batcha zwróć pełne wyniki
+    if (!hasMore) {
+      result.AL1 = {
+        success: true,
+        offersCount: currentChannel === "AL1" ? allOffers.length : 0,
+      };
+      result.AL2 = {
+        success: true,
+        offersCount: currentChannel === "AL2" ? allOffers.length : 0,
+      };
     }
+
+    return result;
   } catch (error) {
-    console.error(`❌ AL2 synchronization failed:`, error);
-    results.AL2.error =
-      error instanceof Error ? error.message : "Unknown error";
-  }
-
-  // Podsumowanie
-  console.log(`\n📊 Synchronization Summary:`);
-  console.log(
-    `   AL1: ${results.AL1.success ? "✅ Success" : "❌ Failed"} (${
-      results.AL1.offersCount
-    } offers)`
-  );
-  if (results.AL1.error) console.log(`        Error: ${results.AL1.error}`);
-  console.log(
-    `   AL2: ${results.AL2.success ? "✅ Success" : "❌ Failed"} (${
-      results.AL2.offersCount
-    } offers)`
-  );
-  if (results.AL2.error) console.log(`        Error: ${results.AL2.error}`);
-
-  // Rzuć błąd tylko jeśli OBA zawiodły
-  if (!results.AL1.success && !results.AL2.success) {
-    throw new Error(
-      `Synchronizacja nie powiodła się dla obu kont. AL1: ${results.AL1.error}, AL2: ${results.AL2.error}`
+    console.error(
+      `❌ ${channel} batch ${batch} synchronization failed:`,
+      error
     );
+    throw error;
   }
-
-  console.log(`🎉 Synchronization completed!`);
-  return results;
 };

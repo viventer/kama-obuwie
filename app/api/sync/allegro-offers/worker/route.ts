@@ -9,6 +9,8 @@ async function handler(req: NextRequest) {
 
     const body = await req.json();
     const userId = body.userId;
+    const batch = body.batch ?? 0;
+    const channel = body.channel ?? "AL1";
 
     if (!userId) {
       console.error("❌ Missing userId in request body");
@@ -21,31 +23,67 @@ async function handler(req: NextRequest) {
       );
     }
 
-    console.log(`👤 Running sync for user: ${userId}`);
+    console.log(
+      `👤 Running sync for user: ${userId}, channel: ${channel}, batch: ${batch}`
+    );
 
-    await redis.set("allegro:sync:status", "running");
-    await redis.set("allegro:sync:started", new Date().toISOString());
-    await redis.del("allegro:sync:progress"); // Wyczyść stary progress
+    // Ustaw status na "running" tylko dla pierwszego batcha
+    if (batch === 0 && channel === "AL1") {
+      await redis.set("allegro:sync:status", "running");
+      await redis.set("allegro:sync:started", new Date().toISOString());
+      await redis.del("allegro:sync:progress"); // Wyczyść stary progress
+    }
 
-    const results = await syncAllegroOffers(userId);
+    // Wykonaj synchronizację dla tego batcha
+    const result = await syncAllegroOffers(userId, channel, batch);
 
-    const hasAnySuccess = results.AL1.success || results.AL2.success;
-    const status = hasAnySuccess ? "completed" : "error";
+    // Sprawdź czy są kolejne batche do przetworzenia
+    if (result.hasMore) {
+      console.log(
+        `🔗 Queueing next batch: ${result.nextBatch} for ${result.nextChannel}`
+      );
 
-    await redis.set("allegro:sync:status", status);
-    await redis.set("allegro:sync:completed", new Date().toISOString());
-    await redis.set("allegro:sync:results", JSON.stringify(results));
+      // Zakolejkuj następny batch
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/sync/allegro-offers`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId,
+            batch: result.nextBatch,
+            channel: result.nextChannel,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error(
+          `❌ Failed to queue next batch: ${await response.text()}`
+        );
+      }
+    } else {
+      // To był ostatni batch - ustaw status na completed
+      const hasAnySuccess = result.AL1?.success || result.AL2?.success;
+      const status = hasAnySuccess ? "completed" : "error";
+
+      await redis.set("allegro:sync:status", status);
+      await redis.set("allegro:sync:completed", new Date().toISOString());
+      await redis.set("allegro:sync:results", JSON.stringify(result));
+
+      console.log("✅ QStash worker: All batches completed!");
+    }
 
     console.log(
       "✅ QStash worker: Background Allegro sync job completed successfully"
     );
 
     return NextResponse.json({
-      success: hasAnySuccess,
-      message: hasAnySuccess
-        ? "Synchronization completed"
-        : "Synchronization failed for all accounts",
-      results,
+      success: true,
+      message: result.hasMore
+        ? `Batch ${batch} completed, next batch queued`
+        : "All batches completed",
+      result,
     });
   } catch (error) {
     console.error(

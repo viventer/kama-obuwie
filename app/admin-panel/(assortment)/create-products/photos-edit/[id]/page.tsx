@@ -1,14 +1,12 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import CreateProductsPhotosForm from "@/components/adminPanel/assortment/create-products/CreateProductsPhotosForm";
-import { Button } from "@/components/ui/button";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { getImageUrl } from "@/server-actions/files/files";
 import Image from "next/image";
 
 import { notFound } from "next/navigation";
-import axios from "axios";
-import RawPhotosDownloadButton from "@/components/adminPanel/assortment/products/RawPhotosDownloadButton";
+import PhotosDownloadButton from "@/components/adminPanel/assortment/products/PhotosDownloadButton";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -32,17 +30,6 @@ export default async function ProductEditPage(props: Props) {
     samplePhotoUrl = await getImageUrl(data.samplePhoto);
   }
 
-  const folderPath = `products/raw-photos/${data.productType}/${data.id}`;
-  const serializedManufacturerCode = data.manufacturerCode.replace(
-    /[^a-zA-Z0-9]/g,
-    "-"
-  );
-  const downloadName = `raw-${serializedManufacturerCode}`;
-  const params = {
-    folderPath,
-    downloadName,
-  };
-
   return (
     <FormWrapper headingText="Dodaj edytowane zdjęcia do produktu">
       {samplePhotoUrl && (
@@ -57,7 +44,13 @@ export default async function ProductEditPage(props: Props) {
           <p className="font-bold">{data.manufacturerCode}</p>
         </section>
       )}
-      <RawPhotosDownloadButton params={params} />
+      <PhotosDownloadButton
+        productType={data.productType}
+        manufacturerCode={data.manufacturerCode}
+        productId={data.id}
+        imagesType="raw"
+        className="mb-8"
+      />
       <CreateProductsPhotosForm productData={data} creationStage="photosEdit" />
     </FormWrapper>
   );

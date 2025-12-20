@@ -6,3 +6,29 @@ export const getNewFileName = (fileName: string) => {
 
   return newFileName;
 };
+
+export const getProductFolderPath = ({
+  type,
+  id,
+  imagesType,
+}: {
+  type: string;
+  id: string;
+  imagesType: "raw" | "edited";
+}) => {
+  return `products/${imagesType}-photos/${type}/${id}`;
+};
+
+export const getProductDownloadName = ({
+  manufacturerCode,
+  imagesType,
+}: {
+  manufacturerCode: string;
+  imagesType: "raw" | "edited";
+}) => {
+  const serializedManufacturerCode = manufacturerCode.replace(
+    /[^a-zA-Z0-9]/g,
+    "-"
+  );
+  return `${imagesType}-${serializedManufacturerCode}`;
+};

@@ -9,6 +9,7 @@ import {
   getDocumentsFromAdminDB,
 } from "@/firebase/getters";
 import { notFound } from "next/navigation";
+import PhotosDownloadButton from "@/components/adminPanel/assortment/products/PhotosDownloadButton";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -51,6 +52,22 @@ export default async function ProductDataPage(props: Props) {
   return (
     <div className="flex flex-col gap-4">
       <ShortProductInfo product={data} />
+      <section className="flex gap-4 flex-wrap">
+        <PhotosDownloadButton
+          productType={data.productType}
+          manufacturerCode={data.manufacturerCode}
+          productId={data.id}
+          imagesType="raw"
+          className="mb-0"
+        />
+        <PhotosDownloadButton
+          productType={data.productType}
+          manufacturerCode={data.manufacturerCode}
+          productId={data.id}
+          imagesType="edited"
+          className="bg-primary/70 hover:bg-primary/100 mb-4"
+        />
+      </section>
       <LongProductInfo
         product={data}
         category={category?.data || undefined}

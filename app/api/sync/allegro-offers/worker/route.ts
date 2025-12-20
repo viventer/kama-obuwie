@@ -107,9 +107,5 @@ async function handler(req: NextRequest) {
   }
 }
 
-// W produkcji: weryfikuj podpis QStash
-// W deweloperze: pomiń weryfikację dla testów
-// export const POST =
-//   process.env.NODE_ENV === "production"
-//     ? verifySignatureAppRouter(handler)
-//     : handler;
+// Eksportuj handler jako POST - weryfikacja podpisu QStash wyłączona na razie
+export const POST = handler;

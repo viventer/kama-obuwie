@@ -31,16 +31,6 @@ export async function getAllegroUserAccessTokens(): Promise<{
   AL1: string;
   AL2: string;
 }> {
-  const cookieStore = await cookies();
-  const sessionId = cookieStore.get("sessionId")?.value;
-  const key = `session:${sessionId}`;
-
-  // 1. Pobierz hash sesji z Redis (tylko do weryfikacji zalogowania)
-  const sess = await redis.hgetall(key);
-  if (!sess || !sess.userId) {
-    throw new Error("Użytkownik nie jest zalogowany");
-  }
-
   // 2. Pobierz globalne tokeny Allegro z Redis
   const redisTokens = await redis.hgetall("allegroAuthData");
   if (!redisTokens) {

@@ -1,11 +1,5 @@
 import CustomerOrderDetails from "@/components/store/checkout/CustomerOrderDetails";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { notFound } from "next/navigation";
@@ -57,7 +51,7 @@ export default async function ThankYouPage(props: Props) {
               ? "zakończona pomyślnie"
               : "nieznany"}
           </p>
-          {orderData.P24Transaction?.status !== "INITIATED" ? (
+          {orderData.P24Transaction?.status !== "COMPLETED" ? (
             <p>
               Aktualny status płatności sprawdzisz klikając w link wysłany na
               Twój adres e-mail.

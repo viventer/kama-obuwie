@@ -32,6 +32,10 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
       await axios.patch(`/api/orders/${id}`, updateData);
 
       const order = await axios.get(`/api/orders/${id}`);
+      if (order.data.shipment?.isCreated || newPhase !== "processing") {
+        return;
+      }
+
       const salesChannel = order.data.salesChannel;
       const allegroOrderId = order.data.allegroId;
       if (["AL1", "AL2"].includes(salesChannel) && allegroOrderId) {

@@ -1,4 +1,5 @@
 import CustomerOrderDetails from "@/components/store/checkout/CustomerOrderDetails";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
@@ -25,7 +26,10 @@ export default async function ThankYouPage(props: Props) {
     notFound();
   }
 
-  console.log(orderData.P24Transaction);
+  const transactions = orderData.P24Transactions || [];
+  const isTransactionCompleted = transactions.some(
+    (t) => t.status === "COMPLETED"
+  );
 
   return (
     <div className="space-y-8">
@@ -43,19 +47,25 @@ export default async function ThankYouPage(props: Props) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="mb-2 font-medium">
-            <span className="text-muted-foreground">Status: </span>
-            {orderData.P24Transaction?.status === "INITIATED"
-              ? "rozpoczęta"
-              : orderData.P24Transaction?.status === "COMPLETED"
-              ? "zakończona pomyślnie"
-              : "nieznany"}
-          </p>
-          {orderData.P24Transaction?.status !== "COMPLETED" ? (
-            <p>
-              Aktualny status płatności sprawdzisz klikając w link wysłany na
-              Twój adres e-mail.
+          {transactions.map((transaction, index) => (
+            <p className="mb-2 font-medium" key={index}>
+              <span className="text-muted-foreground">Status: </span>
+              {transaction.status === "INITIATED"
+                ? "rozpoczęta"
+                : transaction.status === "COMPLETED"
+                ? "zakończona pomyślnie"
+                : "nieznany"}
             </p>
+          ))}
+
+          {!isTransactionCompleted ? (
+            <div>
+              <p className="mb-4">
+                Płatność nie została jeszcze zakończona. Jeśli płatność się nie
+                udała kliknij poniższy przycisk, aby spróbować ponownie.
+              </p>
+              <Button variant={"important"}>Ponów płatność</Button>
+            </div>
           ) : null}
         </CardContent>
       </Card>

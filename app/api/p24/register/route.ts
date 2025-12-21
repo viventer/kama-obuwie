@@ -1,8 +1,15 @@
+import {
+  Order,
+  OrderWithId,
+  P24Transaction,
+} from "@/firebase/schemas/ordersSchemas";
 import { RegisterTransactionData } from "@/firebase/schemas/p24Schemas";
 import { apiErrorResponse, apiResponse } from "@/server-actions/helpers";
 import { updateOrder } from "@/server-actions/orders/orders";
 import { registerTransaction } from "@/server-actions/p24";
+import { adminDB } from "@/firebase/firebaseAdmin";
 import { NextRequest } from "next/server";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 
 export async function POST(request: NextRequest) {
   const {
@@ -34,12 +41,33 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const { data: order } = await getDocumentFromAdminDB<OrderWithId>(
+      "orders",
+      orderId
+    );
+    if (!order) {
+      throw new Error("Zamówienie nie istnieje");
+    }
+
+    const newTransaction: P24Transaction = {
+      sessionId: p24Response.sessionId,
+      amount: transactionData.amount,
+      status: "INITIATED",
+    };
+
+    const updatedTransactions = [
+      ...(order.P24Transactions || []),
+      newTransaction,
+    ];
+
+    const updatedSessionIds = [
+      ...(order.P24SessionIds || []),
+      p24Response.sessionId,
+    ];
+
     await updateOrder(orderId, {
-      P24Transaction: {
-        sessionId: p24Response.sessionId,
-        amount: transactionData.amount,
-        status: "INITIATED",
-      },
+      P24Transactions: updatedTransactions,
+      P24SessionIds: updatedSessionIds,
     });
   } catch (err) {
     return apiErrorResponse(

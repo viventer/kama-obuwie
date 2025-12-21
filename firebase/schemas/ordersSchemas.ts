@@ -249,6 +249,14 @@ export const OrderShipmentSchema = z.object({
   pickupDate: z.string().optional(),
 });
 
+export const P24TransactionSchema = z.object({
+  sessionId: z.string(),
+  orderId: z.number().optional(),
+  amount: z.number(), // kwota w groszach
+  status: z.enum(["INITIATED", "COMPLETED", "FAILED", "UNAUTHORIZED"]),
+  isRedundant: z.boolean().optional(),
+});
+
 export const OrderSchema = z.object({
   id: z.string().optional(),
   number: z.string(),
@@ -275,14 +283,8 @@ export const OrderSchema = z.object({
   summary: z.object({
     totalToPay: PriceSchema,
   }),
-  P24Transaction: z
-    .object({
-      sessionId: z.string(),
-      orderId: z.number().optional(),
-      amount: z.number(), // kwota w groszach
-      status: z.enum(["INITIATED", "COMPLETED", "FAILED", "UNAUTHORIZED"]),
-    })
-    .optional(),
+  P24Transactions: z.array(P24TransactionSchema).optional(),
+  P24SessionIds: z.array(z.string()).optional(), // helper field for querying
   updatedAt: z.string().nullable(),
   createdAt: z.string(),
   salesChannel: SalesChannelSchema,
@@ -357,3 +359,4 @@ export type FrontendOrder = z.infer<typeof FrontendOrderSchema>;
 export type OrderItemType = z.infer<typeof OrderItemSchema>;
 export type AllegroDeliveryData = z.infer<typeof AllegroDeliveryDataSchema>;
 export type OrderDeliveryData = z.infer<typeof OrderDeliveryDataSchema>;
+export type P24Transaction = z.infer<typeof P24TransactionSchema>;

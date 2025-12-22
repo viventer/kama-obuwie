@@ -43,7 +43,6 @@ const adminApp = !getApps().length
   : getApps()[0];
 
 const adminDB = getFirestore(adminApp);
-adminDB.settings({ ignoreUndefinedProperties: true });
 const adminAuth = getAuth(adminApp);
 const adminStorage = getStorage(adminApp);
 

@@ -343,16 +343,21 @@ function convertAllegroDeliveryToOrderDelivery(
     allegroDelivery.address.street
   );
 
+  const address: OrderDeliveryData["address"] = {
+    ...allegroDelivery.address,
+    street,
+    buildingNumber,
+  };
+
+  if (apartmentNumber) {
+    address.apartmentNumber = apartmentNumber;
+  }
+
   return {
     ...allegroDelivery,
     method,
     allegroMethod: allegroDelivery.method,
-    address: {
-      ...allegroDelivery.address,
-      street,
-      buildingNumber,
-      apartmentNumber,
-    },
+    address,
   };
 }
 

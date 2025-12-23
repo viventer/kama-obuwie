@@ -344,6 +344,27 @@ export const FrontendOrderSchema = z.object({
   shoppingCartItems: z.array(ShoppingCartItemSchema.shape.item),
 });
 
+export const EmailOrderDataSchema = z.object({
+  orderDetails: z.object({
+    status: FulfillmentStatusSchema,
+    number: z.string(),
+    id: z.string(),
+  }),
+  paymentType: PaymentTypeSchema,
+  buyer: z.object({
+    email: z.string().email(),
+    phoneNumber: z.string(),
+  }),
+  delivery: z.object({
+    method: DeliveryMethodSchema,
+    address: AddressSchema.nullable(),
+    pickupPoint: PickupPointSchema.nullable(),
+  }),
+  orderedItems: z.array(OrderItemSchema).min(1),
+  totalToPay: PriceSchema,
+  deliveryPrice: PriceSchema,
+});
+
 export type PaymentType = z.infer<typeof PaymentTypeSchema>;
 export type PaymentProvider = z.infer<typeof PaymentProviderSchema>;
 export type AllegroOrderStatus = z.infer<typeof AllegroOrderStatusSchema>;
@@ -360,3 +381,4 @@ export type OrderItemType = z.infer<typeof OrderItemSchema>;
 export type AllegroDeliveryData = z.infer<typeof AllegroDeliveryDataSchema>;
 export type OrderDeliveryData = z.infer<typeof OrderDeliveryDataSchema>;
 export type P24Transaction = z.infer<typeof P24TransactionSchema>;
+export type EmailOrderData = z.infer<typeof EmailOrderDataSchema>;

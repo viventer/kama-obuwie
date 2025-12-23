@@ -45,7 +45,7 @@ export default function DeliveryMethodSelector({
               </FormControl>
               <Label htmlFor="courier" className="text-base gap-4 2xs:text-lg">
                 <Image
-                  src="InpostKurierRect.svg"
+                  src="/inpost/InpostKurierRect.svg"
                   alt="logo kurier inpost"
                   className="size-16 hidden 2xs:block"
                   width={128}
@@ -74,7 +74,7 @@ export default function DeliveryMethodSelector({
                 className="text-base gap-4 2xs:text-lg"
               >
                 <Image
-                  src="InpostPaczkomatRect.svg"
+                  src="/inpost/InpostPaczkomatRect.svg"
                   alt="logo paczkomat inpost"
                   className="size-16 hidden 2xs:block"
                   width={128}

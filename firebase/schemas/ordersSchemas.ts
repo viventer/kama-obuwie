@@ -349,6 +349,8 @@ export const EmailOrderDataSchema = z.object({
     status: FulfillmentStatusSchema,
     number: z.string(),
     id: z.string(),
+    createdAt: z.string(),
+    deliveryDate: z.string(),
   }),
   paymentType: PaymentTypeSchema,
   buyer: z.object({

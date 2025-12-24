@@ -65,7 +65,7 @@ const emailTailwindConfig = {
   },
 };
 
-const OrderCreated = ({
+const OrderCancelled = ({
   emailOrderData,
 }: {
   emailOrderData: EmailOrderData;
@@ -74,7 +74,7 @@ const OrderCreated = ({
     <Head />
     <Tailwind config={emailTailwindConfig}>
       <Body className="font-[ubuntu,roboto,arial,sans-serif] text-text text-base">
-        <Preview>Zobacz dane dotyczące Twojego zamówienia</Preview>
+        <Preview>Twoje zamówienie zostało anulowane</Preview>
         <Container className="my-[10px] mx-auto w-[600px] max-w-full border-2 border-primary rounded-lg">
           <Section className="py-10 px-[74px] text-center">
             <Img
@@ -83,111 +83,29 @@ const OrderCreated = ({
               alt="kama-obuwie"
               className="mx-auto"
             />
-            <Heading className="text-[32px] mb-2">
-              Dziękujemy za zamówienie!
-            </Heading>
-            <Text className="m-0 text-[14px] font-medium">
-              Otrzymaliśmy Twoje zamówienie. Po otrzymaniu płatności
-              rozpoczniemy jego realizację.
-            </Text>
+            <Heading className="text-[32px] mb-2">Zamówienie anulowane</Heading>
           </Section>
           <Hr className="border m-0 border-primary/30" />
           <Section className="py-[20px] px-10">
-            <Heading as="h3" className="mt-0 mb-2">
-              Sprawdź aktualny status zamówienia
-            </Heading>
-            <Link
-              href={`${baseUrl}/order/summary/8972897y`}
-              className="border-primary border-2 text-primary font-medium px-3 py-1 rounded-md inline-block mb-6"
-            >
-              Szczegóły zamówienia
-            </Link>
-            <Heading as="h3" className="mt-0 mb-2">
-              Płatność się nie powiodła?
-            </Heading>
-            <Link
-              href={`${baseUrl}/order/summary/8972897y`}
-              className="bg-primary text-white font-medium px-3 py-1 rounded-md inline-block"
-            >
-              Ponów płatność
-            </Link>
-          </Section>
-          <Hr className="border m-0 border-primary/30" />
-          <Section className="py-[20px] px-10">
-            <Heading as="h2" className="mb-2 mt-0">
-              Dane dostawy
-            </Heading>
-            <Text className="mb-1 mt-0">
-              <span className="font-bold">Email: </span>johndoe@gmail.com
+            <Text className="m-0 text-[14px] font-medium mb-2">
+              Niestety musieliśmy anulować Twoje zamówienie{" "}
+              <span className="font-bold">
+                #{emailOrderData.orderDetails.number}
+              </span>{" "}
+              z powodu brakujących produktów w magazynie. Przepraszamy za
+              wszelkie niedogodności.
             </Text>
-            <Text className="mb-1 mt-0">
-              <span className="font-bold">Nr telefonu: </span>1231123123
-            </Text>
-            <Text className="mb-1 mt-0">
-              <span className="font-bold">Metoda: </span>InPost Kurier
-            </Text>
-            <Text className="mb-1 mt-0">
-              <span className="font-bold">Adres: </span>84-200 Wejherowo, ul.
-              Kwiatowa 14
-            </Text>
-          </Section>
-          <Hr className="border m-0 border-primary/30" />
-          <Section className="py-[20px] px-10">
-            <Heading as="h2" className="mb-2 mt-0">
-              Zamówione produkty
-            </Heading>
-            <Row className="mb-4 bg-card rounded-lg p-3">
-              <Column className="w-[120px]">
-                <Img
-                  src={`${baseUrl}/main-grid/halowki.jpeg`}
-                  alt="halówki"
-                  width={120}
-                  height={120}
-                  className="rounded-xl"
-                />
-              </Column>
-              <Column className="pl-4 align-middle">
-                <Text className="mt-0 mb-1 text-[18px] font-medium">
-                  Erino C925 granatowy
-                </Text>
-                <Text className="mt-0 mb-1 text-[18px]">130,00 zł</Text>
-                <Text className="mt-0 mb-0 text-[14px] text-muted-foreground">
-                  r. 37&nbsp;&nbsp;&nbsp;&nbsp;ilość: 1
-                </Text>
-              </Column>
-            </Row>
-            <Row>
-              <Text className="text-lg mb-2">
-                <span className="font-medium">Koszt dostawy: </span>0,00 zł
+            {emailOrderData.paymentType !== "COD" &&
+            emailOrderData.orderDetails.status === "NEW" ? (
+              <Text className="m-0 text-[14px] font-medium mb-2">
+                Wpłata za zamówienie
+                <span className="font-bold">
+                  {" "}
+                  zostanie automatycznie zwrócona
+                </span>{" "}
+                na Twoje konto w ciągu kilku dni roboczych.
               </Text>
-              <Text className="text-lg mt-0">
-                <span className="font-medium">Łączna kwota: </span>130,00 zł
-              </Text>
-            </Row>
-          </Section>
-          <Hr className="border m-0 border-primary/30" />
-          <Section className="py-[20px] px-10">
-            <Heading as="h2" className="mb-2 mt-0">
-              Dodatkowe informacje
-            </Heading>
-            <Text className="mb-1 mt-0 text-base">
-              <span className="font-bold">Status: </span>oczekiwanie na płatność
-            </Text>
-            <Text className="mb-1 mt-0 text-base">
-              <span className="font-bold">Numer zamówienia: </span>#8972897y
-            </Text>
-            <Text className="mb-1 mt-0 text-base">
-              <span className="font-bold">Data złożenia zamówienia: </span>
-              2025-12-22 21:37
-            </Text>
-            <Text className="mb-1 mt-0 text-base">
-              <span className="font-bold">Przewidywany czas dostawy: </span>
-              sobota 2025-12-27
-            </Text>
-            <Text>
-              Przewidywany czas dostawy zakłada otrzymanie płatności za
-              zamówienie w momencie jego złożenia.
-            </Text>
+            ) : null}
           </Section>
           <Hr className="border m-0 border-primary/30" />
           <Section className="py-[20px] px-10">
@@ -223,7 +141,80 @@ const OrderCreated = ({
             <Text className="m-0">Sobota: 8:00 - 13:30</Text>
           </Section>
           <Hr className="border m-0 border-primary/30" />
-
+          <Section className="py-[20px] px-10">
+            <Heading as="h2" className="mb-2 mt-0">
+              Zamówione produkty
+            </Heading>
+            {emailOrderData.orderedItems.map((item) => (
+              <Row
+                key={item.id}
+                className="mb-4 bg-card rounded-lg p-3 opacity-50"
+              >
+                <Column className="w-[120px]">
+                  <Img
+                    src={item.offer.thumbnail}
+                    alt={item.offer.name || "produkt"}
+                    width={120}
+                    height={120}
+                    className="rounded-xl"
+                  />
+                </Column>
+                <Column className="pl-4 align-middle">
+                  <Text className="mt-0 mb-1 text-[18px] font-medium">
+                    {item.offer.signature}
+                  </Text>
+                  <Text className="mt-0 mb-1 text-[18px]">
+                    {Number(item.price.amount).toFixed(2)} {item.price.currency}
+                  </Text>
+                  <Text className="mt-0 mb-0 text-[14px] text-muted-foreground">
+                    {item.offer.size && `r. ${item.offer.size}`}
+                    &nbsp;&nbsp;&nbsp;&nbsp;ilość: {item.quantity}
+                  </Text>
+                </Column>
+              </Row>
+            ))}
+            <Row>
+              <Text className="text-lg mb-2">
+                <span className="font-medium">Koszt dostawy: </span>
+                <s className="text-muted-foreground">
+                  {Number(emailOrderData.deliveryPrice.amount).toFixed(2)}{" "}
+                  {emailOrderData.deliveryPrice.currency}
+                </s>
+              </Text>
+              <Text className="text-lg mt-0">
+                <span className="font-medium">Łączna kwota: </span>
+                <s className="text-muted-foreground">
+                  {Number(emailOrderData.totalToPay.amount).toFixed(2)}{" "}
+                  {emailOrderData.totalToPay.currency}
+                </s>{" "}
+                0 zł
+              </Text>
+            </Row>
+          </Section>
+          <Hr className="border m-0 border-primary/30" />
+          <Section className="py-[20px] px-10">
+            <Heading as="h2" className="mb-2 mt-0">
+              Dodatkowe informacje
+            </Heading>
+            <Text className="mb-1 mt-0 text-base">
+              <span className="font-bold">Numer zamówienia: </span>#
+              {emailOrderData.orderDetails.number}
+            </Text>
+            <Text className="mb-1 mt-0 text-base">
+              <span className="font-bold">Data złożenia zamówienia: </span>
+              {new Date(emailOrderData.orderDetails.createdAt).toLocaleString(
+                "pl-PL",
+                {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }
+              )}
+            </Text>
+          </Section>
+          <Hr className="border m-0 border-primary/30" />
           <Section className="py-[20px] px-10">
             <Row>
               <Column align="left">
@@ -284,4 +275,4 @@ const OrderCreated = ({
   </Html>
 );
 
-export default OrderCreated;
+export default OrderCancelled;

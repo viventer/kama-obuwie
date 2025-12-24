@@ -110,7 +110,7 @@ const OrderCreated = ({
                 </Heading>
                 <Link
                   href={`${baseUrl}/order-summary/${emailOrderData.orderDetails.id}`}
-                  className="bg-primary text-white font-medium px-3 py-1 rounded-md inline-block"
+                  className="bg-primary border-2 border-primary text-white font-medium px-3 py-1 rounded-md inline-block"
                 >
                   Ponów płatność
                 </Link>

@@ -361,6 +361,7 @@ export const EmailOrderDataSchema = z.object({
     method: DeliveryMethodSchema,
     address: AddressSchema.nullable(),
     pickupPoint: PickupPointSchema.nullable(),
+    parcelNumber: z.string().nullable(),
   }),
   orderedItems: z.array(OrderItemSchema).min(1),
   totalToPay: PriceSchema,

@@ -91,7 +91,7 @@ const OrderSent = ({ emailOrderData }: { emailOrderData: EmailOrderData }) => (
               Sprawdź aktualny status zamówienia
             </Heading>
             <Link
-              href={`${baseUrl}/order/summary/8972897y`}
+              href={`https://inpost.pl/sledzenie-przesylek?number=${emailOrderData.delivery.parcelNumber}`}
               className="bg-primary border-2 border-primary text-white font-medium px-3 py-1 rounded-md inline-block"
             >
               Śledź przesyłkę

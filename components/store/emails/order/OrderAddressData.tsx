@@ -1,6 +1,5 @@
 import { EmailOrderData } from "@/firebase/schemas/ordersSchemas";
 import { Heading, Section, Text } from "@react-email/components";
-import React from "react";
 
 export default function OrderAddressData({
   emailOrderData,
@@ -46,14 +45,17 @@ export default function OrderAddressData({
       )}
       {emailOrderData.delivery.pickupPoint && (
         <Section>
-          <Text className="mb-1 mt-0 font-bold">
+          <Text className="m-0 font-bold">
             Paczkomat {emailOrderData.delivery.pickupPoint.name}
           </Text>
-          <Text className="mb-1 mt-0">
+          <Text className="m-0">
             {emailOrderData.delivery.pickupPoint.address.city}
           </Text>
           <Text className="m-0">
             ul. {emailOrderData.delivery.pickupPoint.address.street}
+          </Text>
+          <Text className="m-0">
+            {emailOrderData.delivery.pickupPoint.description}
           </Text>
         </Section>
       )}

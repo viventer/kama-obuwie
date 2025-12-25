@@ -4,6 +4,8 @@ import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { Order, OrderWithId } from "@/firebase/schemas/ordersSchemas";
 import { verifyTransaction } from "@/server-actions/p24";
 import { updateOrder } from "@/server-actions/orders/orders";
+import { sendOrderEmail } from "@/server-actions/emails/orderEmails";
+import { transformOrderToEmailOrderData } from "@/helpers/orders";
 
 export async function POST(request: NextRequest) {
   console.log("P24 status GET received");
@@ -75,6 +77,12 @@ export async function POST(request: NextRequest) {
         }
 
         await updateOrder(order.id, updateData);
+        await sendOrderEmail({
+          templateName: "orderPaymentConfirmation",
+          to: "studio.codebucket@gmail.com",
+          subject: `Potwierdzenie płatności za zamówienie #${order.number}`,
+          emailOrderData: transformOrderToEmailOrderData(order),
+        });
       } else {
         await updateOrder(order.id, {
           P24Transactions: order.P24Transactions!.map((t) =>

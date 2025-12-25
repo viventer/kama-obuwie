@@ -1,16 +1,11 @@
 import { EmailOrderData } from "@/firebase/schemas/ordersSchemas";
 import {
   Body,
-  Column,
   Container,
   Head,
-  Heading,
   Hr,
   Html,
-  Img,
-  Link,
   Preview,
-  Row,
   Section,
   Tailwind,
   Text,

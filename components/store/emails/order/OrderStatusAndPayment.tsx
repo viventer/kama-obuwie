@@ -16,7 +16,7 @@ export default function OrderStatusAndPayment({
       {emailOrderData.orderDetails.status === "SENT" && (
         <Link
           href={`https://inpost.pl/sledzenie-przesylek?number=${emailOrderData.delivery.parcelNumber}`}
-          className="bg-primary border-2 border-primary text-white font-medium px-3 py-1 rounded-md inline-block"
+          className="bg-primary border-2 border-primary text-white font-medium px-3 py-1 rounded-md inline-block mr-6a"
         >
           Śledź przesyłkę
         </Link>
@@ -29,12 +29,12 @@ export default function OrderStatusAndPayment({
       </Link>
       {emailOrderData.orderDetails.status === "UNPAID" && (
         <>
-          <Heading as="h3" className="mt-0 mb-2">
+          <Heading as="h3" className="mt-6 mb-2">
             Płatność się nie powiodła?
           </Heading>
           <Link
             href={`${baseUrl}/order-summary/${emailOrderData.orderDetails.id}`}
-            className="bg-primary mt-6 border-2 border-primary text-white font-medium px-3 py-1 rounded-md inline-block"
+            className="bg-primary border-2 border-primary text-white font-medium px-3 py-1 rounded-md inline-block"
           >
             Ponów płatność
           </Link>

@@ -69,13 +69,18 @@ export function calculateShippingDate(currentDate: Date = new Date()): Date {
  * @param currentDate - aktualna data (opcjonalnie, domyślnie new Date())
  * @returns sformatowany tekst z informacją o wysyłce
  */
-export function getShippingInfo(currentDate: Date = new Date()): string {
+export function getShippingInfo(
+  currentDate: Date = new Date(),
+  emailFormat: boolean = false
+): string {
   const shippingDays = calculateShippingDays(currentDate);
   const shippingDate = calculateShippingDate(currentDate);
 
   // Sprawdzenie czy dostawa jest jutro (1 dzień)
-  if (shippingDays === 1) {
+  if (shippingDays === 1 && !emailFormat) {
     return "Kup do 13:00 - dostawa jutro";
+  } else if (shippingDays === 1 && emailFormat) {
+    return "U Ciebie jutro";
   }
 
   // Sprawdzenie czy dostawa jest pojutrze (2 dni)

@@ -11,7 +11,10 @@ import InPostSelector from "./InPostSelector";
 import { useToast } from "@/hooks/useToast";
 import PaymentMethodSelector from "./PaymentMethodSelector";
 import OrderSummary from "./OrderSummary";
-import { FrontendOrder } from "@/firebase/schemas/ordersSchemas";
+import {
+  EmailOrderData,
+  FrontendOrder,
+} from "@/firebase/schemas/ordersSchemas";
 import { useShoppingCart } from "@/hooks/useShoppingCart";
 import axios from "axios";
 import { redirect, useRouter } from "next/navigation";
@@ -24,6 +27,8 @@ import {
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { handleApiError } from "@/server-actions/errorHandlers";
 import { RegisterTransactionData } from "@/firebase/schemas/p24Schemas";
+import { SendOrderEmailPayload } from "@/server-actions/emails/orderEmails";
+import { transformOrderToEmailOrderData } from "@/helpers/orders";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
@@ -152,6 +157,26 @@ export default function CheckoutForms() {
       const response = await axios.post("/api/orders", orderData);
       clearCart();
 
+      const { data: createdOrder } = await axios.get(
+        `/api/orders/${response.data.id}`
+      );
+
+      const emailOrderData: EmailOrderData =
+        transformOrderToEmailOrderData(createdOrder);
+
+      const emailPayload: SendOrderEmailPayload = {
+        templateName: "orderCreated",
+        to: checkoutData.email,
+        subject: "Potwierdzenie złożenia zamówienia",
+        emailOrderData,
+      };
+
+      try {
+        await axios.post("/api/email/send", emailPayload);
+      } catch (err) {
+        console.error("Błąd podczas wysyłania emaila:", err);
+      }
+
       if (checkoutData.paymentMethod === "COD") {
         while (isLoading) {
           await new Promise((resolve) => setTimeout(resolve, 100));
@@ -160,10 +185,6 @@ export default function CheckoutForms() {
         router.replace(`/order-summary/${response.data.id}`);
         return;
       }
-
-      const { data: createdOrder } = await axios.get(
-        `/api/orders/${response.data.id}`
-      );
 
       const transactionData: Pick<
         RegisterTransactionData,

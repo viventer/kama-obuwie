@@ -34,7 +34,7 @@ export async function sendOrderEmail({
   try {
     const { data, error } = await resend.emails.send({
       from: "Acme <onboarding@resend.dev>",
-      to: [to],
+      to: ["studio.codebucket@gmail.com"],
       subject: subject,
       react: emailTemplates[templateName]({ emailOrderData }),
     });

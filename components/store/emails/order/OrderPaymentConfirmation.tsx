@@ -15,6 +15,13 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
+import EmailHeader from "../EmailHeader";
+import OrderStatusAndPayment from "./OrderStatusAndPayment";
+import OrderAddressData from "./OrderAddressData";
+import OrderedItemsList from "./OrderedItemsList";
+import OrderAdditionalInfo from "./OrderAdditionalInfo";
+import ContactSection from "../ContactSection";
+import EmailFooter from "../EmailFooter";
 
 // W emailach muszą być pełne URL-e z domeną
 const baseUrl =
@@ -76,256 +83,26 @@ const OrderPaymentConfirmation = ({
       <Body className="font-[ubuntu,roboto,arial,sans-serif] text-text text-base">
         <Preview>Potwierdzenie płatności</Preview>
         <Container className="my-[10px] mx-auto w-[600px] max-w-full border-2 border-primary rounded-lg">
-          <Section className="py-10 px-[74px] text-center">
-            <Img
-              src={`${baseUrl}/branding/logo-banner.png`}
-              width="300"
-              alt="kama-obuwie"
-              className="mx-auto"
-            />
-            <Heading className="text-[32px] mb-2">Zamówienie opłacone</Heading>
-            <Text className="m-0 text-[14px] font-medium">
-              Otrzymaliśmy Twoją płatność za zamówienie{" "}
-              <span className="text-brand">
-                #{emailOrderData.orderDetails.number}
-              </span>
-              . Teraz przejdziemy do jego realizacji. O wysłaniu paczki
-              poinformujemy Cię w kolejnym e-mailu.
-            </Text>
-          </Section>
+          <EmailHeader
+            baseUrl={baseUrl}
+            headingText="Zamówienie opłacone"
+            descriptionText={`Otrzymaliśmy Twoją płatność za zamówienie #${emailOrderData.orderDetails.number}. Teraz przejdziemy do jego realizacji. O wysłaniu paczki poinformujemy Cię w kolejnym e-mailu.`}
+          />
           <Hr className="border m-0 border-primary/30" />
-          <Section className="py-[20px] px-10">
-            <Heading as="h3" className="mt-0 mb-2">
-              Sprawdź aktualny status zamówienia
-            </Heading>
-            <Link
-              href={`${baseUrl}/order-summary/${emailOrderData.orderDetails.id}`}
-              className="border-primary border-2 text-primary font-medium px-3 py-1 rounded-md inline-block mb-6"
-            >
-              Szczegóły zamówienia
-            </Link>
-          </Section>
+          <OrderStatusAndPayment
+            emailOrderData={emailOrderData}
+            baseUrl={baseUrl}
+          />
           <Hr className="border m-0 border-primary/30" />
-          <Section className="py-[20px] px-10">
-            <Heading as="h2" className="mb-2 mt-0">
-              Dane dostawy
-            </Heading>
-            <Text className="mb-1 mt-0">
-              <span className="font-bold">Email: </span>
-              {emailOrderData.buyer.email}
-            </Text>
-            <Text className="mb-1 mt-0">
-              <span className="font-bold">Nr telefonu: </span>
-              {emailOrderData.buyer.phoneNumber}
-            </Text>
-            <Text className="mb-1 mt-0">
-              <span className="font-bold">Metoda: </span>
-              {emailOrderData.paymentType === "COD"
-                ? "Kurier InPost Pobranie"
-                : emailOrderData.delivery.method === "courier"
-                  ? "Kurier InPost"
-                  : "Paczkomat InPost"}
-            </Text>
-            {emailOrderData.delivery.address && (
-              <Section>
-                <Text className="mb-1 mt-0 font-bold">Adres:</Text>
-                <Text>
-                  {emailOrderData.delivery.address.zipCode}{" "}
-                  {emailOrderData.delivery.address.city}
-                </Text>
-                <Text>
-                  ul. {emailOrderData.delivery.address.street}{" "}
-                  {emailOrderData.delivery.address.buildingNumber}
-                  {emailOrderData.delivery.address.apartmentNumber
-                    ? `/${emailOrderData.delivery.address.apartmentNumber}`
-                    : ""}
-                </Text>
-              </Section>
-            )}
-            {emailOrderData.delivery.pickupPoint && (
-              <Section>
-                <Text className="mb-1 mt-0 font-bold">
-                  Paczkomat {emailOrderData.delivery.pickupPoint.name}
-                </Text>
-                <Text>{emailOrderData.delivery.pickupPoint.address.city}</Text>
-                <Text>
-                  ul. {emailOrderData.delivery.pickupPoint.address.street}
-                </Text>
-              </Section>
-            )}
-          </Section>
+          <OrderAddressData emailOrderData={emailOrderData} />
           <Hr className="border m-0 border-primary/30" />
-          <Section className="py-[20px] px-10">
-            <Heading as="h2" className="mb-2 mt-0">
-              Zamówione produkty
-            </Heading>
-            {emailOrderData.orderedItems.map((item) => (
-              <Row key={item.id} className="mb-4 bg-card rounded-lg p-3">
-                <Column className="w-[120px]">
-                  <Img
-                    src={item.offer.thumbnail}
-                    alt={item.offer.name || "produkt"}
-                    width={120}
-                    height={120}
-                    className="rounded-xl"
-                  />
-                </Column>
-                <Column className="pl-4 align-middle">
-                  <Text className="mt-0 mb-1 text-[18px] font-medium">
-                    {item.offer.signature}
-                  </Text>
-                  <Text className="mt-0 mb-1 text-[18px]">
-                    {Number(item.price.amount).toFixed(2)} {item.price.currency}
-                  </Text>
-                  <Text className="mt-0 mb-0 text-[14px] text-muted-foreground">
-                    {item.offer.size && `r. ${item.offer.size}`}
-                    &nbsp;&nbsp;&nbsp;&nbsp;ilość: {item.quantity}
-                  </Text>
-                </Column>
-              </Row>
-            ))}
-            <Row>
-              <Text className="text-lg mb-2">
-                <span className="font-medium">Koszt dostawy: </span>
-                {Number(emailOrderData.deliveryPrice.amount).toFixed(2)}{" "}
-                {emailOrderData.deliveryPrice.currency}
-              </Text>
-              <Text className="text-lg mt-0">
-                <span className="font-medium">Łączna kwota: </span>
-                {Number(emailOrderData.totalToPay.amount).toFixed(2)}{" "}
-                {emailOrderData.totalToPay.currency}
-              </Text>
-            </Row>
-          </Section>
+          <OrderedItemsList emailOrderData={emailOrderData} />
           <Hr className="border m-0 border-primary/30" />
-          <Section className="py-[20px] px-10">
-            <Heading as="h2" className="mb-2 mt-0">
-              Dodatkowe informacje
-            </Heading>
-            <Text className="mb-1 mt-0 text-base">
-              <span className="font-bold">Numer zamówienia: </span>#
-              {emailOrderData.orderDetails.number}
-            </Text>
-            <Text className="mb-1 mt-0 text-base">
-              <span className="font-bold">Data złożenia zamówienia: </span>
-              {new Date(emailOrderData.orderDetails.createdAt).toLocaleString(
-                "pl-PL",
-                {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }
-              )}
-            </Text>
-            <Text className="mb-1 mt-0 text-base">
-              <span className="font-bold">Przewidywany czas dostawy: </span>
-              {new Date(
-                emailOrderData.orderDetails.deliveryDate
-              ).toLocaleDateString("pl-PL", {
-                weekday: "long",
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-              })}
-            </Text>
-            {emailOrderData.orderDetails.status === "UNPAID" && (
-              <Text>
-                Przewidywany czas dostawy zakłada otrzymanie płatności za
-                zamówienie w momencie jego złożenia.
-              </Text>
-            )}
-          </Section>
+          <OrderAdditionalInfo emailOrderData={emailOrderData} />
           <Hr className="border m-0 border-primary/30" />
-          <Section className="py-[20px] px-10">
-            <Heading as="h2" className="mb-0 mt-0">
-              Masz jakieś pytania?
-            </Heading>
-            <Text className="mt-0 mb-2">
-              Poniżej znajdziesz nasze dane kontaktowe. Chętnie pomożemy!
-            </Text>
-            <Text className="text-base font-medium">
-              E-mail:{" "}
-              <Link
-                href="mailto:kontakt.kama.obuwie@gmail.com"
-                className="text-text decoration-brand underline"
-              >
-                kontakt.kama.obuwie@gmail.com
-              </Link>
-            </Text>
-
-            <Text className="text-base font-medium">
-              Nr telefonu:{" "}
-              <Link
-                href="tel:+48664097737"
-                className="text-text decoration-brand underline"
-              >
-                +48 664 097 737
-              </Link>
-            </Text>
-            <Heading as="h4" className="m-0">
-              Godziny pracy
-            </Heading>
-            <Text className="m-0">Pon - Pt: 8:00 - 16:30</Text>
-            <Text className="m-0">Sobota: 8:00 - 13:30</Text>
-          </Section>
+          <ContactSection />
           <Hr className="border m-0 border-primary/30" />
-
-          <Section className="py-[20px] px-10">
-            <Row>
-              <Column align="left">
-                <Text className="m-0 leading-tight">Pozdrawiamy</Text>
-                <Text className="m-0 leading-tight">Zespół kama-obuwie</Text>
-              </Column>
-              <Column align="right">
-                <Img
-                  src={`${baseUrl}/branding/logo-banner.png`}
-                  width="200"
-                  alt="kama-obuwie"
-                />
-              </Column>
-            </Row>
-          </Section>
-          <Hr className="border m-0 border-primary/30" />
-          <Section className="py-[20px] px-10">
-            <Link
-              href={`${baseUrl}/info/contact`}
-              className="text-text decoration-brand underline mr-4"
-            >
-              kontakt
-            </Link>
-            <Link
-              href={`${baseUrl}/info/returns`}
-              className="text-text decoration-brand underline mr-4"
-            >
-              zwroty
-            </Link>
-            <Link
-              href={`${baseUrl}/info/complaints`}
-              className="text-text decoration-brand underline mr-4"
-            >
-              reklamacje
-            </Link>
-            <Link
-              href={`${baseUrl}/info/about`}
-              className="text-text decoration-brand underline mr-4"
-            >
-              o nas
-            </Link>
-            <Link
-              href={`${baseUrl}/info/regulations`}
-              className="text-text decoration-brand underline mr-4"
-            >
-              regulamin
-            </Link>
-            <Link
-              href={`${baseUrl}/info/privacy`}
-              className="text-text decoration-brand underline"
-            >
-              polityka prywatności
-            </Link>
-          </Section>
+          <EmailFooter baseUrl={baseUrl} />
         </Container>
       </Body>
     </Tailwind>

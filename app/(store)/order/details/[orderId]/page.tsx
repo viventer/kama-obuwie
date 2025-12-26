@@ -1,7 +1,7 @@
 import CustomerOrderDetails from "@/components/store/checkout/CustomerOrderDetails";
-import OrderAdditionalInfo from "@/components/store/order/OrderAdditionalInfo";
 import OrderContactInfo from "@/components/store/order/OrderContactInfo";
 import OrderDeliveryDetails from "@/components/store/order/OrderDeliveryDetails";
+import OrderInfo from "@/components/store/order/OrderInfo";
 import OrderTransactionDetails from "@/components/store/order/OrderTransactionDetails";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";
@@ -38,12 +38,12 @@ export default async function OrderDetailsPage(props: Props) {
           Twojego zamówienia.
         </p>
       </section>
+      <OrderInfo orderData={orderData} />
       {orderData.paymentType !== "COD" ? (
         <OrderTransactionDetails orderData={orderData} />
       ) : null}
       <OrderDeliveryDetails orderData={orderData} />
       <CustomerOrderDetails orderData={orderData} />
-      <OrderAdditionalInfo orderData={orderData} />
       <OrderContactInfo />
     </div>
   );

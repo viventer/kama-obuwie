@@ -35,7 +35,7 @@ export default function OrderTransactionDetails({
           <div className="mb-2">
             <p className="mb-2">
               Status:{" "}
-              <span className="text-success font-medium">
+              <span className="font-medium underline decoration-success decoration-2 underline-offset-2">
                 zakończona pomyślnie
               </span>
             </p>
@@ -51,7 +51,7 @@ export default function OrderTransactionDetails({
           <div className="mb-2">
             <p className="mb-2">
               Status:{" "}
-              <span className="text-destructive font-medium">
+              <span className="font-medium underline decoration-destructive decoration-3 underline-offset-2">
                 zakończona niepowodzeniem
               </span>
             </p>

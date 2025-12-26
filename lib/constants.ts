@@ -88,3 +88,16 @@ export const returnStatusTranslations: Record<string, string> = {
   WAREHOUSE_DELIVERED: "Dostarczony do magazynu",
   WAREHOUSE_VERIFICATION: "Weryfikacja magazynowa",
 };
+
+export const orderStatusTranslations: Record<string, string> = {
+  UNPAID: "nieopłacone",
+  NEW: "opłacone",
+  PROCESSING: "w realizacji",
+  READY_FOR_SHIPMENT: "gotowe do wysyłki",
+  READY_FOR_PICKUP: "gotowe do odbioru",
+  SENT: "wysłane",
+  PICKED_UP: "odebrane",
+  CANCELLED: "anulowane",
+  SUSPENDED: "wstrzymane",
+  RETURNED: "zwrócone",
+};

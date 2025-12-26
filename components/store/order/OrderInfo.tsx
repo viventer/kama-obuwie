@@ -1,13 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";
 import { getShippingInfo } from "@/helpers/store";
+import { orderStatusTranslations } from "@/lib/constants";
 import { InfoIcon } from "lucide-react";
 
-export default function OrderAdditionalInfo({
-  orderData,
-}: {
-  orderData: OrderWithId;
-}) {
+export default function OrderInfo({ orderData }: { orderData: OrderWithId }) {
   const isCancelled = orderData.fulfillment!.status === "CANCELLED";
   const deliveryDate = getShippingInfo(new Date(orderData.createdAt), true);
 
@@ -16,10 +13,16 @@ export default function OrderAdditionalInfo({
       <CardHeader className="mb-0">
         <CardTitle className="font-medium text-xl flex gap-2 items-center">
           <InfoIcon className="text-brand" />
-          Dodatkowe informacje
+          Informacje o zamówieniu
         </CardTitle>
       </CardHeader>
       <CardContent>
+        <p className="text-lg mb-2">
+          Status:{" "}
+          <span className="font-medium underline decoration-success decoration-2 underline-offset-2">
+            {orderStatusTranslations[orderData.fulfillment!.status]}
+          </span>
+        </p>
         <p>
           <b>Numer zamówienia: </b>
           {orderData.number}

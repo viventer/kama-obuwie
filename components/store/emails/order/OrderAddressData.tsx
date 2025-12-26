@@ -6,11 +6,19 @@ export default function OrderAddressData({
 }: {
   emailOrderData: EmailOrderData;
 }) {
+  const parcelNumber = emailOrderData.delivery.parcelNumber;
+
   return (
     <Section className="py-[20px] px-10">
       <Heading as="h2" className="mb-2 mt-0">
         Dane dostawy
       </Heading>
+      {parcelNumber && (
+        <Text className="mb-1 mt-0">
+          <span className="font-bold">Nr przesyłki: </span>
+          {parcelNumber}
+        </Text>
+      )}
       <Text className="mb-1 mt-0">
         <span className="font-bold">Email: </span>
         {emailOrderData.buyer.email}

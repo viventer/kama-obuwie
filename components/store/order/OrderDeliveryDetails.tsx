@@ -1,6 +1,8 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrderWithId } from "@/firebase/schemas/ordersSchemas";
 import { TruckIcon } from "lucide-react";
+import Link from "next/link";
 
 export default function OrderDeliveryDetails({
   orderData,
@@ -11,6 +13,8 @@ export default function OrderDeliveryDetails({
     return null;
   }
 
+  const parcelNumber = orderData.shipment?.parcelNumbers?.[0];
+
   return (
     <Card className="gap-2 max-w-xl">
       <CardHeader className="mb-0">
@@ -20,6 +24,22 @@ export default function OrderDeliveryDetails({
         </CardTitle>
       </CardHeader>
       <CardContent>
+        {parcelNumber && (
+          <section className="mb-4">
+            <Button variant={"important"} className="mb-2" asChild>
+              <Link
+                href={`https://inpost.pl/sledzenie-przesylek?number=${parcelNumber}`}
+              >
+                Śledź przesyłkę
+              </Link>
+            </Button>
+            <p className="text-sm">
+              <b>Nr przesyłki: </b>
+              {parcelNumber}
+            </p>
+          </section>
+        )}
+
         <p>
           <b>Email: </b>
           {orderData.buyer.email}

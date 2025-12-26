@@ -10,7 +10,7 @@ import {
   CheckoutDataSchema,
 } from "@/firebase/schemas/checkoutSchemas";
 import { useEffect } from "react";
-import ShoppingCartItemsAccordion from "./ShoppingCartItemsAccordion";
+import ShoppingCartItemsAccordion from "../checkout/ShoppingCartItemsAccordion";
 
 export default function OrderSummary({
   orderButtonHandler,

@@ -10,7 +10,7 @@ import { CheckoutDataSchema } from "@/firebase/schemas/checkoutSchemas";
 import InPostSelector from "./InPostSelector";
 import { useToast } from "@/hooks/useToast";
 import PaymentMethodSelector from "./PaymentMethodSelector";
-import OrderSummary from "./OrderSummary";
+import OrderSummary from "../order/OrderSummary";
 import {
   EmailOrderData,
   FrontendOrder,

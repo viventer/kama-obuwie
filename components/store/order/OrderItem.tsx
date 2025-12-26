@@ -1,4 +1,3 @@
-import LinkText from "@/components/adminPanel/global/LinkText";
 import { Card, CardContent } from "@/components/ui/card";
 import { OrderItemType } from "@/firebase/schemas/ordersSchemas";
 import Image from "next/image";

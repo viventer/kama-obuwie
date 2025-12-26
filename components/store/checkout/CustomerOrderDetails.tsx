@@ -1,5 +1,5 @@
 import { Order, OrderItemType } from "@/firebase/schemas/ordersSchemas";
-import OrderItem from "./OrderItem";
+import OrderItem from "../order/OrderItem";
 
 export default function CustomerOrderDetails({
   orderData,

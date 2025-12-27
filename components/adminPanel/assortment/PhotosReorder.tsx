@@ -99,7 +99,7 @@ export default function PhotosReorder({
                         className="flex-col items-center gap-2 relative"
                       >
                         <SortableImage id={photo.filePath} url={photo.url} />
-                        <div className="absolute top-1 left-2 bg-black/50 rounded-sm px-2 py-1 text-sm font-bold">
+                        <div className="absolute top-1 left-2 bg-black/50 rounded-sm px-2 py-1 text-sm font-bold text-white">
                           {idx + 1}
                         </div>
                       </div>

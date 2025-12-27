@@ -219,9 +219,9 @@ export default function CheckoutForms() {
       <TabsList className="mb-4 gap-0 2xs:gap-2">
         <TabsTrigger
           value="firstStep"
-          className="text-sm font-normal xs:text-base sm:text-lg"
+          className="text-sm font-normal xs:text-base sm:text-lg text-white"
         >
-          <span className="mr-1 aspect-square text-text bg-brand h-full items-center justify-center rounded-xs font-bold text-normal hidden xs:flex">
+          <span className="mr-1 aspect-square bg-primary h-full items-center justify-center rounded-xs font-bold text-normal hidden xs:flex">
             1
           </span>
           Dane{" "}
@@ -231,9 +231,9 @@ export default function CheckoutForms() {
         </TabsTrigger>
         <TabsTrigger
           value="secondStep"
-          className="text-sm font-normal xs:text-base sm:text-lg"
+          className="text-sm font-normal xs:text-base sm:text-lg text-white"
         >
-          <span className="aspect-square mr-1 text-text bg-brand h-full items-center justify-center rounded-xs font-bold text-normal hidden xs:flex">
+          <span className="aspect-square mr-1 bg-primary h-full items-center justify-center rounded-xs font-bold text-normal hidden xs:flex">
             2
           </span>
           Dostawa i płatność

@@ -58,9 +58,8 @@ export default async function Page() {
   ];
 
   // Pobierz kategorie z bazy danych
-  const categoriesFromDB = await getDocumentsFromAdminDB<CategoryWithId>(
-    "categories"
-  );
+  const categoriesFromDB =
+    await getDocumentsFromAdminDB<CategoryWithId>("categories");
 
   const categories: CategoryFromMainPage[] = categoriesFromMainPage.map(
     (categoryFromMainPage) => {

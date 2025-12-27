@@ -21,13 +21,16 @@ export default async function MainNav() {
   const categories = await getDocumentsFromAdminDB<Category>("categories");
 
   const categoriesByRoot =
-    categories?.reduce((acc, category) => {
-      if (!acc[category.rootCategory]) {
-        acc[category.rootCategory] = [];
-      }
-      acc[category.rootCategory].push(category);
-      return acc;
-    }, {} as Record<string, (Category & { id: string })[]>) || {};
+    categories?.reduce(
+      (acc, category) => {
+        if (!acc[category.rootCategory]) {
+          acc[category.rootCategory] = [];
+        }
+        acc[category.rootCategory].push(category);
+        return acc;
+      },
+      {} as Record<string, (Category & { id: string })[]>
+    ) || {};
 
   // Pobierz produkty dla wszystkich kategorii
   const allCategoryIds = categories?.map((category) => category.id) || [];
@@ -79,7 +82,7 @@ export default async function MainNav() {
                 <NavigationMenuTrigger className="bg-primary/15 font-medium px-3">
                   {mainCategory.label}
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-background w-full">
+                <NavigationMenuContent className="bg-background w-ful">
                   <div className="grid w-full max-w-[600px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] text-wrap">
                     {subcategories.map((category) => (
                       <NavigationMenuLink key={category.id} asChild>

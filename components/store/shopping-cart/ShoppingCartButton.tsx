@@ -27,7 +27,7 @@ export default function ShoppingCartButton({
           <ShoppingBasketIcon />
         </HoverCardTrigger>
       </IconButton>
-      <HoverCardContent className="absolute right-0 top-4 w-fit hidden sm:block">
+      <HoverCardContent className="absolute right-0 top-4 w-fit hidden sm:block bg-background">
         <ShoppingCartPreview />
       </HoverCardContent>
     </HoverCard>

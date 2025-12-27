@@ -1,3 +1,5 @@
+import { HomeGridCategory } from "@/components/store/home/HomeGrid";
+import { RootCategory } from "@/firebase/schemas/productsSchemas";
 import { CreateShipmentData } from "@/firebase/schemas/shipmentsSchemas";
 
 export const choosingSizeImageFilePath =
@@ -101,3 +103,74 @@ export const orderStatusTranslations: Record<string, string> = {
   SUSPENDED: "wstrzymane",
   RETURNED: "zwrócone",
 };
+
+export type CategoryFromMainPage = {
+  name: string;
+  rootCategory: RootCategory;
+  id?: string;
+  displayName: string;
+};
+
+export const categoriesFromMainPage: CategoryFromMainPage[] = [
+  {
+    name: "trampki",
+    rootCategory: "obuwie dziecięce",
+    displayName: "Trampki Dziecięce",
+  },
+  {
+    name: "czółenka",
+    rootCategory: "obuwie damskie",
+    displayName: "Czółenka Damskie",
+  },
+  {
+    name: "sportowe",
+    rootCategory: "obuwie dziecięce",
+    displayName: "Sportowe Dziecięce",
+  },
+  {
+    name: "halówki",
+    rootCategory: "obuwie męskie",
+    displayName: "Halówki Męskie",
+  },
+  {
+    name: "klapki",
+    rootCategory: "obuwie damskie",
+    displayName: "Klapki Damskie",
+  },
+  {
+    name: "trampki",
+    rootCategory: "obuwie męskie",
+    displayName: "Trampki Męskie",
+  },
+  {
+    name: "klapki",
+    rootCategory: "obuwie dziecięce",
+    displayName: "Klapki Dziecięce",
+  },
+  {
+    name: "trekkingowe",
+    rootCategory: "obuwie męskie",
+    displayName: "Trekkingowe Męskie",
+  },
+] as const;
+
+export const homeGridCategories: Omit<HomeGridCategory, "id">[] = [
+  {
+    name: "półbuty",
+    rootCategory: "obuwie męskie",
+    displayName: "Półbuty Męskie",
+    imageSrc: "/main-grid/polbuty-meskie.jpg",
+  },
+  {
+    name: "czółenka",
+    rootCategory: "obuwie damskie",
+    displayName: "Czółenka Damskie",
+    imageSrc: "/main-grid/czolenka-damskie.jpg",
+  },
+  {
+    name: "baleriny",
+    rootCategory: "obuwie damskie",
+    displayName: "Baleriny Damskie",
+    imageSrc: "/main-grid/baleriny-damskie.jpg",
+  },
+];

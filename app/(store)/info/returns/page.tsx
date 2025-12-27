@@ -29,22 +29,10 @@ export default function ReturnsPage() {
         </li>
       </ol>
 
-      <Button
-        variant={"important"}
-        className="mt-4"
-        asChild
-        onClick={() =>
-          showDialog({
-            message: "Zwroty są tymczasowo niedostępne.",
-            description:
-              "Zwroty poprzez sklep internetowy będziemy będą możliwe po uruchomieniu na nim sprzedaży. Obecnie przyjmujemy zamówienia tylko przez Allegro.",
-            confirmText: "OK",
-            onConfirm: () => {},
-            hasCancelButton: false,
-          })
-        }
-      >
-        <a href="#">Wypełnij formularz zwrotu</a>
+      <Button variant={"important"} className="mt-4" asChild>
+        <a href="https://szybkiezwroty.pl/kama-obuwie">
+          Wypełnij formularz zwrotu
+        </a>
       </Button>
 
       <section className="mt-8 space-y-6">

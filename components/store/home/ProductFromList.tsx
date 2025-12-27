@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ShoppingBasketIcon } from "lucide-react";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
@@ -40,7 +39,11 @@ export default function ProductFromList({
       </div>
 
       <div className="px-4 py-2">
-        <p className="text-lg">{product.brand || "\u00A0"}</p>
+        <p className="text-lg">
+          {product.brand && product.brand != "bez marki"
+            ? product.brand
+            : "\u00A0"}
+        </p>
         <p className="text-xl font-medium">{product.price} zł</p>
       </div>
     </Card>

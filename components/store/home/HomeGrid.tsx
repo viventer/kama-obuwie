@@ -35,7 +35,7 @@ export default function HomeGrid({ icon, title, categories }: HomeGridProps) {
 
         {categories.map((category) => (
           <Card
-            key={category.id}
+            key={category.id || category.displayName}
             className="col-span-5 row-span-1 flex flex-row justify-between items-center px-4 sm:col-span-3 cursor-pointer transition-colors duration-200 hover:bg-secondary/50 active:bg-secondary/75"
             onClick={() => router.push(`/listing?categoryId=${category.id}`)}
           >

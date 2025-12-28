@@ -114,7 +114,7 @@ export default function ShoppingCartPage() {
         ))}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-border flex flex-col md:flex-row md:justify-between gap-4">
+      <div className="mt-6 pt-4 border-t border-border flex flex-col md:flex-row md:justify-between gap-x-4 gap-y-8">
         <div className="flex-1">
           <div className="flex items-center mb-4">
             <p className="text-xl font-bold text-foreground">
@@ -133,10 +133,15 @@ export default function ShoppingCartPage() {
               checked={termsAccepted}
               onCheckedChange={(value) => setTermsAccepted(value as boolean)}
             />
-            <Label htmlFor="terms" className="gap-1">
+            <Label htmlFor="terms" className="gap-1 flex-wrap">
               Akceptuję{" "}
-              <LinkText href={"/info/regulations"}>regulamin sklepu</LinkText> i{" "}
-              <LinkText href={"/info/privacy"}>politykę prywatności</LinkText>.
+              <LinkText className="text-nowrap" href={"/info/regulations"}>
+                regulamin sklepu
+              </LinkText>{" "}
+              i{" "}
+              <LinkText className="text-nowrap" href={"/info/privacy"}>
+                politykę prywatności.
+              </LinkText>
             </Label>
           </div>
           {hasUnavailableItems().hasUnavailable ? (
@@ -157,7 +162,7 @@ export default function ShoppingCartPage() {
           ) : null}
           <Button
             variant={"important"}
-            className="text-xl px-6 w-fit mb-2"
+            className="text-xl px-6 w-fit mb-2 mt-4"
             disabled={hasUnavailableItems().hasUnavailable || !termsAccepted}
             onClick={() => router.push("/checkout")}
           >

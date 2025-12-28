@@ -113,39 +113,39 @@ export type CategoryFromMainPage = {
 
 export const categoriesFromMainPage: CategoryFromMainPage[] = [
   {
-    name: "trampki",
-    rootCategory: "obuwie dziecięce",
-    displayName: "Trampki Dziecięce",
-  },
-  {
-    name: "czółenka",
+    name: "kapcie",
     rootCategory: "obuwie damskie",
-    displayName: "Czółenka Damskie",
+    displayName: "Kapcie Damskie",
   },
   {
-    name: "sportowe",
-    rootCategory: "obuwie dziecięce",
-    displayName: "Sportowe Dziecięce",
-  },
-  {
-    name: "halówki",
+    name: "kapcie",
     rootCategory: "obuwie męskie",
-    displayName: "Halówki Męskie",
+    displayName: "Kapcie Męskie",
   },
   {
-    name: "klapki",
+    name: "kapcie",
+    rootCategory: "obuwie dziecięce",
+    displayName: "Kapcie Dziecięce",
+  },
+  {
+    name: "botki",
     rootCategory: "obuwie damskie",
-    displayName: "Klapki Damskie",
+    displayName: "Botki Damskie",
   },
   {
-    name: "trampki",
+    name: "trzewiki",
     rootCategory: "obuwie męskie",
-    displayName: "Trampki Męskie",
+    displayName: "Trzewiki Męskie",
   },
   {
-    name: "klapki",
+    name: "Trzewiki",
     rootCategory: "obuwie dziecięce",
-    displayName: "Klapki Dziecięce",
+    displayName: "Zimowe Dziecięce",
+  },
+  {
+    name: "kozaki",
+    rootCategory: "obuwie damskie",
+    displayName: "Kozaki Damskie",
   },
   {
     name: "trekkingowe",

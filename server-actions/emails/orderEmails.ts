@@ -33,8 +33,8 @@ export async function sendOrderEmail({
 }: SendOrderEmailPayload): Promise<CreateEmailResponseSuccess> {
   try {
     const { data, error } = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
-      to: ["studio.codebucket@gmail.com"],
+      from: "kama-obuwie.pl <email@powiadomienia.kama-obuwie.pl>",
+      to: [to],
       subject: subject,
       react: emailTemplates[templateName]({ emailOrderData }),
     });

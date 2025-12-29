@@ -22,7 +22,7 @@ export default function OrderStatusAndPayment({
         </Link>
       )}
       <Link
-        href={`${baseUrl}/order-summary/${emailOrderData.orderDetails.id}`}
+        href={`${baseUrl}/order/details/${emailOrderData.orderDetails.id}`}
         className="border-primary border-2 text-primary font-medium px-3 py-1 rounded-md inline-block"
       >
         Szczegóły zamówienia
@@ -33,7 +33,7 @@ export default function OrderStatusAndPayment({
             Płatność się nie powiodła?
           </Heading>
           <Link
-            href={`${baseUrl}/order-summary/${emailOrderData.orderDetails.id}`}
+            href={`${baseUrl}/order/details/${emailOrderData.orderDetails.id}`}
             className="bg-primary border-2 border-primary text-white font-medium px-3 py-1 rounded-md inline-block"
           >
             Ponów płatność

@@ -182,7 +182,7 @@ export default function CheckoutForms() {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
         stopLoading();
-        router.replace(`/order-summary/${response.data.id}`);
+        router.replace(`/order/thank-you/${response.data.id}`);
         return;
       }
 

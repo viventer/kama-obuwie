@@ -26,7 +26,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     if (newPhase === "sent") {
       const emailPayload: SendOrderEmailPayload = {
         templateName: "orderSent",
-        to: "studio.codebucket@gmail.com",
+        to: order.buyer.email,
         subject: `Twoje zamówienie #${order.number} zostało wysłane`,
         emailOrderData: transformOrderToEmailOrderData(order),
       };
@@ -35,7 +35,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     } else if (newPhase === "cancelled") {
       const emailPayload: SendOrderEmailPayload = {
         templateName: "orderCancelled",
-        to: "studio.codebucket@gmail.com",
+        to: order.buyer.email,
         subject: `Twoje zamówienie #${order.number} zostało anulowane`,
         emailOrderData: transformOrderToEmailOrderData(order),
       };

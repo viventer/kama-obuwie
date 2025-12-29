@@ -79,9 +79,14 @@ export async function POST(request: NextRequest) {
         await updateOrder(order.id, updateData);
         await sendOrderEmail({
           templateName: "orderPaymentConfirmation",
-          to: "studio.codebucket@gmail.com",
+          to: order.buyer.email,
           subject: `Potwierdzenie płatności za zamówienie #${order.number}`,
-          emailOrderData: transformOrderToEmailOrderData(order),
+          emailOrderData: transformOrderToEmailOrderData({
+            ...order,
+            fulfillment: {
+              status: "NEW",
+            },
+          }),
         });
       } else {
         await updateOrder(order.id, {

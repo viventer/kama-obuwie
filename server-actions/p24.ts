@@ -86,7 +86,7 @@ export async function registerTransaction(
     email: transactionData.email,
     country: "PL",
     language: "pl",
-    urlReturn: `${APP_BASE_URL}/order-summary/${orderId}`,
+    urlReturn: `${APP_BASE_URL}/order/thank-you/${orderId}`,
     urlStatus: `${APP_BASE_URL}/api/p24/status`,
     waitForResult: false,
     sign,

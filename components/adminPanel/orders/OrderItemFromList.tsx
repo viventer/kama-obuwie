@@ -15,7 +15,7 @@ export default function OrderItemFromList({
   withPrice: boolean;
   refund?: Order["refund"];
 }) {
-  const size = extractSizeFromTitle(item.offer.name || "");
+  const size = item.offer.size;
   const amountPaid = Number(item.price.amount) * item.quantity;
   const [priceAfterRefund, setPriceAfterRefund] = useState(amountPaid);
   const [refundedAmount, setRefundedAmount] = useState(0);

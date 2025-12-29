@@ -2,6 +2,7 @@ import {
   FulfillmentStatus,
   Order,
   OrderPhase,
+  OrderWithId,
 } from "@/firebase/schemas/ordersSchemas";
 import { TableAction } from "../lib/dataTableColumns";
 import { useToast } from "@/hooks/useToast";
@@ -9,6 +10,8 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { getImageUrl } from "@/server-actions/files/files";
 import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
+import { SendOrderEmailPayload } from "@/server-actions/emails/orderEmails";
+import { transformOrderToEmailOrderData } from "@/helpers/orders";
 
 export type OrderActions = {
   [key in OrderPhase]: TableAction[];
@@ -18,6 +21,50 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
   const { showToast } = useToast();
   const { startLoading, stopLoading } = useFullPageLoading();
   const router = useRouter();
+
+  const sendUpdateEmail = async (newPhase: OrderPhase, order: OrderWithId) => {
+    if (newPhase === "sent") {
+      const emailPayload: SendOrderEmailPayload = {
+        templateName: "orderSent",
+        to: order.buyer.email,
+        subject: `Twoje zamówienie #${order.number} zostało wysłane`,
+        emailOrderData: transformOrderToEmailOrderData(order),
+      };
+
+      await axios.post("/api/email/send", emailPayload);
+    } else if (newPhase === "cancelled") {
+      const emailPayload: SendOrderEmailPayload = {
+        templateName: "orderCancelled",
+        to: order.buyer.email,
+        subject: `Twoje zamówienie #${order.number} zostało anulowane`,
+        emailOrderData: transformOrderToEmailOrderData(order),
+      };
+
+      await axios.post("/api/email/send", emailPayload);
+    }
+  };
+
+  const createLabelRedirect = (isFromAllegro: boolean, orderId: string) => {
+    const createLabelUrl = isFromAllegro
+      ? `/admin-panel/orders/allegro/create-label/${orderId}`
+      : `/admin-panel/orders/create-label/${orderId}`;
+
+    router.push(createLabelUrl);
+  };
+
+  const sendRefundRedirect = (order: OrderWithId) => {
+    if (
+      !order.allegroPayment?.paidAmount ||
+      !order.allegroPayment?.id ||
+      (order?.refund?.type && order.refund.type !== "NONE") ||
+      order.allegroPayment.type === "CASH_ON_DELIVERY"
+    ) {
+      showToast("Brak wpłaty do zwrotu", "default");
+      router.refresh();
+      return;
+    }
+    router.push(`/admin-panel/orders/send-refund/${order.id}`);
+  };
 
   const changeOrderPhase = async (
     id: string | undefined,
@@ -32,22 +79,29 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
       await axios.patch(`/api/orders/${id}`, updateData);
 
       const order = await axios.get(`/api/orders/${id}`);
-      if (order.data.shipment?.isCreated || newPhase !== "processing") {
-        return;
+      if (newPhase == "cancelled" || newPhase == "sent") {
+        await sendUpdateEmail(newPhase, order.data);
       }
 
       const salesChannel = order.data.salesChannel;
       const allegroOrderId = order.data.allegroId;
-      if (["AL1", "AL2"].includes(salesChannel) && allegroOrderId) {
+
+      const isFromAllegro =
+        ["AL1", "AL2"].includes(salesChannel) && allegroOrderId;
+
+      if (isFromAllegro) {
         await axios.put(`/api/allegro/orders/status/${allegroOrderId}`, {
           status: newPhase.toUpperCase(),
           account: salesChannel,
         });
-
-        router.push(`/admin-panel/orders/allegro/create-label/${id}`);
-      } else {
-        router.push(`/admin-panel/orders/create-label/${id}`);
       }
+      if (newPhase === "processing" && !order.data.shipment?.isCreated) {
+        createLabelRedirect(isFromAllegro, id!);
+      } else if (newPhase === "cancelled") {
+        sendRefundRedirect(order.data);
+      }
+
+      showToast("Status zamówienia został zaktualizowany", "success");
     } catch (err) {
       showToast(`Błąd podczas zmiany statusu zamówienia: ${err}`, "error");
     }
@@ -74,35 +128,7 @@ export const useOrderActions = (orderPhase: OrderPhase) => {
     name: "Odrzuć",
     onClick: async (id) => {
       try {
-        const updateData: Partial<Order> = {
-          fulfillment: {
-            status: "CANCELLED",
-          },
-        };
-        await axios.patch(`/api/orders/${id}`, updateData);
-
-        const { data } = await axios.get(`/api/orders/${id}`);
-
-        if (["AL1", "AL2"].includes(data.salesChannel) && data.allegroId) {
-          await axios.put(`/api/allegro/orders/status/${data.allegroId}`, {
-            status: "CANCELLED",
-            account: data.salesChannel,
-          });
-        }
-
-        showToast("Zamówienie odrzucone", "default");
-
-        if (
-          !data.allegroPayment?.paidAmount ||
-          !data.allegroPayment?.id ||
-          (data?.refund?.type && data.refund.type !== "NONE") ||
-          data.allegroPayment.type === "CASH_ON_DELIVERY"
-        ) {
-          showToast("Brak wpłaty do zwrotu", "default");
-          router.refresh();
-          return;
-        }
-        router.push(`/admin-panel/orders/send-refund/${id}`);
+        await changeOrderPhase(id, "cancelled");
       } catch (err) {
         showToast(`Błąd podczas odrzucania zamówienia: ${err}`, "error");
       }

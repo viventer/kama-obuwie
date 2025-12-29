@@ -2,6 +2,7 @@ import LongProductInfo from "@/components/adminPanel/assortment/LongProductInfo"
 import ShortProductInfo from "@/components/adminPanel/assortment/ShortProductInfo";
 import {
   CategoryWithId,
+  EditedPhotoWithUrl,
   ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
 import {
@@ -10,6 +11,8 @@ import {
 } from "@/firebase/getters";
 import { notFound } from "next/navigation";
 import PhotosDownloadButton from "@/components/adminPanel/assortment/products/PhotosDownloadButton";
+import PhotosReorder from "@/components/adminPanel/assortment/PhotosReorder";
+import { getImagesUrls } from "@/server-actions/files/files";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -36,9 +39,8 @@ export default async function ProductDataPage(props: Props) {
         data.categoryId || ""
       )
     : null;
-  const allCategories = await getDocumentsFromAdminDB<CategoryWithId>(
-    "categories"
-  );
+  const allCategories =
+    await getDocumentsFromAdminDB<CategoryWithId>("categories");
 
   if (!allCategories) {
     notFound();
@@ -49,9 +51,30 @@ export default async function ProductDataPage(props: Props) {
     return foundCategory ? foundCategory.name : "";
   });
 
+  const filePaths = data?.editedPhotos?.map((photo) => photo.filePath);
+  if (!data || !filePaths || !data.editedPhotos) {
+    notFound();
+  }
+  const urls = await getImagesUrls(filePaths);
+
+  if (!urls) {
+    console.error("Failed to fetch image URLs");
+    return null;
+  }
+
+  const photosWithUrls: EditedPhotoWithUrl[] = data.editedPhotos.map(
+    (photo, idx) => ({
+      ...photo,
+      url: urls[idx],
+    })
+  );
+
   return (
     <div className="flex flex-col gap-4">
       <ShortProductInfo product={data} />
+      <div className="w-xl max-w-3xl">
+        <PhotosReorder photos={photosWithUrls} readonly={true} />
+      </div>
       <section className="flex gap-4 flex-wrap">
         <PhotosDownloadButton
           productType={data.productType}

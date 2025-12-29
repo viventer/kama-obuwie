@@ -34,7 +34,7 @@ export default function ShippingAndPaymentMethods() {
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
               <Image
-                src={"/InpostPaczkomatRect.svg"}
+                src={"/inpost/InpostPaczkomatRect.svg"}
                 alt="logo InPost Paczkomat"
                 width={64}
                 height={64}
@@ -43,7 +43,7 @@ export default function ShippingAndPaymentMethods() {
             </div>
             <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
               <Image
-                src={"/InpostKurierRect.svg"}
+                src={"/inpost/InpostKurierRect.svg"}
                 alt="logo InPost Paczkomat"
                 width={64}
                 height={64}

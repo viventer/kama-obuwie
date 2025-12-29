@@ -1,3 +1,5 @@
+import { HomeGridCategory } from "@/components/store/home/HomeGrid";
+import { RootCategory } from "@/firebase/schemas/productsSchemas";
 import { CreateShipmentData } from "@/firebase/schemas/shipmentsSchemas";
 
 export const choosingSizeImageFilePath =
@@ -88,3 +90,87 @@ export const returnStatusTranslations: Record<string, string> = {
   WAREHOUSE_DELIVERED: "Dostarczony do magazynu",
   WAREHOUSE_VERIFICATION: "Weryfikacja magazynowa",
 };
+
+export const orderStatusTranslations: Record<string, string> = {
+  UNPAID: "nieopłacone",
+  NEW: "opłacone",
+  PROCESSING: "w realizacji",
+  READY_FOR_SHIPMENT: "gotowe do wysyłki",
+  READY_FOR_PICKUP: "gotowe do odbioru",
+  SENT: "wysłane",
+  PICKED_UP: "odebrane",
+  CANCELLED: "anulowane",
+  SUSPENDED: "wstrzymane",
+  RETURNED: "zwrócone",
+};
+
+export type CategoryFromMainPage = {
+  name: string;
+  rootCategory: RootCategory;
+  id?: string;
+  displayName: string;
+};
+
+export const categoriesFromMainPage: CategoryFromMainPage[] = [
+  {
+    name: "kapcie",
+    rootCategory: "obuwie damskie",
+    displayName: "Kapcie Damskie",
+  },
+  {
+    name: "kapcie",
+    rootCategory: "obuwie męskie",
+    displayName: "Kapcie Męskie",
+  },
+  {
+    name: "kapcie",
+    rootCategory: "obuwie dziecięce",
+    displayName: "Kapcie Dziecięce",
+  },
+  {
+    name: "botki",
+    rootCategory: "obuwie damskie",
+    displayName: "Botki Damskie",
+  },
+  {
+    name: "trzewiki",
+    rootCategory: "obuwie męskie",
+    displayName: "Trzewiki Męskie",
+  },
+  {
+    name: "Trzewiki",
+    rootCategory: "obuwie dziecięce",
+    displayName: "Zimowe Dziecięce",
+  },
+  {
+    name: "kozaki",
+    rootCategory: "obuwie damskie",
+    displayName: "Kozaki Damskie",
+  },
+  {
+    name: "trekkingowe",
+    rootCategory: "obuwie męskie",
+    displayName: "Trekkingowe Męskie",
+  },
+] as const;
+
+export const homeGridCategories: Omit<HomeGridCategory, "id">[] = [
+  {
+    name: "półbuty",
+    rootCategory: "obuwie męskie",
+    displayName: "Półbuty Męskie",
+    imageSrc: "/main-grid/polbuty-meskie.jpg",
+  },
+  {
+    name: "czółenka",
+    rootCategory: "obuwie damskie",
+    displayName: "Czółenka Damskie",
+    imageSrc: "/main-grid/czolenka-damskie.jpg",
+  },
+  {
+    name: "baleriny",
+    rootCategory: "obuwie damskie",
+    displayName: "Baleriny Damskie",
+    imageSrc: "/main-grid/baleriny-damskie.jpg",
+  },
+];

@@ -5,64 +5,20 @@ import {
 } from "@/firebase/schemas/productsSchemas";
 import ProductsList from "@/components/store/home/ProductsList";
 import { getProductsListingData } from "@/server-actions/products/products";
-
-type CategoryFromMainPage = {
-  name: string;
-  rootCategory: RootCategory;
-  id?: string;
-  displayName: string;
-};
+import HomeGrid from "@/components/store/home/HomeGrid";
+import { StarIcon } from "lucide-react";
+import {
+  categoriesFromMainPage,
+  CategoryFromMainPage,
+  homeGridCategories,
+} from "@/lib/constants";
 
 export default async function Page() {
-  const categoriesFromMainPage: CategoryFromMainPage[] = [
-    {
-      name: "trampki",
-      rootCategory: "obuwie dziecięce",
-      displayName: "Trampki Dziecięce",
-    },
-    {
-      name: "czółenka",
-      rootCategory: "obuwie damskie",
-      displayName: "Czółenka Damskie",
-    },
-    {
-      name: "sportowe",
-      rootCategory: "obuwie dziecięce",
-      displayName: "Sportowe Dziecięce",
-    },
-    {
-      name: "halówki",
-      rootCategory: "obuwie męskie",
-      displayName: "Halówki Męskie",
-    },
-    {
-      name: "klapki",
-      rootCategory: "obuwie damskie",
-      displayName: "Klapki Damskie",
-    },
-    {
-      name: "trampki",
-      rootCategory: "obuwie męskie",
-      displayName: "Trampki Męskie",
-    },
-    {
-      name: "klapki",
-      rootCategory: "obuwie dziecięce",
-      displayName: "Klapki Dziecięce",
-    },
-    {
-      name: "trekkingowe",
-      rootCategory: "obuwie męskie",
-      displayName: "Trekkingowe Męskie",
-    },
-  ];
-
   // Pobierz kategorie z bazy danych
-  const categoriesFromDB = await getDocumentsFromAdminDB<CategoryWithId>(
-    "categories"
-  );
+  const categoriesFromDB =
+    await getDocumentsFromAdminDB<CategoryWithId>("categories");
 
-  const categories: CategoryFromMainPage[] = categoriesFromMainPage.map(
+  const mainPageCategories: CategoryFromMainPage[] = categoriesFromMainPage.map(
     (categoryFromMainPage) => {
       const matchingCategory = categoriesFromDB?.find(
         (dbCategory) =>
@@ -77,15 +33,34 @@ export default async function Page() {
     }
   );
 
-  const categoryIds = categories
+  const mainPageCategoriesIds = mainPageCategories
     .map((cat) => cat.id)
     .filter(Boolean) as string[];
 
-  const products = await getProductsListingData(categoryIds);
+  const products = await getProductsListingData(mainPageCategoriesIds);
+
+  const homeGridCategoriesWithIds = homeGridCategories.map((category) => {
+    const matchingCategory = categoriesFromDB?.find(
+      (dbCategory) =>
+        dbCategory.name === category.name &&
+        dbCategory.rootCategory === category.rootCategory
+    );
+
+    return {
+      ...category,
+      id: matchingCategory?.id as string,
+    };
+  });
 
   return (
     <>
-      {/* <HomeGrid /> */}
+      <HomeGrid
+        icon={
+          <StarIcon className="min-w-8 min-h-8 lg:min-w-12 lg:min-h-12 text-brand" />
+        }
+        title="Elegancja na ważne okazje"
+        categories={homeGridCategoriesWithIds}
+      />
       <div className="flex flex-col gap-12">
         {Object.entries(products).map(([categoryId, productsInCategory]) => {
           if (productsInCategory.length < 4) {
@@ -98,8 +73,8 @@ export default async function Page() {
               products={productsInCategory}
               categoryId={categoryId}
               displayName={
-                categories.find((cat) => cat.id === categoryId)?.displayName ||
-                ""
+                mainPageCategories.find((cat) => cat.id === categoryId)
+                  ?.displayName || ""
               }
             />
           );

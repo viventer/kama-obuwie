@@ -10,8 +10,11 @@ import { CheckoutDataSchema } from "@/firebase/schemas/checkoutSchemas";
 import InPostSelector from "./InPostSelector";
 import { useToast } from "@/hooks/useToast";
 import PaymentMethodSelector from "./PaymentMethodSelector";
-import OrderSummary from "./OrderSummary";
-import { FrontendOrder } from "@/firebase/schemas/ordersSchemas";
+import OrderSummary from "../order/OrderSummary";
+import {
+  EmailOrderData,
+  FrontendOrder,
+} from "@/firebase/schemas/ordersSchemas";
 import { useShoppingCart } from "@/hooks/useShoppingCart";
 import axios from "axios";
 import { redirect, useRouter } from "next/navigation";
@@ -24,6 +27,8 @@ import {
 import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { handleApiError } from "@/server-actions/errorHandlers";
 import { RegisterTransactionData } from "@/firebase/schemas/p24Schemas";
+import { SendOrderEmailPayload } from "@/server-actions/emails/orderEmails";
+import { transformOrderToEmailOrderData } from "@/helpers/orders";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
@@ -131,18 +136,18 @@ export default function CheckoutForms() {
         checkoutData.address = null;
       }
 
-      showDialog({
-        message: "Obecnie nie przyjmujemy zamówień poprzez sklep internetowy.",
-        description:
-          "Zamówienie możesz złożyć przez Allegro. Oczekujemy na podłączenie płatności online w naszym sklepie.",
-        confirmText: "Kup przez Allegro",
-        cancelText: "Anuluj",
-        onConfirm: () => {
-          window.location.href = "https://allegro.pl/uzytkownik/kama-obuwie_pl";
-        },
-      });
+      // showDialog({
+      //   message: "Obecnie nie przyjmujemy zamówień poprzez sklep internetowy.",
+      //   description:
+      //     "Zamówienie możesz złożyć przez Allegro. Oczekujemy na podłączenie płatności online w naszym sklepie.",
+      //   confirmText: "Kup przez Allegro",
+      //   cancelText: "Anuluj",
+      //   onConfirm: () => {
+      //     window.location.href = "https://allegro.pl/uzytkownik/kama-obuwie_pl";
+      //   },
+      // });
 
-      return;
+      // return;
 
       const orderData: FrontendOrder = {
         checkoutData,
@@ -152,18 +157,34 @@ export default function CheckoutForms() {
       const response = await axios.post("/api/orders", orderData);
       clearCart();
 
+      const { data: createdOrder } = await axios.get(
+        `/api/orders/${response.data.id}`
+      );
+
+      const emailOrderData: EmailOrderData =
+        transformOrderToEmailOrderData(createdOrder);
+
+      const emailPayload: SendOrderEmailPayload = {
+        templateName: "orderCreated",
+        to: checkoutData.email,
+        subject: "Potwierdzenie złożenia zamówienia",
+        emailOrderData,
+      };
+
+      try {
+        await axios.post("/api/email/send", emailPayload);
+      } catch (err) {
+        console.error("Błąd podczas wysyłania emaila:", err);
+      }
+
       if (checkoutData.paymentMethod === "COD") {
         while (isLoading) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
         stopLoading();
-        router.replace(`/thank-you/${response.data.id}`);
+        router.replace(`/order/thank-you/${response.data.id}`);
         return;
       }
-
-      const { data: createdOrder } = await axios.get(
-        `/api/orders/${response.data.id}`
-      );
 
       const transactionData: Pick<
         RegisterTransactionData,
@@ -198,9 +219,9 @@ export default function CheckoutForms() {
       <TabsList className="mb-4 gap-0 2xs:gap-2">
         <TabsTrigger
           value="firstStep"
-          className="text-sm font-normal xs:text-base sm:text-lg"
+          className="text-sm font-normal xs:text-base sm:text-lg text-white"
         >
-          <span className="mr-1 aspect-square text-text bg-brand h-full items-center justify-center rounded-xs font-bold text-normal hidden xs:flex">
+          <span className="mr-1 aspect-square bg-primary h-full items-center justify-center rounded-xs font-bold text-normal hidden xs:flex">
             1
           </span>
           Dane{" "}
@@ -210,9 +231,9 @@ export default function CheckoutForms() {
         </TabsTrigger>
         <TabsTrigger
           value="secondStep"
-          className="text-sm font-normal xs:text-base sm:text-lg"
+          className="text-sm font-normal xs:text-base sm:text-lg text-white"
         >
-          <span className="aspect-square mr-1 text-text bg-brand h-full items-center justify-center rounded-xs font-bold text-normal hidden xs:flex">
+          <span className="aspect-square mr-1 bg-primary h-full items-center justify-center rounded-xs font-bold text-normal hidden xs:flex">
             2
           </span>
           Dostawa i płatność

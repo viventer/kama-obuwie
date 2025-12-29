@@ -34,7 +34,7 @@
     --muted-foreground: #9ca3af;
 
     --border: #3a4248;
-    --input: #2e3439;
+    --input: #3a4248;
     --ring: #4a7ba7;
 
     --destructive: #dc2626;
@@ -80,7 +80,7 @@
       --muted-foreground: #6b7280;
 
       --border: #d1d5db;
-      --input: #ffffff;
+      --input: #d1d5db;
       --ring: #2e5e90;
 
       --destructive: #d64545;
@@ -91,7 +91,7 @@
 
       --brand: #3b79b8;
 
-      --popover: #ffffff;
+      --popover: #e9edf0;
       --popover-foreground: #1b1f22;
 
       --chart-1: #2e5e90;

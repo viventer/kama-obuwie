@@ -111,7 +111,10 @@ export default function ProductPage({
           productId: productData.id,
           thumbnailUrl: imagesUrls[selectedColorVariant][0],
           categoryName: category.name,
-          brand: productData.brand,
+          brand:
+            productData?.brand && productData.brand != "bez marki"
+              ? productData.brand
+              : "",
           price: price,
           size: selectedSize,
           formattedMainColor: selectedColorVariant,
@@ -166,7 +169,9 @@ export default function ProductPage({
             {category.name}
           </h2>
           <p className="text-lg text-white">
-            {productData?.brand}{" "}
+            {productData?.brand && productData.brand != "bez marki"
+              ? `${productData.brand} `
+              : "\u00A0"}
             <span className="font-thin">{productData.manufacturerCode}</span>
           </p>
         </article>

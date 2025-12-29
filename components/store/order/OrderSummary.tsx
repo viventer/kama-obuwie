@@ -1,13 +1,6 @@
 "use client";
 
 import { useShoppingCart } from "@/hooks/useShoppingCart";
-import ShoppingCartItem from "../shopping-cart/ShoppingCartItem";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import ShippingInfo from "../global/ShippingInfo";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
@@ -17,7 +10,7 @@ import {
   CheckoutDataSchema,
 } from "@/firebase/schemas/checkoutSchemas";
 import { useEffect } from "react";
-import ShoppingCartItemsAccordion from "./ShoppingCartItemsAccordion";
+import ShoppingCartItemsAccordion from "../checkout/ShoppingCartItemsAccordion";
 
 export default function OrderSummary({
   orderButtonHandler,

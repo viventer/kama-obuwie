@@ -19,10 +19,10 @@ export default function ProductTypeSelector() {
       onValueChange={(value) => setProductType(value as ProductType)}
     >
       <TabsList className="flex gap-2">
-        <TabsTrigger value="obuwie" className="flex items-center gap-2">
+        <TabsTrigger value="obuwie" className="flex items-center gap-2 ">
           <p>Obuwie</p>
         </TabsTrigger>
-        <TabsTrigger value="akcesoria" className="flex items-center gap-2">
+        <TabsTrigger value="akcesoria" className="flex items-center gap-2 ">
           <p>Akcesoria</p>
         </TabsTrigger>
       </TabsList>

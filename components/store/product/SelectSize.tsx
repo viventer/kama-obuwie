@@ -69,7 +69,7 @@ export default function SelectSize({
                   }
                 `}
               >
-                <span className="text-sm">{size}</span>
+                <span className="text-sm text-text">{size}</span>
                 {isSelected && available && (
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full"></div>
                 )}

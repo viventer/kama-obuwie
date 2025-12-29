@@ -97,3 +97,6 @@ env:
 
   - variable: P24_CRC
     secret: P24_CRC
+
+  - variable: RESEND_API_KEY
+    secret: RESEND_API_KEY

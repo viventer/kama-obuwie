@@ -186,7 +186,7 @@ export default function InPostSelector({
                 <InpostGeowidgetReact
                   token={token}
                   pointSelect={handlePointSelect}
-                  sandbox={true}
+                  sandbox={false}
                 />
               </div>
             </div>

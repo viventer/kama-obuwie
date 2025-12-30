@@ -90,7 +90,7 @@ export default function ShoppingCartItem({
             </div>
           </div>
 
-          <div className="flex items-center gap-4 sm:gap-6 flex-col xs:flex-row">
+          <div className="flex items-center gap-4 sm:gap-6 flex-col xs:flex-row ">
             {offerData && cartItem.item.isAvailable && (
               <EditCartItemDialog
                 cartItem={cartItem}

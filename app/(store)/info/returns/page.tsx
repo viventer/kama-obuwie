@@ -1,6 +1,5 @@
 "use client";
 
-import { useConfirmDialog } from "@/app/providers/ConfirmDialogProvider";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,8 +10,6 @@ import {
 } from "@/components/ui/card";
 
 export default function ReturnsPage() {
-  const { showDialog } = useConfirmDialog();
-
   return (
     <section>
       <h2 className="text-xl font-bold mb-2">Jak zwrócić produkt?</h2>

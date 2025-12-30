@@ -8,24 +8,11 @@ async function handler(req: NextRequest) {
     console.log("🚀 QStash worker: Starting background Allegro sync job...");
 
     const body = await req.json();
-    const userId = body.userId;
+    const userId = body?.userId || null;
     const batch = body.batch ?? 0;
     const channel = body.channel ?? "AL1";
 
-    if (!userId) {
-      console.error("❌ Missing userId in request body");
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Missing userId in request body",
-        },
-        { status: 400 }
-      );
-    }
-
-    console.log(
-      `👤 Running sync for user: ${userId}, channel: ${channel}, batch: ${batch}`
-    );
+    console.log(`👤 Running sync for channel: ${channel}, batch: ${batch}`);
 
     // Ustaw status na "running" tylko dla pierwszego batcha
     if (batch === 0 && channel === "AL1") {

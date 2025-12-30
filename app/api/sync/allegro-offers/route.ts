@@ -11,24 +11,11 @@ export async function POST(req: NextRequest) {
     console.log("🚀 Queueing Allegro sync job to QStash...");
 
     const body = await req.json();
-    const userId = body.userId;
+    const userId = body?.userId || null;
     const batch = body.batch ?? 0; // Default to batch 0 (start)
     const channel = body.channel ?? "AL1"; // Default to AL1, potem AL2
 
-    if (!userId) {
-      console.error("❌ Missing userId in request body");
-      return NextResponse.json(
-        {
-          success: false,
-          error: "Missing userId in request body",
-        },
-        { status: 400 }
-      );
-    }
-
-    console.log(
-      `👤 Queueing sync for user: ${userId}, channel: ${channel}, batch: ${batch}`
-    );
+    console.log(`👤 Queueing sync for channel: ${channel}, batch: ${batch}`);
 
     // Ustaw status na "queued" tylko dla pierwszego batcha
     if (batch === 0 && channel === "AL1") {

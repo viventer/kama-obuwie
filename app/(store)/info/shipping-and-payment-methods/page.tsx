@@ -1,3 +1,4 @@
+import GoogleIcon from "@/components/icons/GoogleIcon";
 import {
   Card,
   CardContent,
@@ -6,6 +7,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import {
+  BanknoteIcon,
+  CreditCardIcon,
+  LandmarkIcon,
+  SmartphoneIcon,
+} from "lucide-react";
 import Image from "next/image";
 
 export default function ShippingAndPaymentMethods() {
@@ -104,19 +111,6 @@ export default function ShippingAndPaymentMethods() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">
-            Płatności nie są obecnie obsługiwane.
-          </CardTitle>
-          <CardDescription>
-            Oczekujemy na integrację z dostawcą płatności w najbliższej
-            przyszłości.
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
-      {/* Sekcja płatności */}
-      {/* <Card>
-        <CardHeader>
           <CardTitle className="text-lg">Metody płatności</CardTitle>
           <CardDescription>
             Wybierz najbardziej wygodną dla Ciebie opcję płatności
@@ -124,60 +118,31 @@ export default function ShippingAndPaymentMethods() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl mb-2">⚡</div>
-              <h3 className="font-semibold text-foreground text-sm">
-                Szybki przelew online
-              </h3>
+            <div className="flex flex-col items-center justify-center text-center p-4 bg-muted rounded-lg">
+              <SmartphoneIcon className="text-brand size-12 mb-2" />
+              <h3 className="font-semibold text-foreground">BLIK</h3>
             </div>
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl mb-2">📱</div>
-              <h3 className="font-semibold text-foreground text-sm">BLIK</h3>
+            <div className="flex flex-col items-center justify-center text-center p-4 bg-muted rounded-lg">
+              <CreditCardIcon className="text-brand size-12 mb-2" />
+              <h3 className="font-semibold text-foreground">Karta płatnicza</h3>
             </div>
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl mb-2">💳</div>
-              <h3 className="font-semibold text-foreground text-sm">
-                Karta płatnicza
-              </h3>
+            <div className="flex flex-col items-center justify-center text-center p-4 bg-muted rounded-lg">
+              <GoogleIcon className="text-brand size-12 mb-2" />
+              <h3 className="font-semibold text-foreground">Google Pay</h3>
             </div>
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl mb-2">📲</div>
-              <h3 className="font-semibold text-foreground text-sm">
-                Visa Mobile
-              </h3>
-            </div>
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl mb-2">🍎</div>
-              <h3 className="font-semibold text-foreground text-sm">
-                Apple Pay
-              </h3>
-            </div>
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl mb-2">🤖</div>
-              <h3 className="font-semibold text-foreground text-sm">
-                Google Pay
-              </h3>
-            </div>
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl mb-2">📅</div>
-              <h3 className="font-semibold text-foreground text-sm">
-                Płatności odroczone
-              </h3>
-            </div>
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl mb-2">🏦</div>
-              <h3 className="font-semibold text-foreground text-sm">
-                Przelew tradycyjny
+            <div className="flex flex-col items-center justify-center text-center p-4 bg-muted rounded-lg">
+              <LandmarkIcon className="text-brand size-12 mb-2" />
+              <h3 className="font-semibold text-foreground">
+                Przelew online i tradycyjny
               </h3>
             </div>
           </div>
 
           <Separator className="my-6" />
 
-          
           <div className="bg-accent/10 p-6 rounded-lg border border-accent/20">
             <div className="flex items-center space-x-3">
-              <div className="text-accent text-2xl">💰</div>
+              <BanknoteIcon className="size-12 text-brand" />
               <div>
                 <h3 className="text-lg font-semibold text-foreground">
                   Płatność przy odbiorze
@@ -189,7 +154,7 @@ export default function ShippingAndPaymentMethods() {
             </div>
           </div>
         </CardContent>
-      </Card> */}
+      </Card>
 
       {/* Dodatkowe informacje */}
       <Card className="gap-2">

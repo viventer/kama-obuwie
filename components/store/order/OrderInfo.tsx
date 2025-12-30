@@ -6,6 +6,9 @@ import { InfoIcon } from "lucide-react";
 
 export default function OrderInfo({ orderData }: { orderData: OrderWithId }) {
   const isCancelled = orderData.fulfillment!.status === "CANCELLED";
+  const isUnpaid = orderData.fulfillment!.status === "UNPAID";
+  const isNewCOD =
+    orderData.paymentType === "COD" && orderData.fulfillment!.status === "NEW";
   const deliveryDate = getShippingInfo(new Date(orderData.createdAt), true);
 
   return (
@@ -19,8 +22,12 @@ export default function OrderInfo({ orderData }: { orderData: OrderWithId }) {
       <CardContent>
         <p className="text-lg mb-2">
           Status:{" "}
-          <span className="font-medium underline decoration-success decoration-2 underline-offset-2">
-            {orderStatusTranslations[orderData.fulfillment!.status]}
+          <span
+            className={`font-medium underline ${isUnpaid || isCancelled ? "decoration-destructive" : "decoration-success"} decoration-2 underline-offset-2`}
+          >
+            {isNewCOD
+              ? "utworzone"
+              : orderStatusTranslations[orderData.fulfillment!.status]}
           </span>
         </p>
         <p>

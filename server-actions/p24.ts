@@ -68,7 +68,8 @@ export async function registerTransaction(
     RegisterTransactionData,
     "amount" | "email" | "channel"
   >,
-  orderId: string
+  orderId: string,
+  orderNumber: string
 ): Promise<{
   token: string;
   sessionId: string;
@@ -82,7 +83,7 @@ export async function registerTransaction(
     sessionId,
     amount: transactionData.amount,
     currency: "PLN",
-    description: "Wpłata za zamówienie w sklepie Kama Obuwie",
+    description: `Wpłata za zamówienie nr #${orderNumber} w sklepie Kama Obuwie`,
     email: transactionData.email,
     country: "PL",
     language: "pl",

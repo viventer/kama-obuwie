@@ -7,7 +7,6 @@ import { RegisterTransactionData } from "@/firebase/schemas/p24Schemas";
 import { apiErrorResponse, apiResponse } from "@/server-actions/helpers";
 import { updateOrder } from "@/server-actions/orders/orders";
 import { registerTransaction } from "@/server-actions/p24";
-import { adminDB } from "@/firebase/firebaseAdmin";
 import { NextRequest } from "next/server";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 
@@ -23,12 +22,33 @@ export async function POST(request: NextRequest) {
     orderId: string;
   } = await request.json();
 
+  let order: OrderWithId | null = null;
+
+  try {
+    const { data } = await getDocumentFromAdminDB<OrderWithId>(
+      "orders",
+      orderId
+    );
+    order = data;
+    if (!order) {
+      throw new Error("Zamówienie nie istnieje");
+    }
+  } catch (err) {
+    return apiErrorResponse("Zamówienie o podanym id nie istnieje", 400, null, {
+      step: "get_order",
+    });
+  }
+
   let p24Response: {
     sessionId: string;
     token: string;
   } | null = null;
   try {
-    p24Response = await registerTransaction(transactionData, orderId);
+    p24Response = await registerTransaction(
+      transactionData,
+      orderId,
+      order.number
+    );
   } catch (err: any) {
     return apiErrorResponse(
       "Nie udało się zarejestrować transakcji",
@@ -41,14 +61,6 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { data: order } = await getDocumentFromAdminDB<OrderWithId>(
-      "orders",
-      orderId
-    );
-    if (!order) {
-      throw new Error("Zamówienie nie istnieje");
-    }
-
     const newTransaction: P24Transaction = {
       sessionId: p24Response.sessionId,
       amount: transactionData.amount,

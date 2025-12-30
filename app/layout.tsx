@@ -21,7 +21,7 @@ const ubuntuMono = Ubuntu_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "kama-obuwie",
+  title: "Kama Obuwie",
   description:
     "Obuwie dla całej rodziny w jednym miejscu. Wygodne buty na każdą okazję - od sportowych po eleganckie. Znajdź idealne buty dla siebie!",
 };

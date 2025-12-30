@@ -100,3 +100,6 @@ env:
 
   - variable: RESEND_API_KEY
     secret: RESEND_API_KEY
+
+  - variable: NEXT_PUBLIC_NODE_ENV
+    secret: NEXT_PUBLIC_NODE_ENV

@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const response = NextResponse.json({ success: true });
     response.cookies.set("sessionId", sessionId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.NEXT_PUBLIC_NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
       maxAge: 365 * 24 * 60 * 60, // 1 year in seconds - practically "forever"

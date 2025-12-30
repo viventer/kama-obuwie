@@ -31,10 +31,14 @@ export async function sendOrderEmail({
   subject,
   emailOrderData,
 }: SendOrderEmailPayload): Promise<CreateEmailResponseSuccess> {
+  const isProduction = process.env.NEXT_PUBLIC_NODE_ENV === "production";
+
   try {
     const { data, error } = await resend.emails.send({
-      from: "kama-obuwie.pl <email@powiadomienia.kama-obuwie.pl>",
-      to: [to],
+      from: isProduction
+        ? "kama-obuwie.pl <email@powiadomienia.kama-obuwie.pl>"
+        : "dev-kama <onboarding@resend.dev>",
+      to: isProduction ? [to] : ["studio.codebucket@gmail.com"],
       subject: subject,
       react: emailTemplates[templateName]({ emailOrderData }),
     });

@@ -17,7 +17,7 @@ import {
 } from "@/firebase/schemas/ordersSchemas";
 import { useShoppingCart } from "@/hooks/useShoppingCart";
 import axios from "axios";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
 import {

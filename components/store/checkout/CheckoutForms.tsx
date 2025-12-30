@@ -29,15 +29,37 @@ import { handleApiError } from "@/server-actions/errorHandlers";
 import { RegisterTransactionData } from "@/firebase/schemas/p24Schemas";
 import { SendOrderEmailPayload } from "@/server-actions/emails/orderEmails";
 import { transformOrderToEmailOrderData } from "@/helpers/orders";
+import { useEffect } from "react";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
-  const { cart, clearCart, isLoading, updateItemAvailability } =
+  const { cart, clearCart, isLoading, updateItemAvailability, getCartStats } =
     useShoppingCart();
   const router = useRouter();
   const { handleError } = useErrorHandler();
   const { startLoading, stopLoading } = useFullPageLoading();
   const { showDialog } = useConfirmDialog();
+
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    const { itemCount } = getCartStats();
+    if (itemCount < 1) {
+      showDialog({
+        message: "Twój koszyk jest pusty.",
+        description:
+          "Jeśli złożyłeś już zamówienie - sprawdź czy otrzymałeś potwierdzenie na email. W przypadku wystąpienia błędu - skontaktuj się z nami.",
+        onConfirm: () => {
+          router.push("/");
+        },
+        hasCancelButton: false,
+        variant: "error",
+        confirmText: "Strona główna",
+      });
+    }
+  }, [isLoading]);
 
   const form = useForm({
     resolver: zodResolver(CheckoutDataSchema),

@@ -1,5 +1,6 @@
 import { adminStorage } from "@/firebase/firebaseAdmin";
 import { ReturnFormData } from "@/firebase/schemas/returnsSchemas";
+import { getCurrentDateTimeInPoland } from "@/helpers/datetime";
 import { reasonTranslations } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
 import { apiErrorResponse, apiResponse } from "@/server-actions/helpers";
@@ -137,7 +138,7 @@ export const POST = async (req: NextRequest) => {
           <div>
             <div class="logo">allegro</div>
             <div class="date">Data: ${formatDate(
-              new Date().toISOString()
+              getCurrentDateTimeInPoland()
             )}</div>
           </div>
         </div>

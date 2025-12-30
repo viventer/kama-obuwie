@@ -6,6 +6,7 @@ import { verifyTransaction } from "@/server-actions/p24";
 import { updateOrder } from "@/server-actions/orders/orders";
 import { sendOrderEmail } from "@/server-actions/emails/orderEmails";
 import { transformOrderToEmailOrderData } from "@/helpers/orders";
+import { getCurrentDateTimeInPoland } from "@/helpers/datetime";
 
 export async function POST(request: NextRequest) {
   console.log("P24 status GET received");
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
               ? { ...t, status: "COMPLETED", isRedundant }
               : t
           ),
-          updatedAt: new Date().toISOString(),
+          updatedAt: getCurrentDateTimeInPoland(),
         };
 
         if (!isRedundant) {
@@ -95,7 +96,7 @@ export async function POST(request: NextRequest) {
               ? { ...t, status: "FAILED", isRedundant }
               : t
           ),
-          updatedAt: new Date().toISOString(),
+          updatedAt: getCurrentDateTimeInPoland(),
         });
       }
     } catch (verificationError) {
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
             ? { ...t, status: "FAILED", isRedundant }
             : t
         ),
-        updatedAt: new Date().toISOString(),
+        updatedAt: getCurrentDateTimeInPoland(),
       });
     }
 

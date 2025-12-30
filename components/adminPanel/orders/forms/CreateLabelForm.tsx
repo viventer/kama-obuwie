@@ -21,6 +21,7 @@ import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoade
 import { CreateInpostShipmentData } from "@/firebase/schemas/inpost/shipmentsSchemas";
 import ReceiverAddressField from "./ReceiverAddressField";
 import PackageDataFormSection from "./PackageDataFormSection";
+import { getCurrentDateTimeInPoland } from "@/helpers/datetime";
 
 export type CreateAllegroLabelFormValues = Pick<
   CreateShipmentData,
@@ -63,8 +64,8 @@ export default function CreateLabelForm({
             ? orderDeliveryData.address!.buildingNumber +
               ` / ${orderDeliveryData.address?.apartmentNumber}`
             : orderDeliveryData.address?.buildingNumber
-            ? orderDeliveryData.address.buildingNumber
-            : "",
+              ? orderDeliveryData.address.buildingNumber
+              : "",
           city: orderDeliveryData.address?.city || "",
           post_code: orderDeliveryData.address?.zipCode || "",
           country_code: "PL",
@@ -198,8 +199,9 @@ export default function CreateLabelForm({
             [parcelNumber]: shipmentId,
           },
           isPickupAvailable: false,
-          createdAt: orderData?.shipment?.createdAt || new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt:
+            orderData?.shipment?.createdAt || getCurrentDateTimeInPoland(),
+          updatedAt: getCurrentDateTimeInPoland(),
           carrier: "Inpost",
         },
       });

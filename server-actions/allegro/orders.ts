@@ -18,6 +18,7 @@ import { getAllegroOffer } from "./offers";
 import { handleAllegroApiError } from "../errorHandlers";
 import { parseExternalId } from "@/helpers/externalId";
 import { generateOrderNumber } from "../helpers";
+import { getCurrentDateTimeInPoland } from "@/helpers/datetime";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -473,7 +474,7 @@ async function transformAllegroToOrder(
     lineItems: lineItems,
     allegroSurcharges: allegroOrder.surcharges,
     summary: allegroOrder.summary,
-    createdAt: allegroOrder.updatedAt || new Date().toISOString(),
+    createdAt: allegroOrder.updatedAt || getCurrentDateTimeInPoland(),
     updatedAt: allegroOrder.updatedAt,
     salesChannel: salesChannel,
     number: generateOrderNumber(salesChannel),
@@ -534,7 +535,7 @@ function transformAllegroToOrderUpdate(
     }),
     allegroSurcharges: allegroOrder.surcharges,
     summary: allegroOrder.summary,
-    updatedAt: new Date().toISOString(),
+    updatedAt: getCurrentDateTimeInPoland(),
   };
 }
 

@@ -1,3 +1,5 @@
+import { getPolandDate } from "./datetime";
+
 /**
  * Oblicza datę Wielkanocy dla danego roku (algorytm Gaussa)
  * @param year - rok
@@ -88,10 +90,10 @@ function isPolishHoliday(date: Date): boolean {
 
 /**
  * Oblicza czas wysyłki w dniach na podstawie aktualnej daty (uwzględnia święta)
- * @param currentDate - aktualna data (opcjonalnie, domyślnie new Date())
+ * @param currentDate - aktualna data (opcjonalnie, domyślnie getPolandDate())
  * @returns liczba dni potrzebnych na wysyłkę
  */
-export function calculateShippingDays(currentDate: Date = new Date()): number {
+export function calculateShippingDays(currentDate: Date = getPolandDate()): number {
   // Jeśli aktualny dzień jest świętem (nie niedzielą, bo niedziela jest już obsłużona jako dayOfWeek=0),
   // traktujemy go jak sobotę po 8:00
   const dayOfWeek = currentDate.getDay();
@@ -154,10 +156,10 @@ export function calculateShippingDays(currentDate: Date = new Date()): number {
 
 /**
  * Oblicza datę wysyłki na podstawie aktualnej daty
- * @param currentDate - aktualna data (opcjonalnie, domyślnie new Date())
+ * @param currentDate - aktualna data (opcjonalnie, domyślnie getPolandDate())
  * @returns data wysyłki
  */
-export function calculateShippingDate(currentDate: Date = new Date()): Date {
+export function calculateShippingDate(currentDate: Date = getPolandDate()): Date {
   const shippingDays = calculateShippingDays(currentDate);
   const shippingDate = new Date(currentDate);
   shippingDate.setDate(shippingDate.getDate() + shippingDays);
@@ -166,11 +168,11 @@ export function calculateShippingDate(currentDate: Date = new Date()): Date {
 
 /**
  * Formatuje datę wysyłki do czytelnej postaci
- * @param currentDate - aktualna data (opcjonalnie, domyślnie new Date())
+ * @param currentDate - aktualna data (opcjonalnie, domyślnie getPolandDate())
  * @returns sformatowany tekst z informacją o wysyłce
  */
 export function getShippingInfo(
-  currentDate: Date = new Date(),
+  currentDate: Date = getPolandDate(),
   emailFormat: boolean = false
 ): string {
   const shippingDays = calculateShippingDays(currentDate);

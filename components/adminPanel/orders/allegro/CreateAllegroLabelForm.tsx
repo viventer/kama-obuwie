@@ -25,6 +25,7 @@ import { FormEvent } from "react";
 import axios from "axios";
 import { useFullPageLoading } from "@/components/adminPanel/global/FullPageLoader";
 import AllegroPackageDataFormSection from "./AllegroPackageDataFormSection";
+import { getCurrentDateTimeInPoland } from "@/helpers/datetime";
 
 export type CreateAllegroLabelFormValues = Pick<
   CreateShipmentData,
@@ -188,8 +189,8 @@ export default function CreateAllegroLabelForm({
             },
             isPickupAvailable: response.data.isPickupAvailable,
             createdAt:
-              orderData?.shipment?.createdAt || new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
+              orderData?.shipment?.createdAt || getCurrentDateTimeInPoland(),
+            updatedAt: getCurrentDateTimeInPoland(),
             carrier: deliveryService.carrierId,
           },
         });

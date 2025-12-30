@@ -1,5 +1,6 @@
 import { adminStorage } from "@/firebase/firebaseAdmin";
 import { RefundDocumentSchema } from "@/firebase/schemas/ordersSchemas";
+import { getCurrentDateTimeInPoland } from "@/helpers/datetime";
 import { formatDate } from "@/lib/utils";
 import { apiErrorResponse, apiResponse } from "@/server-actions/helpers";
 import { NextRequest } from "next/server";
@@ -131,7 +132,7 @@ export const POST = async (req: NextRequest) => {
         
         <div class="location-date">
           <div>Miejscowość: Bochnia</div>
-          <div>Data: ${formatDate(new Date().toISOString())}</div>
+          <div>Data: ${formatDate(getCurrentDateTimeInPoland())}</div>
         </div>
         
         <table>

@@ -16,6 +16,7 @@ import { generateOrderNumber } from "../helpers";
 import { Offer } from "@/firebase/schemas/offersSchemas";
 import { randomUUID } from "crypto";
 import { PickupPointSchema } from "@/firebase/schemas/commonSchemas";
+import { getCurrentDateTimeInPoland } from "@/helpers/datetime";
 
 export const createOrder = async function (newOrder: Order) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -206,8 +207,8 @@ export const transformFrontendOrderToOrder = async function (
         currency: "PLN",
       },
     },
-    updatedAt: new Date().toISOString(),
-    createdAt: new Date().toISOString(),
+    updatedAt: getCurrentDateTimeInPoland(),
+    createdAt: getCurrentDateTimeInPoland(),
     salesChannel: "DTC",
   };
 

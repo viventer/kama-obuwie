@@ -29,37 +29,21 @@ import { handleApiError } from "@/server-actions/errorHandlers";
 import { RegisterTransactionData } from "@/firebase/schemas/p24Schemas";
 import { SendOrderEmailPayload } from "@/server-actions/emails/orderEmails";
 import { transformOrderToEmailOrderData } from "@/helpers/orders";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
-  const { cart, clearCart, isLoading, updateItemAvailability, getCartStats } =
-    useShoppingCart();
+  const {
+    cart,
+    clearCart,
+    isLoading: isCartLoading,
+    updateItemAvailability,
+    getCartStats,
+  } = useShoppingCart();
   const router = useRouter();
   const { handleError } = useErrorHandler();
   const { startLoading, stopLoading } = useFullPageLoading();
   const { showDialog } = useConfirmDialog();
-
-  useEffect(() => {
-    if (isLoading) {
-      return;
-    }
-
-    const { itemCount } = getCartStats();
-    if (itemCount < 1) {
-      showDialog({
-        message: "Twój koszyk jest pusty.",
-        description:
-          "Jeśli złożyłeś już zamówienie - sprawdź czy otrzymałeś potwierdzenie na email. W przypadku wystąpienia błędu - skontaktuj się z nami.",
-        onConfirm: () => {
-          router.push("/");
-        },
-        hasCancelButton: false,
-        variant: "error",
-        confirmText: "Strona główna",
-      });
-    }
-  }, [isLoading]);
 
   const form = useForm({
     resolver: zodResolver(CheckoutDataSchema),
@@ -135,6 +119,24 @@ export default function CheckoutForms() {
         updateItemAvailability
       );
 
+      const { itemCount } = getCartStats();
+      if (itemCount < 1) {
+        stopLoading();
+        showDialog({
+          message: "Twój koszyk jest pusty.",
+          description:
+            "Jeśli złożyłeś już zamówienie - sprawdź czy otrzymałeś potwierdzenie na email. W przypadku wystąpienia błędu - skontaktuj się z nami.",
+          onConfirm: () => {
+            router.push("/");
+          },
+          hasCancelButton: false,
+          variant: "error",
+          confirmText: "Strona główna",
+        });
+
+        return;
+      }
+
       if (availabilityCheck.hasUnavailable) {
         stopLoading();
 
@@ -200,7 +202,7 @@ export default function CheckoutForms() {
       }
 
       if (checkoutData.paymentMethod === "COD") {
-        while (isLoading) {
+        while (isCartLoading) {
           await new Promise((resolve) => setTimeout(resolve, 100));
         }
         stopLoading();

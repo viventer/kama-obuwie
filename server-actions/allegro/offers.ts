@@ -94,8 +94,6 @@ export const getAllegroOffer = async (
   id: string,
   channel: "AL1" | "AL2"
 ): Promise<AllegroOffer> => {
-  await verifyUser(["ADMIN", "VERIFIED"]);
-
   const accessToken = await getAllegroUserAccessToken(channel);
   const headers = getSingleAllegroHeaders(accessToken);
 

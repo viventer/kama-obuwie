@@ -1,11 +1,19 @@
 import AppSidebar from "@/components/adminPanel/global/AppSidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { verifyUser } from "@/server-actions/auth/auth";
+import { redirect } from "next/navigation";
 
 export default async function layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const isAuthenticated = await verifyUser();
+
+  if (!isAuthenticated) {
+    redirect("/admin-auth/login");
+  }
+
   return (
     <SidebarProvider defaultOpen={false}>
       <AppSidebar />

@@ -17,25 +17,28 @@ export async function verifyUser(roles?: string[]) {
 
   const key = `session:${sessionId}`;
   const sess = await redis.hgetall(key);
+
+  // Sprawdź czy sesja istnieje i ma wszystkie wymagane dane
   if (!sess || !sess.firebaseIdToken || !sess.role) {
     await redis.del(key);
+    return false;
   }
 
+  // Zweryfikuj token Firebase
   try {
-    await adminAuth.verifyIdToken(sess?.firebaseIdToken as string, true);
+    await adminAuth.verifyIdToken(sess.firebaseIdToken as string, true);
   } catch (error) {
-    const ttl = await redis.ttl(key);
-
-    if (ttl <= 0) {
-      // Sesja wygasła
-      await redis.del(key);
-    }
+    console.error("Token verification failed:", error);
+    // Token nieważny - usuń sesję
+    await redis.del(key);
+    return false;
   }
 
-  if (!roles) return true;
-
-  if (roles.length > 0 && !roles.includes(sess?.role as string)) {
-    redirect("/admin-auth/unauthorized");
+  // Sprawdź uprawnienia ról jeśli są wymagane
+  if (roles && roles.length > 0) {
+    if (!roles.includes(sess.role as string)) {
+      redirect("/admin-auth/unauthorized");
+    }
   }
 
   return true;

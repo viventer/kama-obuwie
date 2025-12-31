@@ -42,6 +42,9 @@ export async function POST(request: Request) {
       perms: JSON.stringify({}),
     });
 
+    // Ustaw długi TTL dla sesji (1 rok)
+    await redis.expire(sessionKey, 365 * 24 * 60 * 60);
+
     if (!userDoc.exists) {
       await userRef.set({
         email: email || null,

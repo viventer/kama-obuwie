@@ -40,6 +40,9 @@ export function useUser() {
           });
 
           if (retryRes.status === 401) {
+            console.log(
+              "Status 401 z /refresh/firebase-token w useUser - przekierowanie na login."
+            );
             router.push("/admin-auth/login");
             return { user: null };
           }
@@ -61,6 +64,9 @@ export function useUser() {
           return { user: null };
         }
       } else if (path.startsWith("/admin-panel")) {
+        console.log(
+          "Nie ma auth.currentUser z firebase - przekierowanie na login."
+        );
         router.push("/admin-auth/login");
         return { user: null };
       }

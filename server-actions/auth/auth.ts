@@ -1,6 +1,7 @@
 "use server";
 
 import { adminAuth } from "@/firebase/firebaseAdmin";
+import { refreshFirebaseIdToken } from "@/lib/firebaseTokenRefresh";
 import { redis } from "@/upstash/redis";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -29,9 +30,27 @@ export async function verifyUser(roles?: string[]) {
     await adminAuth.verifyIdToken(sess.firebaseIdToken as string, true);
   } catch (error) {
     console.error("Token verification failed:", error);
-    // Token nieważny - usuń sesję
-    await redis.del(key);
-    return false;
+
+    const refreshToken = (sess.refreshToken as string) || "";
+    if (!refreshToken) {
+      await redis.del(key);
+      return false;
+    }
+
+    try {
+      const refreshed = await refreshFirebaseIdToken(refreshToken);
+
+      await redis.hset(key, {
+        firebaseIdToken: refreshed.id_token,
+        refreshToken: refreshed.refresh_token,
+      });
+
+      await adminAuth.verifyIdToken(refreshed.id_token, true);
+    } catch (refreshError) {
+      console.error("Server-side token refresh failed:", refreshError);
+      await redis.del(key);
+      return false;
+    }
   }
 
   // Sprawdź uprawnienia ról jeśli są wymagane

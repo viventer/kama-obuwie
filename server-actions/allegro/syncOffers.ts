@@ -35,6 +35,15 @@ const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 // Helper do delay między requestami
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+const addPercentToPrice = (amount: string, percent: number): string => {
+  const base = Number.parseFloat(amount);
+  if (!Number.isFinite(base)) return amount;
+
+  const value = base * (1 + percent / 100);
+  // 2 miejsca po przecinku, bez artefaktów float
+  return (Math.round((value + Number.EPSILON) * 100) / 100).toFixed(2);
+};
+
 export const getAllAllegroOffers = async (
   channel: "AL1" | "AL2",
   userId?: string // Opcjonalny userId dla zadań w tle
@@ -130,6 +139,9 @@ export const transformAllegroAL1OfferToOffer = async (
   const parsedSignature = parseSignature(finalSignature);
   const parsedColorVariantName = parsedSignature.colorVariantName;
 
+  const al1Amount = offer.sellingMode.price.amount;
+  const al2Amount = addPercentToPrice(al1Amount, 10);
+
   const transformedOffer: Offer = {
     title: cleanedTitle,
     productId: productId || null,
@@ -137,10 +149,16 @@ export const transformAllegroAL1OfferToOffer = async (
     signature: finalSignature,
     colorVariantName: parsedColorVariantName,
     sellingPrices: {
-      AL1: offer.sellingMode.price.amount,
+      AL1: al1Amount,
+      DTC: al1Amount,
+      POS: al1Amount,
+      AL2: al2Amount,
     },
     initialSellingPrices: {
-      AL1: offer.sellingMode.price.amount,
+      AL1: al1Amount,
+      DTC: al1Amount,
+      POS: al1Amount,
+      AL2: al2Amount,
     },
     createdAt: offer.publication?.startedAt || new Date().toISOString(),
     shippingRates: {

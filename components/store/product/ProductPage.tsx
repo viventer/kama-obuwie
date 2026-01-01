@@ -2,8 +2,9 @@
 
 import {
   CategoryWithId,
-  ProductWithId,
   SizingTableWithId,
+  ColorVariant,
+  ProductParameters,
 } from "@/firebase/schemas/productsSchemas";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import ProductImagesSlider from "./ProductImagesSlider";
@@ -24,6 +25,14 @@ import ShoppingCartPreviewItem from "../shopping-cart/ShoppingCartPreviewItem";
 import ShippingInfo from "../global/ShippingInfo";
 import { ShoppingCartItemType } from "@/firebase/schemas/shoppingCartSchemas";
 
+type StoreProductData = {
+  id: string;
+  brand?: string;
+  manufacturerCode: string;
+  colorVariants: ColorVariant[];
+  parameters: ProductParameters;
+};
+
 export default function ProductPage({
   imagesUrls,
   productData,
@@ -34,7 +43,7 @@ export default function ProductPage({
   choosingSizeImageUrl,
 }: {
   imagesUrls: Record<string, string[]>;
-  productData: ProductWithId;
+  productData: StoreProductData;
   category: CategoryWithId;
   initialColorVariantName?: string;
   offersData: Record<string, OfferWithId>;
@@ -74,9 +83,12 @@ export default function ProductPage({
 
   const currentOffer = offersData[selectedColorVariant];
 
-  const price = Number(
-    offersData[selectedColorVariant].sellingPrices.DTC
-  ) as number;
+  const priceStr =
+    currentOffer?.sellingPrices?.DTC ||
+    (currentOffer?.sellingPrices as any)?.AL1 ||
+    (currentOffer?.sellingPrices as any)?.AL2 ||
+    "0";
+  const price = Number(priceStr) as number;
 
   const { openDialog } = useDialogWindow();
   const { addToCart, findExistingItem } = useShoppingCart();

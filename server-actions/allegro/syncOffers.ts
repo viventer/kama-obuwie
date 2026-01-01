@@ -13,14 +13,22 @@ import {
 } from "./auth";
 import { getSingleAllegroHeaders } from "./global";
 import axios from "axios";
-import { editAllegroOffer } from "./offers";
+import { editAllegroOffer, getAllegroOffer } from "./offers";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { createOffer, updateOffer } from "../offers/offers";
 import { cleanOldExternalId, parseExternalId } from "@/helpers/externalId";
 import { updateProduct } from "../products/products";
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  CategoryWithId,
+  ProductWithId,
+} from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { redis } from "@/upstash/redis";
+import {
+  legacyProductIdFromSignature,
+  parseSignature,
+} from "@/helpers/signature";
+import type { LegacyProduct } from "@/firebase/schemas/legacyProductsSchemas";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -119,11 +127,15 @@ export const transformAllegroAL1OfferToOffer = async (
   const finalSignature = signature.trim() || "";
   console.log("Offer primary image URL:", offer.primaryImage.url);
 
+  const parsedSignature = parseSignature(finalSignature);
+  const parsedColorVariantName = parsedSignature.colorVariantName;
+
   const transformedOffer: Offer = {
     title: cleanedTitle,
     productId: productId || null,
     thumbnail: offer.primaryImage.url,
     signature: finalSignature,
+    colorVariantName: parsedColorVariantName,
     sellingPrices: {
       AL1: offer.sellingMode.price.amount,
     },
@@ -164,6 +176,26 @@ export const transformAllegroAL1OfferToOffer = async (
   return transformedOffer;
 };
 
+const getCategoryByAllegroCategoryId = async (
+  allegroCategoryId: string
+): Promise<CategoryWithId | null> => {
+  const snapshot = await adminDB
+    .collection("categories")
+    .where("allegroCategoryId", "==", allegroCategoryId)
+    .limit(1)
+    .get();
+
+  if (snapshot.empty) {
+    return null;
+  }
+
+  const doc = snapshot.docs[0];
+  return {
+    ...(doc.data() as Omit<CategoryWithId, "id">),
+    id: doc.id,
+  } as CategoryWithId;
+};
+
 const getOfferFromDBBySignature = async (
   signature: string
 ): Promise<Offer | null> => {
@@ -187,14 +219,12 @@ const getProductsBySignature = async (
 ): Promise<ProductWithId[]> => {
   // signature ma format: "... manufacturerCode colorVariantName"
   // Parsujemy signature, aby wydobyć manufacturerCode i colorVariantName
-  const parts = signature.trim().split(" ");
-  if (parts.length < 2) {
+  const parsed = parseSignature(signature);
+  const colorVariantName = parsed.colorVariantName;
+  const manufacturerCode = parsed.manufacturerCode;
+  if (!colorVariantName || !manufacturerCode) {
     return [];
   }
-
-  // Ostatni element to colorVariantName, przedostatni to manufacturerCode
-  const colorVariantName = parts[parts.length - 1];
-  const manufacturerCode = parts[parts.length - 2];
 
   console.log(
     `🔍 Searching products: manufacturerCode="${manufacturerCode}", colorVariant="${colorVariantName}"`
@@ -463,6 +493,8 @@ const syncAL1Offers = async (
       console.log(`🆕 Generated new SKU: ${SKU}`);
     }
 
+    const parsed = parseSignature(signature);
+
     // Przetwarzaj wszystkie rozmiary dla tej signature
     const processedSizes = new Set<string>(); // Deduplikacja rozmiarów
 
@@ -532,10 +564,127 @@ const syncAL1Offers = async (
       }
     }
 
+    // Legacy snapshot: jeśli nie ma produktu, wypełnij legacyProduct żeby dało się wyświetlić w sklepie
+    if (matchingProducts.length === 0 && existingOffer?.id) {
+      try {
+        const representativeOffer = groupedOffers[0];
+        const representativeSize = extractSizeFromTitle(
+          representativeOffer.name
+        ) as string;
+        const categoryFromDb = await getCategoryByAllegroCategoryId(
+          representativeOffer.category.id
+        );
+
+        const colorVariantName =
+          existingOffer.colorVariantName || parsed.colorVariantName;
+
+        const derivedLegacyProductId = legacyProductIdFromSignature(signature);
+        if (!derivedLegacyProductId) {
+          throw new Error(
+            `Brak signature do wyliczenia legacyProductId (AL1): "${signature}"`
+          );
+        }
+
+        const legacyProductId =
+          existingOffer.legacyProductId || derivedLegacyProductId;
+
+        const legacyRef = adminDB
+          .collection("legacyProducts")
+          .doc(legacyProductId);
+        const legacyDoc = await legacyRef.get();
+        const existingLegacy = (
+          legacyDoc.exists ? legacyDoc.data() : null
+        ) as LegacyProduct | null;
+
+        let nextOfferTemplates = { ...(existingLegacy?.offerTemplates || {}) };
+        const hasAnyAl1Template = Boolean(
+          nextOfferTemplates?.AL1 &&
+          Object.keys(nextOfferTemplates.AL1 || {}).length > 0
+        );
+
+        if (!hasAnyAl1Template) {
+          try {
+            const template = await getAllegroOffer(
+              representativeOffer.id,
+              "AL1",
+              { userId }
+            );
+            nextOfferTemplates = {
+              ...nextOfferTemplates,
+              AL1: {
+                ...(nextOfferTemplates.AL1 || {}),
+                [representativeSize || "template"]: template as any,
+              },
+            };
+          } catch (e) {
+            console.warn(
+              `⚠️  Failed to fetch AL1 template for legacy offer: ${representativeOffer.id}`,
+              e
+            );
+          }
+        }
+        const nextImagesUrls = {
+          ...(existingLegacy?.imagesUrls || {}),
+          ...(colorVariantName
+            ? {
+                [colorVariantName]: Array.from(
+                  new Set([
+                    ...(existingLegacy?.imagesUrls?.[colorVariantName] || []),
+                    representativeOffer.primaryImage.url,
+                  ])
+                ),
+              }
+            : {}),
+        };
+
+        const nowIso = new Date().toISOString();
+        const nextLegacyProduct: LegacyProduct = {
+          ...(existingLegacy || {}),
+          signature: existingLegacy?.signature || signature,
+          manufacturerCode:
+            existingLegacy?.manufacturerCode || parsed.manufacturerCode,
+          brand: existingLegacy?.brand || parsed.brand,
+          colorVariantName:
+            existingLegacy?.colorVariantName || parsed.colorVariantName,
+          colorVariants:
+            existingLegacy?.colorVariants &&
+            existingLegacy.colorVariants.length > 0
+              ? existingLegacy.colorVariants
+              : colorVariantName
+                ? [{ color: colorVariantName }]
+                : [],
+          category:
+            existingLegacy?.category || (categoryFromDb as any) || undefined,
+          rootCategory:
+            existingLegacy?.rootCategory || categoryFromDb?.rootCategory,
+          imagesUrls: nextImagesUrls,
+          offerTemplates: nextOfferTemplates,
+          createdAt: existingLegacy?.createdAt || nowIso,
+          updatedAt: nowIso,
+        };
+
+        await legacyRef.set(nextLegacyProduct, { merge: true });
+
+        await updateOffer(existingOffer.id as string, {
+          colorVariantName: colorVariantName,
+          legacyProductId,
+        });
+
+        existingOffer = await getOfferFromDBBySignature(signature);
+      } catch (e) {
+        console.warn(
+          `⚠️  Failed to enrich legacyProduct for signature: ${signature}`,
+          e
+        );
+      }
+    }
+
     // Zaktualizuj offersIds w odpowiadających produktach (po przetworzeniu wszystkich rozmiarów)
     if (matchingProducts.length > 0 && existingOffer?.id) {
-      const parts = signature.trim().split(" ");
-      const colorVariantName = parts[parts.length - 1];
+      const colorVariantName = parseSignature(signature).colorVariantName;
+      if (!colorVariantName) {
+        continue;
+      }
 
       console.log(
         `🔄 Updating offersIds for ${matchingProducts.length} products, variant: ${colorVariantName}, offerId: ${existingOffer.id}`
@@ -557,8 +706,10 @@ const syncAL1Offers = async (
 
     // Zaktualizuj SKU w odpowiadających produktach (jeśli istnieją)
     if (matchingProducts.length > 0) {
-      const parts = signature.trim().split(" ");
-      const colorVariantName = parts[parts.length - 1];
+      const colorVariantName = parseSignature(signature).colorVariantName;
+      if (!colorVariantName) {
+        continue;
+      }
 
       for (const product of matchingProducts) {
         try {
@@ -678,6 +829,91 @@ const syncAL2Offers = async (
       console.log(
         `✅ AL2: Found existing offer with SKU: ${existingOffer.SKU}`
       );
+
+      const parsed = parseSignature(signature);
+
+      // Legacy: dopnij template AL2 jeśli brak produktu i brak template
+      if (!existingOffer.productId) {
+        const derivedLegacyProductId = legacyProductIdFromSignature(signature);
+        if (!derivedLegacyProductId) {
+          throw new Error(
+            `Brak signature do wyliczenia legacyProductId (AL2): "${signature}"`
+          );
+        }
+
+        const legacyProductId =
+          existingOffer.legacyProductId || derivedLegacyProductId;
+
+        const legacyRef = adminDB
+          .collection("legacyProducts")
+          .doc(legacyProductId);
+        const legacyDoc = await legacyRef.get();
+        const existingLegacy = (
+          legacyDoc.exists ? legacyDoc.data() : null
+        ) as LegacyProduct | null;
+
+        const templates = existingLegacy?.offerTemplates || {};
+        const hasAnyAl2Template = Boolean(
+          templates?.AL2 && Object.keys(templates.AL2 || {}).length > 0
+        );
+
+        if (!hasAnyAl2Template && groupedOffers.length > 0) {
+          const representativeOffer = groupedOffers[0];
+          const representativeSize = extractSizeFromTitle(
+            representativeOffer.name
+          ) as string;
+
+          try {
+            const template = await getAllegroOffer(
+              representativeOffer.id,
+              "AL2",
+              { userId }
+            );
+
+            const nextOfferTemplates = {
+              ...templates,
+              AL2: {
+                ...(templates.AL2 || {}),
+                [representativeSize || "template"]: template as any,
+              },
+            };
+
+            const colorVariantName =
+              existingOffer.colorVariantName || parsed.colorVariantName;
+
+            const nowIso = new Date().toISOString();
+            const nextLegacyProduct: LegacyProduct = {
+              ...(existingLegacy || {}),
+              signature: existingLegacy?.signature || signature,
+              manufacturerCode:
+                existingLegacy?.manufacturerCode || parsed.manufacturerCode,
+              brand: existingLegacy?.brand || parsed.brand,
+              colorVariantName:
+                existingLegacy?.colorVariantName || parsed.colorVariantName,
+              offerTemplates: nextOfferTemplates,
+              createdAt: existingLegacy?.createdAt || nowIso,
+              updatedAt: nowIso,
+            };
+
+            await legacyRef.set(nextLegacyProduct, { merge: true });
+
+            await updateOffer(existingOffer.id as string, {
+              colorVariantName,
+              legacyProductId,
+            });
+
+            const refreshed = await getOfferFromDBBySignature(signature);
+            if (refreshed) {
+              existingOffer = refreshed;
+            }
+          } catch (e) {
+            console.warn(
+              `⚠️  Failed to fetch AL2 template for legacy offer (signature: ${signature})`,
+              e
+            );
+          }
+        }
+      }
 
       // Przetwarzaj wszystkie rozmiary dla tej signature
       const processedSizes = new Set<string>(); // Deduplikacja rozmiarów

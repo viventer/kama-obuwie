@@ -13,8 +13,13 @@ import type {
 } from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { getImagesUrls } from "@/server-actions/files/files";
-import { postIndividualAllegroOffer } from "@/server-actions/allegro/offers";
+import {
+  postIndividualAllegroOffer,
+  postIndividualAllegroOfferFromTemplate,
+} from "@/server-actions/allegro/offers";
 import { updateOffer } from "@/server-actions/offers/offers";
+import { parseSignature } from "@/helpers/signature";
+import type { LegacyProductWithId } from "@/firebase/schemas/legacyProductsSchemas";
 
 export type PostIndividualAllegroOfferBody = {
   offerId: string;
@@ -22,28 +27,15 @@ export type PostIndividualAllegroOfferBody = {
   salesChannel: "AL1" | "AL2";
 };
 
-function parseSignatureForProductLookup(signature: string): {
-  manufacturerCode: string;
-  colorVariantName: string;
-} | null {
-  const parts = signature.trim().split(" ").filter(Boolean);
-  if (parts.length < 2) return null;
-
-  return {
-    colorVariantName: parts[parts.length - 1],
-    manufacturerCode: parts[parts.length - 2],
-  };
-}
-
 async function tryFindProductIdForOffer(
   offer: OfferWithId
 ): Promise<string | null> {
   if (!offer.signature) return null;
 
-  const parsed = parseSignatureForProductLookup(offer.signature);
-  if (!parsed) return null;
-
-  const { manufacturerCode, colorVariantName } = parsed;
+  const parsed = parseSignature(offer.signature);
+  const manufacturerCode = parsed.manufacturerCode;
+  const colorVariantName = parsed.colorVariantName;
+  if (!manufacturerCode || !colorVariantName) return null;
 
   const products =
     (await getDocumentsFromAdminDB<ProductWithId>("products", (ref) =>
@@ -85,24 +77,6 @@ export async function POST(request: NextRequest) {
       return apiErrorResponse("Nie znaleziono oferty w bazie danych.", 404);
     }
 
-    // Dla ofert zsynchronizowanych z Allegro może nie istnieć productId.
-    // Wtedy próbujemy automatycznie dopasować produkt po signature.
-    let effectiveProductId = offer.productId;
-    if (!effectiveProductId) {
-      effectiveProductId = await tryFindProductIdForOffer(offer);
-
-      if (effectiveProductId) {
-        await updateOffer(offerId, { productId: effectiveProductId });
-      } else {
-        return apiErrorResponse(
-          "Oferta nie ma przypisanego produktu i nie udało się go automatycznie dopasować po signature. Przypisz produkt ręcznie, aby można było odtworzyć/utworzyć ofertę.",
-          409,
-          null,
-          { step: "offer_creation" }
-        );
-      }
-    }
-
     if (!offer.availability?.[size]) {
       return apiErrorResponse(
         `Rozmiar ${size} nie istnieje w dostępności oferty.`,
@@ -116,6 +90,82 @@ export async function POST(request: NextRequest) {
       return apiErrorResponse("Brak SKU w ofercie.", 400, null, {
         step: "offer_creation",
       });
+    }
+
+    // Dla ofert zsynchronizowanych z Allegro może nie istnieć productId.
+    // Wtedy próbujemy automatycznie dopasować produkt po signature.
+    let effectiveProductId = offer.productId;
+    if (!effectiveProductId) {
+      effectiveProductId = await tryFindProductIdForOffer(offer);
+
+      if (effectiveProductId) {
+        await updateOffer(offerId, { productId: effectiveProductId });
+      } else {
+        // Fallback dla legacy: jeśli mamy snapshot oferty Allegro, możemy odtworzyć bez rekordu produktu
+        if (!offer.legacyProductId) {
+          return apiErrorResponse(
+            "Oferta nie ma przypisanego produktu i nie udało się go automatycznie dopasować po signature. Brak legacyProductId, aby użyć legacy szablonu (offerTemplates) do odtworzenia oferty.",
+            409,
+            null,
+            { step: "offer_creation" }
+          );
+        }
+
+        const { data: legacy } =
+          await getDocumentFromAdminDB<LegacyProductWithId>(
+            "legacyProducts",
+            offer.legacyProductId
+          );
+
+        const templatesForChannel = legacy?.offerTemplates?.[salesChannel];
+
+        const template =
+          (templatesForChannel && templatesForChannel[size]) ||
+          (templatesForChannel
+            ? Object.values(templatesForChannel)[0]
+            : undefined);
+
+        if (!template) {
+          return apiErrorResponse(
+            "Oferta nie ma przypisanego produktu i nie udało się go automatycznie dopasować po signature. Brak też legacy szablonu (offerTemplates), aby odtworzyć ofertę.",
+            409,
+            null,
+            { step: "offer_creation" }
+          );
+        }
+
+        const url = `${process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL}/sale/product-offers`;
+        const allegroHeaders = (
+          await import("@/server-actions/allegro/global")
+        ).getSingleAllegroHeaders(
+          await (
+            await import("@/server-actions/allegro/auth")
+          ).getAllegroUserAccessToken(salesChannel)
+        ) as any;
+
+        const allegroOfferId = await postIndividualAllegroOfferFromTemplate({
+          template: template as any,
+          offer,
+          size,
+          channel: salesChannel,
+          allegroHeaders,
+          url,
+        });
+
+        const nextAllegroOffersIds = {
+          ...(offer.allegroOffersIds || {}),
+          [salesChannel]: {
+            ...((offer.allegroOffersIds as any)?.[salesChannel] || {}),
+            [size]: allegroOfferId,
+          },
+        };
+
+        await updateOffer(offerId, {
+          allegroOffersIds: nextAllegroOffersIds as any,
+        });
+
+        return apiResponse("Oferta utworzona.", 201, { allegroOfferId });
+      }
     }
 
     const { data: product } = await getDocumentFromAdminDB<ProductWithId>(

@@ -9,11 +9,16 @@ import {
   ProductListingData,
 } from "@/firebase/schemas/productsSchemas";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
-import { getDocumentsFromAdminDB } from "@/firebase/getters";
+import {
+  getDocumentFromAdminDB,
+  getDocumentsFromAdminDB,
+} from "@/firebase/getters";
 import { verifyUser } from "../auth/auth";
 import { getImageUrl } from "@/server-actions/files/files";
 import { isValidUrl } from "@/components/adminPanel/offers/helpers/validation";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
+import type { LegacyProductWithId } from "@/firebase/schemas/legacyProductsSchemas";
+import { parseSignature } from "@/helpers/signature";
 
 export const createProduct = async function (newProduct: Product) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -140,6 +145,20 @@ export const getProductsListingData = async function (
 
   const products: Record<string, ProductListingData[]> = {};
 
+  const legacyCache = new Map<string, LegacyProductWithId | null>();
+  const getLegacyById = async (
+    id: string
+  ): Promise<LegacyProductWithId | null> => {
+    if (legacyCache.has(id)) return legacyCache.get(id)!;
+    const { data } = await getDocumentFromAdminDB<LegacyProductWithId>(
+      "legacyProducts",
+      id
+    );
+    const legacy = data || null;
+    legacyCache.set(id, legacy);
+    return legacy;
+  };
+
   for (const categoryId of categoryIds) {
     const categoryProducts =
       allProducts?.filter((product) => product.categoryId === categoryId) || [];
@@ -151,6 +170,57 @@ export const getProductsListingData = async function (
       // Dodajemy wszystkie warianty kolorystyczne do listy
       productsListingData.push(...productListingDataArray);
     }
+
+    // Legacy: oferty bez produktu, ale z legacyProductId (żeby były widoczne w sklepie)
+    const legacyOffersListingData: ProductListingData[] = [];
+    const legacyOffers =
+      allOffers?.filter((offer) => !offer.productId && offer.legacyProductId) ||
+      [];
+
+    for (const offer of legacyOffers) {
+      if (!offer.legacyProductId) continue;
+
+      const legacy = await getLegacyById(offer.legacyProductId);
+      const legacyCategoryId = legacy?.category?.id;
+      if (!legacyCategoryId || legacyCategoryId !== categoryId) continue;
+
+      const parsed = parseSignature(offer.signature || "");
+      const colorVariantName =
+        legacy?.colorVariantName ||
+        offer.colorVariantName ||
+        parsed.colorVariantName ||
+        "";
+
+      if (!colorVariantName) continue;
+
+      const isActive = Object.values(offer.availability || {}).some(
+        (availability) =>
+          availability.value &&
+          availability.value !== "" &&
+          availability.value !== "0"
+      );
+
+      const legacyImages = legacy?.imagesUrls || {};
+      const fallbackThumb = legacyImages[colorVariantName]?.[0] || "";
+      const thumbnailUrl = offer.thumbnail || fallbackThumb;
+
+      const price =
+        offer.sellingPrices?.DTC ||
+        offer.sellingPrices?.AL1 ||
+        offer.sellingPrices?.AL2 ||
+        "0";
+
+      legacyOffersListingData.push({
+        thumbnailUrl,
+        price,
+        id: offer.id,
+        brand: legacy?.brand || undefined,
+        colorVariantName,
+        isActive,
+      });
+    }
+
+    productsListingData.push(...legacyOffersListingData);
 
     products[categoryId] = productsListingData;
   }

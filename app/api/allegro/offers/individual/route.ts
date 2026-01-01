@@ -13,10 +13,8 @@ import type {
 } from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { getImagesUrls } from "@/server-actions/files/files";
-import { getImageUrl } from "@/server-actions/files/files";
 import { postIndividualAllegroOffer } from "@/server-actions/allegro/offers";
 import { updateOffer } from "@/server-actions/offers/offers";
-import { choosingSizeImageFilePath } from "@/lib/constants";
 
 export type PostIndividualAllegroOfferBody = {
   offerId: string;
@@ -195,12 +193,6 @@ export async function POST(request: NextRequest) {
         null,
         { step: "offer_creation" }
       );
-    }
-
-    // Dodaj zdjęcie "jak dobrać rozmiar" na końcu (tak jak w postAllegroOffer)
-    const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
-    if (choosingSizeImageUrl) {
-      imagesUrls.push(choosingSizeImageUrl as string);
     }
 
     const insoleLength = sizingTable.insoleLengths.find(

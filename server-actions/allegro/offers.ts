@@ -127,7 +127,9 @@ export const postAllegroOffer = async (
   } = data;
 
   const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
-  images.push(choosingSizeImageUrl as string);
+  if (choosingSizeImageUrl) {
+    images.push(choosingSizeImageUrl as string);
+  }
 
   // Pobierz tokeny dla obu kont
   const { AL1: AL1AccessToken, AL2: AL2AccessToken } =
@@ -232,6 +234,17 @@ export async function postIndividualAllegroOffer(
     channel,
     SKU,
   } = data;
+
+  // Upewnij się, że obrazek "jak dobrać rozmiar" jest na końcu listy (idempotentnie)
+  const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
+  if (choosingSizeImageUrl) {
+    const urlStr = choosingSizeImageUrl as string;
+    const existingIndex = images.indexOf(urlStr);
+    if (existingIndex !== -1) {
+      images.splice(existingIndex, 1);
+    }
+    images.push(urlStr);
+  }
 
   const formattedProductParameters = await formatAllegroProductParameters(
     product.parameters,

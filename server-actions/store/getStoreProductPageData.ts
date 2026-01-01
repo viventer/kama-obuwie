@@ -176,6 +176,17 @@ export async function getStoreProductPageData(params: {
     }
     category = categoryResult.data;
 
+    if (legacy.sizingTableId) {
+      const { data: sizingTableData } =
+        await getDocumentFromAdminDB<SizingTableWithId>(
+          "sizingTables",
+          legacy.sizingTableId
+        );
+      if (sizingTableData) {
+        sizingTable = sizingTableData;
+      }
+    }
+
     const legacyImagesUrls = legacy.imagesUrls || {};
     if (legacyImagesUrls[baseColorVariantName]?.length) {
       imagesUrls[baseColorVariantName] = legacyImagesUrls[baseColorVariantName];

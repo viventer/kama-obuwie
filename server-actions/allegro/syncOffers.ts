@@ -2,6 +2,7 @@
 
 import { extractSizeFromTitle, removeSizeFromTitle } from "@/helpers/titles";
 import { generateUniqueSKU } from "../products/SKU";
+import { createSizingTable } from "../products/sizingTables";
 import {
   AllegroOfferFromListing,
   Offer,
@@ -14,13 +15,16 @@ import {
 import { getSingleAllegroHeaders } from "./global";
 import axios from "axios";
 import { editAllegroOffer, getAllegroOffer } from "./offers";
+import { getAllegroSizingTable } from "./sizingTables";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { createOffer, updateOffer } from "../offers/offers";
 import { cleanOldExternalId, parseExternalId } from "@/helpers/externalId";
 import { updateProduct } from "../products/products";
 import {
   CategoryWithId,
+  AllegroSizingTable,
   ProductWithId,
+  SizingTable,
 } from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { redis } from "@/upstash/redis";
@@ -42,6 +46,34 @@ const addPercentToPrice = (amount: string, percent: number): string => {
   const value = base * (1 + percent / 100);
   // 2 miejsca po przecinku, bez artefaktów float
   return (Math.round((value + Number.EPSILON) * 100) / 100).toFixed(2);
+};
+
+const transformAllegroSizingTableToSizingTable = (
+  allegroTable: AllegroSizingTable
+): SizingTable => {
+  const insoleLengths: SizingTable["insoleLengths"] = [];
+  const seen = new Set<string>();
+
+  for (const row of allegroTable.values || []) {
+    // Allegro zawsze zwraca: [rozmiar, długość wkładki]
+    const size = (row.cells?.[0] || "").trim();
+    const insoleStr = (row.cells?.[1] || "").trim().replace(",", ".");
+    const insoleLength = Number.parseFloat(insoleStr);
+
+    if (!size) continue;
+    if (!Number.isFinite(insoleLength)) continue;
+    if (seen.has(size)) continue;
+    seen.add(size);
+
+    insoleLengths.push({ size, insoleLength });
+  }
+
+  return {
+    name: (allegroTable.name || "Tabela rozmiarów").slice(0, 32),
+    insoleLengths,
+    sizingAccuracy: "normalna",
+    allegroId: allegroTable.id,
+  };
 };
 
 export const getAllAllegroOffers = async (
@@ -641,6 +673,58 @@ const syncAL1Offers = async (
             );
           }
         }
+
+        // Jeśli oferta ma sizeTable na Allegro, pobierz ją i zapisz w naszej bazie.
+        // W legacyProduct zapisujemy id naszej tabeli w legacyProduct.sizingTableId.
+        let sizingTableId = existingLegacy?.sizingTableId;
+        if (!sizingTableId) {
+          const templateForSizing =
+            (representativeSize &&
+              nextOfferTemplates?.AL1?.[representativeSize]) ||
+            (nextOfferTemplates?.AL1
+              ? Object.values(nextOfferTemplates.AL1)[0]
+              : undefined);
+
+          const allegroSizingTableId = (templateForSizing as any)?.sizeTable
+            ?.id as string | undefined;
+
+          if (allegroSizingTableId) {
+            try {
+              const allegroTable = await getAllegroSizingTable(
+                allegroSizingTableId,
+                "AL1",
+                userId ? { userId } : undefined
+              );
+
+              if (allegroTable) {
+                const existingSizingTable = await adminDB
+                  .collection("sizingTables")
+                  .where("allegroId", "==", allegroSizingTableId)
+                  .limit(1)
+                  .get();
+
+                if (!existingSizingTable.empty) {
+                  sizingTableId = existingSizingTable.docs[0].id;
+                } else {
+                  const sizingTable = transformAllegroSizingTableToSizingTable({
+                    ...allegroTable,
+                    id: allegroSizingTableId,
+                  });
+
+                  sizingTableId = await createSizingTable(
+                    sizingTable,
+                    userId ? { userId } : undefined
+                  );
+                }
+              }
+            } catch (e) {
+              console.warn(
+                `⚠️  Failed to fetch/save sizing table for legacy offer (sizeTable.id=${allegroSizingTableId})`,
+                e
+              );
+            }
+          }
+        }
         const nextImagesUrls = {
           ...(existingLegacy?.imagesUrls || {}),
           ...(colorVariantName
@@ -659,6 +743,7 @@ const syncAL1Offers = async (
         const nextLegacyProduct: LegacyProduct = {
           ...(existingLegacy || {}),
           signature: existingLegacy?.signature || signature,
+          sizingTableId: sizingTableId || existingLegacy?.sizingTableId,
           manufacturerCode:
             existingLegacy?.manufacturerCode || parsed.manufacturerCode,
           brand: existingLegacy?.brand || parsed.brand,

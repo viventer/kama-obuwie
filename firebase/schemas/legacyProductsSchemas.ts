@@ -12,6 +12,8 @@ export const LegacyProductSchema = z.object({
   id: z.string().optional(),
   signature: z.string().min(1).optional(),
 
+  sizingTableId: z.string().optional(),
+
   manufacturerCode: z.string().optional(),
   brand: z.string().optional(),
   colorVariantName: z.string().optional(),

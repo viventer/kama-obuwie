@@ -5,6 +5,7 @@ import { generateUniqueSKU } from "../products/SKU";
 import { createSizingTable } from "../products/sizingTables";
 import {
   AllegroOfferFromListing,
+  AllegroOffer,
   Offer,
 } from "@/firebase/schemas/offersSchemas";
 import { verifyUser } from "../auth/auth";
@@ -17,6 +18,7 @@ import axios from "axios";
 import { editAllegroOffer, getAllegroOffer } from "./offers";
 import { getAllegroSizingTable } from "./sizingTables";
 import { adminDB } from "@/firebase/firebaseAdmin";
+import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { createOffer, updateOffer } from "../offers/offers";
 import { cleanOldExternalId, parseExternalId } from "@/helpers/externalId";
 import { updateProduct } from "../products/products";
@@ -25,6 +27,7 @@ import {
   AllegroSizingTable,
   ProductWithId,
   SizingTable,
+  SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { redis } from "@/upstash/redis";
@@ -74,6 +77,27 @@ const transformAllegroSizingTableToSizingTable = (
     sizingAccuracy: "normalna",
     allegroId: allegroTable.id,
   };
+};
+
+const addMissingSizesFromSizingTableToAvailability = (params: {
+  availability: Offer["availability"] | undefined;
+  sizingTableSizes: string[];
+}): { nextAvailability: Offer["availability"]; addedCount: number } => {
+  const { availability, sizingTableSizes } = params;
+
+  const nextAvailability: Offer["availability"] = { ...(availability || {}) };
+  let addedCount = 0;
+
+  for (const rawSize of sizingTableSizes) {
+    const size = (rawSize || "").trim();
+    if (!size) continue;
+    if (size in nextAvailability) continue;
+
+    nextAvailability[size] = { value: "0" };
+    addedCount++;
+  }
+
+  return { nextAvailability, addedCount };
 };
 
 export const getAllAllegroOffers = async (
@@ -545,6 +569,9 @@ const syncAL1Offers = async (
 
     const parsed = parseSignature(signature);
 
+    // Jeśli w trakcie snapshotu legacy pobierzemy/zapiszemy sizingTable, zapamiętamy jej id.
+    let legacySizingTableId: string | undefined;
+
     // Przetwarzaj wszystkie rozmiary dla tej signature
     const processedSizes = new Set<string>(); // Deduplikacja rozmiarów
 
@@ -605,10 +632,12 @@ const syncAL1Offers = async (
         }
 
         console.log(`✅ AL1: Successfully processed size ${size}`);
-      } catch (sizeError: any) {
+      } catch (sizeError: unknown) {
+        const message =
+          sizeError instanceof Error ? sizeError.message : String(sizeError);
         console.error(
           `❌ AL1: Error processing size ${size} for signature "${signature}":`,
-          sizeError.message || sizeError
+          message
         );
         // Kontynuuj z następnym rozmiarem
       }
@@ -646,7 +675,9 @@ const syncAL1Offers = async (
           legacyDoc.exists ? legacyDoc.data() : null
         ) as LegacyProduct | null;
 
-        let nextOfferTemplates = { ...(existingLegacy?.offerTemplates || {}) };
+        let nextOfferTemplates: NonNullable<LegacyProduct["offerTemplates"]> = {
+          ...(existingLegacy?.offerTemplates || {}),
+        };
         const hasAnyAl1Template = Boolean(
           nextOfferTemplates?.AL1 &&
           Object.keys(nextOfferTemplates.AL1 || {}).length > 0
@@ -654,7 +685,7 @@ const syncAL1Offers = async (
 
         if (!hasAnyAl1Template) {
           try {
-            const template = await getAllegroOffer(
+            const template: AllegroOffer = await getAllegroOffer(
               representativeOffer.id,
               "AL1",
               { userId }
@@ -663,7 +694,7 @@ const syncAL1Offers = async (
               ...nextOfferTemplates,
               AL1: {
                 ...(nextOfferTemplates.AL1 || {}),
-                [representativeSize || "template"]: template as any,
+                [representativeSize || "template"]: template,
               },
             };
           } catch (e) {
@@ -685,8 +716,7 @@ const syncAL1Offers = async (
               ? Object.values(nextOfferTemplates.AL1)[0]
               : undefined);
 
-          const allegroSizingTableId = (templateForSizing as any)?.sizeTable
-            ?.id as string | undefined;
+          const allegroSizingTableId = templateForSizing?.sizeTable?.id;
 
           if (allegroSizingTableId) {
             try {
@@ -725,6 +755,8 @@ const syncAL1Offers = async (
             }
           }
         }
+
+        legacySizingTableId = sizingTableId || existingLegacy?.sizingTableId;
         const nextImagesUrls = {
           ...(existingLegacy?.imagesUrls || {}),
           ...(colorVariantName
@@ -740,6 +772,9 @@ const syncAL1Offers = async (
         };
 
         const nowIso = new Date().toISOString();
+        const categoryFromDbNoId = categoryFromDb
+          ? (({ id: _id, ...rest }) => rest)(categoryFromDb)
+          : undefined;
         const nextLegacyProduct: LegacyProduct = {
           ...(existingLegacy || {}),
           signature: existingLegacy?.signature || signature,
@@ -756,8 +791,7 @@ const syncAL1Offers = async (
               : colorVariantName
                 ? [{ color: colorVariantName }]
                 : [],
-          category:
-            existingLegacy?.category || (categoryFromDb as any) || undefined,
+          category: existingLegacy?.category || categoryFromDbNoId,
           rootCategory:
             existingLegacy?.rootCategory || categoryFromDb?.rootCategory,
           imagesUrls: nextImagesUrls,
@@ -777,6 +811,70 @@ const syncAL1Offers = async (
       } catch (e) {
         console.warn(
           `⚠️  Failed to enrich legacyProduct for signature: ${signature}`,
+          e
+        );
+      }
+    }
+
+    // Uzupełnij availability o rozmiary z tabeli rozmiarów, nawet jeśli nie były wystawione na Allegro.
+    // Przykład: tabela ma 25-30, na Allegro są 26 i 27 -> dopisz 25,28,29,30 z value="0".
+    if (existingOffer?.id) {
+      try {
+        const productSizingTableId = matchingProducts.find(
+          (p) =>
+            typeof p.sizingTableId === "string" && p.sizingTableId.trim() !== ""
+        )?.sizingTableId;
+
+        let sizingTableIdToUse: string | undefined = productSizingTableId;
+        if (!sizingTableIdToUse) {
+          sizingTableIdToUse = legacySizingTableId;
+        }
+
+        if (!sizingTableIdToUse && existingOffer.legacyProductId) {
+          const legacyDoc = await adminDB
+            .collection("legacyProducts")
+            .doc(existingOffer.legacyProductId)
+            .get();
+          const legacyData = legacyDoc.exists
+            ? (legacyDoc.data() as LegacyProduct)
+            : null;
+          if (legacyData?.sizingTableId) {
+            sizingTableIdToUse = legacyData.sizingTableId;
+          }
+        }
+
+        if (sizingTableIdToUse) {
+          const { data: sizingData } =
+            await getDocumentFromAdminDB<SizingTableWithId>(
+              "sizingTables",
+              sizingTableIdToUse
+            );
+
+          const sizesFromTable: string[] = Array.isArray(
+            sizingData?.insoleLengths
+          )
+            ? sizingData.insoleLengths
+                .map((x: SizingTable["insoleLengths"][number]) => x.size)
+                .filter((x): x is string => Boolean(x))
+            : [];
+
+          const { nextAvailability, addedCount } =
+            addMissingSizesFromSizingTableToAvailability({
+              availability: existingOffer.availability,
+              sizingTableSizes: sizesFromTable,
+            });
+
+          if (addedCount > 0) {
+            await updateOffer(existingOffer.id as string, {
+              availability: nextAvailability,
+            });
+
+            existingOffer = await getOfferFromDBBySignature(signature);
+          }
+        }
+      } catch (e) {
+        console.warn(
+          `⚠️  Failed to add missing sizes from sizing table for signature: ${signature}`,
           e
         );
       }
@@ -955,7 +1053,9 @@ const syncAL2Offers = async (
           legacyDoc.exists ? legacyDoc.data() : null
         ) as LegacyProduct | null;
 
-        const templates = existingLegacy?.offerTemplates || {};
+        const templates: NonNullable<LegacyProduct["offerTemplates"]> = {
+          ...(existingLegacy?.offerTemplates || {}),
+        };
         const hasAnyAl2Template = Boolean(
           templates?.AL2 && Object.keys(templates.AL2 || {}).length > 0
         );
@@ -967,7 +1067,7 @@ const syncAL2Offers = async (
           ) as string;
 
           try {
-            const template = await getAllegroOffer(
+            const template: AllegroOffer = await getAllegroOffer(
               representativeOffer.id,
               "AL2",
               { userId }
@@ -977,7 +1077,7 @@ const syncAL2Offers = async (
               ...templates,
               AL2: {
                 ...(templates.AL2 || {}),
-                [representativeSize || "template"]: template as any,
+                [representativeSize || "template"]: template,
               },
             };
 
@@ -1172,7 +1272,18 @@ export const syncAllegroOffers = async (
     }
 
     // Zwróć informacje o tym czy są kolejne batche
-    const result: any = {
+    const result: {
+      success: true;
+      channel: string;
+      batch: number;
+      processedOffers: number;
+      totalOffers: number;
+      hasMore: boolean;
+      nextBatch: number;
+      nextChannel: string;
+      AL1?: { success: true; offersCount: number };
+      AL2?: { success: true; offersCount: number };
+    } = {
       success: true,
       channel: currentChannel,
       batch,

@@ -29,7 +29,11 @@ export const LegacyProductSchema = z.object({
 
   // Snapshoty ofert z Allegro do odtwarzania: { AL1: { "41": AllegroOffer }, AL2: { ... } }
   offerTemplates: z
-    .record(z.enum(["AL1", "AL2"]), z.record(z.string(), AllegroOfferSchema))
+    .object({
+      AL1: z.record(z.string(), AllegroOfferSchema),
+      AL2: z.record(z.string(), AllegroOfferSchema),
+    })
+    .partial()
     .optional(),
 
   createdAt: z.string().optional(),

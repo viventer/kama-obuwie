@@ -1,9 +1,6 @@
 import { z } from "zod";
 
-import {
-  ColorVariantSchema,
-  ProductParametersSchema,
-} from "./productsSchemas";
+import { ColorVariantSchema, ProductParametersSchema } from "./productsSchemas";
 import { AllegroOfferSchema } from "./offersSchemas";
 
 export const LegacyProductSchema = z.object({

@@ -1,10 +1,12 @@
 import { adminDB } from "@/firebase/firebaseAdmin";
 import type {
+  AllegroOffer,
   AllegroOfferFromListing,
   Offer,
 } from "@/firebase/schemas/offersSchemas";
 import type {
   CategoryWithId,
+  ProductParameters,
   ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { cleanOldExternalId, parseExternalId } from "@/helpers/externalId";
@@ -294,4 +296,48 @@ export const resolveSkuForOffer = async (existingOffer: Offer | null) => {
   const SKU = await generateUniqueSKU();
   console.log(`🆕 Generated new SKU: ${SKU}`);
   return SKU;
+};
+
+export const allegroProductParametersToProductParameters = (
+  allegroParameters:
+    | AllegroOffer["productSet"][number]["product"]["parameters"]
+    | undefined
+): ProductParameters | undefined => {
+  if (!Array.isArray(allegroParameters) || allegroParameters.length === 0) {
+    return undefined;
+  }
+
+  const optional: NonNullable<ProductParameters["optional"]> = {};
+
+  for (const p of allegroParameters) {
+    const name = typeof p?.name === "string" ? p.name.trim() : "";
+    if (!name) {
+      continue;
+    }
+
+    const values = Array.isArray(p?.values) ? p.values : [];
+    if (values.length === 0) {
+      continue;
+    }
+
+    const singleOrArray =
+      values.length === 1
+        ? values[0]
+        : (() => {
+            const allStrings = values.every((v) => typeof v === "string");
+            const allNumbers = values.every((v) => typeof v === "number");
+            if (allStrings) return values as string[];
+            if (allNumbers) return values as number[];
+            // ProductParameters (ParamValueSchema) nie wspiera tablic booleanów ani mieszanek,
+            // więc w takich przypadkach zapisujemy jako stringi.
+            return values.map((v) => String(v));
+          })();
+
+    optional[name] = singleOrArray as any;
+  }
+
+  return {
+    required: {},
+    optional,
+  } as ProductParameters;
 };

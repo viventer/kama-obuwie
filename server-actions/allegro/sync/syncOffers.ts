@@ -21,7 +21,10 @@ import { adminDB } from "@/firebase/firebaseAdmin";
 import { createOffer, updateOffer } from "../../offers/offers";
 import { cleanOldExternalId, parseExternalId } from "@/helpers/externalId";
 import { updateProduct } from "../../products/products";
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  ProductParameters,
+  ProductWithId,
+} from "@/firebase/schemas/productsSchemas";
 import { redis } from "@/upstash/redis";
 import {
   legacyProductIdFromSignature,
@@ -33,6 +36,7 @@ import {
   transformAllegroSizingTableToSizingTable,
 } from "./sizingTableSyncHelpers";
 import {
+  allegroProductParametersToProductParameters,
   delay,
   getCategoryByAllegroCategoryId,
   getOfferFromDBBySignature,
@@ -418,6 +422,21 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
     const allegroImagesToUse =
       templateImages.length > 0 ? templateImages : productImages;
 
+    const derivedParameters = allegroProductParametersToProductParameters(
+      templateForImages?.productSet?.[0]?.product?.parameters
+    );
+
+    const mergedLegacyParameters: ProductParameters | undefined =
+      derivedParameters || existingLegacy?.parameters
+        ? ({
+            required: existingLegacy?.parameters?.required || {},
+            optional: {
+              ...(derivedParameters?.optional || {}),
+              ...(existingLegacy?.parameters?.optional || {}),
+            },
+          } as ProductParameters)
+        : undefined;
+
     const nextImagesUrls = {
       ...(existingLegacy?.imagesUrls || {}),
       ...(colorVariantName
@@ -453,6 +472,7 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
           : colorVariantName
             ? [{ color: colorVariantName }]
             : [],
+      parameters: mergedLegacyParameters,
       categoryId: existingLegacy?.categoryId || categoryFromDb?.id,
       imagesUrls: nextImagesUrls,
       offerTemplates: nextOfferTemplates,

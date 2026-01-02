@@ -448,7 +448,6 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
       sizingTableId: sizingTableId || existingLegacy?.sizingTableId,
       manufacturerCode:
         existingLegacy?.manufacturerCode || parsed.manufacturerCode,
-      brand: existingLegacy?.brand || parsed.brand,
       colorVariantName:
         existingLegacy?.colorVariantName || parsed.colorVariantName,
       colorVariants:
@@ -465,6 +464,10 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
       createdAt: existingLegacy?.createdAt || nowIso,
       updatedAt: nowIso,
     };
+
+    if (parsed.brand) {
+      nextLegacyProduct.brand = parsed.brand;
+    }
 
     await legacyRef.set(nextLegacyProduct, { merge: true });
 

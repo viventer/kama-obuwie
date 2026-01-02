@@ -181,7 +181,7 @@ export const getProductsListingData = async function (
       if (!offer.legacyProductId) continue;
 
       const legacy = await getLegacyById(offer.legacyProductId);
-      const legacyCategoryId = legacy?.category?.id;
+      const legacyCategoryId = legacy?.categoryId;
       if (!legacyCategoryId || legacyCategoryId !== categoryId) continue;
 
       const parsed = parseSignature(offer.signature || "");

@@ -438,9 +438,6 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
     };
 
     const nowIso = new Date().toISOString();
-    const categoryFromDbNoId = categoryFromDb
-      ? (({ id: _id, ...rest }) => rest)(categoryFromDb)
-      : undefined;
 
     const nextLegacyProduct: LegacyProduct = {
       ...(existingLegacy || {}),
@@ -456,9 +453,7 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
           : colorVariantName
             ? [{ color: colorVariantName }]
             : [],
-      category: existingLegacy?.category || categoryFromDbNoId,
-      rootCategory:
-        existingLegacy?.rootCategory || categoryFromDb?.rootCategory,
+      categoryId: existingLegacy?.categoryId || categoryFromDb?.id,
       imagesUrls: nextImagesUrls,
       offerTemplates: nextOfferTemplates,
       createdAt: existingLegacy?.createdAt || nowIso,

@@ -162,7 +162,7 @@ export async function getStoreProductPageData(params: {
       return null;
     }
 
-    const legacyCategoryId = legacy.category?.id;
+    const legacyCategoryId = legacy.categoryId;
     if (!legacyCategoryId) {
       return null;
     }

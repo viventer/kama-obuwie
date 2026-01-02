@@ -1,10 +1,8 @@
 import { z } from "zod";
 
 import {
-  CategorySchema,
   ColorVariantSchema,
   ProductParametersSchema,
-  RootCategoryValues,
 } from "./productsSchemas";
 import { AllegroOfferSchema } from "./offersSchemas";
 
@@ -21,8 +19,8 @@ export const LegacyProductSchema = z.object({
   colorVariants: z.array(ColorVariantSchema).default([]).optional(),
   parameters: ProductParametersSchema.default({}).optional(),
 
-  category: CategorySchema.optional(),
-  rootCategory: z.enum(RootCategoryValues).optional(),
+  // ID dokumentu z kolekcji `categories`
+  categoryId: z.string().optional(),
 
   // Zdjęcia do sklepu: { [colorVariantName]: [url1, url2, ...] }
   imagesUrls: z.record(z.string(), z.array(z.string().url())).optional(),

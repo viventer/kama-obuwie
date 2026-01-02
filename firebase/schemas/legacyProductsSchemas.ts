@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { ColorVariantSchema, ProductParametersSchema } from "./productsSchemas";
-import { AllegroOfferSchema } from "./offersSchemas";
+import { AllegroOfferDescriptionSchema } from "./offersSchemas";
 
 export const LegacyProductSchema = z.object({
   id: z.string().optional(),
@@ -22,14 +22,11 @@ export const LegacyProductSchema = z.object({
   // Zdjęcia do sklepu: { [colorVariantName]: [url1, url2, ...] }
   imagesUrls: z.record(z.string(), z.array(z.string().url())).optional(),
 
-  // Snapshoty ofert z Allegro do odtwarzania: { AL1: { "41": AllegroOffer }, AL2: { ... } }
-  offerTemplates: z
-    .object({
-      AL1: z.record(z.string(), AllegroOfferSchema),
-      AL2: z.record(z.string(), AllegroOfferSchema),
-    })
-    .partial()
-    .optional(),
+  // Kopia opisu Allegro (z allegroOffer.description)
+  allegroDescription: AllegroOfferDescriptionSchema.optional(),
+
+  // Nazwa producenta odpowiedzialnego (taka sama dla AL1 i AL2)
+  responsibleProducer: z.string().min(1).optional(),
 
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),

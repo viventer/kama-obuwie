@@ -21,13 +21,7 @@ import { adminDB } from "@/firebase/firebaseAdmin";
 import { createOffer, updateOffer } from "../../offers/offers";
 import { cleanOldExternalId, parseExternalId } from "@/helpers/externalId";
 import { updateProduct } from "../../products/products";
-import {
-  CategoryWithId,
-  AllegroSizingTable,
-  ProductWithId,
-  SizingTable,
-} from "@/firebase/schemas/productsSchemas";
-import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
+import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { redis } from "@/upstash/redis";
 import {
   legacyProductIdFromSignature,
@@ -50,10 +44,6 @@ import {
 } from "./syncOffersHelpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
-
-// Helpery wspólne są w ./syncOffersHelpers
-
-// Helpery sizing-table są w ./sizingTableSyncHelpers
 
 export const getAllAllegroOffers = async (
   channel: "AL1" | "AL2",
@@ -331,6 +321,18 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
       Object.keys(nextOfferTemplates.AL1 || {}).length > 0
     );
 
+    // Używamy template do zdjęć (i sizing table). Jeśli go nie ma, próbujemy pobrać.
+    const getTemplateForSizeOrAny = (
+      templates: NonNullable<LegacyProduct["offerTemplates"]>
+    ): AllegroOffer | undefined => {
+      const direct = templates.AL1?.[representativeSize];
+      if (direct) return direct;
+      return templates.AL1 ? Object.values(templates.AL1)[0] : undefined;
+    };
+
+    let templateForImages: AllegroOffer | undefined =
+      getTemplateForSizeOrAny(nextOfferTemplates);
+
     if (!hasAnyAl1Template) {
       try {
         const template: AllegroOffer = await getAllegroOffer(
@@ -345,6 +347,8 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
             [representativeSize || "template"]: template,
           },
         };
+
+        templateForImages = template;
       } catch (e) {
         console.warn(
           `⚠️  Failed to fetch AL1 template for legacy offer: ${representativeOffer.id}`,
@@ -402,15 +406,32 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
 
     const legacySizingTableId = sizingTableId || existingLegacy?.sizingTableId;
 
+    const templateImages: string[] = Array.isArray(templateForImages?.images)
+      ? templateForImages!.images
+      : [];
+    const productImages: string[] = Array.isArray(
+      templateForImages?.productSet?.[0]?.product?.images
+    )
+      ? templateForImages!.productSet[0]!.product.images
+      : [];
+
+    const allegroImagesToUse =
+      templateImages.length > 0 ? templateImages : productImages;
+
     const nextImagesUrls = {
       ...(existingLegacy?.imagesUrls || {}),
       ...(colorVariantName
         ? {
             [colorVariantName]: Array.from(
-              new Set([
-                ...(existingLegacy?.imagesUrls?.[colorVariantName] || []),
-                representativeOffer.primaryImage.url,
-              ])
+              new Set(
+                [
+                  ...(existingLegacy?.imagesUrls?.[colorVariantName] || []),
+                  representativeOffer.primaryImage.url,
+                  ...allegroImagesToUse,
+                ].filter(
+                  (x): x is string => typeof x === "string" && x.length > 0
+                )
+              )
             ),
           }
         : {}),

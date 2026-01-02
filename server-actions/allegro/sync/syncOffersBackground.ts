@@ -1,7 +1,7 @@
 "use server";
 
 import { Client } from "@upstash/qstash";
-import { verifyUser, getCurrentUserId } from "../auth/auth";
+import { verifyUser, getCurrentUserId } from "../../auth/auth";
 import { redis } from "@/upstash/redis";
 
 const qstashClient = new Client({

@@ -8,8 +8,13 @@ import {
 } from "@/firebase/schemas/productsSchemas";
 import { verifyUser } from "../auth/auth";
 
-export const createSizingTable = async function (newSizingTable: SizingTable) {
-  await verifyUser(["ADMIN", "VERIFIED"]);
+export const createSizingTable = async function (
+  newSizingTable: SizingTable,
+  opts?: { userId?: string }
+) {
+  if (!opts?.userId) {
+    await verifyUser(["ADMIN", "VERIFIED"]);
+  }
 
   SizingTableSchema.parse(newSizingTable);
   const sizingTableRef = adminDB.collection("sizingTables").doc();

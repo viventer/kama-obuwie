@@ -112,14 +112,17 @@ export const transformFrontendOrderToOrder = async function (
         item.offerId
       );
       if (!data) {
+        console.error("oferta nie istnieje");
         throw new Error("Oferta nie istnieje.");
       }
 
       if (!data.SKU) {
+        console.error("oferta nie ma przypisanego SKU");
         throw new Error("Oferta nie ma przypisanego SKU.");
       }
 
       if (!data.sellingPrices.DTC) {
+        console.error("oferta nie ma przypisanej ceny sprzedaży DTC");
         throw new Error("Oferta nie ma przypisanej ceny sprzedaży DTC.");
       }
 
@@ -129,6 +132,9 @@ export const transformFrontendOrderToOrder = async function (
         Number(data.availability[item.size].value) >= item.quantity;
 
       if (!isValidQuantity) {
+        console.error(
+          `Niewystarczająca ilość produktu ${data.SKU} w rozmiarze ${item.size}.`
+        );
         throw new Error(
           `Niewystarczająca ilość produktu ${data.SKU} w rozmiarze ${item.size}.`
         );

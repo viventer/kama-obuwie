@@ -5,6 +5,7 @@ import {
   AllegroOffer,
   AllegroOfferParameters,
   Offer,
+  OfferWithId,
 } from "@/firebase/schemas/offersSchemas";
 import {
   ColorVariant,
@@ -92,9 +93,21 @@ export const editAllegroOffer = async (
 
 export const getAllegroOffer = async (
   id: string,
-  channel: "AL1" | "AL2"
+  channel: "AL1" | "AL2",
+  options?: { userId?: string; skipAuth?: boolean }
 ): Promise<AllegroOffer> => {
-  const accessToken = await getAllegroUserAccessToken(channel);
+  // Pomiń weryfikację jeśli mamy userId (zadanie w tle) lub skipAuth
+  if (!options?.userId && !options?.skipAuth) {
+    await verifyUser(["ADMIN", "VERIFIED"]);
+  }
+
+  let accessToken: string;
+  if (options?.userId) {
+    const tokens = await getAllegroAccessTokensForBackgroundJob();
+    accessToken = tokens[channel];
+  } else {
+    accessToken = await getAllegroUserAccessToken(channel);
+  }
   const headers = getSingleAllegroHeaders(accessToken);
 
   const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers/${id}`;
@@ -127,7 +140,9 @@ export const postAllegroOffer = async (
   } = data;
 
   const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
-  images.push(choosingSizeImageUrl as string);
+  if (choosingSizeImageUrl) {
+    images.push(choosingSizeImageUrl as string);
+  }
 
   // Pobierz tokeny dla obu kont
   const { AL1: AL1AccessToken, AL2: AL2AccessToken } =
@@ -233,6 +248,17 @@ export async function postIndividualAllegroOffer(
     SKU,
   } = data;
 
+  // Upewnij się, że obrazek "jak dobrać rozmiar" jest na końcu listy (idempotentnie)
+  const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
+  if (choosingSizeImageUrl) {
+    const urlStr = choosingSizeImageUrl as string;
+    const existingIndex = images.indexOf(urlStr);
+    if (existingIndex !== -1) {
+      images.splice(existingIndex, 1);
+    }
+    images.push(urlStr);
+  }
+
   const formattedProductParameters = await formatAllegroProductParameters(
     product.parameters,
     allegroCategoryId,
@@ -324,6 +350,108 @@ export async function postIndividualAllegroOffer(
     return handleAllegroApiError(
       err,
       "Błąd podczas tworzenia oferty na Allegro"
+    );
+  }
+}
+
+export async function postIndividualAllegroOfferFromTemplate(params: {
+  template: AllegroOffer;
+  offer: OfferWithId;
+  size: string;
+  channel: "AL1" | "AL2";
+  allegroHeaders: Record<string, string>;
+  url: string;
+}): Promise<string> {
+  const { template, offer, size, channel, allegroHeaders, url } = params;
+
+  if (!offer.SKU) {
+    throw new Error("Brak SKU w ofercie.");
+  }
+  if (!offer.signature) {
+    throw new Error("Brak signature w ofercie.");
+  }
+  if (!offer.availability?.[size]) {
+    throw new Error(`Rozmiar ${size} nie istnieje w dostępności oferty.`);
+  }
+
+  // Klonuj template, żeby nie mutować cache/DB referencji
+  const next: AllegroOffer = JSON.parse(JSON.stringify(template));
+
+  // Images (w naszym payloadzie Allegro korzystamy z productSet[0].product.images)
+  const images =
+    next.productSet?.[0]?.product?.images &&
+    Array.isArray(next.productSet[0].product.images)
+      ? next.productSet[0].product.images
+      : [];
+
+  const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
+  if (choosingSizeImageUrl) {
+    const urlStr = choosingSizeImageUrl as string;
+    const existingIndex = images.indexOf(urlStr);
+    if (existingIndex !== -1) {
+      images.splice(existingIndex, 1);
+    }
+    images.push(urlStr);
+  }
+
+  if (next.productSet?.[0]?.product) {
+    next.productSet[0].product.images = images;
+    next.productSet[0].product.name = `${offer.title} ${size}`;
+  }
+
+  // Podmień cenę/stock/polityki na aktualne z naszej bazy
+  const nextPrice = offer.sellingPrices?.[channel];
+  if (nextPrice) {
+    next.sellingMode = {
+      ...(next.sellingMode || ({} as any)),
+      price: {
+        amount: nextPrice as string,
+        currency: "PLN",
+      },
+    };
+  }
+
+  next.stock = {
+    available: Number(offer.availability[size].value || "0"),
+    unit: "PAIR",
+  };
+
+  // Delivery / afterSalesServices
+  const shippingRateId = offer.shippingRates?.[channel]?.allegroId;
+  if (shippingRateId) {
+    next.delivery = {
+      ...(next.delivery || ({} as any)),
+      handlingTime: (next.delivery as any)?.handlingTime || "PT24H",
+      shippingRates: { id: shippingRateId },
+    };
+  }
+
+  next.afterSalesServices = {
+    impliedWarranty: {
+      id: offer.impliedWarranty?.[channel] as string,
+    },
+    returnPolicy: {
+      id: offer.returnPolicy?.[channel] as string,
+    },
+    ...(offer.warranty?.[channel]
+      ? { warranty: { id: offer.warranty[channel] } }
+      : {}),
+  } as any;
+
+  // External id (spójnie z resztą systemu)
+  next.external = {
+    id: `${offer.signature} [${offer.SKU}r${size}]`,
+  };
+
+  try {
+    const resp = await axios.post(url, next, {
+      headers: allegroHeaders,
+    });
+    return resp.data.id! as string;
+  } catch (err) {
+    return handleAllegroApiError(
+      err,
+      "Błąd podczas tworzenia oferty na Allegro (legacy template)"
     );
   }
 }

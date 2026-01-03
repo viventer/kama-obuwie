@@ -231,6 +231,8 @@ export async function POST(request: NextRequest) {
         const insoleLengthText =
           legacyInsoleLength.insoleLength.toString().replace(".", ",") + " cm";
 
+        const insoleLengthValue = legacyInsoleLength.insoleLength;
+
         let sizeTableAllegroId: string | undefined;
         if (salesChannel === "AL1") {
           sizeTableAllegroId = legacySizingTable.allegroId;
@@ -250,6 +252,7 @@ export async function POST(request: NextRequest) {
           legacy,
           size,
           insoleLengthText,
+          insoleLengthValue,
           channel: salesChannel,
           allegroHeaders,
           url,

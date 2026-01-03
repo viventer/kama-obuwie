@@ -56,13 +56,13 @@ const normalizeLegacyAllegroDescriptionText = (text: string): string => {
 
   // Rozmiar zawsze po frazie "rozmiar: "
   result = result.replace(
-    /(\brozmiar:\s*)((?:<[^>]+>\s*)*)([0-9]+(?:[.,][0-9]+)?)((?:\s*<\/[^>]+>\s*)*)/gi,
+    /(\brozmiar:\s*)((?:<[^>]+>\s*)*)([0-9]+(?:-[0-9]+)?(?:[.,][0-9]+)?)((?:\s*<\/[^>]+>\s*)*)/gi,
     "$1$2{rozmiar}$4"
   );
 
-  // Długość wkładki po frazie "długość wkładki: " (różna wielkość liter)
+  // Długość wkładki po frazie zawierającej "długość wkładki" (np. "długość wkładki wew.")
   result = result.replace(
-    /(\bdługość wkładki:\s*)((?:<[^>]+>\s*)*)([0-9]+(?:[.,][0-9]+)?)(?:\s*cm)?((?:\s*<\/[^>]+>\s*)*)(?:\s*cm)?/gi,
+    /(\bdługość wkładki[^:]*:\s*)((?:<[^>]+>\s*)*)([0-9]+(?:[.,][0-9]+)?)(?:\s*cm)?((?:\s*<\/[^>]+>\s*)*)(?:\s*cm)?/gi,
     "$1$2{długość wkładki}$4"
   );
 
@@ -87,6 +87,42 @@ const normalizeLegacyAllegroDescription = (
       }),
     })),
   };
+};
+
+const normalizeParamName = (value: string): string => {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[łŁ]/g, "l")
+    .replace(/[ąĄ]/g, "a")
+    .replace(/[ćĆ]/g, "c")
+    .replace(/[ęĘ]/g, "e")
+    .replace(/[ńŃ]/g, "n")
+    .replace(/[óÓ]/g, "o")
+    .replace(/[śŚ]/g, "s")
+    .replace(/[żŻ]/g, "z")
+    .replace(/[źŹ]/g, "z");
+};
+
+const removeDynamicSizeAndInsoleFromProductParameters = (
+  parameters: ProductParameters | undefined
+): ProductParameters | undefined => {
+  if (!parameters) return undefined;
+
+  const nextOptional: NonNullable<ProductParameters["optional"]> = {};
+  for (const [key, value] of Object.entries(parameters.optional || {})) {
+    const normalized = normalizeParamName(key);
+    if (normalized === "rozmiar") continue;
+    if (normalized.includes("dlugosc wkladki")) continue;
+    nextOptional[key] = value as any;
+  }
+
+  return {
+    required: parameters.required || {},
+    optional: nextOptional,
+  } as ProductParameters;
 };
 
 export const getAllAllegroOffers = async (
@@ -478,6 +514,9 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
           } as ProductParameters)
         : undefined;
 
+    const sanitizedLegacyParameters =
+      removeDynamicSizeAndInsoleFromProductParameters(mergedLegacyParameters);
+
     const nextImagesUrls = {
       ...(existingLegacy?.imagesUrls || {}),
       ...(colorVariantName
@@ -502,6 +541,8 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
     const nextLegacyProduct: LegacyProduct = {
       ...(existingLegacy || {}),
       signature: existingLegacy?.signature || signature,
+      rootCategory:
+        existingLegacy?.rootCategory || categoryFromDb?.rootCategory,
       sizingTableId: sizingTableId || existingLegacy?.sizingTableId,
       manufacturerCode:
         existingLegacy?.manufacturerCode || parsed.manufacturerCode,
@@ -513,7 +554,7 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
           : colorVariantName
             ? [{ color: colorVariantName }]
             : [],
-      parameters: mergedLegacyParameters,
+      parameters: sanitizedLegacyParameters,
       categoryId: existingLegacy?.categoryId || categoryFromDb?.id,
       imagesUrls: nextImagesUrls,
       allegroDescription:

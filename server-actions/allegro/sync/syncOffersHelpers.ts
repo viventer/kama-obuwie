@@ -309,9 +309,39 @@ export const allegroProductParametersToProductParameters = (
 
   const optional: NonNullable<ProductParameters["optional"]> = {};
 
+  const normalizeParamName = (value: string): string => {
+    return value
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[łŁ]/g, "l")
+      .replace(/[ąĄ]/g, "a")
+      .replace(/[ćĆ]/g, "c")
+      .replace(/[ęĘ]/g, "e")
+      .replace(/[ńŃ]/g, "n")
+      .replace(/[óÓ]/g, "o")
+      .replace(/[śŚ]/g, "s")
+      .replace(/[żŻ]/g, "z")
+      .replace(/[źŹ]/g, "z");
+  };
+
+  const isDynamicSizeOrInsoleParam = (name: string): boolean => {
+    const normalized = normalizeParamName(name);
+    if (normalized === "rozmiar") return true;
+    if (normalized.includes("dlugosc wkladki")) return true;
+    return false;
+  };
+
   for (const p of allegroParameters) {
     const name = typeof p?.name === "string" ? p.name.trim() : "";
     if (!name) {
+      continue;
+    }
+
+    // Te parametry uzupełniamy dopiero podczas wystawiania konkretnej oferty
+    // (zależne od rozmiaru), więc nie zapisujemy ich w legacyProduct.parameters.
+    if (isDynamicSizeOrInsoleParam(name)) {
       continue;
     }
 

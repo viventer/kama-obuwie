@@ -1,11 +1,17 @@
 import { z } from "zod";
 
-import { ColorVariantSchema, ProductParametersSchema } from "./productsSchemas";
+import {
+  ColorVariantSchema,
+  ProductParametersSchema,
+  RootCategoryValues,
+} from "./productsSchemas";
 import { AllegroOfferDescriptionSchema } from "./offersSchemas";
 
 export const LegacyProductSchema = z.object({
   id: z.string().optional(),
   signature: z.string().min(1).optional(),
+
+  rootCategory: z.enum(RootCategoryValues).optional(),
 
   sizingTableId: z.string().optional(),
 

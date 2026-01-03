@@ -40,6 +40,35 @@ const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
 type Primitive = string | number | boolean | string[] | number[];
 
+const normalizeAllegroParamName = (value: string): string => {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[łŁ]/g, "l")
+    .replace(/[ąĄ]/g, "a")
+    .replace(/[ćĆ]/g, "c")
+    .replace(/[ęĘ]/g, "e")
+    .replace(/[ńŃ]/g, "n")
+    .replace(/[óÓ]/g, "o")
+    .replace(/[śŚ]/g, "s")
+    .replace(/[żŻ]/g, "z")
+    .replace(/[źŹ]/g, "z");
+};
+
+const removeDynamicSizeAndInsoleParameters = (
+  parameters: AllegroOfferParameters
+): AllegroOfferParameters => {
+  return parameters.filter((p) => {
+    const name = typeof p?.name === "string" ? p.name : "";
+    const normalized = normalizeAllegroParamName(name);
+    if (normalized === "rozmiar") return false;
+    if (normalized.includes("dlugosc wkladki")) return false;
+    return true;
+  });
+};
+
 const replaceVariablesInAllegroOfferDescription = (params: {
   description: AllegroOfferDescription;
   variableValues: Record<string, string>;
@@ -395,6 +424,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
   legacy: LegacyProductWithId;
   size: string;
   insoleLengthText: string;
+  insoleLengthValue: number;
   channel: "AL1" | "AL2";
   allegroHeaders: Record<string, string>;
   url: string;
@@ -408,6 +438,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
     legacy,
     size,
     insoleLengthText,
+    insoleLengthValue,
     channel,
     allegroHeaders,
     url,
@@ -424,7 +455,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
     throw new Error("Brak signature w ofercie.");
   }
   if (!offer.availability?.[size]) {
-    throw new Error(`Rozmiar ${size} nie istnieje w dostępności oferty.`);
+    throw new Error(`Rozmiar ${size} nie istpnieje w dostępności oferty.`);
   }
   if (!legacy.allegroDescription) {
     throw new Error("Brak allegroDescription w legacyProduct.");
@@ -432,9 +463,23 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
   if (!insoleLengthText) {
     throw new Error("Brak insoleLengthText dla wystawienia oferty legacy.");
   }
+  if (Number.isNaN(insoleLengthValue)) {
+    throw new Error("Brak insoleLengthValue dla wystawienia oferty legacy.");
+  }
   if (!legacy.responsibleProducer) {
     throw new Error("Brak responsibleProducer w legacyProduct.");
   }
+
+  const insoleLengthParamName =
+    legacy.rootCategory === "obuwie dziecięce"
+      ? "Długość wkładki wew."
+      : "Długość wkładki";
+
+  const nextProductParameters: AllegroOfferParameters = [
+    ...removeDynamicSizeAndInsoleParameters(productParameters),
+    { name: "Rozmiar", values: [size] },
+    { name: insoleLengthParamName, values: [insoleLengthValue] },
+  ];
 
   // Idempotentnie dopnij obrazek "jak dobrać rozmiar" na koniec
   const images = [...inputImages];
@@ -492,7 +537,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
         category: {
           id: allegroCategoryId,
         },
-        parameters: productParameters,
+        parameters: nextProductParameters,
         images: images,
       },
     },

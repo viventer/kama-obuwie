@@ -20,7 +20,11 @@ import { getAllegroSizingTable } from "../sizingTables";
 import { getAllegroResponsibleProducer } from "../responsibleProducers";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { createOffer, updateOffer } from "../../offers/offers";
-import { cleanOldExternalId, parseExternalId } from "@/helpers/externalId";
+import {
+  buildExternalId,
+  cleanOldExternalId,
+  parseExternalId,
+} from "@/helpers/externalId";
 import { updateProduct } from "../../products/products";
 import {
   type ProductParameters,
@@ -230,7 +234,7 @@ const syncAl1SizesForSignature = async (params: {
         "AL1",
         {
           external: {
-            id: `${signature} [${SKU}r${size}]`,
+            id: buildExternalId({ signature, SKU, size }),
           },
         },
         { userId }
@@ -299,6 +303,12 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
     const categoryFromDb = await getCategoryByAllegroCategoryId(
       representativeOffer.category.id
     );
+
+    if (!categoryFromDb) {
+      throw new Error(
+        `Nie znaleziono kategorii dla allegroCategoryId: "${representativeOffer.category.id} (najpewniej akcesoria), pomijam wzbogacanie legacyProduct."`
+      );
+    }
 
     const colorVariantName =
       existingOffer.colorVariantName || parsed.colorVariantName;
@@ -761,6 +771,15 @@ const syncAL2Offers = async (
         continue;
       }
 
+      const existingSku = existingOffer.SKU;
+      if (!existingSku) {
+        console.log(
+          `⚠️  AL2: Existing offer for signature "${signature}" has no SKU - skipping`
+        );
+        skippedSignatures++;
+        continue;
+      }
+
       console.log(
         `✅ AL2: Found existing offer with SKU: ${existingOffer.SKU}`
       );
@@ -794,7 +813,11 @@ const syncAL2Offers = async (
             "AL2",
             {
               external: {
-                id: `${signature} [${existingOffer.SKU}r${size}]`,
+                id: buildExternalId({
+                  signature,
+                  SKU: existingSku,
+                  size,
+                }),
               },
             },
             { userId }

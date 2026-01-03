@@ -18,9 +18,9 @@ export const parseExternalId = (
     };
   }
 
-  // Pattern to match [SKU]r[size] anywhere in the string
+  // Pattern to match [SKU] or [SKU]r[size] anywhere in the string
   // SKU is 4 characters (base32), size can be numeric or range (e.g., 34-35)
-  const pattern = /\[([A-Z2-9]{4}r\d+(?:-\d+)?)\]/g;
+  const pattern = /\[([A-Z2-9]{4})(?:r(\d+(?:-\d+)?))?\]/g;
   const matches = [...externalId.matchAll(pattern)];
 
   if (matches.length === 0) {
@@ -33,24 +33,12 @@ export const parseExternalId = (
 
   // Take the last match (most recent SKU)
   const lastMatch = matches[matches.length - 1];
-  const fullMatch = lastMatch[1]; // e.g., "AB1Cr32" or "6GYSr34-35"
-  const skuSizePattern = /^([A-Z2-9]{4})r(\d+(?:-\d+)?)$/;
-  const skuSizeMatch = fullMatch.match(skuSizePattern);
+  const sku = lastMatch[1] || null; // e.g., "AB1C" or "6GYS"
+  const size = (lastMatch[2] || null) as string | null; // e.g., "32" or "34-35" or null
 
-  if (!skuSizeMatch) {
-    return {
-      signature: externalId,
-      SKU: null,
-      size: null,
-    };
-  }
-
-  const sku = skuSizeMatch[1]; // e.g., "AB1C" or "6GYS"
-  const size = skuSizeMatch[2]; // e.g., "32" or "34-35"
-
-  // Remove ALL occurrences of [SKU]r[size] pattern (including range sizes)
+  // Remove ALL occurrences of [SKU] and [SKU]r[size] patterns
   const signature = externalId
-    .replace(/\[([A-Z2-9]{4}r\d+(?:-\d+)?)\]/g, "")
+    .replace(/\[([A-Z2-9]{4})(?:r(\d+(?:-\d+)?))?\]/g, "")
     .trim();
 
   return {
@@ -58,6 +46,26 @@ export const parseExternalId = (
     SKU: sku,
     size,
   };
+};
+
+/**
+ * Buduje external.id w formacie:
+ * - "{signature} [{SKU}r{size}]" dla ofert z rozmiarem
+ * - "{signature} [{SKU}]" dla ofert bez rozmiaru (np. akcesoria)
+ */
+export const buildExternalId = (params: {
+  signature: string;
+  SKU: string;
+  size?: string | null | undefined;
+}): string => {
+  const signature = (params.signature || "").trim();
+  const SKU = (params.SKU || "").trim();
+  const size = (params.size || "").toString().trim();
+
+  const sizeSuffix = size ? `r${size}` : "";
+  const bracket = `[${SKU}${sizeSuffix}]`;
+
+  return `${signature} ${bracket}`.trim();
 };
 
 /**

@@ -174,7 +174,7 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
               available: availability || 0,
               unit: "PAIR",
             },
-            name: `${form.getValues("title")} ${size}`,
+            name: `${form.getValues("title")} ${size != "null" && size ? size : ""}`.trim(),
             publication: {
               status: availability > 0 ? "ACTIVE" : "INACTIVE",
             },

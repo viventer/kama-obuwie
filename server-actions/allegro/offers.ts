@@ -509,7 +509,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
         name: process.env.RESPONSIBLE_PERSON_NAME!,
       },
       product: {
-        name: `${offer.title} ${size}`,
+        name: `${offer.title} ${size ? size : ""}`.trim(),
         category: {
           id: allegroCategoryId,
         },

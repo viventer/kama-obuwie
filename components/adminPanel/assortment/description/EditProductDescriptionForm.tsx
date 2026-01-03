@@ -23,7 +23,7 @@ import { useToast } from "@/hooks/useToast";
 import axios from "axios";
 import DescriptionVariablesList from "./DescriptionVariablesList";
 import ImportProductDescription from "./ImportProductDescription";
-import { convertToAllegroDescription } from "@/server-actions/allegro/offers";
+import { convertToAllegroDescription } from "@/helpers/allegroOffers";
 import { getColorVariantName } from "../helpers/productsHelpers";
 import {
   DescriptionVariable,

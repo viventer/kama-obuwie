@@ -7,7 +7,6 @@ import {
   AllegroOfferFromListing,
   AllegroOffer,
   Offer,
-  AllegroOfferDescription,
 } from "@/firebase/schemas/offersSchemas";
 import { verifyUser } from "../../auth/auth";
 import {
@@ -24,7 +23,7 @@ import { createOffer, updateOffer } from "../../offers/offers";
 import { cleanOldExternalId, parseExternalId } from "@/helpers/externalId";
 import { updateProduct } from "../../products/products";
 import {
-  ProductParameters,
+  type ProductParameters,
   ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { redis } from "@/upstash/redis";
@@ -44,86 +43,14 @@ import {
   getOfferFromDBBySignature,
   getProductsBySignature,
   groupAl1OffersBySignature,
+  normalizeLegacyAllegroDescription,
   resolveSkuForOffer,
+  removeDynamicSizeAndInsoleFromProductParameters,
   updateOfferInDB,
   updateProductOffersIds,
 } from "./syncOffersHelpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
-
-const normalizeLegacyAllegroDescriptionText = (text: string): string => {
-  let result = text;
-
-  // Rozmiar zawsze po frazie "rozmiar: "
-  result = result.replace(
-    /(\brozmiar:\s*)((?:<[^>]+>\s*)*)([0-9]+(?:-[0-9]+)?(?:[.,][0-9]+)?)((?:\s*<\/[^>]+>\s*)*)/gi,
-    "$1$2{rozmiar}$4"
-  );
-
-  // Długość wkładki po frazie zawierającej "długość wkładki" (np. "długość wkładki wew.")
-  result = result.replace(
-    /(\bdługość wkładki[^:]*:\s*)((?:<[^>]+>\s*)*)([0-9]+(?:[.,][0-9]+)?)(?:\s*cm)?((?:\s*<\/[^>]+>\s*)*)(?:\s*cm)?/gi,
-    "$1$2{długość wkładki}$4"
-  );
-
-  return result;
-};
-
-const normalizeLegacyAllegroDescription = (
-  description: AllegroOfferDescription | undefined
-): AllegroOfferDescription | undefined => {
-  if (!description) return undefined;
-
-  return {
-    sections: description.sections.map((section) => ({
-      items: section.items.map((item) => {
-        if (item.type !== "TEXT" || typeof item.content !== "string") {
-          return item;
-        }
-        return {
-          ...item,
-          content: normalizeLegacyAllegroDescriptionText(item.content),
-        };
-      }),
-    })),
-  };
-};
-
-const normalizeParamName = (value: string): string => {
-  return value
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[łŁ]/g, "l")
-    .replace(/[ąĄ]/g, "a")
-    .replace(/[ćĆ]/g, "c")
-    .replace(/[ęĘ]/g, "e")
-    .replace(/[ńŃ]/g, "n")
-    .replace(/[óÓ]/g, "o")
-    .replace(/[śŚ]/g, "s")
-    .replace(/[żŻ]/g, "z")
-    .replace(/[źŹ]/g, "z");
-};
-
-const removeDynamicSizeAndInsoleFromProductParameters = (
-  parameters: ProductParameters | undefined
-): ProductParameters | undefined => {
-  if (!parameters) return undefined;
-
-  const nextOptional: NonNullable<ProductParameters["optional"]> = {};
-  for (const [key, value] of Object.entries(parameters.optional || {})) {
-    const normalized = normalizeParamName(key);
-    if (normalized === "rozmiar") continue;
-    if (normalized.includes("dlugosc wkladki")) continue;
-    nextOptional[key] = value as any;
-  }
-
-  return {
-    required: parameters.required || {},
-    optional: nextOptional,
-  } as ProductParameters;
-};
 
 export const getAllAllegroOffers = async (
   channel: "AL1" | "AL2",

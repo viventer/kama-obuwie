@@ -1,6 +1,7 @@
 import { adminDB } from "@/firebase/firebaseAdmin";
 import type {
   AllegroOffer,
+  AllegroOfferDescription,
   AllegroOfferFromListing,
   Offer,
 } from "@/firebase/schemas/offersSchemas";
@@ -15,6 +16,80 @@ import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/
 import { generateUniqueSKU } from "../../products/SKU";
 import { updateProduct } from "../../products/products";
 import { updateOffer } from "../../offers/offers";
+
+const normalizeLegacyAllegroDescriptionText = (text: string): string => {
+  let result = text;
+
+  // Rozmiar zawsze po frazie "rozmiar: "
+  result = result.replace(
+    /(\brozmiar:\s*)((?:<[^>]+>\s*)*)([0-9]+(?:-[0-9]+)?(?:[.,][0-9]+)?)((?:\s*<\/[^>]+>\s*)*)/gi,
+    "$1$2{rozmiar}$4"
+  );
+
+  // Długość wkładki po frazie zawierającej "długość wkładki" (np. "długość wkładki wew.")
+  result = result.replace(
+    /(\bdługość wkładki[^:]*:\s*)((?:<[^>]+>\s*)*)([0-9]+(?:[.,][0-9]+)?)(?:\s*cm)?((?:\s*<\/[^>]+>\s*)*)(?:\s*cm)?/gi,
+    "$1$2{długość wkładki}$4"
+  );
+
+  return result;
+};
+
+export const normalizeLegacyAllegroDescription = (
+  description: AllegroOfferDescription | undefined
+): AllegroOfferDescription | undefined => {
+  if (!description) return undefined;
+
+  return {
+    sections: description.sections.map((section) => ({
+      items: section.items.map((item) => {
+        if (item.type !== "TEXT" || typeof item.content !== "string") {
+          return item;
+        }
+        return {
+          ...item,
+          content: normalizeLegacyAllegroDescriptionText(item.content),
+        };
+      }),
+    })),
+  };
+};
+
+const normalizeParamName = (value: string): string => {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[łŁ]/g, "l")
+    .replace(/[ąĄ]/g, "a")
+    .replace(/[ćĆ]/g, "c")
+    .replace(/[ęĘ]/g, "e")
+    .replace(/[ńŃ]/g, "n")
+    .replace(/[óÓ]/g, "o")
+    .replace(/[śŚ]/g, "s")
+    .replace(/[żŻ]/g, "z")
+    .replace(/[źŹ]/g, "z");
+};
+
+export const removeDynamicSizeAndInsoleFromProductParameters = (
+  parameters: ProductParameters | undefined
+): ProductParameters | undefined => {
+  if (!parameters) return undefined;
+
+  const nextOptional: NonNullable<ProductParameters["optional"]> = {};
+  for (const [key, value] of Object.entries(parameters.optional || {})) {
+    const normalized = normalizeParamName(key);
+    if (normalized === "rozmiar") continue;
+    if (normalized.includes("dlugosc wkladki")) continue;
+    nextOptional[key] = value as any;
+  }
+
+  return {
+    required: parameters.required || {},
+    optional: nextOptional,
+  } as ProductParameters;
+};
 
 export const delay = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));

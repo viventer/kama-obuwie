@@ -3,6 +3,7 @@
 import { PostOfferBody } from "@/app/api/allegro/offers/route";
 import {
   AllegroOffer,
+  AllegroOfferDescription,
   AllegroOfferParameters,
   Offer,
   OfferWithId,
@@ -38,6 +39,40 @@ import type { LegacyProductWithId } from "@/firebase/schemas/legacyProductsSchem
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
 type Primitive = string | number | boolean | string[] | number[];
+
+const replaceVariablesInAllegroOfferDescription = (params: {
+  description: AllegroOfferDescription;
+  variableValues: Record<string, string>;
+}): AllegroOfferDescription => {
+  const { description, variableValues } = params;
+
+  const replaceInText = (text: string): string => {
+    let result = text;
+
+    // Prosta podmiana zmiennych w formacie {nazwa}
+    result = result.replace(/\{rozmiar\}/g, variableValues["rozmiar"] ?? "");
+    result = result.replace(
+      /\{długość wkładki\}/g,
+      variableValues["długość wkładki"] ?? ""
+    );
+
+    return result;
+  };
+
+  return {
+    sections: description.sections.map((section) => ({
+      items: section.items.map((item) => {
+        if (item.type !== "TEXT" || typeof item.content !== "string") {
+          return item;
+        }
+        return {
+          ...item,
+          content: replaceInText(item.content),
+        };
+      }),
+    })),
+  };
+};
 
 type AllegroIndividualOffer = {
   allegroOfferData: Omit<AllegroOffer, "stock" | "description" | "productSet">;
@@ -359,6 +394,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
   offer: OfferWithId;
   legacy: LegacyProductWithId;
   size: string;
+  insoleLengthText: string;
   channel: "AL1" | "AL2";
   allegroHeaders: Record<string, string>;
   url: string;
@@ -371,6 +407,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
     offer,
     legacy,
     size,
+    insoleLengthText,
     channel,
     allegroHeaders,
     url,
@@ -391,6 +428,9 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
   }
   if (!legacy.allegroDescription) {
     throw new Error("Brak allegroDescription w legacyProduct.");
+  }
+  if (!insoleLengthText) {
+    throw new Error("Brak insoleLengthText dla wystawienia oferty legacy.");
   }
   if (!legacy.responsibleProducer) {
     throw new Error("Brak responsibleProducer w legacyProduct.");
@@ -460,8 +500,16 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
 
   const externalId = `${offer.signature} [${offer.SKU}r${size}]`;
 
-  const payload: AllegroOffer = {
+  const description = replaceVariablesInAllegroOfferDescription({
     description: legacy.allegroDescription,
+    variableValues: {
+      rozmiar: size,
+      "długość wkładki": insoleLengthText,
+    },
+  });
+
+  const payload: AllegroOffer = {
+    description,
     productSet,
     sellingMode: {
       price: {

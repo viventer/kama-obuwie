@@ -7,6 +7,7 @@ import {
   AllegroOfferFromListing,
   AllegroOffer,
   Offer,
+  AllegroOfferDescription,
 } from "@/firebase/schemas/offersSchemas";
 import { verifyUser } from "../../auth/auth";
 import {
@@ -49,6 +50,44 @@ import {
 } from "./syncOffersHelpers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
+
+const normalizeLegacyAllegroDescriptionText = (text: string): string => {
+  let result = text;
+
+  // Rozmiar zawsze po frazie "rozmiar: "
+  result = result.replace(
+    /(\brozmiar:\s*)((?:<[^>]+>\s*)*)([0-9]+(?:[.,][0-9]+)?)((?:\s*<\/[^>]+>\s*)*)/gi,
+    "$1$2{rozmiar}$4"
+  );
+
+  // Długość wkładki po frazie "długość wkładki: " (różna wielkość liter)
+  result = result.replace(
+    /(\bdługość wkładki:\s*)((?:<[^>]+>\s*)*)([0-9]+(?:[.,][0-9]+)?)(?:\s*cm)?((?:\s*<\/[^>]+>\s*)*)(?:\s*cm)?/gi,
+    "$1$2{długość wkładki}$4"
+  );
+
+  return result;
+};
+
+const normalizeLegacyAllegroDescription = (
+  description: AllegroOfferDescription | undefined
+): AllegroOfferDescription | undefined => {
+  if (!description) return undefined;
+
+  return {
+    sections: description.sections.map((section) => ({
+      items: section.items.map((item) => {
+        if (item.type !== "TEXT" || typeof item.content !== "string") {
+          return item;
+        }
+        return {
+          ...item,
+          content: normalizeLegacyAllegroDescriptionText(item.content),
+        };
+      }),
+    })),
+  };
+};
 
 export const getAllAllegroOffers = async (
   channel: "AL1" | "AL2",
@@ -388,7 +427,9 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
     const imagesFromAllegro =
       offerImages.length > 0 ? offerImages : productSetImages;
 
-    const derivedAllegroDescription = allegroOfferDetails?.description;
+    const derivedAllegroDescription = normalizeLegacyAllegroDescription(
+      allegroOfferDetails?.description
+    );
 
     const responsibleProducerRef = (allegroOfferDetails as any)?.productSet?.[0]
       ?.responsibleProducer;

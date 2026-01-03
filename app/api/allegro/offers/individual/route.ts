@@ -191,14 +191,49 @@ export async function POST(request: NextRequest) {
           legacy.brand
         );
 
+        if (!legacy.sizingTableId) {
+          return apiErrorResponse(
+            "LegacyProduct nie ma sizingTableId (nie można uzupełnić długości wkładki w opisie).",
+            409,
+            null,
+            { step: "offer_creation" }
+          );
+        }
+
+        const { data: legacySizingTable } =
+          await getDocumentFromAdminDB<SizingTableWithId>(
+            "sizingTables",
+            legacy.sizingTableId
+          );
+
+        if (!legacySizingTable) {
+          return apiErrorResponse(
+            "Nie znaleziono tabeli rozmiarów legacyProduct.",
+            404,
+            null,
+            { step: "offer_creation" }
+          );
+        }
+
+        const legacyInsoleLength = legacySizingTable.insoleLengths.find(
+          (item) => item.size.toString() === size.toString()
+        );
+
+        if (!legacyInsoleLength) {
+          return apiErrorResponse(
+            `Rozmiar ${size} nie istnieje w tabeli rozmiarów legacyProduct (nie można uzupełnić opisu).`,
+            409,
+            null,
+            { step: "offer_creation" }
+          );
+        }
+
+        const insoleLengthText =
+          legacyInsoleLength.insoleLength.toString().replace(".", ",") + " cm";
+
         let sizeTableAllegroId: string | undefined;
-        if (salesChannel === "AL1" && legacy.sizingTableId) {
-          const { data: sizingTable } =
-            await getDocumentFromAdminDB<SizingTableWithId>(
-              "sizingTables",
-              legacy.sizingTableId
-            );
-          sizeTableAllegroId = sizingTable?.allegroId;
+        if (salesChannel === "AL1") {
+          sizeTableAllegroId = legacySizingTable.allegroId;
         }
 
         const url = `${process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL}/sale/product-offers`;
@@ -214,6 +249,7 @@ export async function POST(request: NextRequest) {
           offer,
           legacy,
           size,
+          insoleLengthText,
           channel: salesChannel,
           allegroHeaders,
           url,

@@ -7,15 +7,19 @@ import { ArrowRightIcon, Ghost } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
+import { analytics } from "@/firebase/firebase";
+import { logEvent } from "firebase/analytics";
 
 export default function ProductsList({
   displayName,
   products,
   categoryId,
+  categoryName,
 }: {
   displayName: string;
   products: ProductListingData[];
   categoryId: string;
+  categoryName: string;
 }) {
   const router = useRouter();
   const { currentBreakpoint } = useBreakpoint();
@@ -53,11 +57,30 @@ export default function ProductsList({
         </div>
         <Card
           className="p-0 px-2 sm:px-4 lg:px-6 flex justify-center cursor-pointer bg-brand/25 transition-colors duration-200 hover:bg-brand/50 active:bg-brand/75 flex-shrink-0"
-          onClick={() => router.push(`/listing?categoryId=${categoryId}`)}
+          onClick={() => {
+            if (analytics) {
+              logEvent(analytics, "view_item_list", {
+                item_list_id: categoryId,
+                item_list_name: categoryName,
+                from: "home_products_list",
+              });
+            }
+
+            router.push(`/listing?categoryId=${categoryId}`);
+          }}
         >
           <Button
             variant={"ghost"}
-            onClick={() => router.push(`/listing?categoryId=${categoryId}`)}
+            onClick={() => {
+              if (analytics) {
+                logEvent(analytics, "view_item_list", {
+                  item_list_id: categoryId,
+                  item_list_name: categoryName,
+                  from: "home_products_list",
+                });
+              }
+              router.push(`/listing?categoryId=${categoryId}`);
+            }}
             className="hover:translate-x-1 transition-transform w-fit h-fit"
           >
             <ArrowRightIcon className="size-8 lg:size-12 hover:translate-x-1 transition-transform" />

@@ -76,6 +76,10 @@ export default async function Page() {
                 mainPageCategories.find((cat) => cat.id === categoryId)
                   ?.displayName || ""
               }
+              categoryName={
+                mainPageCategories.find((cat) => cat.id === categoryId)?.name ||
+                ""
+              }
             />
           );
         })}

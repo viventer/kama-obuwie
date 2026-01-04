@@ -2,9 +2,9 @@ import { z } from "zod";
 import { PaymentMethodSchema } from "./checkoutSchemas";
 
 export const ItemSchema = z.object({
-  item_id: z.string(), // sku
-  item_name: z.string(), // signature
-  item_category: z.string(), // category name
+  item_id: z.string().optional(), // sku
+  item_name: z.string().optional(), // signature
+  item_category: z.string().optional(), // category name
   item_brand: z.string().optional(),
   price: z.number().min(0),
   size: z.string().optional(),
@@ -24,15 +24,15 @@ export const ListingSchema = z.object({
   from: z.enum(["home_grid", "nav", "home_products_list"]),
 });
 
+export const SelectItemSchema = ShoppingEventBaseSchema;
+
 export const ViewItemSchema = z.object({
   items: z.array(ItemSchema).min(1),
 });
 
 export const AddToCartSchema = ShoppingEventBaseSchema;
 
-export const ViewCartSchema = ShoppingEventBaseSchema.extend({
-  view: z.enum(["full", "preview"]),
-});
+export const ViewCartSchema = ShoppingEventBaseSchema;
 
 export const RemoveFromCartSchema = ShoppingEventBaseSchema;
 
@@ -57,7 +57,7 @@ export const BeginPaymentSchema = ShoppingEventBaseSchema.extend({
 });
 
 export const PurchaseSchema = ShoppingEventBaseSchema.extend({
-  transaction_id: z.string(),
+  transaction_id: z.string(), // order id
   payment_type: PaymentMethodSchema,
 });
 

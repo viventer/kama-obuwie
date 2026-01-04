@@ -8,6 +8,9 @@ import { EditIcon, InfoIcon, TrashIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import EditCartItemDialog from "./EditCartItemDialog";
 import LinkText from "@/components/adminPanel/global/LinkText";
+import { analytics } from "@/firebase/firebase";
+import { logEvent } from "firebase/analytics";
+import { ItemType } from "@/firebase/schemas/analyticsSchemas";
 
 interface ShoppingCartItemProps {
   cartItem: ShoppingCartItemType;
@@ -24,6 +27,27 @@ export default function ShoppingCartItem({
     const itemName = `${cartItem.item.categoryName} ${
       cartItem.item.brand || ""
     }`;
+
+    if (analytics) {
+      logEvent(analytics, "remove_from_cart", {
+        items: [
+          {
+            item_id: offerData?.SKU,
+            item_name: offerData?.signature,
+            item_brand: cartItem.item.brand,
+            item_category: cartItem.item.categoryName,
+            price: cartItem.item.price,
+            size: cartItem.item.size,
+            quantity: cartItem.item.quantity,
+            item_variant: cartItem.item.formattedMainColor,
+          },
+        ] as ItemType[],
+
+        value: cartItem.item.price * cartItem.item.quantity,
+        currency: "PLN",
+      });
+    }
+
     if (onRemove) {
       onRemove(cartItem.id, itemName);
     }

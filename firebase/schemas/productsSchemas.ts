@@ -189,6 +189,7 @@ export const BrandInfoSchema = z.object({
 });
 
 export const AllegroSizingTableSchema = z.object({
+  id: z.string().optional(),
   name: z.string(),
   template: z.object({
     id: z.string(),

@@ -11,7 +11,7 @@ import { getColorVariantName } from "./productsHelpers";
 export function addMissingAllegroParameters(
   formattedProductParameters: AllegroOfferParameters,
   rootCategory: string,
-  insoleLength: { size: string; insoleLength: number },
+  insoleLength: { size: string; insoleLength: number } | null | undefined,
   colorVariant: ColorVariant,
   manufacturerCode: string,
   EAN?: string
@@ -32,14 +32,18 @@ export function addMissingAllegroParameters(
 
   const allegroProductParameters: AllegroOfferParameters = [
     ...formattedProductParameters,
-    {
-      name: sizeParameterName,
-      values: [insoleLength.size.toString()],
-    },
-    {
-      name: insoleLengthParameterName,
-      values: [insoleLength.insoleLength.toString()],
-    },
+    ...(insoleLength
+      ? ([
+          {
+            name: sizeParameterName,
+            values: [insoleLength.size.toString()],
+          },
+          {
+            name: insoleLengthParameterName,
+            values: [insoleLength.insoleLength.toString()],
+          },
+        ] as AllegroOfferParameters)
+      : []),
     {
       name: "Kolor",
       values: [colorVariant.color],

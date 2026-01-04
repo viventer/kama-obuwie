@@ -5,15 +5,20 @@ import {
   AllegroOffer,
   AllegroOfferParameters,
   Offer,
+  OfferWithId,
 } from "@/firebase/schemas/offersSchemas";
 import {
   ColorVariant,
   Description,
   DescriptionVariable,
-  DescriptionVariables,
   Product,
   ProductParameters,
 } from "@/firebase/schemas/productsSchemas";
+import {
+  convertToAllegroDescription,
+  removeDynamicSizeAndInsoleParameters,
+  replaceVariablesInAllegroOfferDescription,
+} from "@/helpers/allegroOffers";
 import {
   getAllegroUserAccessTokens,
   getAllegroUserAccessToken,
@@ -32,6 +37,9 @@ import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/
 import { handleAllegroApiError } from "../errorHandlers";
 import { addMissingAllegroParameters } from "@/components/adminPanel/assortment/helpers/allegroParameters";
 import { getFormattedSizingTable } from "@/lib/utils";
+import type { LegacyProductWithId } from "@/firebase/schemas/legacyProductsSchemas";
+import { buildExternalId } from "@/helpers/externalId";
+import { resolveSingleAvailabilityKey } from "@/helpers/availability";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -39,14 +47,15 @@ type Primitive = string | number | boolean | string[] | number[];
 
 type AllegroIndividualOffer = {
   allegroOfferData: Omit<AllegroOffer, "stock" | "description" | "productSet">;
-  insoleLength: {
+  insoleLength?: {
     size: string;
     insoleLength: number;
-  };
-  insoleLengths: {
+  } | null;
+  insoleLengths?: {
     size: string;
     insoleLength: number;
   }[];
+  availabilityKey: string;
   offer: Offer;
   product: Product;
   colorVariant: ColorVariant;
@@ -92,9 +101,21 @@ export const editAllegroOffer = async (
 
 export const getAllegroOffer = async (
   id: string,
-  channel: "AL1" | "AL2"
+  channel: "AL1" | "AL2",
+  options?: { userId?: string; skipAuth?: boolean }
 ): Promise<AllegroOffer> => {
-  const accessToken = await getAllegroUserAccessToken(channel);
+  // Pomiń weryfikację jeśli mamy userId (zadanie w tle) lub skipAuth
+  if (!options?.userId && !options?.skipAuth) {
+    await verifyUser(["ADMIN", "VERIFIED"]);
+  }
+
+  let accessToken: string;
+  if (options?.userId) {
+    const tokens = await getAllegroAccessTokensForBackgroundJob();
+    accessToken = tokens[channel];
+  } else {
+    accessToken = await getAllegroUserAccessToken(channel);
+  }
   const headers = getSingleAllegroHeaders(accessToken);
 
   const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers/${id}`;
@@ -127,7 +148,9 @@ export const postAllegroOffer = async (
   } = data;
 
   const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
-  images.push(choosingSizeImageUrl as string);
+  if (choosingSizeImageUrl) {
+    images.push(choosingSizeImageUrl as string);
+  }
 
   // Pobierz tokeny dla obu kont
   const { AL1: AL1AccessToken, AL2: AL2AccessToken } =
@@ -135,7 +158,8 @@ export const postAllegroOffer = async (
   const allegroHeaders = getAllegroHeaders(AL1AccessToken, AL2AccessToken);
 
   const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers`;
-  const insoleLengths = sizingTable.insoleLengths;
+  const insoleLengths = sizingTable?.insoleLengths || [];
+  const hasSizes = insoleLengths.length > 0;
 
   const results = { AL1: {}, AL2: {} } as {
     AL1: Record<string, string>;
@@ -184,11 +208,34 @@ export const postAllegroOffer = async (
 
     const channelResults: Record<string, string> = {};
 
-    for (const insoleLength of insoleLengths) {
+    if (hasSizes) {
+      for (const insoleLength of insoleLengths) {
+        const allegroId = await postIndividualAllegroOffer({
+          allegroOfferData,
+          insoleLength,
+          insoleLengths,
+          availabilityKey: insoleLength.size.toString(),
+          offer,
+          product,
+          colorVariant,
+          allegroHeaders: allegroHeaders[channel],
+          url,
+          allegroCategoryId,
+          images,
+          channel,
+          SKU,
+        });
+
+        channelResults[insoleLength.size.toString()] = allegroId;
+      }
+    } else {
+      const availabilityKey = resolveSingleAvailabilityKey(offer.availability);
+
       const allegroId = await postIndividualAllegroOffer({
         allegroOfferData,
-        insoleLength,
-        insoleLengths,
+        insoleLength: null,
+        insoleLengths: [],
+        availabilityKey,
         offer,
         product,
         colorVariant,
@@ -200,7 +247,7 @@ export const postAllegroOffer = async (
         SKU,
       });
 
-      channelResults[insoleLength.size.toString()] = allegroId;
+      channelResults[availabilityKey] = allegroId;
     }
 
     return { channel, results: channelResults };
@@ -223,6 +270,7 @@ export async function postIndividualAllegroOffer(
     allegroOfferData,
     insoleLength,
     insoleLengths,
+    availabilityKey,
     offer,
     product,
     colorVariant,
@@ -233,6 +281,17 @@ export async function postIndividualAllegroOffer(
     SKU,
   } = data;
 
+  // Upewnij się, że obrazek "jak dobrać rozmiar" jest na końcu listy (idempotentnie)
+  const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
+  if (choosingSizeImageUrl) {
+    const urlStr = choosingSizeImageUrl as string;
+    const existingIndex = images.indexOf(urlStr);
+    if (existingIndex !== -1) {
+      images.splice(existingIndex, 1);
+    }
+    images.push(urlStr);
+  }
+
   const formattedProductParameters = await formatAllegroProductParameters(
     product.parameters,
     allegroCategoryId,
@@ -242,10 +301,10 @@ export async function postIndividualAllegroOffer(
   const allegroProductParameters = addMissingAllegroParameters(
     formattedProductParameters,
     product.rootCategory as string,
-    insoleLength,
+    insoleLength || null,
     colorVariant,
     product.manufacturerCode,
-    offer.EAN?.[`r${insoleLength.size}`]
+    insoleLength ? offer.EAN?.[`r${insoleLength.size}`] : undefined
   );
 
   if (!product?.responsibleProducer?.[channel]) {
@@ -266,7 +325,7 @@ export async function postIndividualAllegroOffer(
         name: process.env.RESPONSIBLE_PERSON_NAME!,
       },
       product: {
-        name: `${offer.title} ${insoleLength.size}`,
+        name: `${offer.title}${insoleLength?.size ? ` ${insoleLength.size}` : ""}`,
         category: {
           id: allegroCategoryId,
         },
@@ -276,16 +335,20 @@ export async function postIndividualAllegroOffer(
     },
   ];
 
-  const formattedSizingTable = getFormattedSizingTable(insoleLengths);
+  const formattedSizingTable =
+    Array.isArray(insoleLengths) && insoleLengths.length > 0
+      ? getFormattedSizingTable(insoleLengths)
+      : "";
 
   const descriptionVariableValues: Record<DescriptionVariable, string> = {
-    rozmiar: insoleLength.size.toString(),
+    rozmiar: insoleLength?.size?.toString() || "",
     kolor: colorVariant.color,
     marka: product.brand || "",
     "kod producenta": product.manufacturerCode || "",
     rozmiarówka: formattedSizingTable,
-    "długość wkładki":
-      insoleLength.insoleLength.toString().replace(".", ",") + " cm",
+    "długość wkładki": insoleLength
+      ? insoleLength.insoleLength.toString().replace(".", ",") + " cm"
+      : "",
     "tytuł oferty": offer.title,
   };
 
@@ -299,15 +362,19 @@ export async function postIndividualAllegroOffer(
     product.manufacturerCode
   } ${getColorVariantName(colorVariant)}`;
 
-  // Dodaj unikalny identyfikator z kanałem i rozmiarem
-  const externalId = `${signature} [${SKU}r${insoleLength.size}]`;
+  // Dodaj unikalny identyfikator (dla akcesoriów może nie być rozmiaru)
+  const externalId = buildExternalId({
+    signature,
+    SKU,
+    size: insoleLength?.size || null,
+  });
 
   const allegroOffer: AllegroOffer = {
     ...allegroOfferData,
     description,
     productSet,
     stock: {
-      available: Number(offer.availability[insoleLength.size].value),
+      available: Number(offer.availability?.[availabilityKey]?.value || "0"),
       unit: "PAIR",
     },
     external: {
@@ -324,6 +391,190 @@ export async function postIndividualAllegroOffer(
     return handleAllegroApiError(
       err,
       "Błąd podczas tworzenia oferty na Allegro"
+    );
+  }
+}
+
+export async function postIndividualAllegroOfferFromLegacy(params: {
+  offer: OfferWithId;
+  legacy: LegacyProductWithId;
+  size: string;
+  insoleLengthText: string;
+  insoleLengthValue: number;
+  channel: "AL1" | "AL2";
+  allegroHeaders: Record<string, string>;
+  url: string;
+  allegroCategoryId: string;
+  images: string[];
+  productParameters: AllegroOfferParameters;
+  sizeTableAllegroId?: string;
+}): Promise<string> {
+  const {
+    offer,
+    legacy,
+    size,
+    insoleLengthText,
+    insoleLengthValue,
+    channel,
+    allegroHeaders,
+    url,
+    allegroCategoryId,
+    images: inputImages,
+    productParameters,
+    sizeTableAllegroId,
+  } = params;
+
+  if (!offer.SKU) {
+    throw new Error("Brak SKU w ofercie.");
+  }
+  if (!offer.signature) {
+    throw new Error("Brak signature w ofercie.");
+  }
+  if (!offer.availability?.[size]) {
+    throw new Error(`Rozmiar ${size} nie istpnieje w dostępności oferty.`);
+  }
+  if (!legacy.allegroDescription) {
+    throw new Error("Brak allegroDescription w legacyProduct.");
+  }
+  if (!insoleLengthText) {
+    throw new Error("Brak insoleLengthText dla wystawienia oferty legacy.");
+  }
+  if (Number.isNaN(insoleLengthValue)) {
+    throw new Error("Brak insoleLengthValue dla wystawienia oferty legacy.");
+  }
+  if (!legacy.responsibleProducer) {
+    throw new Error("Brak responsibleProducer w legacyProduct.");
+  }
+
+  const insoleLengthParamName =
+    legacy.rootCategory === "obuwie dziecięce"
+      ? "Długość wkładki wew."
+      : "Długość wkładki";
+
+  const nextProductParameters: AllegroOfferParameters = [
+    ...removeDynamicSizeAndInsoleParameters(productParameters),
+    { name: "Rozmiar", values: [size] },
+    { name: insoleLengthParamName, values: [insoleLengthValue] },
+  ];
+
+  // Idempotentnie dopnij obrazek "jak dobrać rozmiar" na koniec
+  const images = [...inputImages];
+  const choosingSizeImageUrl = await getImageUrl(choosingSizeImageFilePath);
+  if (choosingSizeImageUrl) {
+    const urlStr = choosingSizeImageUrl as string;
+    const existingIndex = images.indexOf(urlStr);
+    if (existingIndex !== -1) {
+      images.splice(existingIndex, 1);
+    }
+    images.push(urlStr);
+  }
+
+  const nextPrice = offer.sellingPrices?.[channel];
+  if (!nextPrice) {
+    throw new Error(`Brak ceny sprzedaży dla kanału ${channel}.`);
+  }
+
+  const shippingRateId = offer.shippingRates?.[channel]?.allegroId;
+  if (!shippingRateId) {
+    throw new Error(
+      `Brak stawek wysyłki (shippingRates) dla kanału ${channel}.`
+    );
+  }
+
+  const impliedWarrantyId = offer.impliedWarranty?.[channel];
+  if (!impliedWarrantyId) {
+    throw new Error(
+      `Brak warunków reklamacji (impliedWarranty) dla kanału ${channel}.`
+    );
+  }
+
+  const returnPolicyId = offer.returnPolicy?.[channel];
+  if (!returnPolicyId) {
+    throw new Error(
+      `Brak polityki zwrotów (returnPolicy) dla kanału ${channel}.`
+    );
+  }
+
+  const productSet = [
+    {
+      responsibleProducer: {
+        type: "NAME" as const,
+        name: legacy.responsibleProducer,
+      },
+      safetyInformation: {
+        type: "TEXT" as const,
+        description: safetyInformation,
+      },
+      responsiblePerson: {
+        name: process.env.RESPONSIBLE_PERSON_NAME!,
+      },
+      product: {
+        name: `${offer.title} ${size ? size : ""}`.trim(),
+        category: {
+          id: allegroCategoryId,
+        },
+        parameters: nextProductParameters,
+        images: images,
+      },
+    },
+  ];
+
+  const nextExternalId = buildExternalId({
+    signature: offer.signature,
+    SKU: offer.SKU,
+    size,
+  });
+
+  const description = replaceVariablesInAllegroOfferDescription({
+    description: legacy.allegroDescription,
+    variableValues: {
+      rozmiar: size,
+      "długość wkładki": insoleLengthText,
+    },
+  });
+
+  const payload: AllegroOffer = {
+    description,
+    productSet,
+    sellingMode: {
+      price: {
+        amount: nextPrice as string,
+        currency: "PLN",
+      },
+    },
+    delivery: {
+      handlingTime: "PT24H",
+      shippingRates: {
+        id: shippingRateId,
+      },
+    },
+    images,
+    afterSalesServices: {
+      impliedWarranty: { id: impliedWarrantyId as string },
+      returnPolicy: { id: returnPolicyId as string },
+      ...(offer.warranty?.[channel]
+        ? { warranty: { id: offer.warranty[channel] } }
+        : {}),
+    },
+    stock: {
+      available: Number(offer.availability[size].value || "0"),
+      unit: "PAIR",
+    },
+    external: { id: nextExternalId },
+    ...(channel === "AL1" && sizeTableAllegroId
+      ? { sizeTable: { id: sizeTableAllegroId } }
+      : {}),
+  };
+
+  try {
+    const resp = await axios.post(url, payload, {
+      headers: allegroHeaders,
+    });
+    return resp.data.id! as string;
+  } catch (err) {
+    return handleAllegroApiError(
+      err,
+      "Błąd podczas tworzenia oferty na Allegro (legacy)"
     );
   }
 }
@@ -422,76 +673,4 @@ async function getAllegroBrandAmbiguousValueId(categoryId: string): Promise<{
   };
 }
 
-function replaceDescriptionVariables(
-  text: string,
-  values: Record<DescriptionVariable, string>
-): string {
-  let result = stripWrapperParagraphs(text);
-
-  for (const variable of DescriptionVariables) {
-    const regex = new RegExp(`{${variable}}`, "g");
-    result = result.replace(regex, values[variable] ?? "");
-  }
-
-  return result;
-}
-
-export async function convertToAllegroDescription(
-  description: Description,
-  imagesUrls: string[],
-  variableValues: Record<string, string>
-): Promise<{
-  sections: Array<{
-    items: Array<{ type: "TEXT" | "IMAGE"; content?: string; url?: string }>;
-  }>;
-}> {
-  const sections: Array<{
-    items: Array<{ type: "TEXT" | "IMAGE"; content?: string; url?: string }>;
-  }> = [];
-
-  for (const row of description) {
-    const items: Array<{
-      type: "TEXT" | "IMAGE";
-      content?: string;
-      url?: string;
-    }> = [];
-
-    for (let idx = 0; idx < row.elementsTypes.length; idx++) {
-      const type = row.elementsTypes[idx];
-      const element = row.elements[idx];
-
-      if (type === "text") {
-        const raw = element.content ?? "";
-        let content = replaceDescriptionVariables(raw, variableValues);
-        content = content
-          .replace(/<strong>/g, "<b>")
-          .replace(/<\/strong>/g, "</b>")
-          .replace(/<br\s*\/?>/gi, "");
-
-        if (content) {
-          items.push({ type: "TEXT", content });
-        }
-      } else if (type === "image") {
-        const key = element.image!;
-        let url: string;
-
-        if (key === "rozmiarówka") {
-          url = imagesUrls[imagesUrls.length - 1];
-        } else {
-          const index = parseInt(key, 10);
-          url = imagesUrls[index - 1];
-        }
-
-        items.push({ type: "IMAGE", url });
-      }
-    }
-
-    sections.push({ items });
-  }
-
-  return { sections };
-}
-
-function stripWrapperParagraphs(text: string): string {
-  return text.replace(/<p>\s*{rozmiarówka}\s*<\/p>/g, "{rozmiarówka}");
-}
+export { convertToAllegroDescription };

@@ -1,7 +1,10 @@
 "use server";
 
 import axios from "axios";
-import { getAllegroUserAccessToken } from "./auth";
+import {
+  getAllegroAccessTokensForBackgroundJob,
+  getAllegroUserAccessToken,
+} from "./auth";
 import { getSingleAllegroHeaders } from "./global";
 import {
   AllegroSizingTable,
@@ -14,8 +17,8 @@ const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
 const url = `${ALLEGRO_API_BASE_URL}/sale/size-tables`;
 
-export async function getAllegroSizingTables() {
-  const accessToken = await getAllegroUserAccessToken();
+export async function getAllegroSizingTables(account: "AL1" | "AL2" = "AL1") {
+  const accessToken = await getAllegroUserAccessToken(account);
   const allegroHeaders = getSingleAllegroHeaders(accessToken);
 
   try {
@@ -27,6 +30,38 @@ export async function getAllegroSizingTables() {
     handleAllegroApiError(
       error,
       "Błąd podczas pobierania tabel rozmiarów z Allegro"
+    );
+  }
+}
+
+export async function getAllegroSizingTable(
+  id: string,
+  account: "AL1" | "AL2" = "AL1",
+  opts?: { userId?: string }
+): Promise<AllegroSizingTable | undefined> {
+  if (!id || id.trim() === "") {
+    throw new Error("Brak id tabeli rozmiarów.");
+  }
+
+  let accessToken: string;
+  if (opts?.userId) {
+    const tokens = await getAllegroAccessTokensForBackgroundJob();
+    accessToken = tokens[account];
+  } else {
+    accessToken = await getAllegroUserAccessToken(account);
+  }
+
+  const allegroHeaders = getSingleAllegroHeaders(accessToken);
+
+  try {
+    const response = await axios.get(`${url}/${id}`, {
+      headers: allegroHeaders,
+    });
+    return AllegroSizingTableSchema.parse(response.data);
+  } catch (error) {
+    handleAllegroApiError(
+      error,
+      "Błąd podczas pobierania tabeli rozmiarów z Allegro"
     );
   }
 }

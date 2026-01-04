@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   getAllegroSyncStatus,
   triggerAllegroSync,
-} from "@/server-actions/allegro/syncOffersBackground";
+} from "@/server-actions/allegro/sync/syncOffersBackground";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -126,10 +126,10 @@ export default function Page() {
               status === "error"
                 ? "border-destructive"
                 : status === "completed"
-                ? "border-success"
-                : status === "running" || status === "queued"
-                ? "border-accent"
-                : "border-primary"
+                  ? "border-success"
+                  : status === "running" || status === "queued"
+                    ? "border-accent"
+                    : "border-primary"
             }`}
           >
             <p className="font-medium whitespace-pre-line">{message}</p>

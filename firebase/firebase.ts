@@ -2,7 +2,7 @@ import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getAnalytics } from "firebase/analytics";
+import { Analytics, getAnalytics, logEvent } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -26,6 +26,9 @@ googleAuthProvider.setCustomParameters({
   prompt: "select_account",
 });
 const storage = getStorage(app);
-const analytics = getAnalytics(app);
+let analytics: Analytics | null = null;
+if (typeof window !== "undefined") {
+  analytics = getAnalytics(app);
+}
 
 export { db, app, storage, auth, googleAuthProvider, analytics };

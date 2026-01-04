@@ -2,15 +2,16 @@
 
 import {
   CategoryWithId,
-  ProductWithId,
   SizingTableWithId,
+  ColorVariant,
+  ProductParameters,
 } from "@/firebase/schemas/productsSchemas";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import ProductImagesSlider from "./ProductImagesSlider";
 import SelectProductVariant from "./SelectProductVariant";
 import SelectSize from "./SelectSize";
 import SizingTableDialog from "./SizingTableDialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,17 @@ import { useToast } from "@/hooks/useToast";
 import ShoppingCartPreviewItem from "../shopping-cart/ShoppingCartPreviewItem";
 import ShippingInfo from "../global/ShippingInfo";
 import { ShoppingCartItemType } from "@/firebase/schemas/shoppingCartSchemas";
+import { analytics } from "@/firebase/firebase";
+import { logEvent } from "firebase/analytics";
+import { ItemType } from "@/firebase/schemas/analyticsSchemas";
+
+type StoreProductData = {
+  id: string;
+  brand?: string;
+  manufacturerCode: string;
+  colorVariants: ColorVariant[];
+  parameters: ProductParameters;
+};
 
 export default function ProductPage({
   imagesUrls,
@@ -34,7 +46,7 @@ export default function ProductPage({
   choosingSizeImageUrl,
 }: {
   imagesUrls: Record<string, string[]>;
-  productData: ProductWithId;
+  productData: StoreProductData;
   category: CategoryWithId;
   initialColorVariantName?: string;
   offersData: Record<string, OfferWithId>;
@@ -44,6 +56,27 @@ export default function ProductPage({
   if (!productData.colorVariants) {
     notFound();
   }
+
+  useEffect(() => {
+    if (analytics) {
+      logEvent(analytics, "view_item", {
+        items: [
+          {
+            item_id: offersData[selectedColorVariant].SKU,
+            item_name: offersData[selectedColorVariant].signature,
+            item_category: category.name,
+            item_brand: productData.brand,
+            price: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+            size: selectedSize,
+            quantity: 1,
+            item_variant: selectedColorVariant,
+          } as ItemType,
+        ],
+        value: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+        currency: "PLN",
+      });
+    }
+  }, []);
 
   const validInitialVariant =
     initialColorVariantName &&
@@ -74,15 +107,37 @@ export default function ProductPage({
 
   const currentOffer = offersData[selectedColorVariant];
 
-  const price = Number(
-    offersData[selectedColorVariant].sellingPrices.DTC
-  ) as number;
+  const priceStr =
+    currentOffer?.sellingPrices?.DTC ||
+    (currentOffer?.sellingPrices as any)?.AL1 ||
+    (currentOffer?.sellingPrices as any)?.AL2 ||
+    "0";
+  const price = Number(priceStr) as number;
 
   const { openDialog } = useDialogWindow();
   const { addToCart, findExistingItem } = useShoppingCart();
   const { showToast } = useToast();
 
   const handleAddToCart = () => {
+    if (analytics) {
+      logEvent(analytics, "add_to_cart", {
+        items: [
+          {
+            item_id: offersData[selectedColorVariant].SKU,
+            item_name: offersData[selectedColorVariant].signature,
+            item_category: category.name,
+            item_brand: productData.brand,
+            price: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+            size: selectedSize,
+            quantity: 1,
+            item_variant: selectedColorVariant,
+          } as ItemType,
+        ],
+        value: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+        currency: "PLN",
+      });
+    }
+
     if (!selectedSize) {
       showToast("Proszę wybrać rozmiar", "error");
       return;

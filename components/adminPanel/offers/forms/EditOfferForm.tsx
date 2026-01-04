@@ -153,30 +153,75 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
     }
 
     try {
+      const availabilityMap = formData.availability || {};
+      const sizesToProcess = Object.keys(availabilityMap);
+
       const updatePromises = allegroSalesChannels.flatMap((salesChannel) => {
-        const offersIds = oldData.allegroOffersIds?.[salesChannel] as Record<
-          string,
-          string
-        >;
-        return Object.entries(offersIds).map(async ([size, offerId]) => {
+        const offersIds =
+          (oldData.allegroOffersIds?.[salesChannel] as Record<
+            string,
+            string
+          >) || {};
+
+        return sizesToProcess.map(async (size) => {
           const availability = Number(
             form.getValues(`availability.${size}.value`)
           );
 
-          return axios.patch(`/api/allegro/offers/${offerId}`, {
-            offerPartial: {
-              ...offersPartials[salesChannel],
-              stock: {
-                available: availability || 0,
-                unit: "PAIR",
-              },
-              name: `${form.getValues("title")} ${size}`,
-              publication: {
-                status: availability > 0 ? "ACTIVE" : "INACTIVE",
-              },
+          const offerPartial = {
+            ...offersPartials[salesChannel],
+            stock: {
+              available: availability || 0,
+              unit: "PAIR",
             },
-            salesChannel,
-          });
+            name: `${form.getValues("title")} ${size != "null" && size ? size : ""}`.trim(),
+            publication: {
+              status: availability > 0 ? "ACTIVE" : "INACTIVE",
+            },
+          };
+
+          const existingOfferId = offersIds[size];
+
+          // Dla AL2 nie tworzymy ofert – tylko edytujemy, jeśli istnieją.
+          if (salesChannel === "AL2" && !existingOfferId) {
+            return;
+          }
+
+          const createOffer = async (): Promise<string> => {
+            const { data } = await axios.post(
+              "/api/allegro/offers/individual",
+              {
+                offerId: oldData.id,
+                size,
+                salesChannel,
+              }
+            );
+            return data.allegroOfferId as string;
+          };
+
+          let offerIdToUpdate = existingOfferId || (await createOffer());
+
+          try {
+            await axios.patch(`/api/allegro/offers/${offerIdToUpdate}`, {
+              offerPartial,
+              salesChannel,
+            });
+          } catch (err: any) {
+            const status = err?.response?.status;
+            if (status === 404) {
+              if (salesChannel === "AL2") {
+                return;
+              }
+              offerIdToUpdate = await createOffer();
+              await axios.patch(`/api/allegro/offers/${offerIdToUpdate}`, {
+                offerPartial,
+                salesChannel,
+              });
+              return;
+            }
+
+            throw err;
+          }
         });
       });
 

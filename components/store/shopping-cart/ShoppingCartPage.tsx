@@ -19,6 +19,9 @@ import {
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import LinkText from "@/components/adminPanel/global/LinkText";
+import { analytics } from "@/firebase/firebase";
+import { logEvent } from "firebase/analytics";
+import { ItemType } from "@/firebase/schemas/analyticsSchemas";
 
 export default function ShoppingCartPage() {
   const {
@@ -60,6 +63,29 @@ export default function ShoppingCartPage() {
 
   useEffect(() => {
     if (isLoading) return;
+    if (analytics) {
+      logEvent(analytics, "view_cart", {
+        items: cart.map(
+          (cartItem) =>
+            ({
+              item_id: offersData[cartItem.item.offerId]?.SKU,
+              item_name: offersData[cartItem.item.offerId]?.signature,
+              item_brand: cartItem.item.brand,
+              item_category: cartItem.item.categoryName,
+              price: cartItem.item.price,
+              size: cartItem.item.size,
+              quantity: cartItem.item.quantity,
+              item_variant: cartItem.item.formattedMainColor,
+            }) as ItemType
+        ),
+        value: cart.reduce(
+          (sum, cartItem) => sum + cartItem.item.price * cartItem.item.quantity,
+          0
+        ),
+        currency: "PLN",
+      });
+    }
+
     (async () => {
       await fetchOffers();
     })();
@@ -164,7 +190,33 @@ export default function ShoppingCartPage() {
             variant={"important"}
             className="text-xl px-6 w-fit mb-2 mt-4"
             disabled={hasUnavailableItems().hasUnavailable || !termsAccepted}
-            onClick={() => router.push("/checkout")}
+            onClick={() => {
+              if (analytics) {
+                logEvent(analytics, "begin_checkout", {
+                  items: cart.map(
+                    (cartItem) =>
+                      ({
+                        item_id: offersData[cartItem.item.offerId]?.SKU,
+                        item_name: offersData[cartItem.item.offerId]?.signature,
+                        item_brand: cartItem.item.brand,
+                        item_category: cartItem.item.categoryName,
+                        price: cartItem.item.price,
+                        size: cartItem.item.size,
+                        quantity: cartItem.item.quantity,
+                        item_variant: cartItem.item.formattedMainColor,
+                      }) as ItemType
+                  ),
+                  value: cart.reduce(
+                    (sum, cartItem) =>
+                      sum + cartItem.item.price * cartItem.item.quantity,
+                    0
+                  ),
+                  currency: "PLN",
+                });
+              }
+
+              router.push("/checkout");
+            }}
           >
             Do kasy
           </Button>

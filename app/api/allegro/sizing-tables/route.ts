@@ -9,7 +9,7 @@ import { NextRequest } from "next/server";
 export async function GET() {
   const data = await getAllegroSizingTables();
   if (!data) {
-    return apiResponse("Nie znaleziono cenników dostaw.", 204);
+    return apiResponse("Nie znaleziono tabeli rozmiarów.", 204);
   }
 
   return apiResponse("Tabele rozmiarów zostały pobrane.", 200, data);

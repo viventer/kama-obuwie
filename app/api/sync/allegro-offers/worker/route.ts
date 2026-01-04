@@ -1,4 +1,4 @@
-import { syncAllegroOffers } from "@/server-actions/allegro/syncOffers";
+import { syncAllegroOffers } from "@/server-actions/allegro/sync/syncOffers";
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/upstash/redis";
 import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";

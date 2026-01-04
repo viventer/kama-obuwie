@@ -30,6 +30,9 @@ import { RegisterTransactionData } from "@/firebase/schemas/p24Schemas";
 import { SendOrderEmailPayload } from "@/server-actions/emails/orderEmails";
 import { transformOrderToEmailOrderData } from "@/helpers/orders";
 import { useEffect, useState } from "react";
+import { analytics } from "@/firebase/firebase";
+import { logEvent } from "firebase/analytics";
+import { ItemType } from "@/firebase/schemas/analyticsSchemas";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
@@ -199,6 +202,27 @@ export default function CheckoutForms() {
         await axios.post("/api/email/send", emailPayload);
       } catch (err) {
         console.error("Błąd podczas wysyłania emaila:", err);
+      }
+
+      if (analytics) {
+        logEvent(analytics, "purchase", {
+          items: cart.map(
+            (cartItem) =>
+              ({
+                item_id: offersData[cartItem.item.offerId]?.SKU,
+                item_name: offersData[cartItem.item.offerId]?.signature,
+                item_brand: cartItem.item.brand,
+                item_category: cartItem.item.categoryName,
+                price: cartItem.item.price,
+                size: cartItem.item.size,
+                quantity: cartItem.item.quantity,
+                item_variant: cartItem.item.formattedMainColor,
+              }) as ItemType
+          ),
+          transaction_id: createdOrder.id,
+          value: parseFloat(createdOrder.summary.totalToPay.amount),
+          currency: "PLN",
+        });
       }
 
       if (checkoutData.paymentMethod === "COD") {

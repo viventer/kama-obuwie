@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
+import { analytics } from "@/firebase/firebase";
+import { logEvent } from "firebase/analytics";
 
 export default function ProductFromList({
   product,

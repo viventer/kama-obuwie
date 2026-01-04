@@ -10,6 +10,7 @@ import {
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { Category } from "@/firebase/schemas/productsSchemas";
 import { getProductsListingData } from "@/server-actions/products/products";
+import NavOptionContent from "./NavOptionContent";
 
 const mainCategories = [
   { label: "Męskie", rootCategory: "obuwie męskie" },
@@ -83,19 +84,7 @@ export default async function MainNav() {
                   {mainCategory.label}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-background w-ful">
-                  <div className="grid w-full max-w-[600px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] text-wrap">
-                    {subcategories.map((category) => (
-                      <NavigationMenuLink key={category.id} asChild>
-                        <LinkText
-                          href={`/listing?categoryId=${encodeURIComponent(
-                            category.id
-                          )}`}
-                        >
-                          {category.name}
-                        </LinkText>
-                      </NavigationMenuLink>
-                    ))}
-                  </div>
+                  <NavOptionContent subcategories={subcategories} />
                 </NavigationMenuContent>
               </NavigationMenuItem>
             );

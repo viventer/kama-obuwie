@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Ubuntu, Ubuntu_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { ConfirmDialogProvider } from "@/app/providers/ConfirmDialogProvider";
 import { AuthProvider } from "./providers/AuthProvider";
 import { FullPageLoaderProvider } from "@/components/adminPanel/global/FullPageLoader";
@@ -31,6 +32,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const isProduction = process.env.NEXT_PUBLIC_NODE_ENV === "production";
+  const googleTagId = "GTM-PXQZP6MW";
+
   return (
     <html
       lang="pl"
@@ -39,6 +43,10 @@ export default async function RootLayout({
       <body
         className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen`}
       >
+        {isProduction && googleTagId ? (
+          <GoogleTagManager gtmId={googleTagId} />
+        ) : null}
+
         <ConfirmDialogProvider>
           <AuthProvider>
             <FullPageLoaderProvider>

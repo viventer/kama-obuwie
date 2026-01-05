@@ -97,6 +97,9 @@ export async function getStoreProductPageData(params: {
 
     if (product.offersIds) {
       for (const [variantName, offerId] of Object.entries(product.offersIds)) {
+        if (typeof offerId !== "string" || offerId.trim().length === 0) {
+          continue;
+        }
         const { data: offer } = await getDocumentFromAdminDB<OfferWithId>(
           "offers",
           offerId

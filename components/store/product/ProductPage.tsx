@@ -54,6 +54,10 @@ export default function ProductPage({
   choosingSizeImageUrl?: string;
 }) {
   if (!productData.colorVariants) {
+    console.log(
+      "Brak wariantów kolorystycznych dla produktu o ID:",
+      productData.id
+    );
     notFound();
   }
 
@@ -93,6 +97,20 @@ export default function ProductPage({
 
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const fromQuery = searchParams.get("colorVariantName") || undefined;
+    if (!fromQuery) return;
+
+    const isValid = productData.colorVariants.some(
+      (variant) => getColorVariantName(variant) === fromQuery
+    );
+
+    if (isValid) {
+      setSelectedColorVariant(fromQuery);
+      setSelectedSize("");
+    }
+  }, [searchParams, productData.colorVariants]);
 
   const handleVariantChange = (newVariant: string) => {
     setSelectedColorVariant(newVariant);

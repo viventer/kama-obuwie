@@ -11,7 +11,7 @@ import ProductImagesSlider from "./ProductImagesSlider";
 import SelectProductVariant from "./SelectProductVariant";
 import SelectSize from "./SelectSize";
 import SizingTableDialog from "./SizingTableDialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,9 @@ import { useToast } from "@/hooks/useToast";
 import ShoppingCartPreviewItem from "../shopping-cart/ShoppingCartPreviewItem";
 import ShippingInfo from "../global/ShippingInfo";
 import { ShoppingCartItemType } from "@/firebase/schemas/shoppingCartSchemas";
+import { analytics } from "@/firebase/firebase";
+import { logEvent } from "firebase/analytics";
+import { ItemType } from "@/firebase/schemas/analyticsSchemas";
 
 type StoreProductData = {
   id: string;
@@ -51,8 +54,33 @@ export default function ProductPage({
   choosingSizeImageUrl?: string;
 }) {
   if (!productData.colorVariants) {
+    console.log(
+      "Brak wariantów kolorystycznych dla produktu o ID:",
+      productData.id
+    );
     notFound();
   }
+
+  useEffect(() => {
+    if (analytics) {
+      logEvent(analytics, "view_item", {
+        items: [
+          {
+            item_id: offersData[selectedColorVariant].SKU,
+            item_name: offersData[selectedColorVariant].signature,
+            item_category: category.name,
+            item_brand: productData.brand,
+            price: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+            size: selectedSize,
+            quantity: 1,
+            item_variant: selectedColorVariant,
+          } as ItemType,
+        ],
+        value: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+        currency: "PLN",
+      });
+    }
+  }, []);
 
   const validInitialVariant =
     initialColorVariantName &&
@@ -69,6 +97,20 @@ export default function ProductPage({
 
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const fromQuery = searchParams.get("colorVariantName") || undefined;
+    if (!fromQuery) return;
+
+    const isValid = productData.colorVariants.some(
+      (variant) => getColorVariantName(variant) === fromQuery
+    );
+
+    if (isValid) {
+      setSelectedColorVariant(fromQuery);
+      setSelectedSize("");
+    }
+  }, [searchParams, productData.colorVariants]);
 
   const handleVariantChange = (newVariant: string) => {
     setSelectedColorVariant(newVariant);
@@ -95,6 +137,25 @@ export default function ProductPage({
   const { showToast } = useToast();
 
   const handleAddToCart = () => {
+    if (analytics) {
+      logEvent(analytics, "add_to_cart", {
+        items: [
+          {
+            item_id: offersData[selectedColorVariant].SKU,
+            item_name: offersData[selectedColorVariant].signature,
+            item_category: category.name,
+            item_brand: productData.brand,
+            price: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+            size: selectedSize,
+            quantity: 1,
+            item_variant: selectedColorVariant,
+          } as ItemType,
+        ],
+        value: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+        currency: "PLN",
+      });
+    }
+
     if (!selectedSize) {
       showToast("Proszę wybrać rozmiar", "error");
       return;

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, PackageIcon, StarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { analytics } from "@/firebase/firebase";
+import { logEvent } from "firebase/analytics";
 
 export type HomeGridCategory = {
   id: string;
@@ -37,7 +39,17 @@ export default function HomeGrid({ icon, title, categories }: HomeGridProps) {
           <Card
             key={category.id || category.displayName}
             className="col-span-5 row-span-1 flex flex-row justify-between items-center px-4 sm:col-span-3 cursor-pointer transition-colors duration-200 hover:bg-secondary/50 active:bg-secondary/75"
-            onClick={() => router.push(`/listing?categoryId=${category.id}`)}
+            onClick={() => {
+              if (analytics) {
+                logEvent(analytics, "view_item_list", {
+                  item_list_id: category.id,
+                  item_list_name: category.name,
+                  from: "home_grid",
+                });
+              }
+
+              router.push(`/listing/${category.id}`);
+            }}
           >
             <div className="flex items-center gap-4">
               <Image
@@ -53,7 +65,14 @@ export default function HomeGrid({ icon, title, categories }: HomeGridProps) {
               variant="ghost"
               onClick={(e) => {
                 e.stopPropagation();
-                router.push(`/listing?categoryId=${category.id}`);
+                if (analytics) {
+                  logEvent(analytics, "view_item_list", {
+                    item_list_id: category.id,
+                    item_list_name: category.name,
+                    from: "home_grid",
+                  });
+                }
+                router.push(`/listing/${category.id}`);
               }}
               className="hover:translate-x-1 transition-transform"
             >

@@ -174,13 +174,18 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
               available: availability || 0,
               unit: "PAIR",
             },
-            name: `${form.getValues("title")} ${size}`,
+            name: `${form.getValues("title")} ${size != "null" && size ? size : ""}`.trim(),
             publication: {
               status: availability > 0 ? "ACTIVE" : "INACTIVE",
             },
           };
 
           const existingOfferId = offersIds[size];
+
+          // Dla AL2 nie tworzymy ofert – tylko edytujemy, jeśli istnieją.
+          if (salesChannel === "AL2" && !existingOfferId) {
+            return;
+          }
 
           const createOffer = async (): Promise<string> => {
             const { data } = await axios.post(
@@ -204,6 +209,9 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
           } catch (err: any) {
             const status = err?.response?.status;
             if (status === 404) {
+              if (salesChannel === "AL2") {
+                return;
+              }
               offerIdToUpdate = await createOffer();
               await axios.patch(`/api/allegro/offers/${offerIdToUpdate}`, {
                 offerPartial,

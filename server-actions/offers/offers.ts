@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { Offer, OfferSchema } from "@/firebase/schemas/offersSchemas";
 import { verifyUser } from "../auth/auth";
@@ -48,12 +49,25 @@ export const updateOffer = async function (
 
   OfferSchema.partial().parse(updateData);
   const offerRef = adminDB.collection("offers").doc(id);
-  const productDoc = await offerRef.get();
-  if (!productDoc.exists) {
+  const offerDoc = await offerRef.get();
+  if (!offerDoc.exists) {
     throw new Error("Oferta nie istnieje.");
   }
 
   await offerRef.update(updateData);
+
+  const currentOffer = offerDoc.data() as Offer | undefined;
+  const productId =
+    typeof currentOffer?.productId === "string" && currentOffer.productId.trim()
+      ? currentOffer.productId
+      : null;
+
+  if (productId) {
+    revalidatePath(`/product/${productId}`);
+  } else {
+    // Legacy: strona produktu jest pod ID oferty
+    revalidatePath(`/product/${id}`);
+  }
 };
 
 export const getPostOfferBody = async ({
@@ -97,8 +111,8 @@ export const syncOffersAvailability = async function (
     salesChannel === "AL1"
       ? ["AL2"]
       : salesChannel === "AL2"
-      ? ["AL1"]
-      : ["AL1", "AL2"];
+        ? ["AL1"]
+        : ["AL1", "AL2"];
 
   for (const item of orderItems) {
     const { SKU, size, allegroId: mainChannelOfferId } = item.offer;
@@ -144,6 +158,17 @@ export const syncOffersAvailability = async function (
         .update({
           [`availability.${size}.value`]: newAvailability.toString(),
         });
+
+      const productId =
+        typeof offer.productId === "string" && offer.productId.trim()
+          ? offer.productId
+          : null;
+
+      if (productId) {
+        revalidatePath(`/product/${productId}`);
+      } else {
+        revalidatePath(`/product/${offerId}`);
+      }
 
       // Zaktualizuj dostępność na wszystkich przeciwnych kanałach Allegro
       const updateOfferData = {

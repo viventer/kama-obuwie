@@ -17,11 +17,19 @@ import { getSingleAllegroHeaders } from "../global";
 import axios from "axios";
 import { editAllegroOffer, getAllegroOffer } from "../offers";
 import { getAllegroSizingTable } from "../sizingTables";
+import { getAllegroResponsibleProducer } from "../responsibleProducers";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { createOffer, updateOffer } from "../../offers/offers";
-import { cleanOldExternalId, parseExternalId } from "@/helpers/externalId";
+import {
+  buildExternalId,
+  cleanOldExternalId,
+  parseExternalId,
+} from "@/helpers/externalId";
 import { updateProduct } from "../../products/products";
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  type ProductParameters,
+  ProductWithId,
+} from "@/firebase/schemas/productsSchemas";
 import { redis } from "@/upstash/redis";
 import {
   legacyProductIdFromSignature,
@@ -33,12 +41,15 @@ import {
   transformAllegroSizingTableToSizingTable,
 } from "./sizingTableSyncHelpers";
 import {
+  allegroProductParametersToProductParameters,
   delay,
   getCategoryByAllegroCategoryId,
   getOfferFromDBBySignature,
   getProductsBySignature,
   groupAl1OffersBySignature,
+  normalizeLegacyAllegroDescription,
   resolveSkuForOffer,
+  removeDynamicSizeAndInsoleFromProductParameters,
   updateOfferInDB,
   updateProductOffersIds,
 } from "./syncOffersHelpers";
@@ -223,7 +234,7 @@ const syncAl1SizesForSignature = async (params: {
         "AL1",
         {
           external: {
-            id: `${signature} [${SKU}r${size}]`,
+            id: buildExternalId({ signature, SKU, size }),
           },
         },
         { userId }
@@ -293,6 +304,12 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
       representativeOffer.category.id
     );
 
+    if (!categoryFromDb) {
+      throw new Error(
+        `Nie znaleziono kategorii dla allegroCategoryId: "${representativeOffer.category.id} (najpewniej akcesoria), pomijam wzbogacanie legacyProduct."`
+      );
+    }
+
     const colorVariantName =
       existingOffer.colorVariantName || parsed.colorVariantName;
 
@@ -312,60 +329,25 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
       legacyDoc.exists ? legacyDoc.data() : null
     ) as LegacyProduct | null;
 
-    let nextOfferTemplates: NonNullable<LegacyProduct["offerTemplates"]> = {
-      ...(existingLegacy?.offerTemplates || {}),
-    };
-
-    const hasAnyAl1Template = Boolean(
-      nextOfferTemplates?.AL1 &&
-      Object.keys(nextOfferTemplates.AL1 || {}).length > 0
-    );
-
-    // Używamy template do zdjęć (i sizing table). Jeśli go nie ma, próbujemy pobrać.
-    const getTemplateForSizeOrAny = (
-      templates: NonNullable<LegacyProduct["offerTemplates"]>
-    ): AllegroOffer | undefined => {
-      const direct = templates.AL1?.[representativeSize];
-      if (direct) return direct;
-      return templates.AL1 ? Object.values(templates.AL1)[0] : undefined;
-    };
-
-    let templateForImages: AllegroOffer | undefined =
-      getTemplateForSizeOrAny(nextOfferTemplates);
-
-    if (!hasAnyAl1Template) {
-      try {
-        const template: AllegroOffer = await getAllegroOffer(
-          representativeOffer.id,
-          "AL1",
-          { userId }
-        );
-        nextOfferTemplates = {
-          ...nextOfferTemplates,
-          AL1: {
-            ...(nextOfferTemplates.AL1 || {}),
-            [representativeSize || "template"]: template,
-          },
-        };
-
-        templateForImages = template;
-      } catch (e) {
-        console.warn(
-          `⚠️  Failed to fetch AL1 template for legacy offer: ${representativeOffer.id}`,
-          e
-        );
-      }
+    let allegroOfferDetails: AllegroOffer | undefined;
+    try {
+      allegroOfferDetails = await getAllegroOffer(
+        representativeOffer.id,
+        "AL1",
+        {
+          userId,
+        }
+      );
+    } catch (e) {
+      console.warn(
+        `⚠️  Failed to fetch AL1 template for legacy offer: ${representativeOffer.id}`,
+        e
+      );
     }
 
     let sizingTableId = existingLegacy?.sizingTableId;
     if (!sizingTableId) {
-      const templateForSizing =
-        nextOfferTemplates?.AL1?.[representativeSize] ||
-        (nextOfferTemplates?.AL1
-          ? Object.values(nextOfferTemplates.AL1)[0]
-          : undefined);
-
-      const allegroSizingTableId = templateForSizing?.sizeTable?.id;
+      const allegroSizingTableId = allegroOfferDetails?.sizeTable?.id;
       if (allegroSizingTableId) {
         try {
           const allegroTable = await getAllegroSizingTable(
@@ -382,18 +364,18 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
               .get();
 
             if (!existingSizingTable.empty) {
-              sizingTableId = existingSizingTable.docs[0].id;
-            } else {
-              const sizingTable = transformAllegroSizingTableToSizingTable({
-                ...allegroTable,
-                id: allegroSizingTableId,
-              });
-
-              sizingTableId = await createSizingTable(
-                sizingTable,
-                userId ? { userId } : undefined
-              );
+              // usunięcie starej (niepoprawnej) tabeli jeśli istnieje
+              existingSizingTable.docs[0].ref.delete();
             }
+            const sizingTable = transformAllegroSizingTableToSizingTable({
+              ...allegroTable,
+              id: allegroSizingTableId,
+            });
+
+            sizingTableId = await createSizingTable(
+              sizingTable,
+              userId ? { userId } : undefined
+            );
           }
         } catch (e) {
           console.warn(
@@ -406,17 +388,71 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
 
     const legacySizingTableId = sizingTableId || existingLegacy?.sizingTableId;
 
-    const templateImages: string[] = Array.isArray(templateForImages?.images)
-      ? templateForImages!.images
+    const offerImages: string[] = Array.isArray(allegroOfferDetails?.images)
+      ? allegroOfferDetails!.images
       : [];
-    const productImages: string[] = Array.isArray(
-      templateForImages?.productSet?.[0]?.product?.images
+    const productSetImages: string[] = Array.isArray(
+      allegroOfferDetails?.productSet?.[0]?.product?.images
     )
-      ? templateForImages!.productSet[0]!.product.images
+      ? allegroOfferDetails!.productSet[0]!.product.images
       : [];
 
-    const allegroImagesToUse =
-      templateImages.length > 0 ? templateImages : productImages;
+    const imagesFromAllegro =
+      offerImages.length > 0 ? offerImages : productSetImages;
+
+    const derivedAllegroDescription = normalizeLegacyAllegroDescription(
+      allegroOfferDetails?.description
+    );
+
+    const responsibleProducerRef = (allegroOfferDetails as any)?.productSet?.[0]
+      ?.responsibleProducer;
+    const responsibleProducerIdFromAllegro =
+      typeof responsibleProducerRef?.id === "string"
+        ? responsibleProducerRef.id
+        : undefined;
+    const responsibleProducerNameFromAllegro =
+      typeof responsibleProducerRef?.name === "string"
+        ? responsibleProducerRef.name
+        : undefined;
+
+    let derivedResponsibleProducerName: string | undefined =
+      responsibleProducerNameFromAllegro;
+
+    if (!derivedResponsibleProducerName && responsibleProducerIdFromAllegro) {
+      try {
+        const producer = await getAllegroResponsibleProducer(
+          responsibleProducerIdFromAllegro,
+          "AL1",
+          userId ? { userId } : undefined
+        );
+        if (producer?.name) {
+          derivedResponsibleProducerName = producer.name;
+        }
+      } catch (e) {
+        console.warn(
+          `⚠️  Failed to resolve responsibleProducer name (id=${responsibleProducerIdFromAllegro})`,
+          e
+        );
+      }
+    }
+
+    const derivedParameters = allegroProductParametersToProductParameters(
+      allegroOfferDetails?.productSet?.[0]?.product?.parameters
+    );
+
+    const mergedLegacyParameters: ProductParameters | undefined =
+      derivedParameters || existingLegacy?.parameters
+        ? ({
+            required: existingLegacy?.parameters?.required || {},
+            optional: {
+              ...(derivedParameters?.optional || {}),
+              ...(existingLegacy?.parameters?.optional || {}),
+            },
+          } as ProductParameters)
+        : undefined;
+
+    const sanitizedLegacyParameters =
+      removeDynamicSizeAndInsoleFromProductParameters(mergedLegacyParameters);
 
     const nextImagesUrls = {
       ...(existingLegacy?.imagesUrls || {}),
@@ -427,7 +463,7 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
                 [
                   ...(existingLegacy?.imagesUrls?.[colorVariantName] || []),
                   representativeOffer.primaryImage.url,
-                  ...allegroImagesToUse,
+                  ...imagesFromAllegro,
                 ].filter(
                   (x): x is string => typeof x === "string" && x.length > 0
                 )
@@ -438,17 +474,15 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
     };
 
     const nowIso = new Date().toISOString();
-    const categoryFromDbNoId = categoryFromDb
-      ? (({ id: _id, ...rest }) => rest)(categoryFromDb)
-      : undefined;
 
     const nextLegacyProduct: LegacyProduct = {
       ...(existingLegacy || {}),
       signature: existingLegacy?.signature || signature,
+      rootCategory:
+        existingLegacy?.rootCategory || categoryFromDb?.rootCategory,
       sizingTableId: sizingTableId || existingLegacy?.sizingTableId,
       manufacturerCode:
         existingLegacy?.manufacturerCode || parsed.manufacturerCode,
-      brand: existingLegacy?.brand || parsed.brand,
       colorVariantName:
         existingLegacy?.colorVariantName || parsed.colorVariantName,
       colorVariants:
@@ -457,14 +491,20 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
           : colorVariantName
             ? [{ color: colorVariantName }]
             : [],
-      category: existingLegacy?.category || categoryFromDbNoId,
-      rootCategory:
-        existingLegacy?.rootCategory || categoryFromDb?.rootCategory,
+      parameters: sanitizedLegacyParameters,
+      categoryId: existingLegacy?.categoryId || categoryFromDb?.id,
       imagesUrls: nextImagesUrls,
-      offerTemplates: nextOfferTemplates,
+      allegroDescription:
+        existingLegacy?.allegroDescription || derivedAllegroDescription,
+      responsibleProducer:
+        existingLegacy?.responsibleProducer || derivedResponsibleProducerName,
       createdAt: existingLegacy?.createdAt || nowIso,
       updatedAt: nowIso,
     };
+
+    if (parsed.brand) {
+      nextLegacyProduct.brand = parsed.brand;
+    }
 
     await legacyRef.set(nextLegacyProduct, { merge: true });
 
@@ -731,6 +771,15 @@ const syncAL2Offers = async (
         continue;
       }
 
+      const existingSku = existingOffer.SKU;
+      if (!existingSku) {
+        console.log(
+          `⚠️  AL2: Existing offer for signature "${signature}" has no SKU - skipping`
+        );
+        skippedSignatures++;
+        continue;
+      }
+
       console.log(
         `✅ AL2: Found existing offer with SKU: ${existingOffer.SKU}`
       );
@@ -764,7 +813,11 @@ const syncAL2Offers = async (
             "AL2",
             {
               external: {
-                id: `${signature} [${existingOffer.SKU}r${size}]`,
+                id: buildExternalId({
+                  signature,
+                  SKU: existingSku,
+                  size,
+                }),
               },
             },
             { userId }

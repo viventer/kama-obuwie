@@ -18,8 +18,8 @@ export const transformAllegroSizingTableToSizingTable = (
 
   for (const row of allegroTable.values || []) {
     // Allegro zawsze zwraca: [rozmiar, długość wkładki]
-    const size = (row.cells?.[0] || "").trim();
-    const insoleStr = (row.cells?.[1] || "").trim().replace(",", ".");
+    const size = (row.cells?.[1] || "").trim();
+    const insoleStr = (row.cells?.[0] || "").trim().replace(",", ".");
     const insoleLength = Number.parseFloat(insoleStr);
 
     if (!size) continue;

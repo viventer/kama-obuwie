@@ -5,6 +5,7 @@ import {
   getDocumentsFromAdminDB,
 } from "@/firebase/getters";
 import { CategoryWithId } from "@/firebase/schemas/productsSchemas";
+import { getCategoryDisplayName } from "@/helpers/categories";
 import { getProductsListingData } from "@/server-actions/products/products";
 import { notFound } from "next/navigation";
 
@@ -47,7 +48,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <div className="w-fit 2xs:w-full mx-auto sm:mx-0 ">
-      <SubpageHeading text={`${category.data.name}`} />
+      <SubpageHeading text={`${getCategoryDisplayName(category.data)}`} />
       <section className="grid gap-6 2xs:grid-cols-[repeat(auto-fill,_minmax(10rem,_1fr))] lg:grid-cols-[repeat(auto-fill,_minmax(15rem,_1fr))]">
         {filteredProducts && filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (

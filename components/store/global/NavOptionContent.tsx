@@ -17,7 +17,7 @@ export default function NavOptionContent({
       {subcategories.map((category) => (
         <NavigationMenuLink key={category.id} asChild>
           <LinkText
-            href={`/listing?categoryId=${encodeURIComponent(category.id)}`}
+            href={`/listing/${encodeURIComponent(category.id)}`}
             onClick={() => {
               if (analytics) {
                 logEvent(analytics, "view_item_list", {

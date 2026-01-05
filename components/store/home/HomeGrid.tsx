@@ -48,7 +48,7 @@ export default function HomeGrid({ icon, title, categories }: HomeGridProps) {
                 });
               }
 
-              router.push(`/listing?categoryId=${category.id}`);
+              router.push(`/listing/${category.id}`);
             }}
           >
             <div className="flex items-center gap-4">
@@ -72,7 +72,7 @@ export default function HomeGrid({ icon, title, categories }: HomeGridProps) {
                     from: "home_grid",
                   });
                 }
-                router.push(`/listing?categoryId=${category.id}`);
+                router.push(`/listing/${category.id}`);
               }}
               className="hover:translate-x-1 transition-transform"
             >

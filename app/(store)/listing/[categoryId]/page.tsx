@@ -1,16 +1,31 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import ProductFromList from "@/components/store/home/ProductFromList";
-import { getDocumentFromAdminDB } from "@/firebase/getters";
+import {
+  getDocumentFromAdminDB,
+  getDocumentsFromAdminDB,
+} from "@/firebase/getters";
 import { CategoryWithId } from "@/firebase/schemas/productsSchemas";
 import { getProductsListingData } from "@/server-actions/products/products";
 import { notFound } from "next/navigation";
 
+export const revalidate = 86400; // 24h (ISR)
+
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  const categories =
+    await getDocumentsFromAdminDB<CategoryWithId>("categories");
+  return (categories ?? [])
+    .filter((category) => Boolean(category.id))
+    .map((category) => ({ categoryId: category.id }));
+}
+
 type Props = {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  params: Promise<{ categoryId: string }>;
 };
 
-export default async function page({ searchParams }: Props) {
-  const categoryId = (await searchParams).categoryId;
+export default async function Page({ params }: Props) {
+  const { categoryId } = await params;
   if (!categoryId || typeof categoryId !== "string") {
     notFound();
   }
@@ -33,7 +48,7 @@ export default async function page({ searchParams }: Props) {
   return (
     <div className="w-fit 2xs:w-full mx-auto sm:mx-0 ">
       <SubpageHeading text={`${category.data.name}`} />
-      <section className="grid gap-6 grid-cols- 2xs:grid-cols-[repeat(auto-fill,_minmax(10rem,_1fr))] lg:grid-cols-[repeat(auto-fill,_minmax(15rem,_1fr))]">
+      <section className="grid gap-6 2xs:grid-cols-[repeat(auto-fill,_minmax(10rem,_1fr))] lg:grid-cols-[repeat(auto-fill,_minmax(15rem,_1fr))]">
         {filteredProducts && filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <ProductFromList

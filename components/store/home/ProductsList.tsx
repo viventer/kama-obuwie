@@ -66,7 +66,7 @@ export default function ProductsList({
               });
             }
 
-            router.push(`/listing?categoryId=${categoryId}`);
+            router.push(`/listing/${categoryId}`);
           }}
         >
           <Button
@@ -79,7 +79,7 @@ export default function ProductsList({
                   from: "home_products_list",
                 });
               }
-              router.push(`/listing?categoryId=${categoryId}`);
+              router.push(`/listing/${categoryId}`);
             }}
             className="hover:translate-x-1 transition-transform w-fit h-fit"
           >

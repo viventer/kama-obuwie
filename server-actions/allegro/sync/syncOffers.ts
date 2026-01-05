@@ -364,18 +364,18 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
               .get();
 
             if (!existingSizingTable.empty) {
-              sizingTableId = existingSizingTable.docs[0].id;
-            } else {
-              const sizingTable = transformAllegroSizingTableToSizingTable({
-                ...allegroTable,
-                id: allegroSizingTableId,
-              });
-
-              sizingTableId = await createSizingTable(
-                sizingTable,
-                userId ? { userId } : undefined
-              );
+              // usunięcie starej (niepoprawnej) tabeli jeśli istnieje
+              existingSizingTable.docs[0].ref.delete();
             }
+            const sizingTable = transformAllegroSizingTableToSizingTable({
+              ...allegroTable,
+              id: allegroSizingTableId,
+            });
+
+            sizingTableId = await createSizingTable(
+              sizingTable,
+              userId ? { userId } : undefined
+            );
           }
         } catch (e) {
           console.warn(

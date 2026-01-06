@@ -163,7 +163,7 @@ export const categoriesFromMainPage: CategoryFromMainPage[] = [
     displayName: "Klapki Basenowe Damskie",
   },
   {
-    name: "klapki męskie",
+    name: "klapki",
     rootCategory: "obuwie męskie",
     displayName: "Klapki Męskie",
   },

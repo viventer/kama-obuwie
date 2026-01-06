@@ -113,6 +113,21 @@ export type CategoryFromMainPage = {
 
 export const categoriesFromMainPage: CategoryFromMainPage[] = [
   {
+    name: "botki",
+    rootCategory: "obuwie damskie",
+    displayName: "Botki Damskie",
+  },
+  {
+    name: "trzewiki",
+    rootCategory: "obuwie męskie",
+    displayName: "Trzewiki Męskie",
+  },
+  {
+    name: "kozaki",
+    rootCategory: "obuwie damskie",
+    displayName: "Kozaki Damskie",
+  },
+  {
     name: "kapcie",
     rootCategory: "obuwie damskie",
     displayName: "Kapcie Damskie",
@@ -128,29 +143,29 @@ export const categoriesFromMainPage: CategoryFromMainPage[] = [
     displayName: "Kapcie Dziecięce",
   },
   {
-    name: "botki",
-    rootCategory: "obuwie damskie",
-    displayName: "Botki Damskie",
-  },
-  {
-    name: "trzewiki",
-    rootCategory: "obuwie męskie",
-    displayName: "Trzewiki Męskie",
-  },
-  {
-    name: "Trzewiki",
+    name: "baleriny",
     rootCategory: "obuwie dziecięce",
-    displayName: "Zimowe Dziecięce",
+    displayName: "Baleriny Dziewczęce",
   },
   {
-    name: "kozaki",
+    name: "trampki",
+    rootCategory: "obuwie dziecięce",
+    displayName: "Trampki Dziecięce",
+  },
+  {
+    name: "sportowe",
+    rootCategory: "obuwie dziecięce",
+    displayName: "Sportowe Dziecięce",
+  },
+  {
+    name: "klapki basenowe (sportowe)",
     rootCategory: "obuwie damskie",
-    displayName: "Kozaki Damskie",
+    displayName: "Klapki Basenowe Damskie",
   },
   {
-    name: "trekkingowe",
+    name: "klapki męskie",
     rootCategory: "obuwie męskie",
-    displayName: "Trekkingowe Męskie",
+    displayName: "Klapki Męskie",
   },
 ] as const;
 

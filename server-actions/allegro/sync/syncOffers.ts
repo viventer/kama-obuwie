@@ -206,6 +206,16 @@ export const transformAllegroAL1OfferToOffer = async (
   return transformedOffer;
 };
 
+const shouldForceZeroAvailabilityForListingOffer = (
+  offer: AllegroOfferFromListing
+): boolean => {
+  return (
+    (offer.publication?.status === "ENDED" ||
+      offer.publication?.status === "INACTIVE") &&
+    offer.stock.available > 0
+  );
+};
+
 const syncAl1SizesForSignature = async (params: {
   signature: string;
   groupedOffers: AllegroOfferFromListing[];
@@ -228,7 +238,42 @@ const syncAl1SizesForSignature = async (params: {
 
     console.log(`📦 Processing size ${size} for ${signature}`);
 
+    const forceZeroAvailability =
+      shouldForceZeroAvailabilityForListingOffer(offer);
+    const availabilityForDb = forceZeroAvailability
+      ? "0"
+      : offer.stock.available.toString();
+
     try {
+      if (forceZeroAvailability) {
+        console.log(
+          `⚠️  AL1: Offer is ENDED but has stock.available=${offer.stock.available} (id=${offer.id}). Forcing stock to 0 on Allegro + DB.`
+        );
+
+        try {
+          const allegroOfferDetails = await getAllegroOffer(offer.id, "AL1", {
+            userId,
+          });
+
+          await editAllegroOffer(
+            offer.id,
+            "AL1",
+            {
+              stock: {
+                available: 0,
+                unit: allegroOfferDetails.stock.unit,
+              },
+            },
+            { userId }
+          );
+        } catch (e) {
+          console.warn(
+            `⚠️  AL1: Failed to force stock.available=0 on Allegro for offerId=${offer.id}. Will still store availability=0 in DB.`,
+            e
+          );
+        }
+      }
+
       await editAllegroOffer(
         offer.id,
         "AL1",
@@ -246,7 +291,7 @@ const syncAl1SizesForSignature = async (params: {
           {
             size,
             allegroId: offer.id,
-            availability: offer.stock.available.toString(),
+            availability: availabilityForDb,
             SKU,
           },
           "AL1"
@@ -259,6 +304,10 @@ const syncAl1SizesForSignature = async (params: {
           SKU,
           existingOffer?.productId || undefined
         );
+
+        if (forceZeroAvailability) {
+          transformedOffer.availability[size] = { value: "0" };
+        }
 
         const createdOfferId = await createOffer(transformedOffer);
         console.log(`✨ Created new offer with ID: ${createdOfferId}`);
@@ -791,6 +840,9 @@ const syncAL2Offers = async (
         const offer = groupedOffers[i];
         const size = extractSizeFromTitle(offer.name) as string;
 
+        const forceZeroAvailability =
+          shouldForceZeroAvailabilityForListingOffer(offer);
+
         // Sprawdź czy ten rozmiar już był przetwarzany
         if (processedSizes.has(size)) {
           console.log(
@@ -807,6 +859,39 @@ const syncAL2Offers = async (
         );
 
         try {
+          if (forceZeroAvailability) {
+            console.log(
+              `⚠️  AL2: Offer is ENDED but has stock.available=${offer.stock.available} (id=${offer.id}). Forcing stock to 0 on Allegro + DB.`
+            );
+
+            try {
+              const allegroOfferDetails = await getAllegroOffer(
+                offer.id,
+                "AL2",
+                {
+                  userId,
+                }
+              );
+
+              await editAllegroOffer(
+                offer.id,
+                "AL2",
+                {
+                  stock: {
+                    available: 0,
+                    unit: allegroOfferDetails.stock.unit,
+                  },
+                },
+                { userId }
+              );
+            } catch (e) {
+              console.warn(
+                `⚠️  AL2: Failed to force stock.available=0 on Allegro for offerId=${offer.id}. Will still store availability=0 in DB.`,
+                e
+              );
+            }
+          }
+
           // Aktualizuj external.id na Allegro dla AL2
           await editAllegroOffer(
             offer.id,
@@ -830,6 +915,7 @@ const syncAL2Offers = async (
               size,
               allegroId: offer.id,
               allegroOffer: offer,
+              ...(forceZeroAvailability ? { availability: "0" } : {}),
             },
             "AL2"
           );

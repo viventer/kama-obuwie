@@ -7,20 +7,19 @@ import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 
 export const revalidate = 86400; // 24h (ISR)
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const products: ProductWithId[] =
-    (await getDocumentsFromAdminDB<ProductWithId>(
-      "products"
-    )) as ProductWithId[];
-  const offers: OfferWithId[] = (await getDocumentsFromAdminDB<OfferWithId>(
-    "offers"
-  )) as OfferWithId[];
-  const productsWithOffers = products.filter((product) =>
-    Boolean(product.offersIds && Object.keys(product.offersIds).length > 0)
-  );
-  const legacyOffers = offers.filter((offer) => Boolean(offer.legacyProductId));
+  const productsWithOffers =
+    (await getDocumentsFromAdminDB<ProductWithId>("products", (ref) =>
+      ref.where("offersIds", "!=", null)
+    )) ?? [];
+
+  const legacyOffers =
+    (await getDocumentsFromAdminDB<OfferWithId>("offers", (ref) =>
+      ref.where("legacyProductId", ">", "")
+    )) ?? [];
+
   return [...productsWithOffers, ...legacyOffers]
     .filter((entity) => Boolean(entity.id))
     .map((entity) => ({ id: entity.id }));

@@ -1,6 +1,7 @@
 "use server";
 
 import { adminDB } from "@/firebase/firebaseAdmin";
+import { FieldPath } from "firebase-admin/firestore";
 import {
   Product,
   ProductPartialSchema,
@@ -48,33 +49,6 @@ export const updateProduct = async function (
   await productRef.update(updateData);
 };
 
-export const getProductBySKU = async function (
-  sku: string
-): Promise<ProductWithId | null> {
-  await verifyUser(["ADMIN", "VERIFIED"]);
-
-  if (!sku || sku.trim() === "") {
-    throw new Error("SKU nie może być pusty.");
-  }
-
-  const products = await getDocumentsFromAdminDB<Product>("products");
-
-  if (!products) {
-    return null;
-  }
-
-  for (const product of products) {
-    if (product.SKU) {
-      const skuValues = Object.values(product.SKU);
-      if (skuValues.includes(sku)) {
-        return product as ProductWithId;
-      }
-    }
-  }
-
-  return null;
-};
-
 export const getProductsListingData = async function (
   categoryIds: string[]
 ): Promise<Record<string, ProductListingData[]>> {
@@ -83,7 +57,57 @@ export const getProductsListingData = async function (
     (ref) => ref.where("categoryId", "in", categoryIds)
   );
 
-  const allOffers = await getDocumentsFromAdminDB<OfferWithId>("offers");
+  const legacyOffersAll =
+    (await getDocumentsFromAdminDB<OfferWithId>("offers", (ref) =>
+      ref.where("legacyProductId", ">", "")
+    )) ?? [];
+
+  const getOffersByIds = async (offerIds: string[]): Promise<OfferWithId[]> => {
+    const uniqueIds = Array.from(
+      new Set(offerIds.filter((id) => typeof id === "string" && id.trim()))
+    );
+
+    if (uniqueIds.length === 0) return [];
+
+    const chunks: string[][] = [];
+    for (let i = 0; i < uniqueIds.length; i += 10) {
+      chunks.push(uniqueIds.slice(i, i + 10));
+    }
+
+    const snapshots = await Promise.all(
+      chunks.map((batch) =>
+        adminDB
+          .collection("offers")
+          .where(FieldPath.documentId(), "in", batch)
+          .get()
+      )
+    );
+
+    return snapshots.flatMap((snap) =>
+      snap.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...(doc.data() as Omit<OfferWithId, "id">),
+          }) as OfferWithId
+      )
+    );
+  };
+
+  const productsArray = allProducts ?? [];
+
+  const neededOfferIds: string[] = [];
+  for (const product of productsArray) {
+    if (!product.offersIds) continue;
+    for (const offerId of Object.values(product.offersIds)) {
+      if (typeof offerId === "string" && offerId.trim()) {
+        neededOfferIds.push(offerId);
+      }
+    }
+  }
+
+  const offers = await getOffersByIds(neededOfferIds);
+  const offerById = new Map<string, OfferWithId>(offers.map((o) => [o.id, o]));
 
   const transformProductToProductListingData = async (
     product: ProductWithId
@@ -101,7 +125,7 @@ export const getProductsListingData = async function (
 
       if (!offerId) continue;
 
-      const offer = allOffers?.find((offer) => offer.id === offerId);
+      const offer = offerById.get(offerId);
       if (!offer) continue;
 
       // Sprawdź, czy z danego koloru jest dostępny choć jeden rozmiar
@@ -173,9 +197,10 @@ export const getProductsListingData = async function (
 
     // Legacy: oferty bez produktu, ale z legacyProductId (żeby były widoczne w sklepie)
     const legacyOffersListingData: ProductListingData[] = [];
-    const legacyOffers =
-      allOffers?.filter((offer) => !offer.productId && offer.legacyProductId) ||
-      [];
+
+    const legacyOffers = legacyOffersAll.filter(
+      (offer) => !offer.productId && offer.legacyProductId
+    );
 
     for (const offer of legacyOffers) {
       if (!offer.legacyProductId) continue;

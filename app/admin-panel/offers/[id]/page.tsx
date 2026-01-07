@@ -3,7 +3,6 @@ import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { notFound } from "next/navigation";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import EditOfferForm from "@/components/adminPanel/offers/forms/EditOfferForm";
-import { getProductBySKU } from "@/server-actions/products/products";
 
 type Props = {
   params: Promise<{ id: string }>;

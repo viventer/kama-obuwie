@@ -11,7 +11,7 @@ import { notFound } from "next/navigation";
 
 export const revalidate = 86400; // 24h (ISR)
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const categories =

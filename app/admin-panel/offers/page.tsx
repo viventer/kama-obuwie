@@ -5,7 +5,7 @@ import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 
 export const revalidate = 0;
 
-export default async function ProductsPage() {
+export default async function OffersPage() {
   const offers = await getDocumentsFromAdminDB<OfferWithId>("offers");
   offers?.sort((a, b) => {
     if (a.signature < b.signature) return -1;

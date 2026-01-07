@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Ubuntu, Ubuntu_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { GoogleTagManager } from "@next/third-parties/google";
+import Script from "next/script";
 import { ConfirmDialogProvider } from "@/app/providers/ConfirmDialogProvider";
 import { AuthProvider } from "./providers/AuthProvider";
 import { FullPageLoaderProvider } from "@/components/adminPanel/global/FullPageLoader";
@@ -33,20 +33,36 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const isProduction = process.env.NEXT_PUBLIC_NODE_ENV === "production";
-  const googleTagId = "GTM-PXQZP6MW";
+  const googleAdsTagId = "AW-17853144337";
 
   return (
     <html
       lang="pl"
       className="scrollbar scrollbar-track-transparent scrollbar-thumb-primary"
     >
+      <head>
+        {isProduction ? (
+          <>
+            <Script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsTagId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-ads-gtag" strategy="afterInteractive">
+              {`
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', '${googleAdsTagId}');
+              `.trim()}
+            </Script>
+          </>
+        ) : null}
+      </head>
       <body
         className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen`}
       >
-        {isProduction && googleTagId ? (
-          <GoogleTagManager gtmId={googleTagId} />
-        ) : null}
-
         <ConfirmDialogProvider>
           <AuthProvider>
             <FullPageLoaderProvider>

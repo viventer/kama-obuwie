@@ -161,6 +161,12 @@ export const getProductsListingData = async function (
         brand: product?.brand || undefined,
         colorVariantName,
         isActive,
+        availability: Object.fromEntries(
+          Object.entries(offer.availability).map(([size, avail]) => [
+            size,
+            parseInt(avail.value || "0"),
+          ])
+        ),
       });
     }
 
@@ -242,6 +248,12 @@ export const getProductsListingData = async function (
         brand: legacy?.brand || undefined,
         colorVariantName,
         isActive,
+        availability: Object.fromEntries(
+          Object.entries(offer.availability || {}).map(([size, avail]) => [
+            size,
+            parseInt(avail.value || "0"),
+          ])
+        ),
       });
     }
 

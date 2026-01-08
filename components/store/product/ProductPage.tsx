@@ -9,7 +9,6 @@ import {
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import ProductImagesSlider from "./ProductImagesSlider";
 import SelectProductVariant from "./SelectProductVariant";
-import SelectSize from "./SelectSize";
 import SizingTableDialog from "./SizingTableDialog";
 import { useEffect, useState } from "react";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
@@ -27,6 +26,7 @@ import { ShoppingCartItemType } from "@/firebase/schemas/shoppingCartSchemas";
 import { analytics } from "@/firebase/firebase";
 import { logEvent } from "firebase/analytics";
 import { ItemType } from "@/firebase/schemas/analyticsSchemas";
+import ProductPageSizeSelector from "./ProductPageSizeSelector";
 
 type StoreProductData = {
   id: string;
@@ -266,7 +266,7 @@ export default function ProductPage({
         />
         <section>
           {currentOffer && currentOffer.availability && (
-            <SelectSize
+            <ProductPageSizeSelector
               availability={currentOffer.availability}
               selectedSize={selectedSize}
               onSizeChange={setSelectedSize}

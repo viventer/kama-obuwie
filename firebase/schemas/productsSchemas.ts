@@ -260,4 +260,5 @@ export type ProductListingData = {
   brand: string | undefined;
   colorVariantName: string;
   isActive: boolean;
+  availability: Record<string, number>; // key: size, value: availability value
 };

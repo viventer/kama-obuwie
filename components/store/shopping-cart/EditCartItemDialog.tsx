@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/useToast";
 import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
-import SelectSize from "../product/SelectSize";
+import ProductPageSizeSelector from "../product/ProductPageSizeSelector";
 import { Availability } from "@/firebase/schemas/offersSchemas";
 import { ShoppingCartItemType } from "@/firebase/schemas/shoppingCartSchemas";
 
@@ -154,7 +154,7 @@ export default function EditCartItemDialog({
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
-          <SelectSize
+          <ProductPageSizeSelector
             availability={availability}
             selectedSize={selectedSize}
             onSizeChange={handleSizeChange}

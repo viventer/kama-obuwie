@@ -1,5 +1,5 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import ProductFromList from "@/components/store/home/ProductFromList";
+import CategoryProductsListing from "@/components/store/listing/CategoryProductsListing";
 import {
   getDocumentFromAdminDB,
   getDocumentsFromAdminDB,
@@ -49,18 +49,7 @@ export default async function Page({ params }: Props) {
   return (
     <div className="w-fit 2xs:w-full mx-auto sm:mx-0 ">
       <SubpageHeading text={`${getCategoryDisplayName(category.data)}`} />
-      <section className="grid gap-6 2xs:grid-cols-[repeat(auto-fill,_minmax(10rem,_1fr))] lg:grid-cols-[repeat(auto-fill,_minmax(15rem,_1fr))]">
-        {filteredProducts && filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <ProductFromList
-              key={`${product.id}-${product.colorVariantName}`}
-              product={product}
-            />
-          ))
-        ) : (
-          <div className="text-lg">Brak dostępnych produktów</div>
-        )}
-      </section>
+      <CategoryProductsListing productsFromCategory={filteredProducts} />
     </div>
   );
 }

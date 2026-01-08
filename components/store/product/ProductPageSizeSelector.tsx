@@ -3,17 +3,17 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Availability } from "@/firebase/schemas/offersSchemas";
 
-interface SelectSizeProps {
+interface ProductPageSizeSelectorProps {
   availability: Record<string, Availability>;
   selectedSize: string;
   onSizeChange: (size: string) => void;
 }
 
-export default function SelectSize({
+export default function ProductPageSizeSelector({
   availability,
   selectedSize,
   onSizeChange,
-}: SelectSizeProps) {
+}: ProductPageSizeSelectorProps) {
   const availableSizes = Object.keys(availability).sort();
 
   if (availableSizes.length === 0) {
@@ -77,37 +77,34 @@ export default function SelectSize({
             );
           })}
         </TabsList>
-
-        {/* Zawsze wyświetlana informacja o wybranym rozmiarze */}
-        <div className="text-sm text-muted-foreground min-h-[1.25rem]">
-          {selectedSize ? (
-            <>
-              Wybrano rozmiar:{" "}
-              <span className="font-medium text-text">{selectedSize}</span>
-              {(() => {
-                const available = isAvailable(selectedSize);
-                const sizeAvailability = availability[selectedSize];
-
-                if (available && sizeAvailability) {
-                  return (
-                    <span className="ml-2 text-success font-medium">
-                      (dostępne: {sizeAvailability.value})
-                    </span>
-                  );
-                } else {
-                  return (
-                    <span className="ml-2 text-destructive">(niedostępne)</span>
-                  );
-                }
-              })()}
-            </>
-          ) : (
-            <span className="text-muted-foreground/70">
-              Nie wybrano rozmiaru
-            </span>
-          )}
-        </div>
       </Tabs>
+      {/* Zawsze wyświetlana informacja o wybranym rozmiarze */}
+      <div className="text-sm text-muted-foreground mt-1 mb-4">
+        {selectedSize ? (
+          <>
+            Wybrano rozmiar:{" "}
+            <span className="font-medium text-text">{selectedSize}</span>
+            {(() => {
+              const available = isAvailable(selectedSize);
+              const sizeAvailability = availability[selectedSize];
+
+              if (available && sizeAvailability) {
+                return (
+                  <span className="ml-2 text-success font-medium">
+                    (dostępne: {sizeAvailability.value})
+                  </span>
+                );
+              } else {
+                return (
+                  <span className="ml-2 text-destructive">(niedostępne)</span>
+                );
+              }
+            })()}
+          </>
+        ) : (
+          <span className="text-muted-foreground/70">Nie wybrano rozmiaru</span>
+        )}
+      </div>
     </article>
   );
 }

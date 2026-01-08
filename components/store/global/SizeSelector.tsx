@@ -10,13 +10,13 @@ export default function SizeSelector({
   onChange: (sizes: string[]) => void;
 }) {
   return (
-    <article>
+    <article className="max-w-full">
       <h3 className="font-bold text-lg mb-1">Wybierz rozmiar</h3>
       <ToggleGroup
         type="multiple"
         variant="outline"
         size="sm"
-        className="flex justify-start gap-2 ml-1"
+        className="flex justify-start gap-2 ml-1 flex-wrap max-h-24 overflow-y-auto scrollbar-thin"
       >
         {availableSizes.map((size) => (
           <ToggleGroupItem

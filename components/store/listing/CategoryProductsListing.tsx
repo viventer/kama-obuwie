@@ -4,11 +4,7 @@ import { ProductListingData } from "@/firebase/schemas/productsSchemas";
 import ProductFromList from "../home/ProductFromList";
 import { useEffect, useState } from "react";
 import ListingFilters from "./ListingFilters";
-
-export type PriceRange = {
-  from: number;
-  to: number;
-};
+import { getPriceRangesForFiltering, PriceRange } from "@/helpers/prices";
 
 export default function CategoryProductsListing({
   productsFromCategory,
@@ -16,8 +12,13 @@ export default function CategoryProductsListing({
   productsFromCategory: ProductListingData[];
 }) {
   const [availableSizes, setAvailableSizes] = useState<string[]>([]);
+  const [availablePriceRanges, setAvailablePriceRanges] = useState<
+    PriceRange[]
+  >([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedPrices, setSelectedPrices] = useState<PriceRange[]>([]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<PriceRange[]>(
+    []
+  );
   const [filteredProducts, setFilteredProducts] =
     useState<ProductListingData[]>(productsFromCategory);
 
@@ -28,7 +29,24 @@ export default function CategoryProductsListing({
         sizesSet.add(size);
       });
     });
-    setAvailableSizes(Array.from(sizesSet));
+    setAvailableSizes(
+      Array.from(sizesSet).sort((a, b) => Number(a) - Number(b))
+    );
+
+    const pricesSet = new Set<number>();
+    productsFromCategory.forEach((product) => {
+      if (product.price !== undefined && product.price !== null) {
+        pricesSet.add(Number(product.price));
+      }
+    });
+
+    const priceRanges: PriceRange[] | null = getPriceRangesForFiltering(
+      Array.from(pricesSet)
+    );
+
+    if (priceRanges !== null) {
+      setAvailablePriceRanges(priceRanges);
+    }
   }, [productsFromCategory]);
 
   useEffect(() => {
@@ -40,8 +58,17 @@ export default function CategoryProductsListing({
       );
     }
 
+    if (selectedPriceRange.length > 0) {
+      filtered = filtered.filter((product) => {
+        const price = Number(product.price);
+        return selectedPriceRange.some(
+          (range) => price >= range.from && price <= range.to
+        );
+      });
+    }
+
     setFilteredProducts(filtered);
-  }, [selectedSizes, selectedPrices]);
+  }, [selectedSizes, selectedPriceRange, productsFromCategory]);
 
   return (
     <>
@@ -49,21 +76,25 @@ export default function CategoryProductsListing({
         selectedSizes={selectedSizes}
         availableSizes={availableSizes}
         sizesOnChange={setSelectedSizes}
-        selectedPrices={selectedPrices}
-        pricesOnChange={setSelectedPrices}
+        selectedPriceRange={selectedPriceRange}
+        pricesOnChange={setSelectedPriceRange}
+        availablePriceRanges={availablePriceRanges}
       />
-      <section className="grid gap-6 2xs:grid-cols-[repeat(auto-fill,_minmax(10rem,_1fr))] lg:grid-cols-[repeat(auto-fill,_minmax(15rem,_1fr))]">
-        {filteredProducts && filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
+
+      {filteredProducts && filteredProducts.length > 0 ? (
+        <section className="grid gap-6 2xs:grid-cols-[repeat(auto-fill,_minmax(10rem,_1fr))] lg:grid-cols-[repeat(auto-fill,_minmax(15rem,_1fr))]">
+          {filteredProducts.map((product) => (
             <ProductFromList
               key={`${product.id}-${product.colorVariantName}`}
               product={product}
             />
-          ))
-        ) : (
-          <div className="text-lg">Brak dostępnych produktów</div>
-        )}
-      </section>
+          ))}
+        </section>
+      ) : (
+        <div className="text-lg">
+          Nie znaleziono produktów spełniających podane kryteria.
+        </div>
+      )}
     </>
   );
 }

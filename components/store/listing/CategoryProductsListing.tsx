@@ -4,7 +4,12 @@ import { ProductListingData } from "@/firebase/schemas/productsSchemas";
 import ProductFromList from "../home/ProductFromList";
 import { useEffect, useState } from "react";
 import ListingFilters from "./ListingFilters";
-import { getPriceRangesForFiltering, PriceRange } from "@/helpers/prices";
+import {
+  getPriceRangesForFiltering,
+  isProductPriceInRange,
+  PriceRange,
+} from "@/helpers/prices";
+import { getAllListingSizes, hasSelectedSizes } from "@/helpers/sizes";
 
 export default function CategoryProductsListing({
   productsFromCategory,
@@ -23,15 +28,7 @@ export default function CategoryProductsListing({
     useState<ProductListingData[]>(productsFromCategory);
 
   useEffect(() => {
-    const sizesSet = new Set<string>();
-    productsFromCategory.forEach((product) => {
-      Object.keys(product.availability).forEach((size) => {
-        sizesSet.add(size);
-      });
-    });
-    setAvailableSizes(
-      Array.from(sizesSet).sort((a, b) => Number(a) - Number(b))
-    );
+    setAvailableSizes(getAllListingSizes(productsFromCategory));
 
     const pricesSet = new Set<number>();
     productsFromCategory.forEach((product) => {
@@ -54,17 +51,14 @@ export default function CategoryProductsListing({
 
     if (selectedSizes.length > 0) {
       filtered = filtered.filter((product) =>
-        selectedSizes.some((size) => product.availability[size])
+        hasSelectedSizes(selectedSizes, product.availability)
       );
     }
 
     if (selectedPriceRange.length > 0) {
-      filtered = filtered.filter((product) => {
-        const price = Number(product.price);
-        return selectedPriceRange.some(
-          (range) => price >= range.from && price <= range.to
-        );
-      });
+      filtered = filtered.filter((product) =>
+        isProductPriceInRange(product, selectedPriceRange)
+      );
     }
 
     setFilteredProducts(filtered);

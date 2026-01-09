@@ -1,3 +1,5 @@
+import { ProductListingData } from "@/firebase/schemas/productsSchemas";
+
 export type PriceRange = {
   from: number;
   to: number;
@@ -56,4 +58,14 @@ export const getPriceRangesForFiltering = (
     { from: maxRangePrice + 0.01, to: Infinity },
   ];
   return priceRanges;
+};
+
+export const isProductPriceInRange = (
+  product: ProductListingData,
+  selectedRange: PriceRange[]
+): boolean => {
+  const price = Number(product.price);
+  return selectedRange.some(
+    (range) => price >= range.from && price <= range.to
+  );
 };

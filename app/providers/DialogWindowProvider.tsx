@@ -8,6 +8,14 @@ export interface DialogConfig {
   content: ReactNode;
   hasCancelButton?: boolean;
   cancelText?: string;
+  cancelVariant?:
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link"
+    | "important";
   confirmText?: string;
   onConfirm?: () => void;
   onCancel?: () => void;
@@ -17,7 +25,8 @@ export interface DialogConfig {
     | "outline"
     | "secondary"
     | "ghost"
-    | "link";
+    | "link"
+    | "important";
 }
 
 interface DialogContextType {

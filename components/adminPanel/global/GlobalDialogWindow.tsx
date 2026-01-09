@@ -41,7 +41,10 @@ export default function GlobalDialogWindow() {
 
         <DialogFooter>
           {config.hasCancelButton === true && (
-            <Button variant="destructive" onClick={handleCancel}>
+            <Button
+              variant={config.cancelVariant || "outline"}
+              onClick={handleCancel}
+            >
               {config.cancelText || "Anuluj"}
             </Button>
           )}

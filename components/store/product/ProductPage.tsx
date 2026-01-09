@@ -10,7 +10,7 @@ import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import ProductImagesSlider from "./ProductImagesSlider";
 import SelectProductVariant from "./SelectProductVariant";
 import SizingTableDialog from "./SizingTableDialog";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ import { analytics } from "@/firebase/firebase";
 import { logEvent } from "firebase/analytics";
 import { ItemType } from "@/firebase/schemas/analyticsSchemas";
 import ProductPageSizeSelector from "./ProductPageSizeSelector";
+import SelectSizeDialogContent from "./SelectSizeDialogContent";
 
 type StoreProductData = {
   id: string;
@@ -94,6 +95,11 @@ export default function ProductPage({
     useState(validInitialVariant);
 
   const [selectedSize, setSelectedSize] = useState<string>("");
+  const selectedSizeRef = useRef<string>("");
+
+  useEffect(() => {
+    selectedSizeRef.current = selectedSize;
+  }, [selectedSize]);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -132,31 +138,14 @@ export default function ProductPage({
     "0";
   const price = Number(priceStr) as number;
 
-  const { openDialog } = useDialogWindow();
+  const { openDialog, closeDialog } = useDialogWindow();
   const { addToCart, findExistingItem } = useShoppingCart();
   const { showToast } = useToast();
 
   const handleAddToCart = () => {
-    if (analytics) {
-      logEvent(analytics, "add_to_cart", {
-        items: [
-          {
-            item_id: offersData[selectedColorVariant].SKU,
-            item_name: offersData[selectedColorVariant].signature,
-            item_category: category.name,
-            item_brand: productData.brand,
-            price: Number(offersData[selectedColorVariant].sellingPrices.DTC),
-            size: selectedSize,
-            quantity: 1,
-            item_variant: selectedColorVariant,
-          } as ItemType,
-        ],
-        value: Number(offersData[selectedColorVariant].sellingPrices.DTC),
-        currency: "PLN",
-      });
-    }
+    const sizeToAdd = selectedSizeRef.current;
 
-    if (!selectedSize) {
+    if (!sizeToAdd) {
       showToast("Proszę wybrać rozmiar", "error");
       return;
     }
@@ -166,11 +155,30 @@ export default function ProductPage({
       return;
     }
 
+    if (analytics) {
+      logEvent(analytics, "add_to_cart", {
+        items: [
+          {
+            item_id: offersData[selectedColorVariant].SKU,
+            item_name: offersData[selectedColorVariant].signature,
+            item_category: category.name,
+            item_brand: productData.brand,
+            price: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+            size: sizeToAdd,
+            quantity: 1,
+            item_variant: selectedColorVariant,
+          } as ItemType,
+        ],
+        value: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+        currency: "PLN",
+      });
+    }
+
     // Sprawdź czy produkt już istnieje w koszyku
     const existingItem = findExistingItem(
       currentOffer.id,
       productData.id,
-      selectedSize
+      sizeToAdd
     );
 
     if (existingItem) {
@@ -189,7 +197,7 @@ export default function ProductPage({
               ? productData.brand
               : "",
           price: price,
-          size: selectedSize,
+          size: sizeToAdd,
           formattedMainColor: selectedColorVariant,
           quantity: 1,
           isAvailable: true,
@@ -204,6 +212,7 @@ export default function ProductPage({
           cancelText: "Kontynuuj zakupy",
           confirmText: "Przejdź do koszyka",
           onConfirm: () => router.push("/shopping-cart"),
+          confirmVariant: "important",
         });
       } catch (error) {
         console.error("Error adding to cart:", error);
@@ -266,11 +275,14 @@ export default function ProductPage({
         />
         <section>
           {currentOffer && currentOffer.availability && (
-            <ProductPageSizeSelector
-              availability={currentOffer.availability}
-              selectedSize={selectedSize}
-              onSizeChange={setSelectedSize}
-            />
+            <section>
+              <h3 className="mb-1 text-lg font-medium">Wybierz rozmiar</h3>
+              <ProductPageSizeSelector
+                availability={currentOffer.availability}
+                selectedSize={selectedSize}
+                onSizeChange={setSelectedSize}
+              />
+            </section>
           )}
           {sizingTable && (
             <Button
@@ -285,8 +297,33 @@ export default function ProductPage({
         <article>
           <Button
             className="w-full max-w-[300px] text-xl font-bold px-8 py-6 bg-primary text-white hover:brightness-125 hover:bg-primary mb-2"
-            onClick={handleAddToCart}
-            disabled={!selectedSize}
+            onClick={() => {
+              if (selectedSize) {
+                handleAddToCart();
+                return;
+              }
+              openDialog({
+                title: "Wybierz rozmiar",
+                content: (
+                  <SelectSizeDialogContent
+                    availability={currentOffer?.availability}
+                    selectedSize={selectedSize}
+                    onSizeChange={setSelectedSize}
+                  />
+                ),
+                hasCancelButton: false,
+                confirmText: "Dodaj do koszyka",
+                onConfirm: () => {
+                  // Najpierw zamknij bieżący dialog. Provider czyści config po ~200ms,
+                  // więc otwarcie kolejnego dialogu musi poczekać, żeby nie został nadpisany.
+                  closeDialog();
+                  setTimeout(() => {
+                    handleAddToCart();
+                  }, 250);
+                },
+                confirmVariant: "important",
+              });
+            }}
           >
             Dodaj do koszyka
           </Button>

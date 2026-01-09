@@ -47,19 +47,21 @@ export default function ProductSpecifications({
     >
       <h3 className="text-xl font-bold mb-2">Specyfikacja</h3>
       <ul className="flex flex-col gap-2">
-        {allParameters.map(([key, value]) => (
-          <li
-            key={key}
-            className="flex justify-between items-start border-b border-secondary/50 pb-2 last:border-b-0 last:pb-0"
-          >
-            <span className="font-medium capitalize min-w-0 flex-1 mr-4">
-              {key.replace(/([A-Z])/g, " $1").trim()}
-            </span>
-            <span className="text-right min-w-0 flex-1">
-              {renderParameterValue(value)}
-            </span>
-          </li>
-        ))}
+        {allParameters
+          .filter(([_, value]) => Boolean(value))
+          .map(([key, value]) => (
+            <li
+              key={key}
+              className="flex justify-between items-start border-b border-secondary/50 pb-2 last:border-b-0 last:pb-0"
+            >
+              <span className="font-medium capitalize min-w-0 flex-1 mr-4">
+                {key.replace(/([A-Z])/g, " $1").trim()}
+              </span>
+              <span className="text-right min-w-0 flex-1">
+                {renderParameterValue(value)}
+              </span>
+            </li>
+          ))}
       </ul>
     </article>
   );

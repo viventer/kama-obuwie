@@ -12,6 +12,7 @@ import {
   CategoryFromMainPage,
   homeGridCategories,
 } from "@/lib/constants";
+import { orderByProductAvailability } from "@/helpers/availability";
 
 export default async function Page() {
   // Pobierz kategorie z bazy danych
@@ -63,14 +64,18 @@ export default async function Page() {
       />
       <div className="flex flex-col gap-12">
         {Object.entries(products).map(([categoryId, productsInCategory]) => {
-          if (productsInCategory.length < 4) {
+          const filteredProducts = productsInCategory
+            .filter((product) => product.isActive)
+            .sort((a, b) => orderByProductAvailability(a, b));
+
+          if (filteredProducts.length < 4) {
             return null;
           }
 
           return (
             <ProductsList
               key={categoryId}
-              products={productsInCategory}
+              products={filteredProducts}
               categoryId={categoryId}
               displayName={
                 mainPageCategories.find((cat) => cat.id === categoryId)

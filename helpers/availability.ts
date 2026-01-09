@@ -1,3 +1,5 @@
+import { ProductListingData } from "@/firebase/schemas/productsSchemas";
+
 /**
  * Zwraca klucz dostępności dla ofert bez rozmiaru.
  *
@@ -16,4 +18,18 @@ export const resolveSingleAvailabilityKey = (
   if (Object.prototype.hasOwnProperty.call(safeAvailability, "0")) return "0";
 
   return keys[0] || "0";
+};
+
+export const orderByProductAvailability = (
+  productA: ProductListingData,
+  productB: ProductListingData
+): number => {
+  const aUnavailable = Object.values(productA.availability).filter(
+    (value) => value == 0
+  ).length;
+  const bUnavailable = Object.values(productB.availability).filter(
+    (value) => value == 0
+  ).length;
+
+  return aUnavailable - bUnavailable;
 };

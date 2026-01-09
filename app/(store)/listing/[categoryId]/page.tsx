@@ -5,6 +5,7 @@ import {
   getDocumentsFromAdminDB,
 } from "@/firebase/getters";
 import { CategoryWithId } from "@/firebase/schemas/productsSchemas";
+import { orderByProductAvailability } from "@/helpers/availability";
 import { getCategoryDisplayName } from "@/helpers/categories";
 import { getProductsListingData } from "@/server-actions/products/products";
 import { notFound } from "next/navigation";
@@ -42,9 +43,9 @@ export default async function Page({ params }: Props) {
 
   const products = await getProductsListingData([categoryId]);
   const productsInCategory = products[categoryId];
-  const filteredProducts = productsInCategory?.filter(
-    (product) => product.isActive
-  );
+  const filteredProducts = productsInCategory
+    ?.filter((product) => product.isActive)
+    .sort((a, b) => orderByProductAvailability(a, b));
 
   return (
     <div className="w-fit 2xs:w-full mx-auto sm:mx-0 ">

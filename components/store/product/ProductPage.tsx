@@ -241,7 +241,7 @@ export default function ProductPage({
           <h2 className="capitalize font-bold text-xl text-white">
             {category.name}
           </h2>
-          <p className="text-lg text-white">
+          <p className="text-lg text-white capitalize">
             {productData?.brand && productData.brand != "bez marki"
               ? `${productData.brand} `
               : "\u00A0"}

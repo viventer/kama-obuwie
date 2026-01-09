@@ -80,7 +80,7 @@ export default async function MainNav() {
                 key={mainCategory.rootCategory}
                 className="w-full"
               >
-                <NavigationMenuTrigger className="bg-primary/15 font-medium px-3">
+                <NavigationMenuTrigger className="bg-primary/15 font-medium px-3 capitalize">
                   {mainCategory.label}
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="bg-background w-ful">

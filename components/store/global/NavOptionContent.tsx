@@ -27,6 +27,7 @@ export default function NavOptionContent({
                 });
               }
             }}
+            className="capitalize"
           >
             {category.name}
           </LinkText>

@@ -41,7 +41,7 @@ export default function ProductFromList({
       </div>
 
       <div className="px-4 py-2">
-        <p className="text-lg">
+        <p className="text-lg capitalize">
           {product.brand && product.brand != "bez marki"
             ? product.brand
             : "\u00A0"}

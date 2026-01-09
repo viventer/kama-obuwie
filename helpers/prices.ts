@@ -39,12 +39,12 @@ export const getPriceRangesForFiltering = (
     return null;
   }
 
-  let minRangePrice = roundToPsychologicalPrice(0.85 * median);
+  let minRangePrice = roundToPsychologicalPrice(0.9 * median);
   if (minRangePrice <= minValue) {
     minRangePrice = minValue;
   }
 
-  let maxRangePrice = roundToPsychologicalPrice(1.15 * median);
+  let maxRangePrice = roundToPsychologicalPrice(1.1 * median);
   if (maxRangePrice >= maxValue) {
     maxRangePrice = maxValue;
   }

@@ -331,7 +331,7 @@ export default function ProductPage({
           <ShippingInfo />
           <ShopReviewsWidget className="mt-6" isProductPage={true} />
         </article>
-        <AdvantagesBox price={price} />
+        <AdvantagesBox price={price} className="h-fit flex-0" />
         <ProductSpecifications
           productParameters={productData.parameters}
           className="md:hidden"

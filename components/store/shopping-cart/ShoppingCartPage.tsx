@@ -222,7 +222,7 @@ export default function ShoppingCartPage() {
           </Button>
           <ShippingInfo />
         </div>
-        <AdvantagesBox price={totalPrice} />
+        <AdvantagesBox price={totalPrice} className="h-fit" />
       </div>
     </div>
   );

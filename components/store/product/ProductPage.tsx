@@ -28,6 +28,7 @@ import { logEvent } from "firebase/analytics";
 import { ItemType } from "@/firebase/schemas/analyticsSchemas";
 import ProductPageSizeSelector from "./ProductPageSizeSelector";
 import SelectSizeDialogContent from "./SelectSizeDialogContent";
+import ShopReviewsWidget from "../global/ShopReviewsWidget";
 
 type StoreProductData = {
   id: string;
@@ -296,7 +297,7 @@ export default function ProductPage({
         </section>
         <article>
           <Button
-            className="w-full max-w-[300px] text-xl font-bold px-8 py-6 bg-primary text-white hover:brightness-125 hover:bg-primary mb-2"
+            className="w-full md:max-w-[300px] text-xl font-bold px-8 py-6 bg-primary text-white hover:brightness-125 hover:bg-primary mb-2"
             onClick={() => {
               if (selectedSize) {
                 handleAddToCart();
@@ -328,6 +329,7 @@ export default function ProductPage({
             Dodaj do koszyka
           </Button>
           <ShippingInfo />
+          <ShopReviewsWidget className="mt-6" />
         </article>
         <AdvantagesBox price={price} />
         <ProductSpecifications

@@ -1,4 +1,5 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
+import ShopReviewsWidget from "@/components/store/global/ShopReviewsWidget";
 import CategoryProductsListing from "@/components/store/listing/CategoryProductsListing";
 import {
   getDocumentFromAdminDB,
@@ -49,6 +50,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <div className="w-fit 2xs:w-full mx-auto sm:mx-0 ">
+      <ShopReviewsWidget className="mb-6" />
       <SubpageHeading text={`${getCategoryDisplayName(category.data)}`} />
       <CategoryProductsListing productsFromCategory={filteredProducts} />
     </div>

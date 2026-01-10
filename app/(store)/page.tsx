@@ -13,6 +13,7 @@ import {
   homeGridCategories,
 } from "@/lib/constants";
 import { orderByProductAvailability } from "@/helpers/availability";
+import ShopReviewsWidget from "@/components/store/global/ShopReviewsWidget";
 
 export default async function Page() {
   // Pobierz kategorie z bazy danych
@@ -55,6 +56,7 @@ export default async function Page() {
 
   return (
     <>
+      <ShopReviewsWidget className="mb-6" />
       <HomeGrid
         icon={
           <StarIcon className="min-w-8 min-h-8 lg:min-w-12 lg:min-h-12 text-brand" />

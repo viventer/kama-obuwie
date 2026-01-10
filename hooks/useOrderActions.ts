@@ -4,7 +4,7 @@ import {
   OrderPhase,
   OrderWithId,
 } from "@/firebase/schemas/ordersSchemas";
-import { TableAction } from "../lib/dataTableColumns";
+import { TableAction } from "@/lib/dataTableColumns";
 import { useToast } from "@/hooks/useToast";
 import { useRouter } from "next/navigation";
 import axios from "axios";

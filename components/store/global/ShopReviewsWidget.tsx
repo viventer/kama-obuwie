@@ -11,10 +11,14 @@ import {
 import { cn } from "@/lib/utils";
 import { ThumbsUpIcon } from "lucide-react";
 import ReviewsDialogContent from "./ReviewsDialogContent";
+import ReviewsSlider from "./ReviewsSlider";
+import { useBreakpoint } from "@/hooks/useBreakpoint";
 
 export default function ShopReviewsWidget({
   className,
+  isProductPage = false,
 }: {
+  isProductPage?: boolean;
   className?: string;
 }) {
   const { openDialog, closeDialog } = useDialogWindow();
@@ -30,21 +34,42 @@ export default function ShopReviewsWidget({
     });
   };
 
+  const { currentBreakpoint } = useBreakpoint();
+
   return (
-    <Card className={cn("py-4 gap-2", className)}>
-      <CardHeader className="px-2 2xs:px-4 lg:px-6">
+    <Card
+      className={cn(
+        "py-4 justify-between",
+        className,
+        isProductPage ? "gap-2" : "gap-4"
+      )}
+    >
+      <CardHeader className="px-4 lg:px-6">
         <CardTitle className="flex items-center gap-2">
           <ThumbsUpIcon className="size-6 xl:size-8 text-success" />
           <h4 className="xl:text-2xl font-medium text-lg">
             99,7% zadowolonych klientów
           </h4>
         </CardTitle>
-        <CardDescription>Na podstawie 600+ opinii</CardDescription>
+        <CardDescription>
+          Na podstawie 600+ opinii{" "}
+          {!isProductPage && (
+            <span className="hidden sm:inline">
+              z ostatnich 12 miesięcy na Allegro.
+            </span>
+          )}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="flex justify-end px-2 2xs:px-4">
-        <Button variant={"outline"} onClick={openModal}>
-          Zobacz opinie
-        </Button>
+      <CardContent
+        className={`flex items-end ${isProductPage ? "justify-end" : ""} px-4`}
+      >
+        {isProductPage || currentBreakpoint.includes("s") ? (
+          <Button variant={"outline"} onClick={openModal}>
+            Zobacz opinie
+          </Button>
+        ) : (
+          <ReviewsSlider className="hidden sm:flex" />
+        )}
       </CardContent>
     </Card>
   );

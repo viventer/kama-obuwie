@@ -14,6 +14,7 @@ import {
 } from "@/lib/constants";
 import { orderByProductAvailability } from "@/helpers/availability";
 import ShopReviewsWidget from "@/components/store/global/ShopReviewsWidget";
+import AdvantagesBox from "@/components/store/product/AdvantagesBox";
 
 export default async function Page() {
   // Pobierz kategorie z bazy danych
@@ -56,7 +57,10 @@ export default async function Page() {
 
   return (
     <>
-      <ShopReviewsWidget className="mb-6" />
+      <div className="flex gap-4 mb-12">
+        <ShopReviewsWidget className="flex-2" />
+        <AdvantagesBox price={0} className="hidden xl:flex" />
+      </div>
       <HomeGrid
         icon={
           <StarIcon className="min-w-8 min-h-8 lg:min-w-12 lg:min-h-12 text-brand" />

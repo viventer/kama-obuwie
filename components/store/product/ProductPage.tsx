@@ -329,7 +329,7 @@ export default function ProductPage({
             Dodaj do koszyka
           </Button>
           <ShippingInfo />
-          <ShopReviewsWidget className="mt-6" />
+          <ShopReviewsWidget className="mt-6" isProductPage={true} />
         </article>
         <AdvantagesBox price={price} />
         <ProductSpecifications

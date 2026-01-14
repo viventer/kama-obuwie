@@ -42,7 +42,7 @@ export default function ProductImagesSlider({
               thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
           }}
           modules={[FreeMode, Navigation, Thumbs, EffectFade]}
-          className="w-full aspect-[4/3] rounded-lg"
+          className="w-full  rounded-lg "
         >
           {imagesUrls.map((image, index) => (
             <SwiperSlide key={index}>
@@ -50,7 +50,7 @@ export default function ProductImagesSlider({
                 <Image
                   src={image}
                   alt={""}
-                  className="block h-full w-full object-contain bg-white"
+                  className="block h-full w-full object-cover bg-white rounded-lg max-w-[400px]  md:max-w-full aspect-[4/3]"
                   height={1000}
                   width={1000}
                 />
@@ -62,18 +62,18 @@ export default function ProductImagesSlider({
         {/* Niestandardowe przyciski nawigacji - na środku głównego zdjęcia */}
         <Button
           variant="ghost"
-          className="custom-prev absolute left-2 top-1/2 z-10 -translate-y-1/2 hover:-translate-x-1 transition-transform w-16 h-16"
+          className="custom-prev absolute left-2 top-1/2 z-10 -translate-y-1/2 hover:-translate-x-1 transition-transform w-12 h-12 bg-white/30"
           onClick={() => swiperRef.current?.slidePrev()}
         >
-          <ChevronLeft className="size-16 text-black/75" />
+          <ChevronLeft className="size-12 text-black/75" />
         </Button>
 
         <Button
           variant="ghost"
-          className="custom-next absolute right-2 top-1/2 z-10 -translate-y-1/2 hover:translate-x-1 transition-transform w-16 h-16"
+          className="custom-next absolute right-2 top-1/2 z-10 -translate-y-1/2 hover:translate-x-1 transition-transform w-12 h-12 bg-white/30"
           onClick={() => swiperRef.current?.slideNext()}
         >
-          <ChevronRight className="size-16 text-black/75" />
+          <ChevronRight className="size-12 text-black/75" />
         </Button>
       </div>
 
@@ -84,7 +84,7 @@ export default function ProductImagesSlider({
         slidesPerView={4}
         watchSlidesProgress={true}
         modules={[FreeMode, Navigation, Thumbs]}
-        className="thumbs mt-3 h-fit w-full "
+        className="thumbs mt-3 h-fit w-full hidden! md:flex!"
       >
         {imagesUrls.map((image, index) => (
           <SwiperSlide key={index}>

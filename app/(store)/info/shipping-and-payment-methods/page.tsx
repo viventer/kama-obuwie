@@ -38,8 +38,8 @@ export default function ShippingAndPaymentMethods() {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Dostępne metody dostaw */}
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
+          <div className="flex gap-4">
+            <div className="text-center p-4 bg-muted rounded-lg w-32 md:w-48">
               <Image
                 src={"/inpost/InpostPaczkomatRect.svg"}
                 alt="logo InPost Paczkomat"
@@ -48,7 +48,7 @@ export default function ShippingAndPaymentMethods() {
                 className="w-full"
               />
             </div>
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
+            <div className="text-center p-4 bg-muted rounded-lg w-32 md:w-48">
               <Image
                 src={"/inpost/InpostKurierRect.svg"}
                 alt="logo InPost Paczkomat"
@@ -62,97 +62,95 @@ export default function ShippingAndPaymentMethods() {
           <Separator />
 
           {/* Ceny dostaw */}
-          <Card className="gap-2">
-            <CardHeader>
-              <CardTitle>Koszty dostawy</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-foreground">Cena podstawowa:</span>
-                  <span className="font-semibold  text-lg">9,99 zł</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-foreground">
-                    Przy zakupach za min. 55 zł:
-                  </span>
-                  <span className="font-semibold text-success text-lg">
-                    GRATIS
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <article>
+            <h3 className="font-bold text-lg mb-2">Koszty dostawy</h3>
+            <div className="flex justify-between items-center">
+              <span className="text-foreground">Cena podstawowa:</span>
+              <span className="font-semibold  text-lg">9,99 zł</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-foreground">
+                Przy zakupach za min. 55 zł:
+              </span>
+              <span className="font-semibold text-success text-lg">GRATIS</span>
+            </div>
+          </article>
 
           {/* Informacje o wysyłce */}
-          <Card className="gap-2">
-            <CardHeader>
-              <CardTitle>Czas dostawy</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <p>
-                  W przypadku zamówień złożonych do godziny 13:00, paczka
-                  zostanie wysłana{" "}
-                  <span className="underline decoration-2 decoration-success font-bold">
-                    tego samego dnia
-                  </span>
-                  , a dostawa nastąpi zwykle w ciągu jednego dnia roboczego.
-                </p>
-                <p>
-                  Zamówienia złożone po godzinie 13:00 oraz w weekendy i dni
-                  świąteczne będą realizowane w najbliższy dzień roboczy.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <div>
+            <h3 className="font-bold text-lg mb-2">Czas dostawy</h3>
+            <p className="mb-2">
+              W przypadku zamówień złożonych do godziny 13:00, paczka zostanie
+              wysłana{" "}
+              <span className="underline decoration-2 decoration-success font-bold">
+                tego samego dnia
+              </span>
+              , a dostawa nastąpi zwykle w ciągu jednego dnia roboczego.
+            </p>
+            <p>
+              Zamówienia złożone po godzinie 13:00 oraz w weekendy i dni
+              świąteczne będą realizowane w najbliższy dzień roboczy.
+            </p>
+          </div>
         </CardContent>
       </Card>
-
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Metody płatności</CardTitle>
           <CardDescription>
-            Wybierz najbardziej wygodną dla Ciebie opcję płatności
+            Wszystkie płatności online są bezpieczne i obsługiwane przez
+            Przelewy24
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="flex flex-col items-center justify-center text-center p-4 bg-muted rounded-lg">
-              <SmartphoneIcon className="text-brand size-12 mb-2" />
-              <h3 className="font-semibold text-foreground">BLIK</h3>
-            </div>
-            <div className="flex flex-col items-center justify-center text-center p-4 bg-muted rounded-lg">
-              <CreditCardIcon className="text-brand size-12 mb-2" />
-              <h3 className="font-semibold text-foreground">Karta płatnicza</h3>
-            </div>
-            <div className="flex flex-col items-center justify-center text-center p-4 bg-muted rounded-lg">
-              <GoogleIcon className="text-brand size-12 mb-2" />
-              <h3 className="font-semibold text-foreground">Google Pay</h3>
-            </div>
-            <div className="flex flex-col items-center justify-center text-center p-4 bg-muted rounded-lg">
-              <LandmarkIcon className="text-brand size-12 mb-2" />
-              <h3 className="font-semibold text-foreground">
-                Przelew online i tradycyjny
-              </h3>
-            </div>
-          </div>
-
-          <Separator className="my-6" />
-
-          <div className="bg-accent/10 p-6 rounded-lg border border-accent/20">
-            <div className="flex items-center space-x-3">
-              <BanknoteIcon className="size-12 text-brand" />
-              <div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  Płatność przy odbiorze
-                </h3>
-                <p className="text-muted-foreground">
-                  Dostępna w przypadku dostawy InPost Kurier
-                </p>
-              </div>
-            </div>
-          </div>
+          <ul>
+            <li className="ml-4 flex items-center gap-2">
+              <Image
+                src={"/payment/p24.svg"}
+                alt="logo przelewy24"
+                height={50}
+                width={50}
+              />
+              <p>Przelew online</p>
+            </li>
+            <li className="ml-4 flex items-center gap-2">
+              <Image
+                src={"/payment/blik.png"}
+                alt="logo blik"
+                height={50}
+                width={50}
+              />
+              <p>BLIK</p>
+            </li>
+            <li className="ml-4 flex items-center gap-2">
+              <Image
+                src={"/payment/visa.webp"}
+                alt="logo visa"
+                height={30}
+                width={30}
+              />
+              <Image
+                src={"/payment/mastercard.svg"}
+                alt="logo mastercard"
+                height={30}
+                width={30}
+              />
+              <p>Płatność kartą</p>
+            </li>
+            <li className="ml-4 flex items-center gap-2">
+              <Image
+                src={"/payment/gpay.png"}
+                alt="logo google pay"
+                height={50}
+                width={50}
+              />
+              <p>Google Pay</p>
+            </li>
+            <li className="ml-4 flex items-center gap-2">
+              <BanknoteIcon className="size-[30px] text-brand" />
+              <p>Płatność przy odbiorze</p>
+            </li>
+          </ul>
         </CardContent>
       </Card>
 

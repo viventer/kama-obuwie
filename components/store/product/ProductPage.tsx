@@ -29,6 +29,8 @@ import { ItemType } from "@/firebase/schemas/analyticsSchemas";
 import ProductPageSizeSelector from "./ProductPageSizeSelector";
 import SelectSizeDialogContent from "./SelectSizeDialogContent";
 import ShopReviewsWidget from "../global/ShopReviewsWidget";
+import { useBreakpoint } from "@/hooks/useBreakpoint";
+import MobileProductPageShopAdvantages from "./MobileProductPageShopAdvantages";
 
 type StoreProductData = {
   id: string;
@@ -55,6 +57,12 @@ export default function ProductPage({
   sizingTable?: SizingTableWithId;
   choosingSizeImageUrl?: string;
 }) {
+  const { currentBreakpoint } = useBreakpoint();
+
+  useEffect(() => {
+    console.log(currentBreakpoint);
+  }, [currentBreakpoint]);
+
   if (!productData.colorVariants) {
     console.log(
       "Brak wariantów kolorystycznych dla produktu o ID:",
@@ -329,9 +337,15 @@ export default function ProductPage({
             Dodaj do koszyka
           </Button>
           <ShippingInfo />
-          <ShopReviewsWidget className="mt-6" isProductPage={true} />
+          {currentBreakpoint && currentBreakpoint.includes("s") ? (
+            <MobileProductPageShopAdvantages className="mt-4" />
+          ) : (
+            <>
+              <ShopReviewsWidget className="mt-6 mb-6" isProductPage={true} />
+              <AdvantagesBox price={price} className="h-fit flex-0" />
+            </>
+          )}
         </article>
-        <AdvantagesBox price={price} className="h-fit flex-0" />
         <ProductSpecifications
           productParameters={productData.parameters}
           className="md:hidden"

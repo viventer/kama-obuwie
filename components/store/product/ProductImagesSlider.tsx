@@ -50,7 +50,7 @@ export default function ProductImagesSlider({
                 <Image
                   src={image}
                   alt={""}
-                  className="block h-full w-full object-cover bg-white rounded-lg max-w-[400px]  md:max-w-full aspect-[4/3]"
+                  className="block h-full w-full object-cover bg-white rounded-lg max-w-[400px]  md:max-w-full aspect-[5/4] md:aspect-[4/3]"
                   height={1000}
                   width={1000}
                 />

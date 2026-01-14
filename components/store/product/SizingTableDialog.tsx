@@ -25,7 +25,7 @@ export default function SizingTableDialog({
   choosingSizeImageUrl,
 }: SizingTableDialogProps) {
   return (
-    <div className="w-full max-h-[calc(100vh-20rem)] overflow-auto scrollbar px-4 sm:max-h-[60vh]">
+    <div className="w-full overflow-auto scrollbar px-4 md:max-h-[60vh]">
       <Accordion type="single" collapsible className="mb-6">
         <AccordionItem value="instructions">
           <AccordionTrigger>Jak dobrać rozmiar?</AccordionTrigger>

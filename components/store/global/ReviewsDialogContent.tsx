@@ -3,7 +3,7 @@ import { ThumbsUpIcon } from "lucide-react";
 
 export default function ReviewsDialogContent() {
   return (
-    <section className="flex flex-col gap-4">
+    <section className="flex flex-col gap-4 overflow-hidden">
       <header>
         <div className="flex items-center gap-2">
           <ThumbsUpIcon className="size-6 text-success md:size-8" />
@@ -13,8 +13,8 @@ export default function ReviewsDialogContent() {
         </div>
         <p>Na podstawie 600+ ocen z ostatnich 12 miesięcy.</p>
       </header>
-      <article className="pb-4 border-b-1 border-secondary">
-        <ul className="flex flex-col gap-2 max-h-[24svh] overflow-auto scrollbar pt-1 pr-2">
+      <article className="pb-4 border-b-1 border-secondary h-[17rem]">
+        <ul className="flex flex-col gap-2 overflow-auto scrollbar pt-1 pr-2 h-full">
           {allegroReviews.map((review, index) => (
             <li
               key={index}

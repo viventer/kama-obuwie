@@ -145,7 +145,7 @@ export default function EditCartItemDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-h-[calc(100vh-20rem)] max-w-[90vw] overflow-auto sm:max-h-[60vh] scrollbar">
+      <DialogContent className="overflow-auto md:max-h-[60vh] scrollbar">
         <DialogHeader>
           <DialogTitle className="text-xl">Edytuj przedmiot</DialogTitle>
           <DialogDescription className="capitalize">

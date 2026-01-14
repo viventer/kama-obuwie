@@ -25,7 +25,7 @@ export default function ShopReviewsWidget({
 
   const openModal = () => {
     openDialog({
-      title: "Opinie klientów o kama-obuwie.pl",
+      title: "Opinie klientów o sklepie",
       content: <ReviewsDialogContent />,
       hasCancelButton: false,
       confirmText: "Wróć do zakupów",

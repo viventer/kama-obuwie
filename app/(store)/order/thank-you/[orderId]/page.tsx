@@ -28,7 +28,7 @@ export default async function ThankYouPage(props: Props) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 my-4">
       <section>
         <h2 className="font-medium text-2xl">Dziękujemy za zamówienie</h2>
         <p>

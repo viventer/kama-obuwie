@@ -57,7 +57,7 @@ export default async function Page() {
 
   return (
     <>
-      <div className="flex gap-4 mb-12">
+      <div className="flex gap-4 mb-12 mt-6">
         <ShopReviewsWidget className="flex-2" />
         <AdvantagesBox price={0} className="hidden xl:flex" />
       </div>

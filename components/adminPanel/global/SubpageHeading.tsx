@@ -1,7 +1,9 @@
+import { Card } from "@/components/ui/card";
+
 export default function SubpageHeading({ text }: { text: string }) {
   return (
-    <div className="bg-foreground/10 rounded-t-md px-8 py-2 mb-4 sm:mb-6 flex items-center gap-4 w-fit border-b-2 border-b-secondary">
-      <h2 className="text-xl font-semibold capitalize">{text}</h2>
-    </div>
+    <Card className="bg-foreground/10 rounded-b-none border-0 border-b-brand border-b-2 px-4 md:px-8 py-1 md:py-2 mb-4 md:mb-6 flex items-center gap-4 w-fit ">
+      <h2 className="text-lg md:text-xl font-semibold capitalize">{text}</h2>
+    </Card>
   );
 }

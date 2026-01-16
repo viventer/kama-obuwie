@@ -31,6 +31,7 @@ import SelectSizeDialogContent from "./SelectSizeDialogContent";
 import ShopReviewsWidget from "../global/ShopReviewsWidget";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
 import MobileProductPageShopAdvantages from "./MobileProductPageShopAdvantages";
+import ReturnToListingButton from "./ReturnToListingButton";
 
 type StoreProductData = {
   id: string;
@@ -246,111 +247,114 @@ export default function ProductPage({
   };
 
   return (
-    <div className="flex flex-col gap-4 md:flex-row sm:gap-8">
-      <div className="flex flex-col gap-8">
-        <ProductImagesSlider imagesUrls={imagesUrls[selectedColorVariant]} />
-        <ProductSpecifications
-          productParameters={productData.parameters}
-          className="hidden md:flex"
-        />
-      </div>
-      <div className="w-full flex flex-col gap-6">
-        <article className="bg-primary/75 rounded-sm px-4 py-2">
-          <h2 className="capitalize font-bold text-xl text-white">
-            {category.name}
-          </h2>
-          <p className="text-lg text-white capitalize">
-            {productData?.brand && productData.brand != "bez marki"
-              ? `${productData.brand} `
-              : "\u00A0"}
-            <span className="font-thin">{productData.manufacturerCode}</span>
-          </p>
-        </article>
-        <div className="border-2 border-success w-fit px-4 py-3 rounded-sm flex gap-2 items-center">
-          <TagIcon className="text-success" />
-          <p className="text-2xl font-medium">
-            {new Intl.NumberFormat("pl-PL", {
-              style: "currency",
-              currency: "PLN",
-              minimumFractionDigits: 2,
-            }).format(price)}
-          </p>
+    <>
+      <ReturnToListingButton category={category} className="mb-2 md:mb-3" />
+      <div className="flex flex-col gap-4 md:flex-row sm:gap-8">
+        <div className="flex flex-col gap-8">
+          <ProductImagesSlider imagesUrls={imagesUrls[selectedColorVariant]} />
+          <ProductSpecifications
+            productParameters={productData.parameters}
+            className="hidden md:flex"
+          />
         </div>
-        <SelectProductVariant
-          colorVariants={productData.colorVariants}
-          imagesUrls={imagesUrls}
-          selectedColorVariant={selectedColorVariant}
-          onVariantChange={handleVariantChange}
-        />
-        <section>
-          {currentOffer && currentOffer.availability && (
-            <section>
-              <h3 className="mb-1 text-lg font-medium">Wybierz rozmiar</h3>
-              <ProductPageSizeSelector
-                availability={currentOffer.availability}
-                selectedSize={selectedSize}
-                onSizeChange={setSelectedSize}
-              />
-            </section>
-          )}
-          {sizingTable && (
+        <div className="w-full flex flex-col gap-6">
+          <article className="bg-primary/75 rounded-sm px-4 py-2">
+            <h2 className="capitalize font-bold text-xl text-white">
+              {category.name}
+            </h2>
+            <p className="text-lg text-white capitalize">
+              {productData?.brand && productData.brand != "bez marki"
+                ? `${productData.brand} `
+                : "\u00A0"}
+              <span className="font-thin">{productData.manufacturerCode}</span>
+            </p>
+          </article>
+          <div className="border-2 border-success w-fit px-4 py-3 rounded-sm flex gap-2 items-center">
+            <TagIcon className="text-success" />
+            <p className="text-2xl font-medium">
+              {new Intl.NumberFormat("pl-PL", {
+                style: "currency",
+                currency: "PLN",
+                minimumFractionDigits: 2,
+              }).format(price)}
+            </p>
+          </div>
+          <SelectProductVariant
+            colorVariants={productData.colorVariants}
+            imagesUrls={imagesUrls}
+            selectedColorVariant={selectedColorVariant}
+            onVariantChange={handleVariantChange}
+          />
+          <section>
+            {currentOffer && currentOffer.availability && (
+              <section>
+                <h3 className="mb-1 text-lg font-medium">Wybierz rozmiar</h3>
+                <ProductPageSizeSelector
+                  availability={currentOffer.availability}
+                  selectedSize={selectedSize}
+                  onSizeChange={setSelectedSize}
+                />
+              </section>
+            )}
+            {sizingTable && (
+              <Button
+                variant={"outline"}
+                className="w-fit "
+                onClick={showSizingTable}
+              >
+                Tabela rozmiarów
+              </Button>
+            )}
+          </section>
+          <article>
             <Button
-              variant={"outline"}
-              className="w-fit "
-              onClick={showSizingTable}
+              className="w-full md:max-w-[300px] text-xl font-bold px-8 py-6 bg-primary text-white hover:brightness-125 hover:bg-primary mb-2"
+              onClick={() => {
+                if (selectedSize) {
+                  handleAddToCart();
+                  return;
+                }
+                openDialog({
+                  title: "Wybierz rozmiar",
+                  content: (
+                    <SelectSizeDialogContent
+                      availability={currentOffer?.availability}
+                      selectedSize={selectedSize}
+                      onSizeChange={setSelectedSize}
+                    />
+                  ),
+                  hasCancelButton: false,
+                  confirmText: "Dodaj do koszyka",
+                  onConfirm: () => {
+                    // Najpierw zamknij bieżący dialog. Provider czyści config po ~200ms,
+                    // więc otwarcie kolejnego dialogu musi poczekać, żeby nie został nadpisany.
+                    closeDialog();
+                    setTimeout(() => {
+                      handleAddToCart();
+                    }, 250);
+                  },
+                  confirmVariant: "important",
+                });
+              }}
             >
-              Tabela rozmiarów
+              Dodaj do koszyka
             </Button>
-          )}
-        </section>
-        <article>
-          <Button
-            className="w-full md:max-w-[300px] text-xl font-bold px-8 py-6 bg-primary text-white hover:brightness-125 hover:bg-primary mb-2"
-            onClick={() => {
-              if (selectedSize) {
-                handleAddToCart();
-                return;
-              }
-              openDialog({
-                title: "Wybierz rozmiar",
-                content: (
-                  <SelectSizeDialogContent
-                    availability={currentOffer?.availability}
-                    selectedSize={selectedSize}
-                    onSizeChange={setSelectedSize}
-                  />
-                ),
-                hasCancelButton: false,
-                confirmText: "Dodaj do koszyka",
-                onConfirm: () => {
-                  // Najpierw zamknij bieżący dialog. Provider czyści config po ~200ms,
-                  // więc otwarcie kolejnego dialogu musi poczekać, żeby nie został nadpisany.
-                  closeDialog();
-                  setTimeout(() => {
-                    handleAddToCart();
-                  }, 250);
-                },
-                confirmVariant: "important",
-              });
-            }}
-          >
-            Dodaj do koszyka
-          </Button>
-          <ShippingInfo />
-          {currentBreakpoint && currentBreakpoint.includes("s") ? (
-            <MobileProductPageShopAdvantages className="mt-4" />
-          ) : (
-            <>
-              <ShopReviewsWidget className="mt-6 mb-6" isProductPage={true} />
-              <AdvantagesBox price={price} className="h-fit flex-0" />
-            </>
-          )}
-        </article>
-        <ProductSpecifications
-          productParameters={productData.parameters}
-          className="md:hidden"
-        />
+            <ShippingInfo />
+            {currentBreakpoint && currentBreakpoint.includes("s") ? (
+              <MobileProductPageShopAdvantages className="mt-4" />
+            ) : (
+              <>
+                <ShopReviewsWidget className="mt-6 mb-6" isProductPage={true} />
+                <AdvantagesBox price={price} className="h-fit flex-0" />
+              </>
+            )}
+          </article>
+          <ProductSpecifications
+            productParameters={productData.parameters}
+            className="md:hidden"
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

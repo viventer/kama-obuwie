@@ -21,7 +21,7 @@ export const ShoppingEventBaseSchema = z.object({
 export const ListingSchema = z.object({
   item_list_id: z.string().optional(), // category id
   item_list_name: z.string().optional(), // category name
-  from: z.enum(["home_grid", "nav", "home_products_list"]),
+  from: z.enum(["home_grid", "nav", "home_products_list", "product_page"]),
 });
 
 export const SelectItemSchema = ShoppingEventBaseSchema;

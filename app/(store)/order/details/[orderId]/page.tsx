@@ -29,7 +29,7 @@ export default async function OrderDetailsPage(props: Props) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 my-4">
       <section>
         <h2 className="font-medium text-2xl">Szczegóły zamówienia</h2>
         <p>

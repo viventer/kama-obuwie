@@ -263,7 +263,7 @@ export default function CheckoutForms() {
   };
 
   return (
-    <Tabs value={activeTab} onValueChange={handleTabChange}>
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="my-4">
       <TabsList className="mb-4 gap-0 2xs:gap-2">
         <TabsTrigger
           value="firstStep"

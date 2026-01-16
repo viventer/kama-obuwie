@@ -126,7 +126,7 @@ export default function ShoppingCartPage() {
   }, 0);
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto my-4">
       <h1 className="text-2xl font-bold mb-6 text-foreground">Koszyk</h1>
 
       <div className="space-y-4">

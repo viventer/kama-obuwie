@@ -22,6 +22,7 @@ import LinkText from "@/components/adminPanel/global/LinkText";
 import { analytics } from "@/firebase/firebase";
 import { logEvent } from "firebase/analytics";
 import { ItemType } from "@/firebase/schemas/analyticsSchemas";
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 
 export default function ShoppingCartPage() {
   const {
@@ -127,7 +128,7 @@ export default function ShoppingCartPage() {
 
   return (
     <div className="max-w-4xl mx-auto my-4">
-      <h1 className="text-2xl font-bold mb-6 text-foreground">Koszyk</h1>
+      <SubpageHeading text="koszyk" />
 
       <div className="space-y-4">
         {cart.map((cartItem) => (

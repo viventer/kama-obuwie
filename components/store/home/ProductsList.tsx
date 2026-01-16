@@ -9,6 +9,7 @@ import { useBreakpoint } from "@/hooks/useBreakpoint";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
 import { analytics } from "@/firebase/firebase";
 import { logEvent } from "firebase/analytics";
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 
 export default function ProductsList({
   displayName,
@@ -45,7 +46,7 @@ export default function ProductsList({
 
   return (
     <section>
-      <h3 className="text-2xl font-bold mb-3">{displayName}</h3>
+      <SubpageHeading text={displayName} />
       <div className="flex w-full justify-between">
         <div className="flex gap-4 w-full pr-4 md:pr-8 lg:pr-12">
           {products.slice(0, productsToShow).map((product) => (

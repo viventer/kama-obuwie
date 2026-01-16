@@ -16,7 +16,7 @@ export default function SizeSelector({
         type="multiple"
         variant="outline"
         size="sm"
-        className="flex justify-start gap-2 ml-1 md:flex-wrap max-h-12 md:max-h-24 overflow-auto scrollbar-hidden"
+        className="flex justify-start gap-2 ml-1 md:flex-wrap max-h-12 md:max-h-24 overflow-auto pb-2 md:pb-0 scrollbar-thin"
       >
         {availableSizes.map((size) => (
           <ToggleGroupItem

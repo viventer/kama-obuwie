@@ -23,7 +23,7 @@ export default function OrderedItemsList({
       {emailOrderData.orderedItems.map((item) => (
         <Row
           key={item.id}
-          className={`mb-4 bg-card rounded-lg p-3 ${isCancelled ? "opacity-50" : ""}`}
+          className={`mb-4 bg-card rounded-sm p-3 ${isCancelled ? "opacity-50" : ""}`}
         >
           <Column className="w-[120px]">
             <Img
@@ -31,7 +31,7 @@ export default function OrderedItemsList({
               alt={item.offer.name || "produkt"}
               width={120}
               height={120}
-              className="rounded-xl"
+              className="rounded-sm"
             />
           </Column>
           <Column className="pl-4 align-middle">

@@ -18,7 +18,7 @@ export default function ReviewsDialogContent() {
           {allegroReviews.map((review, index) => (
             <li
               key={index}
-              className="flex items-center gap-2 border-success border-1 rounded-md px-3 py-2 bg-secondary/15"
+              className="flex items-center gap-2 border-success border-1 rounded-sm px-3 py-2 bg-secondary/15"
             >
               <ThumbsUpIcon className="size-4 text-success flex-shrink-0" />"
               {review}"

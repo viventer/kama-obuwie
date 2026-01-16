@@ -48,7 +48,7 @@ export default function SelectProductVariant({
                     alt={`Wariant ${variantName}`}
                     width={120}
                     height={120}
-                    className={`object-contain aspect-square bg-white rounded-xl transition-all duration-200 ${
+                    className={`object-contain aspect-square bg-white rounded-sm transition-all duration-200 ${
                       isSelected
                         ? "ring-4 ring-brand opacity-100"
                         : "opacity-75 hover:opacity-100"

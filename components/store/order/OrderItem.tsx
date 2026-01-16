@@ -12,7 +12,7 @@ export default function OrderItem({ itemData }: { itemData: OrderItemType }) {
               src={itemData.offer.thumbnail}
               alt={`${itemData.offer.signature}`}
               fill
-              className="object-contain rounded-xl bg-white"
+              className="object-contain rounded-sm bg-white"
               sizes="80px"
             />
           </div>

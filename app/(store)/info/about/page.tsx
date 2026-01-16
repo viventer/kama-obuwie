@@ -57,7 +57,7 @@ export default function AboutPage() {
 
           {/* Wyróżniki */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-8">
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
+            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-sm">
               <ClockIcon className="text-brand w-8 h-8 mb-3" />
               <h3 className="font-semibold text-foreground text-sm mb-1">
                 13+ lat doświadczenia
@@ -65,7 +65,7 @@ export default function AboutPage() {
               <p className="text-xs text-foreground">Sprawdzona jakość usług</p>
             </div>
 
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
+            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-sm">
               <ShoppingBagIcon className="text-brand w-8 h-8 mb-3" />
               <h3 className="font-semibold text-foreground text-sm mb-1">
                 Szeroki asortyment
@@ -75,7 +75,7 @@ export default function AboutPage() {
               </p>
             </div>
 
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
+            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-sm">
               <StarIcon className="text-brand w-8 h-8 mb-3" />
               <h3 className="font-semibold text-foreground text-sm mb-1">
                 Zadowoleni klienci
@@ -85,7 +85,7 @@ export default function AboutPage() {
               </p>
             </div>
 
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-lg">
+            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-sm">
               <MapPinIcon className="text-brand w-8 h-8 mb-3" />
               <h3 className="font-semibold text-foreground text-sm mb-1">
                 Sklep stacjonarny

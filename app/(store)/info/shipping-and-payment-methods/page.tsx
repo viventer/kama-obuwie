@@ -39,7 +39,7 @@ export default function ShippingAndPaymentMethods() {
         <CardContent className="space-y-6">
           {/* Dostępne metody dostaw */}
           <div className="flex gap-4">
-            <div className="text-center p-4 bg-muted rounded-lg w-32 md:w-48">
+            <div className="text-center p-4 bg-muted rounded-sm w-32 md:w-48">
               <Image
                 src={"/inpost/InpostPaczkomatRect.svg"}
                 alt="logo InPost Paczkomat"
@@ -48,7 +48,7 @@ export default function ShippingAndPaymentMethods() {
                 className="w-full"
               />
             </div>
-            <div className="text-center p-4 bg-muted rounded-lg w-32 md:w-48">
+            <div className="text-center p-4 bg-muted rounded-sm w-32 md:w-48">
               <Image
                 src={"/inpost/InpostKurierRect.svg"}
                 alt="logo InPost Paczkomat"

@@ -25,7 +25,7 @@ export default function ReviewsSlider({ className }: { className?: string }) {
       <CarouselContent>
         {allegroReviews.map((review, index) => (
           <CarouselItem key={index} className="items-end flex">
-            <div className="flex items-center gap-2 border-success border-1 rounded-md px-4 py-2">
+            <div className="flex items-center gap-2 border-success border-1 rounded-sm px-4 py-2">
               <ThumbsUpIcon className="size-4 text-success" />
               {review}
             </div>

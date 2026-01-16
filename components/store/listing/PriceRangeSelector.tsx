@@ -22,8 +22,8 @@ export default function PriceRangeSelector({
   };
 
   return (
-    <article>
-      <h3 className="font-bold text-lg mb-1">Wybierz przedział cenowy</h3>
+    <article className="hidden md:block">
+      <h3 className="font-bold md:text-lg mb-1">Wybierz przedział cenowy</h3>
       <ToggleGroup
         value={selectedPriceRange.map((range) => `${range.from}-${range.to}`)}
         onValueChange={handleValueChange}

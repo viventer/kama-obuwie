@@ -49,7 +49,7 @@ export default function SizingTableDialog({
                     alt="Instrukcja dobierania rozmiaru"
                     width={300}
                     height={200}
-                    className="rounded-lg mx-auto"
+                    className="rounded-sm mx-auto"
                   />
                 </div>
               )}

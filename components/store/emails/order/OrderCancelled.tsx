@@ -75,7 +75,7 @@ const OrderCancelled = ({
     <Tailwind config={emailTailwindConfig}>
       <Body className="font-[ubuntu,roboto,arial,sans-serif] text-text text-base">
         <Preview>Twoje zamówienie zostało anulowane</Preview>
-        <Container className="my-[10px] mx-auto w-[600px] max-w-full border-2 border-primary rounded-lg">
+        <Container className="my-[10px] mx-auto w-[600px] max-w-full border-2 border-primary rounded-sm">
           <EmailHeader baseUrl={baseUrl} headingText="Zamówienie anulowane" />
           <Hr className="border m-0 border-primary/30" />
           <Section className="py-[20px] px-10">

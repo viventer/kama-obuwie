@@ -10,7 +10,7 @@ export default function ShoppingCartPreviewItem({
 
   return (
     <div className="flex gap-4 pb-3 border-b border-border last:border-b-0 items-center">
-      <div className="relative w-20 h-20 flex-shrink-0 bg-muted rounded-md overflow-hidden">
+      <div className="relative w-20 h-20 flex-shrink-0 bg-muted rounded-sm overflow-hidden">
         <Image
           src={item.thumbnailUrl}
           alt={`${item.brand || ""} ${item.categoryName}`}

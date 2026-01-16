@@ -82,7 +82,7 @@ const OrderCreated = ({
     <Tailwind config={emailTailwindConfig}>
       <Body className="font-[ubuntu,roboto,arial,sans-serif] text-text text-base">
         <Preview>Zobacz dane dotyczące Twojego zamówienia</Preview>
-        <Container className="my-[10px] mx-auto w-[600px] max-w-full border-2 border-primary rounded-lg">
+        <Container className="my-[10px] mx-auto w-[600px] max-w-full border-2 border-primary rounded-sm">
           <EmailHeader
             baseUrl={baseUrl}
             headingText="Dziękujemy za zamówienie!"

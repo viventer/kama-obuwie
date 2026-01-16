@@ -57,7 +57,7 @@ export default async function Page() {
 
   return (
     <>
-      <div className="flex gap-4 mb-12 mt-6">
+      <div className="flex gap-4 mt-6 mb-8 md:mt-10 md:mb-12">
         <ShopReviewsWidget className="flex-2" />
         <AdvantagesBox price={0} className="hidden xl:flex" />
       </div>
@@ -68,7 +68,7 @@ export default async function Page() {
         title="Elegancja na ważne okazje"
         categories={homeGridCategoriesWithIds}
       />
-      <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-8 md:gap-12">
         {Object.entries(products).map(([categoryId, productsInCategory]) => {
           const filteredProducts = productsInCategory
             .filter((product) => product.isActive)

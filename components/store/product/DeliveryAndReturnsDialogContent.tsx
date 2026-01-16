@@ -1,6 +1,11 @@
+"use client";
+
+import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import LinkText from "@/components/adminPanel/global/LinkText";
 
 export default function DeliveryAndReturnsDialogContent() {
+  const { closeDialog } = useDialogWindow();
+
   return (
     <section className="flex flex-col gap-4 overflow-auto">
       <article className="flex flex-col gap-2">
@@ -34,7 +39,10 @@ export default function DeliveryAndReturnsDialogContent() {
             </li>
           </ul>
         </div>
-        <LinkText href="/info/shipping-and-payment-methods">
+        <LinkText
+          href="/info/shipping-and-payment-methods"
+          onClick={closeDialog}
+        >
           Więcej o dostawie
         </LinkText>
       </article>
@@ -61,7 +69,9 @@ export default function DeliveryAndReturnsDialogContent() {
           </ul>
         </div>
       </article>
-      <LinkText href="/info/returns">Więcej o zwrotach</LinkText>
+      <LinkText href="/info/returns" onClick={closeDialog}>
+        Więcej o zwrotach
+      </LinkText>
     </section>
   );
 }

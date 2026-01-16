@@ -1,8 +1,13 @@
+"use client";
+
+import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import LinkText from "@/components/adminPanel/global/LinkText";
 import { BanknoteIcon } from "lucide-react";
 import Image from "next/image";
 
 export default function DeliveryAndPaymentMethodsDialogContent() {
+  const { closeDialog } = useDialogWindow();
+
   return (
     <section className="flex flex-col gap-4 overflow-auto">
       <article className="flex flex-col gap-2">
@@ -97,7 +102,7 @@ export default function DeliveryAndPaymentMethodsDialogContent() {
           .
         </p>
       </article>
-      <LinkText href="/info/shipping-and-payment-methods">
+      <LinkText href="/info/shipping-and-payment-methods" onClick={closeDialog}>
         Więcej o dostawie i płatnościach
       </LinkText>
     </section>

@@ -78,7 +78,7 @@ export default function ProductPageSizeSelector({
         </TabsList>
       </Tabs>
       {/* Zawsze wyświetlana informacja o wybranym rozmiarze */}
-      <div className="text-sm text-muted-foreground mt-1 mb-2">
+      <div className="text-sm text-muted-foreground mt-1">
         {selectedSize ? (
           <>
             Wybrano rozmiar:{" "}

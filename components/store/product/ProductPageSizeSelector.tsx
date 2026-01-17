@@ -51,7 +51,7 @@ export default function ProductPageSizeSelector({
                 value={size}
                 disabled={!available}
                 className={`
-                  p-3 w-10 h-10 md:w-12 md:h-12 aspect-square
+                  p-3 w-10 h-10 max-w-10 md:w-12 md:h-12 md:max-w-12 aspect-square
                   data-[state=active]:bg-transparent data-[state=active]:shadow-none 
                   bg-transparent rounded-lg
                   transition-all font-medium

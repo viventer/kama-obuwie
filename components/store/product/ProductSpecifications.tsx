@@ -28,7 +28,7 @@ export default function ProductSpecifications({
       <article
         className={cn(
           "flex flex-col gap-2 border-secondary border-1 px-4 py-3 rounded-sm w-full",
-          className
+          className,
         )}
       >
         <p className="text-muted-foreground text-sm">
@@ -42,7 +42,7 @@ export default function ProductSpecifications({
     <article
       className={cn(
         "flex flex-col gap-2 border-secondary border-1 px-4 py-3 rounded-sm w-full",
-        className
+        className,
       )}
     >
       <h3 className="text-xl font-bold mb-2">Specyfikacja</h3>

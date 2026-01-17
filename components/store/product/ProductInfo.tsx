@@ -15,17 +15,11 @@ export default function ProductInfo({
   productData: StoreProductDataForStore;
 }) {
   const { advantages, salesDescription } = parseProductDescription(
-    productData.description
+    productData.description,
   );
 
-  console.log(advantages);
-  console.log(salesDescription);
-
   return (
-    <section className={cn("", className)}>
-      <h2 className="text-lg md:text-xl font-semibold mb-2">
-        Informacje o produkcie
-      </h2>
+    <section className={cn("flex flex-col gap-4", className)}>
       {advantages.length > 0 && <ProductAdvantages advantages={advantages} />}
       {salesDescription && (
         <ProductSalesDescription salesDescription={salesDescription} />

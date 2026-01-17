@@ -24,11 +24,11 @@ export default function SelectProductVariant({
 
   return (
     <article>
-      <h3 className="text-lg mb-1">Kolor</h3>
+      <h3 className="text-lg font-medium md:text-xl">Kolor</h3>
       <Tabs
         value={selectedColorVariant}
         onValueChange={onVariantChange}
-        className="w-full"
+        className="w-full gap-0"
       >
         <TabsList className="flex gap-4 h-auto bg-transparent mb-2">
           {colorVariants.map((colorVariant) => {

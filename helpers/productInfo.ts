@@ -39,7 +39,7 @@ const stripHtml = (html: string): string => {
 const extractHtmlFromDescription = (
   description:
     | ProductWithId["description"]
-    | LegacyProductWithId["allegroDescription"]
+    | LegacyProductWithId["allegroDescription"],
 ): string => {
   if (!description) return "";
 
@@ -81,7 +81,7 @@ const extractParagraphs = (html: string): string[] => {
 };
 
 const extractH2Blocks = (
-  html: string
+  html: string,
 ): Array<{ html: string; index: number }> => {
   const regex = /<h2\b[^>]*>[\s\S]*?<\/h2>/gi;
   const out: Array<{ html: string; index: number }> = [];
@@ -99,6 +99,11 @@ const isNonEmptyParagraph = (pHtml: string): boolean => {
   return text.length > 0;
 };
 
+const unwrapOuterPTags = (pHtml: string): string => {
+  const match = pHtml.match(/^<p\b[^>]*>([\s\S]*?)<\/p>$/i);
+  return (match?.[1] ?? pHtml).trim();
+};
+
 /**
  * Parsuje opis produktu (nowy Description lub legacy AllegroOfferDescription) na:
  * - advantages: każdy paragraf (<p>) zawierający ✅ (z zachowaniem HTML)
@@ -108,7 +113,7 @@ const isNonEmptyParagraph = (pHtml: string): boolean => {
 export const parseProductDescription = (
   description:
     | ProductWithId["description"]
-    | LegacyProductWithId["allegroDescription"]
+    | LegacyProductWithId["allegroDescription"],
 ): ParsedProductDescription => {
   const html = extractHtmlFromDescription(description);
   if (!html.trim()) {
@@ -116,7 +121,13 @@ export const parseProductDescription = (
   }
 
   const paragraphs = extractParagraphs(html);
-  const advantages = paragraphs.filter((p) => containsCheckmark(p));
+  // Uwaga: `extractParagraphs` zwraca pełne <p>...</p>. Jeśli później
+  // owiniesz to kolejnym <p>, powstaje nieprawidłowe <p><p>...</p></p>,
+  // co przeglądarka "naprawia" inaczej niż React i powoduje hydration mismatch.
+  const advantages = paragraphs
+    .filter((p) => containsCheckmark(p))
+    .map(unwrapOuterPTags)
+    .filter(Boolean);
 
   // Szukamy pierwszej sekcji: <h2> ... </h2> + dalsza treść,
   // gdzie h2 nie zawiera "rozmiar" i w sekcji jest przynajmniej jeden <p> bez ✅.
@@ -137,7 +148,7 @@ export const parseProductDescription = (
     const h2Text = normalizeForSearch(stripHtml(h2s[i]!.html));
     if (
       blockedSalesDescriptionH2Substrings.some((blocked) =>
-        h2Text.includes(blocked)
+        h2Text.includes(blocked),
       )
     ) {
       continue;
@@ -149,7 +160,7 @@ export const parseProductDescription = (
     const blockParagraphs =
       extractParagraphs(block).filter(isNonEmptyParagraph);
     const hasNonCheckmarkParagraph = blockParagraphs.some(
-      (p) => !containsCheckmark(p)
+      (p) => !containsCheckmark(p),
     );
     if (!hasNonCheckmarkParagraph) {
       continue;

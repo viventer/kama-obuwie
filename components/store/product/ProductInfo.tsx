@@ -17,7 +17,7 @@ export default function ProductInfo({
   );
 
   return (
-    <section className={cn("flex flex-col gap-4", className)}>
+    <section className={cn("flex flex-col gap-8", className)}>
       {advantages.length > 0 && <ProductAdvantages advantages={advantages} />}
       {salesDescription && (
         <ProductSalesDescription salesDescription={salesDescription} />

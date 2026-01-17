@@ -10,7 +10,7 @@ export default function ProductSalesDescription({
     <article>
       <h2 className="font-medium text-lg md:text-xl mb-1">Opis produktu</h2>
       <ExpandableElement
-        collapsedHeight={64}
+        collapsedHeight={128}
         expandText="Pokaż więcej"
         collapseText="Zwiń opis"
       >

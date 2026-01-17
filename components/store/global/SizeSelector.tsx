@@ -10,7 +10,7 @@ export default function SizeSelector({
   onChange: (sizes: string[]) => void;
 }) {
   return (
-    <article className="max-w-[90vw]">
+    <article className="max-w-[90vw] md:max-w-[700px]">
       <h3 className="font-bold md:text-lg text-base mb-1">Wybierz rozmiar</h3>
       <ToggleGroup
         type="multiple"

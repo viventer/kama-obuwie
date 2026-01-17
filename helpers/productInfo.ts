@@ -139,6 +139,8 @@ export const parseProductDescription = (
     "dane",
     "cechy",
     "zalety",
+    "parametry",
+    "specyfikacja",
   ];
 
   for (let i = 0; i < h2s.length; i++) {

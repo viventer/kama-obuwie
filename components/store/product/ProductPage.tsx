@@ -251,17 +251,17 @@ export default function ProductPage({
     <>
       <ReturnToListingButton category={category} className="mb-2 md:mb-3" />
       <div className="flex flex-col gap-4 md:flex-row sm:gap-8">
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-8 flex-0">
           <ProductImagesSlider imagesUrls={imagesUrls[selectedColorVariant]} />
           <ProductInfo className="hidden md:flex" productData={productData} />
         </div>
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-2 w-full flex-1">
           {productData?.brand && productData.brand != "bez marki" && (
-            <h2 className="capitalize font-bold text-xl text-white md:text-2xl md:bg-brand/70 md:px-4 md:py-2 md:rounded-sm md:flex md:flex-col">
-              {category.name} {productData.brand}
+            <h2 className="capitalize font-bold text-xl text-white md:text-2xl md:bg-brand/70 md:px-4 md:py-2 md:rounded-sm md:flex md:flex-col md:mb-4">
+              {category.name}
               <span className="font-normal">
                 {" "}
-                {productData.manufacturerCode}
+                {productData.brand} {productData.manufacturerCode}
               </span>
             </h2>
           )}
@@ -285,7 +285,7 @@ export default function ProductPage({
             <section>
               {currentOffer && currentOffer.availability && (
                 <section>
-                  <h3 className="mb-1 text-lg font-medium"> Rozmiar</h3>
+                  <h3 className="text-lg font-medium"> Rozmiar</h3>
                   <ProductPageSizeSelector
                     availability={currentOffer.availability}
                     selectedSize={selectedSize}

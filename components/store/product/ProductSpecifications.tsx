@@ -39,7 +39,10 @@ export default function ProductSpecifications({
     return true;
   });
 
-  if (productBrand) {
+  if (
+    productBrand &&
+    allParameters.every(([key]) => key.toLowerCase() !== "marka")
+  ) {
     filteredParameters.unshift(["Marka", productBrand]);
   }
 

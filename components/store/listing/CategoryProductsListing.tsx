@@ -22,7 +22,7 @@ export default function CategoryProductsListing({
   >([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState<PriceRange[]>(
-    []
+    [],
   );
   const [filteredProducts, setFilteredProducts] =
     useState<ProductListingData[]>(productsFromCategory);
@@ -38,7 +38,7 @@ export default function CategoryProductsListing({
     });
 
     const priceRanges: PriceRange[] | null = getPriceRangesForFiltering(
-      Array.from(pricesSet)
+      Array.from(pricesSet),
     );
 
     if (priceRanges !== null) {
@@ -51,13 +51,13 @@ export default function CategoryProductsListing({
 
     if (selectedSizes.length > 0) {
       filtered = filtered.filter((product) =>
-        hasSelectedSizes(selectedSizes, product.availability)
+        hasSelectedSizes(selectedSizes, product.availability),
       );
     }
 
     if (selectedPriceRange.length > 0) {
       filtered = filtered.filter((product) =>
-        isProductPriceInRange(product, selectedPriceRange)
+        isProductPriceInRange(product, selectedPriceRange),
       );
     }
 
@@ -76,7 +76,7 @@ export default function CategoryProductsListing({
       />
 
       {filteredProducts && filteredProducts.length > 0 ? (
-        <section className="grid gap-4 md:gap-6 grid-cols-[repeat(auto-fill,_minmax(8rem,_1fr))] lg:grid-cols-[repeat(auto-fill,_minmax(15rem,_1fr))]">
+        <section className="grid gap-4 md:gap-6 grid-cols-[repeat(auto-fill,_minmax(9rem,_1fr))] md:grid-cols-[repeat(auto-fill,_minmax(14rem,_1fr))]">
           {filteredProducts.map((product) => (
             <ProductFromList
               key={`${product.id}-${product.colorVariantName}`}

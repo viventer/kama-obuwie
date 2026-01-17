@@ -21,6 +21,9 @@ export type StoreProductDataForStore = {
   manufacturerCode: string;
   colorVariants: ColorVariant[];
   parameters: ProductParameters;
+  description?:
+    | ProductWithId["description"]
+    | LegacyProductWithId["allegroDescription"];
 };
 
 export type StoreProductPageData = {
@@ -127,6 +130,7 @@ export async function getStoreProductPageData(params: {
       manufacturerCode: product.manufacturerCode,
       colorVariants: product.colorVariants || [],
       parameters: product.parameters,
+      description: product.description,
     };
   } else {
     // Fallback: id wskazuje na offerId (legacy)
@@ -223,6 +227,7 @@ export async function getStoreProductPageData(params: {
       parameters:
         legacy.parameters ||
         ({ required: {}, optional: {} } as ProductParameters),
+      description: legacy.allegroDescription,
     };
   }
 

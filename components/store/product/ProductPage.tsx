@@ -32,6 +32,7 @@ import ShopReviewsWidget from "../global/ShopReviewsWidget";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
 import MobileProductPageShopAdvantages from "./MobileProductPageShopAdvantages";
 import ReturnToListingButton from "./ReturnToListingButton";
+import ProductInfo from "./ProductInfo";
 
 type StoreProductData = {
   id: string;
@@ -349,10 +350,7 @@ export default function ProductPage({
               </>
             )}
           </article>
-          <ProductSpecifications
-            productParameters={productData.parameters}
-            className="md:hidden"
-          />
+          <ProductInfo className="md:hidden" productData={productData} />
         </div>
       </div>
     </>

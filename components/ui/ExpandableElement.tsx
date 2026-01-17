@@ -56,7 +56,6 @@ export default function ExpandableElement({
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collapsedHeight, isExpanded]);
 
   const toggle = () => {

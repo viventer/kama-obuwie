@@ -12,7 +12,7 @@ export default function ProductAdvantages({
     <article>
       <h2 className="font-medium text-lg md:text-xl mb-1">Zalety produktu</h2>
       <ExpandableElement
-        collapsedHeight={128}
+        collapsedHeight={160}
         expandText="Pokaż wszystkie zalety"
         collapseText="Zwiń zalety"
       >

@@ -8,13 +8,15 @@ export default function ProductSalesDescription({
 }) {
   return (
     <article>
-      <h2 className="font-medium text-lg md:text-xl mb-1">Opis produktu</h2>
       <ExpandableElement
-        collapsedHeight={128}
-        expandText="Pokaż więcej"
+        collapsedHeight={160}
+        expandText="Rozwiń opis"
         collapseText="Zwiń opis"
       >
-        <div dangerouslySetInnerHTML={{ __html: salesDescription! }}></div>
+        <div
+          dangerouslySetInnerHTML={{ __html: salesDescription! }}
+          className="product-sales-description"
+        ></div>
       </ExpandableElement>
     </article>
   );

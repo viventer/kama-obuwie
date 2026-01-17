@@ -267,3 +267,15 @@ button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.product-sales-description h2 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+@media (width >= 48rem /* 768px */) {
+  .product-sales-description h2 {
+    font-size: 1.25rem;
+  }
+}

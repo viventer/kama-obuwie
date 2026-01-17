@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import ProductAdvantages from "./ProductAdvantages";
 import { StoreProductDataForStore } from "@/server-actions/store/getStoreProductPageData";
@@ -21,11 +23,13 @@ export default function ProductInfo({
 
   return (
     <section className={cn("", className)}>
-      <h2 className="text-lg md:text-xl font-semibold mb-4">
+      <h2 className="text-lg md:text-xl font-semibold mb-2">
         Informacje o produkcie
       </h2>
-      <ProductAdvantages advantages={advantages} />
-      <ProductSalesDescription salesDescription={salesDescription} />
+      {advantages.length > 0 && <ProductAdvantages advantages={advantages} />}
+      {salesDescription && (
+        <ProductSalesDescription salesDescription={salesDescription} />
+      )}
       <ProductSpecifications productParameters={productData.parameters} />
     </section>
   );

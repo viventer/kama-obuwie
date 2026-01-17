@@ -1,3 +1,5 @@
+"use client";
+
 import ExpandableElement from "@/components/ui/ExpandableElement";
 import { ParsedProductDescription } from "@/helpers/productInfo";
 

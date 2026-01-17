@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 import ProductAdvantages from "./ProductAdvantages";
 import { StoreProductDataForStore } from "@/server-actions/store/getStoreProductPageData";
@@ -24,7 +22,10 @@ export default function ProductInfo({
       {salesDescription && (
         <ProductSalesDescription salesDescription={salesDescription} />
       )}
-      <ProductSpecifications productParameters={productData.parameters} />
+      <ProductSpecifications
+        productParameters={productData.parameters}
+        productBrand={productData.brand}
+      />
     </section>
   );
 }

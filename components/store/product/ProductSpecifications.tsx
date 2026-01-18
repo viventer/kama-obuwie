@@ -3,6 +3,7 @@
 import ExpandableElement from "@/components/ui/ExpandableElement";
 import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 
 export default function ProductSpecifications({
   productParameters,
@@ -41,7 +42,7 @@ export default function ProductSpecifications({
 
   if (
     productBrand &&
-    allParameters.every(([key]) => key.toLowerCase() !== "marka")
+    !filteredParameters.some(([key]) => key.toLowerCase() === "marka")
   ) {
     filteredParameters.unshift(["Marka", productBrand]);
   }

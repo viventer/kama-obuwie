@@ -151,7 +151,8 @@ export const parseProductDescription = (
     if (
       blockedSalesDescriptionH2Substrings.some((blocked) =>
         h2Text.includes(blocked),
-      )
+      ) ||
+      !h2Text
     ) {
       continue;
     }

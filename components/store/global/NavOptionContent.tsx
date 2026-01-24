@@ -13,7 +13,7 @@ export default function NavOptionContent({
   subcategories: CategoryWithId[];
 }) {
   return (
-    <div className="grid w-full max-w-[600px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] text-wrap">
+    <div className="grid !max-w-[600px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] text-wrap">
       {subcategories.map((category) => (
         <NavigationMenuLink key={category.id} asChild>
           <LinkText

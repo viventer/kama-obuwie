@@ -53,7 +53,7 @@ export default async function MainNav() {
                 <NavigationMenuTrigger className="bg-primary/15 font-medium px-3 capitalize">
                   {mainCategory.label}
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-background w-full">
+                <NavigationMenuContent className="bg-background !max-w-[100svw] !w-[100svw] bottom-0 relative max-h-fit !h-[calc(100svh-160px)] overflow-auto scrollbar sm:!max-w-fit">
                   <NavOptionContent subcategories={subcategories} />
                 </NavigationMenuContent>
               </NavigationMenuItem>

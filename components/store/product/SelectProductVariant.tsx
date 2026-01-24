@@ -30,7 +30,10 @@ export default function SelectProductVariant({
         onValueChange={onVariantChange}
         className="w-full gap-0"
       >
-        <TabsList className="flex gap-4 h-auto bg-transparent mb-2">
+        <TabsList
+          className="h-auto bg-transparent mb-2 grid gap-4
+    grid-cols-[repeat(auto-fit,minmax(60px,100px))] justify-start w-full"
+        >
           {colorVariants.map((colorVariant) => {
             const variantName = getColorVariantName(colorVariant);
             const isSelected = selectedColorVariant === variantName;
@@ -40,23 +43,32 @@ export default function SelectProductVariant({
               <TabsTrigger
                 key={variantName}
                 value={variantName}
-                className="p-0 h-auto data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 hover:bg-transparent"
+                className="p-0 h-auto data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 hover:bg-transparent flex-1 max-w-fit"
               >
-                <div className="relative">
+                <div
+                  className={`
+                    relative
+                    after:rounded-b-sm
+                    after:absolute after:left-0 after:right-0 after:bottom-0
+                    after:h-1 md:after:h-1.5
+                    after:bg-brand
+                    after:origin-left
+                    after:scale-y-0
+                    after:transition-transform after:duration-200
+                    ${isSelected ? "after:scale-y-100" : ""}
+                  `}
+                >
                   <Image
                     src={imageUrl}
                     alt={`Wariant ${variantName}`}
                     width={120}
                     height={120}
-                    className={`object-contain aspect-square bg-white rounded-sm transition-all duration-200 ${
+                    className={`object-contain min-w-[60px] aspect-square bg-white rounded-sm border-b-0 border-brand  transition-all duration-200 ease-in-out ${
                       isSelected
-                        ? "ring-4 ring-brand opacity-100"
+                        ? "border-b-4 md:border-b-6 opacity-100"
                         : "opacity-75 hover:opacity-100"
                     }`}
                   />
-                  {isSelected && (
-                    <div className="absolute -top-2 -right-2 w-4 h-4 bg-brand rounded-full"></div>
-                  )}
                 </div>
               </TabsTrigger>
             );

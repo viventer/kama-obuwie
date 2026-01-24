@@ -63,11 +63,7 @@ export default function SelectProductVariant({
                     alt={`Wariant ${variantName}`}
                     width={120}
                     height={120}
-                    className={`object-contain min-w-[60px] aspect-square bg-white rounded-sm border-b-0 border-brand  transition-all duration-200 ease-in-out ${
-                      isSelected
-                        ? "border-b-4 md:border-b-6 opacity-100"
-                        : "opacity-75 hover:opacity-100"
-                    }`}
+                    className={`object-contain min-w-[60px] aspect-square bg-white rounded-sm`}
                   />
                 </div>
               </TabsTrigger>

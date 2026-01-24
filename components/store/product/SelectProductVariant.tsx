@@ -63,7 +63,7 @@ export default function SelectProductVariant({
                     alt={`Wariant ${variantName}`}
                     width={120}
                     height={120}
-                    className={`object-contain min-w-0 w-fit aspect-square bg-white rounded-sm`}
+                    className={`object-contain min-w-0 aspect-square bg-white rounded-sm`}
                   />
                 </div>
               </TabsTrigger>

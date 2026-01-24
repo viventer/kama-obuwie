@@ -16,7 +16,6 @@ import { notFound, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { TagIcon } from "lucide-react";
 import AdvantagesBox from "./AdvantagesBox";
-import ProductSpecifications from "./ProductSpecifications";
 import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import { useToast } from "@/hooks/useToast";
@@ -78,17 +77,20 @@ export default function ProductPage({
       logEvent(analytics, "view_item", {
         items: [
           {
-            item_id: offersData[selectedColorVariant].SKU,
-            item_name: offersData[selectedColorVariant].signature,
+            item_id: offersData[selectedColorVariant]?.SKU || "none",
+            item_name: offersData[selectedColorVariant]?.signature || "none",
             item_category: category.name,
             item_brand: productData.brand,
-            price: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+            price:
+              Number(offersData[selectedColorVariant]?.sellingPrices?.DTC) ||
+              50,
             size: selectedSize,
             quantity: 1,
             item_variant: selectedColorVariant,
           } as ItemType,
         ],
-        value: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+        value:
+          Number(offersData[selectedColorVariant]?.sellingPrices?.DTC) || 50,
         currency: "PLN",
       });
     }
@@ -167,20 +169,23 @@ export default function ProductPage({
     }
 
     if (analytics) {
-      logEvent(analytics, "add_to_cart", {
+      logEvent(analytics, "view_item", {
         items: [
           {
-            item_id: offersData[selectedColorVariant].SKU,
-            item_name: offersData[selectedColorVariant].signature,
+            item_id: offersData[selectedColorVariant]?.SKU || "none",
+            item_name: offersData[selectedColorVariant]?.signature || "none",
             item_category: category.name,
             item_brand: productData.brand,
-            price: Number(offersData[selectedColorVariant].sellingPrices.DTC),
-            size: sizeToAdd,
+            price:
+              Number(offersData[selectedColorVariant]?.sellingPrices?.DTC) ||
+              50,
+            size: selectedSize,
             quantity: 1,
             item_variant: selectedColorVariant,
           } as ItemType,
         ],
-        value: Number(offersData[selectedColorVariant].sellingPrices.DTC),
+        value:
+          Number(offersData[selectedColorVariant]?.sellingPrices?.DTC) || 50,
         currency: "PLN",
       });
     }

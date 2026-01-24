@@ -36,12 +36,12 @@ const stripHtml = (html: string): string => {
     .trim();
 };
 
-const extractHtmlFromDescription = (
+const extractHtmlPartsFromDescription = (
   description:
     | ProductWithId["description"]
     | LegacyProductWithId["allegroDescription"],
-): string => {
-  if (!description) return "";
+): string[] => {
+  if (!description) return [];
 
   // Nowy format: Description (tablica wierszy)
   if (Array.isArray(description)) {
@@ -50,11 +50,11 @@ const extractHtmlFromDescription = (
     for (const row of rows) {
       for (const el of row.elements || []) {
         if (typeof el?.content === "string" && el.content.trim()) {
-          parts.push(el.content);
+          parts.push(el.content.trim());
         }
       }
     }
-    return parts.join("\n");
+    return parts;
   }
 
   // Legacy: AllegroOfferDescription { sections: [...] }
@@ -64,14 +64,15 @@ const extractHtmlFromDescription = (
     for (const section of maybeAllegro.sections) {
       for (const item of section.items || []) {
         if (item?.type === "TEXT" && typeof item.content === "string") {
-          parts.push(item.content);
+          const content = item.content.trim();
+          if (content) parts.push(content);
         }
       }
     }
-    return parts.join("\n");
+    return parts;
   }
 
-  return "";
+  return [];
 };
 
 const extractParagraphs = (html: string): string[] => {
@@ -108,14 +109,16 @@ const unwrapOuterPTags = (pHtml: string): string => {
  * Parsuje opis produktu (nowy Description lub legacy AllegroOfferDescription) na:
  * - advantages: każdy paragraf (<p>) zawierający ✅ (z zachowaniem HTML)
  * - salesDescription: pierwsza sekcja zaczynająca się od <h2>, której nagłówek nie zawiera "rozmiar",
- *   i która ma co najmniej jeden paragraf bez ✅. Zwracany jest fragment od tego <h2> do następnego <h2> (bez niego).
+ *   i która ma co najmniej jeden paragraf bez ✅. Zwracany jest fragment od tego <h2> do końca tej samej sekcji
+ *   (albo do kolejnego <h2>, jeśli występuje w tej samej sekcji).
  */
 export const parseProductDescription = (
   description:
     | ProductWithId["description"]
     | LegacyProductWithId["allegroDescription"],
 ): ParsedProductDescription => {
-  const html = extractHtmlFromDescription(description);
+  const htmlParts = extractHtmlPartsFromDescription(description);
+  const html = htmlParts.join("\n");
   if (!html.trim()) {
     return { advantages: [] };
   }
@@ -129,10 +132,10 @@ export const parseProductDescription = (
     .map(unwrapOuterPTags)
     .filter(Boolean);
 
-  // Szukamy pierwszej sekcji: <h2> ... </h2> + dalsza treść,
-  // gdzie h2 nie zawiera "rozmiar" i w sekcji jest przynajmniej jeden <p> bez ✅.
+  // Szukamy pierwszej sekcji (w granicach pojedynczego elementu/sekcji opisu):
+  // <h2> ... </h2> + dalsza treść, gdzie h2 nie zawiera blokowanych słów,
+  // i w sekcji jest przynajmniej jeden <p> bez ✅.
   let salesDescription: string | undefined;
-  const h2s = extractH2Blocks(html);
 
   const blockedSalesDescriptionH2Substrings = [
     "rozmiar",
@@ -143,34 +146,41 @@ export const parseProductDescription = (
     "specyfikacja",
   ];
 
-  for (let i = 0; i < h2s.length; i++) {
-    const start = h2s[i]!.index;
-    const end = i + 1 < h2s.length ? h2s[i + 1]!.index : html.length;
+  for (const partHtml of htmlParts) {
+    const h2s = extractH2Blocks(partHtml);
+    if (!h2s.length) continue;
 
-    const h2Text = normalizeForSearch(stripHtml(h2s[i]!.html));
-    if (
-      blockedSalesDescriptionH2Substrings.some((blocked) =>
-        h2Text.includes(blocked),
-      ) ||
-      !h2Text
-    ) {
-      continue;
+    for (let i = 0; i < h2s.length; i++) {
+      const start = h2s[i]!.index;
+      const end = i + 1 < h2s.length ? h2s[i + 1]!.index : partHtml.length;
+
+      const h2Text = normalizeForSearch(stripHtml(h2s[i]!.html));
+      if (
+        blockedSalesDescriptionH2Substrings.some((blocked) =>
+          h2Text.includes(blocked),
+        ) ||
+        !h2Text
+      ) {
+        continue;
+      }
+
+      const block = partHtml.slice(start, end).trim();
+      if (!block) continue;
+
+      const blockParagraphs =
+        extractParagraphs(block).filter(isNonEmptyParagraph);
+      const hasNonCheckmarkParagraph = blockParagraphs.some(
+        (p) => !containsCheckmark(p),
+      );
+      if (!hasNonCheckmarkParagraph) {
+        continue;
+      }
+
+      salesDescription = block;
+      break;
     }
 
-    const block = html.slice(start, end).trim();
-    if (!block) continue;
-
-    const blockParagraphs =
-      extractParagraphs(block).filter(isNonEmptyParagraph);
-    const hasNonCheckmarkParagraph = blockParagraphs.some(
-      (p) => !containsCheckmark(p),
-    );
-    if (!hasNonCheckmarkParagraph) {
-      continue;
-    }
-
-    salesDescription = block;
-    break;
+    if (salesDescription) break;
   }
 
   return {

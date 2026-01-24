@@ -26,27 +26,27 @@ export default async function Page() {
       const matchingCategory = categoriesFromDB?.find(
         (dbCategory) =>
           dbCategory.name === categoryFromMainPage.name &&
-          dbCategory.rootCategory === categoryFromMainPage.rootCategory
+          dbCategory.rootCategory === categoryFromMainPage.rootCategory,
       );
 
       return {
         ...categoryFromMainPage,
         id: matchingCategory?.id,
       };
-    }
+    },
   );
 
   const mainPageCategoriesIds = mainPageCategories
     .map((cat) => cat.id)
     .filter(Boolean) as string[];
 
-  const products = await getProductsListingData(mainPageCategoriesIds);
+  const products = await getProductsListingData(mainPageCategoriesIds, 12);
 
   const homeGridCategoriesWithIds = homeGridCategories.map((category) => {
     const matchingCategory = categoriesFromDB?.find(
       (dbCategory) =>
         dbCategory.name === category.name &&
-        dbCategory.rootCategory === category.rootCategory
+        dbCategory.rootCategory === category.rootCategory,
     );
 
     return {

@@ -17,6 +17,7 @@ const mainCategories = [
 
 export default async function MainNav() {
   const categories = await getDocumentsFromAdminDB<Category>("categories");
+  categories?.sort((a, b) => a.name.localeCompare(b.name));
 
   const categoriesByRoot =
     categories?.reduce(

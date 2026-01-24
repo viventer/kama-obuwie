@@ -173,6 +173,55 @@ const getLegacyProductsByCategoryIds = async (
   return legacyProductsAll;
 };
 
+const normalizeLimit = (value: number | undefined): number | undefined => {
+  if (typeof value !== "number" || !Number.isFinite(value)) return undefined;
+  const normalized = Math.floor(value);
+  if (normalized <= 0) return 0;
+  return normalized;
+};
+
+const getProductsByCategoryIds = async (
+  categoryIds: string[],
+  productsLimit?: number,
+): Promise<ProductWithId[]> => {
+  const limit = normalizeLimit(productsLimit);
+
+  // Bez limitu: jedno zapytanie "in".
+  if (limit === undefined) {
+    return (
+      (await getDocumentsFromAdminDB<ProductWithId>("products", (ref) =>
+        ref.where("categoryId", "in", categoryIds),
+      )) ?? []
+    );
+  }
+
+  // Limit = 0: nie pobieramy nic.
+  if (limit === 0) {
+    return [];
+  }
+
+  // Z limitem: osobne zapytanie per kategoria, żeby limit działał "per category".
+  const snapshots = await Promise.all(
+    categoryIds.map((categoryId) =>
+      adminDB
+        .collection("products")
+        .where("categoryId", "==", categoryId)
+        .limit(limit)
+        .get(),
+    ),
+  );
+
+  return snapshots.flatMap((snap) =>
+    snap.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...(doc.data() as Omit<ProductWithId, "id">),
+        }) as ProductWithId,
+    ),
+  );
+};
+
 const getLegacyOffersByLegacyProductIds = async (
   legacyProductIds: string[],
 ): Promise<OfferWithId[]> => {
@@ -291,6 +340,7 @@ export const updateProduct = async function (
 
 export const getProductsListingData = async function (
   categoryIds: string[],
+  productsLimit?: number,
 ): Promise<Record<string, ProductListingData[]>> {
   const uniqueCategoryIds = toUniqueNonEmptyStrings(categoryIds);
 
@@ -298,12 +348,10 @@ export const getProductsListingData = async function (
     return {};
   }
 
-  const allProducts = await getDocumentsFromAdminDB<ProductWithId>(
-    "products",
-    (ref) => ref.where("categoryId", "in", uniqueCategoryIds),
+  const productsArray = await getProductsByCategoryIds(
+    uniqueCategoryIds,
+    productsLimit,
   );
-
-  const productsArray = allProducts ?? [];
 
   const productsByCategoryId = buildProductsByCategoryId(productsArray);
   const neededOfferIds = collectOfferIdsFromProducts(productsArray);

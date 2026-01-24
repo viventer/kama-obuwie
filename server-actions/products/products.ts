@@ -10,10 +10,7 @@ import {
   ProductListingData,
 } from "@/firebase/schemas/productsSchemas";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
-import {
-  getDocumentFromAdminDB,
-  getDocumentsFromAdminDB,
-} from "@/firebase/getters";
+import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { verifyUser } from "../auth/auth";
 import { getImageUrl } from "@/server-actions/files/files";
 import { isValidUrl } from "@/components/adminPanel/offers/helpers/validation";
@@ -35,7 +32,7 @@ export const createProduct = async function (newProduct: Product) {
 
 export const updateProduct = async function (
   id: string,
-  updateData: Partial<Product>
+  updateData: Partial<Product>,
 ) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
@@ -50,21 +47,24 @@ export const updateProduct = async function (
 };
 
 export const getProductsListingData = async function (
-  categoryIds: string[]
+  categoryIds: string[],
 ): Promise<Record<string, ProductListingData[]>> {
-  const allProducts = await getDocumentsFromAdminDB<ProductWithId>(
-    "products",
-    (ref) => ref.where("categoryId", "in", categoryIds)
+  const uniqueCategoryIds = Array.from(
+    new Set(categoryIds.filter((id) => typeof id === "string" && id.trim())),
   );
 
-  const legacyOffersAll =
-    (await getDocumentsFromAdminDB<OfferWithId>("offers", (ref) =>
-      ref.where("legacyProductId", ">", "")
-    )) ?? [];
+  if (uniqueCategoryIds.length === 0) {
+    return {};
+  }
+
+  const allProducts = await getDocumentsFromAdminDB<ProductWithId>(
+    "products",
+    (ref) => ref.where("categoryId", "in", uniqueCategoryIds),
+  );
 
   const getOffersByIds = async (offerIds: string[]): Promise<OfferWithId[]> => {
     const uniqueIds = Array.from(
-      new Set(offerIds.filter((id) => typeof id === "string" && id.trim()))
+      new Set(offerIds.filter((id) => typeof id === "string" && id.trim())),
     );
 
     if (uniqueIds.length === 0) return [];
@@ -79,8 +79,8 @@ export const getProductsListingData = async function (
         adminDB
           .collection("offers")
           .where(FieldPath.documentId(), "in", batch)
-          .get()
-      )
+          .get(),
+      ),
     );
 
     return snapshots.flatMap((snap) =>
@@ -89,12 +89,19 @@ export const getProductsListingData = async function (
           ({
             id: doc.id,
             ...(doc.data() as Omit<OfferWithId, "id">),
-          }) as OfferWithId
-      )
+          }) as OfferWithId,
+      ),
     );
   };
 
   const productsArray = allProducts ?? [];
+
+  const productsByCategoryId = productsArray.reduce<
+    Record<string, ProductWithId[]>
+  >((acc, product) => {
+    (acc[product.categoryId!] ||= []).push(product);
+    return acc;
+  }, {});
 
   const neededOfferIds: string[] = [];
   for (const product of productsArray) {
@@ -110,7 +117,7 @@ export const getProductsListingData = async function (
   const offerById = new Map<string, OfferWithId>(offers.map((o) => [o.id, o]));
 
   const transformProductToProductListingData = async (
-    product: ProductWithId
+    product: ProductWithId,
   ): Promise<ProductListingData[]> => {
     const productListingDataArray: ProductListingData[] = [];
 
@@ -133,7 +140,7 @@ export const getProductsListingData = async function (
         (availability) =>
           availability.value &&
           availability.value !== "" &&
-          availability.value !== "0"
+          availability.value !== "0",
       );
 
       let thumbnailUrl = "";
@@ -146,7 +153,7 @@ export const getProductsListingData = async function (
         }
       } else if (product?.editedPhotos) {
         const editedPhotoForVariant = product.editedPhotos.find(
-          (photo) => photo.colorVariantName === colorVariantName
+          (photo) => photo.colorVariantName === colorVariantName,
         );
         if (editedPhotoForVariant) {
           const imageUrl = await getImageUrl(editedPhotoForVariant.filePath);
@@ -165,7 +172,7 @@ export const getProductsListingData = async function (
           Object.entries(offer.availability).map(([size, avail]) => [
             size,
             parseInt(avail.value || "0"),
-          ])
+          ]),
         ),
       });
     }
@@ -175,23 +182,75 @@ export const getProductsListingData = async function (
 
   const products: Record<string, ProductListingData[]> = {};
 
-  const legacyCache = new Map<string, LegacyProductWithId | null>();
-  const getLegacyById = async (
-    id: string
-  ): Promise<LegacyProductWithId | null> => {
-    if (legacyCache.has(id)) return legacyCache.get(id)!;
-    const { data } = await getDocumentFromAdminDB<LegacyProductWithId>(
-      "legacyProducts",
-      id
+  // Legacy: pobieramy tylko legacyProducts z kategorii wejściowych (filtrowanie na etapie zapytania),
+  // żeby uniknąć odczytów per-offer.
+  const legacyCategoryChunks: string[][] = [];
+  for (let i = 0; i < uniqueCategoryIds.length; i += 10) {
+    legacyCategoryChunks.push(uniqueCategoryIds.slice(i, i + 10));
+  }
+
+  const legacyProductsAll = (
+    await Promise.all(
+      legacyCategoryChunks.map((chunk) =>
+        getDocumentsFromAdminDB<LegacyProductWithId>("legacyProducts", (ref) =>
+          ref.where("categoryId", "in", chunk),
+        ),
+      ),
+    )
+  )
+    .flat()
+    .filter(Boolean) as LegacyProductWithId[];
+
+  const legacyById = new Map<string, LegacyProductWithId>(
+    legacyProductsAll.map((legacy) => [legacy.id, legacy]),
+  );
+
+  const getLegacyOffersByLegacyProductIds = async (
+    legacyProductIds: string[],
+  ): Promise<OfferWithId[]> => {
+    const uniqueLegacyIds = Array.from(
+      new Set(
+        legacyProductIds.filter((id) => typeof id === "string" && id.trim()),
+      ),
     );
-    const legacy = data || null;
-    legacyCache.set(id, legacy);
-    return legacy;
+
+    if (uniqueLegacyIds.length === 0) return [];
+
+    const chunks: string[][] = [];
+    for (let i = 0; i < uniqueLegacyIds.length; i += 10) {
+      chunks.push(uniqueLegacyIds.slice(i, i + 10));
+    }
+
+    const snapshots = await Promise.all(
+      chunks.map((batch) =>
+        adminDB
+          .collection("offers")
+          .where("legacyProductId", "in", batch)
+          .get(),
+      ),
+    );
+
+    return snapshots.flatMap((snap) =>
+      snap.docs.map(
+        (doc) =>
+          ({
+            id: doc.id,
+            ...(doc.data() as Omit<OfferWithId, "id">),
+          }) as OfferWithId,
+      ),
+    );
   };
 
-  for (const categoryId of categoryIds) {
-    const categoryProducts =
-      allProducts?.filter((product) => product.categoryId === categoryId) || [];
+  const legacyOffersAll = await getLegacyOffersByLegacyProductIds(
+    Array.from(legacyById.keys()),
+  );
+
+  const legacyOffers = legacyOffersAll.filter(
+    (offer) => !offer.productId && offer.legacyProductId,
+  );
+
+  for (const categoryId of uniqueCategoryIds) {
+    const categoryProducts = productsByCategoryId[categoryId] || [];
 
     const productsListingData: ProductListingData[] = [];
     for (const product of categoryProducts) {
@@ -204,14 +263,10 @@ export const getProductsListingData = async function (
     // Legacy: oferty bez produktu, ale z legacyProductId (żeby były widoczne w sklepie)
     const legacyOffersListingData: ProductListingData[] = [];
 
-    const legacyOffers = legacyOffersAll.filter(
-      (offer) => !offer.productId && offer.legacyProductId
-    );
-
     for (const offer of legacyOffers) {
       if (!offer.legacyProductId) continue;
 
-      const legacy = await getLegacyById(offer.legacyProductId);
+      const legacy = legacyById.get(offer.legacyProductId) || null;
       const legacyCategoryId = legacy?.categoryId;
       if (!legacyCategoryId || legacyCategoryId !== categoryId) continue;
 
@@ -228,7 +283,7 @@ export const getProductsListingData = async function (
         (availability) =>
           availability.value &&
           availability.value !== "" &&
-          availability.value !== "0"
+          availability.value !== "0",
       );
 
       const legacyImages = legacy?.imagesUrls || {};
@@ -252,7 +307,7 @@ export const getProductsListingData = async function (
           Object.entries(offer.availability || {}).map(([size, avail]) => [
             size,
             parseInt(avail.value || "0"),
-          ])
+          ]),
         ),
       });
     }

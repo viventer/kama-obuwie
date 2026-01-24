@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       "a.allegroimg.allegrosandbox.pl",
       "a.allegroimg.pl",
       "allegroimg.pl",
+      "a.allegroimg.com",
       "allegro.pl.allegrosandbox.pl",
     ],
   },

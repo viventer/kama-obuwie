@@ -59,6 +59,7 @@ export default function ProductPage({
   choosingSizeImageUrl?: string;
 }) {
   const { currentBreakpoint } = useBreakpoint();
+  const [filteredVariants, setFilteredVariants] = useState<ColorVariant[]>([]);
 
   useEffect(() => {
     console.log(currentBreakpoint);
@@ -73,6 +74,21 @@ export default function ProductPage({
   }
 
   useEffect(() => {
+    const availableVariants = productData.colorVariants.filter((variant) => {
+      const variantName = getColorVariantName(variant);
+      const offer = offersData[variantName];
+      if (!offer || Object.keys(offer.availability).length === 0) return false;
+      const isActive = Object.values(offer.availability).some(
+        (availability) =>
+          availability.value &&
+          availability.value !== "" &&
+          availability.value !== "0",
+      );
+
+      return isActive;
+    });
+    setFilteredVariants(availableVariants);
+
     if (analytics) {
       logEvent(analytics, "view_item", {
         items: [
@@ -282,7 +298,7 @@ export default function ProductPage({
           </div>
           <div className="w-full flex flex-col gap-4">
             <SelectProductVariant
-              colorVariants={productData.colorVariants}
+              colorVariants={filteredVariants}
               imagesUrls={imagesUrls}
               selectedColorVariant={selectedColorVariant}
               onVariantChange={handleVariantChange}

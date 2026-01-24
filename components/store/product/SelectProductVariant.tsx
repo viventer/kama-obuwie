@@ -32,7 +32,7 @@ export default function SelectProductVariant({
       >
         <TabsList
           className="h-auto bg-transparent mb-2 grid gap-4
-    grid-cols-[repeat(auto-fit,minmax(60px,100px))] justify-start w-full"
+    grid-cols-[repeat(auto-fit,minmax(70px,max-content))]  justify-start w-full"
         >
           {colorVariants.map((colorVariant) => {
             const variantName = getColorVariantName(colorVariant);
@@ -43,7 +43,7 @@ export default function SelectProductVariant({
               <TabsTrigger
                 key={variantName}
                 value={variantName}
-                className="p-0 h-auto data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 hover:bg-transparent flex-1 max-w-fit"
+                className="p-0 h-auto data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 hover:bg-transparent max-w-fit"
               >
                 <div
                   className={`
@@ -63,7 +63,7 @@ export default function SelectProductVariant({
                     alt={`Wariant ${variantName}`}
                     width={120}
                     height={120}
-                    className={`object-contain min-w-[60px] aspect-square bg-white rounded-sm`}
+                    className={`object-contain min-w-0 w-fit aspect-square bg-white rounded-sm`}
                   />
                 </div>
               </TabsTrigger>

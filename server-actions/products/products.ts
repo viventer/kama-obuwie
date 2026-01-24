@@ -137,7 +137,11 @@ const transformProductToProductListingData = async (
 
     productListingDataArray.push({
       thumbnailUrl,
-      price: offer.sellingPrices.DTC || "0",
+      price:
+        offer.sellingPrices.DTC ||
+        offer.sellingPrices.AL1 ||
+        offer.sellingPrices.AL2 ||
+        "0",
       id: product.id,
       brand: product?.brand || undefined,
       colorVariantName,
@@ -292,7 +296,11 @@ const transformLegacyOfferToListingData = (
     offer.sellingPrices?.DTC ||
     offer.sellingPrices?.AL1 ||
     offer.sellingPrices?.AL2 ||
-    "0";
+    null;
+
+  if (!price) {
+    return null;
+  }
 
   return {
     thumbnailUrl,

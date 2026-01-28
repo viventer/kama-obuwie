@@ -57,12 +57,17 @@ gtag('js', new Date());
 gtag('config', '${googleAdsTagId}');
               `.trim()}
             </Script>
+            <meta
+              name="google-site-verification"
+              content="9Ud0WgGabcpBktv5pzGZ3nP51iLK9GslHEo-s1j8WZk"
+            />
           </>
-        ) : null}
-        <meta
-          name="google-site-verification"
-          content="9Ud0WgGabcpBktv5pzGZ3nP51iLK9GslHEo-s1j8WZk"
-        />
+        ) : (
+          <meta
+            name="google-site-verification"
+            content="q2HwT7PPwI-INPFKZgq-biCl3lUX7luJe4MX0lkrN8M"
+          />
+        )}
       </head>
       <body
         className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen`}

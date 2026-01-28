@@ -55,7 +55,8 @@ export default function SelectProductVariant({
                     after:origin-left
                     after:scale-y-0
                     after:transition-transform after:duration-200
-                    ${isSelected ? "after:scale-y-100" : ""}
+                    transition-all duration-200
+                    ${isSelected ? "after:scale-y-100" : "brightness-75"}
                   `}
                 >
                   <Image

@@ -1,49 +1,68 @@
-import LinkText from "@/components/adminPanel/global/LinkText";
 import React from "react";
+import MobileFooterLinks from "./MobileFooterLinks";
+import FooterDeliveryAndPaymentMethods from "./FooterDeliveryAndPaymentMethods";
+
+export type NavOption = {
+  groupLabel: string;
+  links: {
+    label: string;
+    url: string;
+  }[];
+};
 
 export default function Footer() {
-  const links = [
+  const navOptions: NavOption[] = [
     {
-      label: "kontakt",
-      url: "/info/contact",
+      groupLabel: "Obsługa klienta",
+      links: [
+        {
+          label: "Kontakt",
+          url: "/info/contact",
+        },
+        {
+          label: "Zwroty",
+          url: "/info/returns",
+        },
+        {
+          label: "Reklamacje",
+          url: "/info/complaints",
+        },
+      ],
     },
     {
-      label: "zwroty",
-      url: "/info/returns",
+      groupLabel: "Informacje o sklepie",
+      links: [
+        {
+          label: "Metody dostaw i płatności",
+          url: "/info/shipping-and-payment-methods",
+        },
+        {
+          label: "O nas",
+          url: "/info/about",
+        },
+      ],
     },
     {
-      label: "reklamacje",
-      url: "/info/complaints",
-    },
-    {
-      label: "metody dostaw i płatności",
-      url: "/info/shipping-and-payment-methods",
-    },
-    {
-      label: "o nas",
-      url: "/info/about",
-    },
-    {
-      label: "regulamin",
-      url: "/info/regulations",
-    },
-    {
-      label: "polityka prywatności",
-      url: "/info/privacy",
+      groupLabel: "Regulaminy",
+      links: [
+        {
+          label: "Regulamin",
+          url: "/info/regulations",
+        },
+        {
+          label: "Polityka prywatności",
+          url: "/info/privacy",
+        },
+      ],
     },
   ];
 
   return (
-    <footer className="bg-card px-4 py-2 border-t border-border mt-auto flex justify-center">
-      <nav className="max-w-[1440px] w-full">
-        <ul className="flex flex-wrap items-center gap-4">
-          {links.map((link) => (
-            <li key={link.url} className="text-sm">
-              <LinkText href={link.url}>{link.label}</LinkText>
-            </li>
-          ))}
-        </ul>
+    <footer className="bg-card px-4 py-2 border-t border-border mt-auto">
+      <nav className="max-w-[1440px] w-full mb-2">
+        <MobileFooterLinks navOptions={navOptions} />
       </nav>
+      <FooterDeliveryAndPaymentMethods />
     </footer>
   );
 }

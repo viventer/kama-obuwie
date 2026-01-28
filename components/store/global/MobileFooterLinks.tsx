@@ -6,20 +6,23 @@ import {
 } from "@/components/ui/accordion";
 import { NavOption } from "./Footer";
 import LinkText from "@/components/adminPanel/global/LinkText";
+import { cn } from "@/lib/utils";
 
 export default function MobileFooterLinks({
   navOptions,
+  className,
 }: {
   navOptions: NavOption[];
+  className?: string;
 }) {
   return (
-    <div className="w-full flex flex-col justify-center">
+    <div className={cn("w-full", className)}>
       {navOptions.map((option) => (
         <Accordion
           type="single"
           collapsible
           key={option.groupLabel}
-          className="flex justify-center w-full"
+          className="w-full"
         >
           <AccordionItem value={option.groupLabel} className="w-full">
             <AccordionTrigger className="py-2">

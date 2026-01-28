@@ -13,8 +13,8 @@ export default function FooterDeliveryAndPaymentMethods() {
   ];
 
   return (
-    <section className="mb-2">
-      <h3 className="font-medium">Metody płatności i dostawy</h3>
+    <section>
+      <h3 className="font-medium md:text-lg">Metody płatności i dostawy</h3>
       <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2 items-center">
         {logos.map((logo) => (
           <Image

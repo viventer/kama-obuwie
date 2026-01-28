@@ -1,6 +1,7 @@
 import React from "react";
 import MobileFooterLinks from "./MobileFooterLinks";
 import FooterDeliveryAndPaymentMethods from "./FooterDeliveryAndPaymentMethods";
+import DesktopFooterLinks from "./DesktopFooterLinks";
 
 export type NavOption = {
   groupLabel: string;
@@ -58,11 +59,17 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-card px-4 py-2 border-t border-border mt-auto">
-      <nav className="max-w-[1440px] w-full mb-2">
-        <MobileFooterLinks navOptions={navOptions} />
-      </nav>
-      <FooterDeliveryAndPaymentMethods />
+    <footer className="bg-card border-t border-border mt-auto py-2 md:py-6 ">
+      <div className="max-w-[1440px] w-[90vw] mx-auto xl:flex justify-between items-start">
+        <nav className=" w-full mb-3 md:mb-6">
+          <DesktopFooterLinks
+            navOptions={navOptions}
+            className="hidden md:flex"
+          />
+          <MobileFooterLinks navOptions={navOptions} className="md:hidden" />
+        </nav>
+        <FooterDeliveryAndPaymentMethods />
+      </div>
     </footer>
   );
 }

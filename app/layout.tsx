@@ -59,6 +59,10 @@ gtag('config', '${googleAdsTagId}');
             </Script>
           </>
         ) : null}
+        <meta
+          name="google-site-verification"
+          content="9Ud0WgGabcpBktv5pzGZ3nP51iLK9GslHEo-s1j8WZk"
+        />
       </head>
       <body
         className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen`}

@@ -92,11 +92,12 @@ const identifierRefiner = (
 export const MerchantCenterProductBaseObjectSchema = z.object({
   offerId: NonEmptyTrimmedString.max(50), // sku with size ABDCr12
   title: NonEmptyTrimmedString.max(150),
-  description: NonEmptyTrimmedString.max(5000),
+  description: NonEmptyTrimmedString.max(5000).optional(), // from parseProductDescription (if exists)
 
-  link: HttpUrlSchema,
-  imageLink: HttpUrlSchema,
-  additionalImageLinks: z.array(HttpUrlSchema).max(10).optional(),
+  link: HttpUrlSchema, // https://kama-obuwie.pl/product/id?colorVariantName=colorVariantName
+  // id - productId or legacyOfferId
+  imageLink: HttpUrlSchema, // url from offer.thumbnail
+  additionalImageLinks: z.array(HttpUrlSchema).max(10).optional(), // urls from product.editedPhotos[:10] or legacyProduct.imagesUrls
 
   contentLanguage: LanguageCodeSchema,
   targetCountry: CountryCodeSchema,
@@ -120,7 +121,7 @@ export const MerchantCenterProductBaseObjectSchema = z.object({
   googleProductCategory: z.string().trim().min(1).optional(),
   productTypes: z.array(NonEmptyTrimmedString).optional(),
 
-  itemGroupId: NonEmptyTrimmedString.max(50).optional(), // brand-model
+  itemGroupId: NonEmptyTrimmedString.max(50).optional(), // brand-manufacturer-code
 
   color: NonEmptyTrimmedString.optional(),
   gender: MerchantCenterGenderSchema.optional(),
@@ -128,7 +129,7 @@ export const MerchantCenterProductBaseObjectSchema = z.object({
   sizes: z.array(NonEmptyTrimmedString).optional(),
   sizeSystem: MerchantCenterSizeSystemSchema.optional(),
   sizeType: MerchantCenterSizeTypeSchema.optional(),
-  material: NonEmptyTrimmedString.optional(),
+  material: NonEmptyTrimmedString.optional(), // "materiał zewnętrzny" or "materiał" product parameter (if exists)
   pattern: NonEmptyTrimmedString.optional(),
 
   shippingWeight: z

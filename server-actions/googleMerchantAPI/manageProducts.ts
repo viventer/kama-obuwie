@@ -1,6 +1,6 @@
 "use server";
 
-import { MerchantCenterFootwearProduct } from "@/firebase/schemas/merchantCenter";
+import { MerchantCenterFootwearProduct } from "@/firebase/schemas/merchantCenterSchemas";
 import { getMerchantCenterProductId } from "@/helpers/merchantCenter";
 import { google } from "googleapis";
 

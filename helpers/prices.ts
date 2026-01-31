@@ -1,3 +1,4 @@
+import { Offer } from "@/firebase/schemas/offersSchemas";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
 
 export type PriceRange = {
@@ -29,7 +30,7 @@ export function roundToPsychologicalPrice(price: number): number {
 }
 
 export const getPriceRangesForFiltering = (
-  prices: number[]
+  prices: number[],
 ): PriceRange[] | null => {
   const median = getMedian(prices);
   const minValue = Math.min(...prices);
@@ -62,10 +63,17 @@ export const getPriceRangesForFiltering = (
 
 export const isProductPriceInRange = (
   product: ProductListingData,
-  selectedRange: PriceRange[]
+  selectedRange: PriceRange[],
 ): boolean => {
   const price = Number(product.price);
   return selectedRange.some(
-    (range) => price >= range.from && price <= range.to
+    (range) => price >= range.from && price <= range.to,
   );
+};
+
+export const getOfferPriceForDTC = (
+  sellingPrices: Offer["sellingPrices"],
+): string | null => {
+  const { DTC, AL1 } = sellingPrices;
+  return DTC || AL1 || null;
 };

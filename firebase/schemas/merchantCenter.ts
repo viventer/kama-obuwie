@@ -144,6 +144,7 @@ export const MerchantCenterProductBaseSchema =
 
 export const MerchantCenterFootwearProductSchema =
   MerchantCenterProductBaseObjectSchema.extend({
+    availability: z.enum(["in stock", "out of stock"]),
     googleProductCategory: z.literal("187"), // shoes
     color: NonEmptyTrimmedString,
     gender: MerchantCenterGenderSchema,

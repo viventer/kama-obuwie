@@ -1,6 +1,7 @@
 "use server";
 
 import { MerchantCenterFootwearProduct } from "@/firebase/schemas/merchantCenter";
+import { getMerchantCenterProductId } from "@/helpers/merchantCenter";
 import { google } from "googleapis";
 
 import type { content_v2 } from "googleapis";
@@ -32,9 +33,12 @@ export async function insertGoogleMerchantProduct(
   const auth = createGoogleMerchantServiceAccountAuth();
   const content = google.content({ version: "v2", auth });
 
-  // Content API wymaga pola `id` w formacie:
-  // channel:contentLanguage:targetCountry:offerId
-  const id = `${product.channel}:${product.contentLanguage}:${product.targetCountry}:${product.offerId}`;
+  const id = getMerchantCenterProductId({
+    channel: product.channel,
+    contentLanguage: product.contentLanguage,
+    targetCountry: product.targetCountry,
+    offerId: product.offerId,
+  });
 
   const requestBody: content_v2.Schema$Product = {
     ...product,
@@ -45,4 +49,36 @@ export async function insertGoogleMerchantProduct(
     merchantId,
     requestBody,
   });
+}
+
+export async function updateGoogleMerchantProductAvailability(
+  product: MerchantCenterFootwearProduct,
+  availability: MerchantCenterFootwearProduct["availability"],
+) {
+  const merchantId = getRequiredEnv("GOOGLE_MERCHANT_ID");
+  const auth = createGoogleMerchantServiceAccountAuth();
+  const content = google.content({ version: "v2", auth });
+
+  const id = getMerchantCenterProductId({
+    channel: product.channel,
+    contentLanguage: product.contentLanguage,
+    targetCountry: product.targetCountry,
+    offerId: product.offerId,
+  });
+
+  const requestBody: content_v2.Schema$ProductsCustomBatchRequest = {
+    entries: [
+      {
+        batchId: 1,
+        merchantId,
+        method: "patch",
+        productId: id,
+        product: {
+          availability,
+        },
+      },
+    ],
+  };
+
+  return content.products.custombatch({ requestBody });
 }

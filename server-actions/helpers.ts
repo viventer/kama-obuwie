@@ -21,7 +21,7 @@ export const isValidSKU = (sku: string): boolean => {
  * - Obsługuje 50k zamówień dziennie bez powtórzeń
  */
 export function generateOrderNumber(
-  salesChannel: "AL1" | "AL2" | "POS" | "DTC"
+  salesChannel: "AL1" | "AL2" | "POS" | "DTC",
 ): string {
   // Alfabet base32 bez niejednoznacznych znaków (bez O, 0, 1, I)
   const ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // 32 znaki
@@ -40,7 +40,7 @@ export function generateOrderNumber(
   // Losowa część (3 znaki) - dla 32^3 = 32,768 kombinacji na sekundę
   const randomPart = Array.from(
     { length: 3 },
-    () => ALPHABET[Math.floor(Math.random() * ALPHABET.length)]
+    () => ALPHABET[Math.floor(Math.random() * ALPHABET.length)],
   ).join("");
 
   // Konwersja timestamp na base32 (około 3-4 znaki)
@@ -70,7 +70,7 @@ export interface ApiErrorResponse {
 export function apiResponse(
   message: string,
   status: number,
-  data?: Record<string, any>
+  data?: Record<string, any>,
 ): Response {
   if (status === 204) {
     return new NextResponse(null, { status });
@@ -86,7 +86,7 @@ export function apiErrorResponse(
   message: string,
   status: number,
   errors?: any,
-  details?: Record<string, any>
+  details?: Record<string, any>,
 ): Response {
   const errorResponse: any = {
     message,

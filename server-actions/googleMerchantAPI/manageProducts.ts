@@ -1,5 +1,6 @@
 "use server";
 
+import { MerchantCenterFootwearProduct } from "@/firebase/schemas/merchantCenter";
 import { google } from "googleapis";
 
 import type { content_v2 } from "googleapis";
@@ -25,14 +26,23 @@ function createGoogleMerchantServiceAccountAuth() {
 }
 
 export async function insertGoogleMerchantProduct(
-  product: content_v2.Schema$Product,
+  product: MerchantCenterFootwearProduct,
 ) {
   const merchantId = getRequiredEnv("GOOGLE_MERCHANT_ID");
   const auth = createGoogleMerchantServiceAccountAuth();
   const content = google.content({ version: "v2", auth });
 
+  // Content API wymaga pola `id` w formacie:
+  // channel:contentLanguage:targetCountry:offerId
+  const id = `${product.channel}:${product.contentLanguage}:${product.targetCountry}:${product.offerId}`;
+
+  const requestBody: content_v2.Schema$Product = {
+    ...product,
+    id,
+  };
+
   return content.products.insert({
     merchantId,
-    requestBody: product,
+    requestBody,
   });
 }

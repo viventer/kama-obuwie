@@ -90,7 +90,7 @@ const identifierRefiner = (
 };
 
 export const MerchantCenterProductBaseObjectSchema = z.object({
-  offerId: NonEmptyTrimmedString.max(50),
+  offerId: NonEmptyTrimmedString.max(50), // sku with size ABDCr12
   title: NonEmptyTrimmedString.max(150),
   description: NonEmptyTrimmedString.max(5000),
 
@@ -103,7 +103,7 @@ export const MerchantCenterProductBaseObjectSchema = z.object({
   channel: z.enum(["online", "local"]).default("online"),
 
   availability: MerchantCenterAvailabilitySchema,
-  condition: MerchantCenterConditionSchema,
+  condition: z.literal("new"),
 
   price: MerchantCenterMoneySchema,
   salePrice: MerchantCenterMoneySchema.optional(),
@@ -117,12 +117,10 @@ export const MerchantCenterProductBaseObjectSchema = z.object({
   mpn: NonEmptyTrimmedString.optional(),
   identifierExists: z.boolean().optional(),
 
-  googleProductCategory: z
-    .union([z.string().trim().min(1), z.number().int()])
-    .optional(),
+  googleProductCategory: z.string().trim().min(1).optional(),
   productTypes: z.array(NonEmptyTrimmedString).optional(),
 
-  itemGroupId: NonEmptyTrimmedString.max(50).optional(),
+  itemGroupId: NonEmptyTrimmedString.max(50).optional(), // brand-model
 
   color: NonEmptyTrimmedString.optional(),
   gender: MerchantCenterGenderSchema.optional(),
@@ -135,11 +133,7 @@ export const MerchantCenterProductBaseObjectSchema = z.object({
 
   shippingWeight: z
     .object({
-      value: z.preprocess((v) => {
-        if (typeof v === "number" && Number.isFinite(v)) return v;
-        if (typeof v === "string") return parseFloat(v);
-        return v;
-      }, z.number().positive()),
+      value: z.number().positive(),
       unit: z.enum(["kg", "g", "lb", "oz"]),
     })
     .optional(),
@@ -150,12 +144,13 @@ export const MerchantCenterProductBaseSchema =
 
 export const MerchantCenterFootwearProductSchema =
   MerchantCenterProductBaseObjectSchema.extend({
-    // Dla obuwia (apparel/footwear) te atrybuty są praktycznie zawsze wymagane
-    // do poprawnej klasyfikacji i wariantów.
+    googleProductCategory: z.literal("187"), // shoes
     color: NonEmptyTrimmedString,
     gender: MerchantCenterGenderSchema,
     ageGroup: MerchantCenterAgeGroupSchema,
     sizes: z.array(NonEmptyTrimmedString).min(1).max(1),
+    sizeSystem: z.literal("EU"),
+    sizeType: z.literal("regular"),
   }).superRefine(identifierRefiner);
 
 export type MerchantCenterFootwearProduct = z.infer<

@@ -1,0 +1,38 @@
+"use server";
+
+import { google } from "googleapis";
+
+import type { content_v2 } from "googleapis";
+
+function getRequiredEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing env var: ${name}`);
+  return value;
+}
+
+function createGoogleMerchantServiceAccountAuth() {
+  const clientEmail = getRequiredEnv("GOOGLE_MERCHANT_CLIENT_EMAIL");
+  const privateKey = getRequiredEnv("GOOGLE_MERCHANT_PRIVATE_KEY").replace(
+    /\\n/g,
+    "\n",
+  );
+
+  return new google.auth.JWT({
+    email: clientEmail,
+    key: privateKey,
+    scopes: ["https://www.googleapis.com/auth/content"],
+  });
+}
+
+export async function insertGoogleMerchantProduct(
+  product: content_v2.Schema$Product,
+) {
+  const merchantId = getRequiredEnv("GOOGLE_MERCHANT_ID");
+  const auth = createGoogleMerchantServiceAccountAuth();
+  const content = google.content({ version: "v2", auth });
+
+  return content.products.insert({
+    merchantId,
+    requestBody: product,
+  });
+}

@@ -23,7 +23,7 @@ export const triggerAllegroSync = async () => {
   const currentStatus = await redis.get("allegro:sync:status");
   if (currentStatus === "running") {
     throw new Error(
-      "Synchronizacja jest już w toku. Poczekaj na zakończenie poprzedniej synchronizacji."
+      "Synchronizacja jest już w toku. Poczekaj na zakończenie poprzedniej synchronizacji.",
     );
   }
 
@@ -62,13 +62,13 @@ export const triggerAllegroSync = async () => {
     await redis.set("allegro:sync:status", "error");
     await redis.set(
       "allegro:sync:error",
-      error instanceof Error ? error.message : "Unknown error"
+      error instanceof Error ? error.message : "Unknown error",
     );
 
     throw new Error(
       `Nie udało się uruchomić synchronizacji: ${
         error instanceof Error ? error.message : "Nieznany błąd"
-      }`
+      }`,
     );
   }
 };

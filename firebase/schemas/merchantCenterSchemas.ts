@@ -17,8 +17,8 @@ const LanguageCodeSchema = z
 const HttpUrlSchema = NonEmptyTrimmedString.url();
 
 export const MerchantCenterAvailabilitySchema = z.enum([
-  "in stock",
-  "out of stock",
+  "in_stock",
+  "out_of_stock",
   "preorder",
   "backorder",
 ]);
@@ -50,11 +50,11 @@ export const MerchantCenterSizeTypeSchema = z.enum([
 ]);
 
 export const MerchantCenterMoneySchema = z.object({
-  value: z
+  amountMicros: z
     .string()
     .trim()
-    .regex(/^\d+\.\d{2}$/, "Kwota musi mieć format 123.45"),
-  currency: z
+    .regex(/^\d+$/, "amountMicros musi być liczbą"),
+  currencyCode: z
     .string()
     .trim()
     .toUpperCase()
@@ -70,50 +70,48 @@ export const MerchantCenterShippingSchema = z.object({
 const identifierRefiner = (
   data: {
     brand?: string;
-    gtin?: string;
+    gtins?: string[];
     mpn?: string;
     identifierExists?: boolean;
   },
   ctx: z.RefinementCtx,
 ) => {
   if (data.identifierExists === false) return;
-  const hasGtin = Boolean(data.gtin);
+  const hasGtin = Boolean(data.gtins && data.gtins.length > 0);
   const hasBrandMpn = Boolean(data.brand && data.mpn);
   if (!hasGtin && !hasBrandMpn) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message:
-        "Wymagane identyfikatory: podaj gtin albo (brand + mpn), lub ustaw identifierExists=false",
-      path: ["gtin"],
+        "Wymagane identyfikatory: podaj gtins albo (brand + mpn), lub ustaw identifierExists=false",
+      path: ["gtins"],
     });
   }
 };
 
-export const MerchantCenterProductBaseObjectSchema = z.object({
-  offerId: NonEmptyTrimmedString.max(50), // sku with size ABDCr12
+export const MerchantCenterProductAttributesBaseObjectSchema = z.object({
   title: NonEmptyTrimmedString.max(150),
-  description: NonEmptyTrimmedString.max(5000).optional(), // from parseProductDescription (if exists)
+  description: NonEmptyTrimmedString.max(5000).optional(),
 
-  link: HttpUrlSchema, // https://kama-obuwie.pl/product/id?colorVariantName=colorVariantName
-  // id - productId or legacyOfferId
-  imageLink: HttpUrlSchema, // url from offer.thumbnail
-  additionalImageLinks: z.array(HttpUrlSchema).max(10).optional(), // urls from product.editedPhotos[:10] or legacyProduct.imagesUrls
-
-  contentLanguage: LanguageCodeSchema,
-  targetCountry: CountryCodeSchema,
-  channel: z.enum(["online", "local"]).default("online"),
+  link: HttpUrlSchema,
+  imageLink: HttpUrlSchema,
+  additionalImageLinks: z.array(HttpUrlSchema).max(10).optional(),
 
   availability: MerchantCenterAvailabilitySchema,
-  condition: z.literal("new"),
+  condition: MerchantCenterConditionSchema,
 
   price: MerchantCenterMoneySchema,
   salePrice: MerchantCenterMoneySchema.optional(),
 
   brand: NonEmptyTrimmedString.optional(),
-  gtin: z
-    .string()
-    .trim()
-    .regex(/^\d{8,14}$/, "GTIN musi mieć 8-14 cyfr")
+  gtins: z
+    .array(
+      z
+        .string()
+        .trim()
+        .regex(/^\d{8,14}$/, "GTIN musi mieć 8-14 cyfr"),
+    )
+    .max(10)
     .optional(),
   mpn: NonEmptyTrimmedString.optional(),
   identifierExists: z.boolean().optional(),
@@ -121,15 +119,15 @@ export const MerchantCenterProductBaseObjectSchema = z.object({
   googleProductCategory: z.string().trim().min(1).optional(),
   productTypes: z.array(NonEmptyTrimmedString).optional(),
 
-  itemGroupId: NonEmptyTrimmedString.max(50).optional(), // brand-manufacturer-code
+  itemGroupId: NonEmptyTrimmedString.max(50).optional(),
 
   color: NonEmptyTrimmedString.optional(),
   gender: MerchantCenterGenderSchema.optional(),
   ageGroup: MerchantCenterAgeGroupSchema.optional(),
-  sizes: z.array(NonEmptyTrimmedString).optional(),
+  size: NonEmptyTrimmedString.optional(),
   sizeSystem: MerchantCenterSizeSystemSchema.optional(),
-  sizeType: MerchantCenterSizeTypeSchema.optional(),
-  material: NonEmptyTrimmedString.optional(), // "materiał zewnętrzny" or "materiał" product parameter (if exists)
+  sizeTypes: z.array(MerchantCenterSizeTypeSchema).max(2).optional(),
+  material: NonEmptyTrimmedString.optional(),
   pattern: NonEmptyTrimmedString.optional(),
 
   shippingWeight: z
@@ -140,20 +138,36 @@ export const MerchantCenterProductBaseObjectSchema = z.object({
     .optional(),
 });
 
-export const MerchantCenterProductBaseSchema =
-  MerchantCenterProductBaseObjectSchema.superRefine(identifierRefiner);
+export const MerchantCenterProductAttributesBaseSchema =
+  MerchantCenterProductAttributesBaseObjectSchema.superRefine(
+    identifierRefiner,
+  );
 
-export const MerchantCenterFootwearProductSchema =
-  MerchantCenterProductBaseObjectSchema.extend({
-    availability: z.enum(["in stock", "out of stock"]),
-    googleProductCategory: z.literal("187"), // shoes
+export const MerchantCenterProductInputBaseSchema = z.object({
+  offerId: NonEmptyTrimmedString.max(50),
+  contentLanguage: LanguageCodeSchema,
+  feedLabel: CountryCodeSchema,
+  productAttributes: MerchantCenterProductAttributesBaseSchema,
+});
+
+const MerchantCenterFootwearProductAttributesSchema =
+  MerchantCenterProductAttributesBaseObjectSchema.extend({
+    availability: z.enum(["in_stock", "out_of_stock"]),
+    googleProductCategory: z.literal("187"),
     color: NonEmptyTrimmedString,
     gender: MerchantCenterGenderSchema,
     ageGroup: MerchantCenterAgeGroupSchema,
-    sizes: z.array(NonEmptyTrimmedString).min(1).max(1),
+    size: NonEmptyTrimmedString,
     sizeSystem: z.literal("EU"),
-    sizeType: z.literal("regular"),
+    sizeTypes: z.tuple([z.literal("regular")]),
   }).superRefine(identifierRefiner);
+
+export const MerchantCenterFootwearProductSchema = z.object({
+  offerId: NonEmptyTrimmedString.max(50),
+  contentLanguage: LanguageCodeSchema,
+  feedLabel: CountryCodeSchema,
+  productAttributes: MerchantCenterFootwearProductAttributesSchema,
+});
 
 export type MerchantCenterFootwearProduct = z.infer<
   typeof MerchantCenterFootwearProductSchema

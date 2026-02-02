@@ -64,11 +64,12 @@ export const OfferSchema = z.object({
         value: z.string(),
         salesChannel: z.enum(["AL1", "AL2"]),
         size: z.string(),
-      })
+      }),
     )
     .optional(),
   EAN: z.record(z.string(), z.string().optional()).optional(), // { "31": "1234567890123", "32": "9876543210987" }
   SKU: z.string().optional(),
+  isAddedToMerchantCenter: z.boolean().optional(),
 });
 
 export const AllegroDescriptionItemSchema = z.object({
@@ -90,7 +91,7 @@ export const AllegroOfferParametersSchema = z.array(
     name: z.string(),
     values: z.array(ParamValueSchema),
     valuesIds: z.array(z.string()).optional(),
-  })
+  }),
 );
 
 export const AllegroOfferSchema = z.object({
@@ -123,7 +124,7 @@ export const AllegroOfferSchema = z.object({
           description: z.string().max(5000),
         })
         .optional(),
-    })
+    }),
   ),
   sellingMode: z.object({
     price: z.object({

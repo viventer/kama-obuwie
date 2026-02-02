@@ -136,6 +136,11 @@ export default function AppSidebar() {
                 Synchronizacja z Allegro
               </LinkText>
             </SidebarMenuItem>
+            <SidebarMenuItem>
+              <LinkText href="/admin-panel/offers/merchant-center">
+                Google Merchant Center
+              </LinkText>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
         {/* <SidebarGroup>

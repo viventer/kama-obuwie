@@ -9,17 +9,15 @@ import {
 import { getOfferPriceForDTC } from "./prices";
 
 export function getMerchantCenterProductId({
-  channel,
   contentLanguage,
-  targetCountry,
+  feedLabel,
   offerId,
 }: {
-  channel: MerchantCenterFootwearProduct["channel"];
   contentLanguage: MerchantCenterFootwearProduct["contentLanguage"];
-  targetCountry: MerchantCenterFootwearProduct["targetCountry"];
+  feedLabel: MerchantCenterFootwearProduct["feedLabel"];
   offerId: MerchantCenterFootwearProduct["offerId"];
 }): string {
-  return `${channel}:${contentLanguage}:${targetCountry}:${offerId}`;
+  return `${contentLanguage}~${feedLabel}~${offerId}`;
 }
 
 export function getMerchantCenterItemGroupId({
@@ -28,7 +26,7 @@ export function getMerchantCenterItemGroupId({
 }: {
   brand?: string;
   manufacturerCode: string;
-}): MerchantCenterFootwearProduct["itemGroupId"] {
+}): MerchantCenterFootwearProduct["productAttributes"]["itemGroupId"] {
   if (brand) {
     return `${brand}-${manufacturerCode}`;
   }
@@ -38,14 +36,17 @@ export function getMerchantCenterItemGroupId({
 export function getMerchantCenterProductAvaiability(
   availability: OfferWithId["availability"],
   size: string,
-): MerchantCenterFootwearProduct["availability"] {
-  return availability[size].value ? "in stock" : "out of stock";
+): MerchantCenterFootwearProduct["productAttributes"]["availability"] {
+  return availability[size].value ? "in_stock" : "out_of_stock";
 }
 
 export function getMerchantCenterProductGender(
   rootCategory: CategoryWithId["rootCategory"],
-): MerchantCenterFootwearProduct["gender"] {
-  const genderMap: Record<string, MerchantCenterFootwearProduct["gender"]> = {
+): MerchantCenterFootwearProduct["productAttributes"]["gender"] {
+  const genderMap: Record<
+    string,
+    MerchantCenterFootwearProduct["productAttributes"]["gender"]
+  > = {
     "obuwie damskie": "female",
     "obuwie męskie": "male",
     "obuwie dziecięce": "unisex",
@@ -56,7 +57,7 @@ export function getMerchantCenterProductGender(
 
 export function getMerchantCenterProductMaterial(
   parameters: ProductWithId["parameters"] | LegacyProductWithId["parameters"],
-): MerchantCenterFootwearProduct["material"] | null {
+): MerchantCenterFootwearProduct["productAttributes"]["material"] | null {
   if (!parameters) return null;
 
   const materialParam =
@@ -72,7 +73,7 @@ export function getMerchantCenterProductMaterial(
   return null;
 }
 
-export function getMerchantCenterFootwearProduct(
+export type GetFootwearProductPayload = {
   offerData: Pick<
     OfferWithId,
     | "SKU"
@@ -81,7 +82,7 @@ export function getMerchantCenterFootwearProduct(
     | "sellingPrices"
     | "id"
     | "colorVariantName"
-  >,
+  >;
   productData: {
     id: string;
     brand?: string;
@@ -90,11 +91,28 @@ export function getMerchantCenterFootwearProduct(
     description?: string;
     parameters: ProductWithId["parameters"] | LegacyProductWithId["parameters"];
     colorVariant: ColorVariant;
-  },
-  category: CategoryWithId,
-  thumbnailUrl: string,
-  size: string,
+  };
+  category: CategoryWithId;
+  thumbnailUrl: string;
+  size: string;
+};
+
+function moneyValueToMicros(value: string): string {
+  const [wholePart, fractionalPart = "0"] = value.split(".");
+  const normalizedFraction = (fractionalPart + "00").slice(0, 2);
+  const whole = Number.parseInt(wholePart || "0", 10);
+  const fraction = Number.parseInt(normalizedFraction || "0", 10);
+  if (!Number.isFinite(whole) || !Number.isFinite(fraction)) {
+    throw new Error(`Nieprawidłowa kwota: ${value}`);
+  }
+  return String(whole * 1_000_000 + fraction * 10_000);
+}
+
+export function getMerchantCenterFootwearProduct(
+  payload: GetFootwearProductPayload,
 ): MerchantCenterFootwearProduct {
+  const { offerData, productData, category, thumbnailUrl, size } = payload;
+
   const price = getOfferPriceForDTC(offerData.sellingPrices);
   if (!price) {
     throw new Error(
@@ -102,50 +120,55 @@ export function getMerchantCenterFootwearProduct(
     );
   }
 
+  const brand = productData.brand;
+  const mpn = productData.manufacturerCode;
+
   const merchantProduct: MerchantCenterFootwearProduct = {
     offerId: `${offerData.SKU}r${size}`,
-    title: offerData.title,
-    link: `https://kama-obuwie.pl/product/${productData.id}?colorVariantName=${offerData.colorVariantName}`,
-    imageLink: thumbnailUrl,
-    additionalImageLinks: productData.imagesUrls,
-    contentLanguage: "PL",
-    targetCountry: "PL",
-    channel: "online",
-    availability: getMerchantCenterProductAvaiability(
-      offerData.availability,
+    contentLanguage: "pl",
+    feedLabel: "PL",
+    productAttributes: {
+      title: offerData.title,
+      link: `https://kama-obuwie.pl/product/${productData.id}?colorVariantName=${offerData.colorVariantName}`,
+      imageLink: thumbnailUrl,
+      additionalImageLinks: productData.imagesUrls,
+      availability: getMerchantCenterProductAvaiability(
+        offerData.availability,
+        size,
+      ),
+      condition: "new",
+      price: {
+        amountMicros: moneyValueToMicros(price),
+        currencyCode: "PLN",
+      },
+      googleProductCategory: "187",
+      productTypes: [category.name],
+      itemGroupId: getMerchantCenterItemGroupId({
+        brand,
+        manufacturerCode: productData.manufacturerCode,
+      }),
+      color: productData.colorVariant.color,
+      gender: getMerchantCenterProductGender(category.rootCategory),
+      ageGroup: category.rootCategory === "obuwie dziecięce" ? "kids" : "adult",
       size,
-    ),
-    condition: "new",
-    price: {
-      value: price,
-      currency: "PLN",
+      sizeSystem: "EU",
+      sizeTypes: ["regular"],
+      mpn,
+      identifierExists: brand ? undefined : false,
     },
-    googleProductCategory: "187",
-    productTypes: [category.name],
-    itemGroupId: getMerchantCenterItemGroupId({
-      brand: productData?.brand,
-      manufacturerCode: productData.manufacturerCode,
-    }),
-    color: productData.colorVariant.color,
-    gender: getMerchantCenterProductGender(category.rootCategory),
-    ageGroup: category.rootCategory === "obuwie dziecięce" ? "kids" : "adult",
-    sizes: [size],
-    sizeSystem: "EU",
-    sizeType: "regular",
   };
 
   if (productData.description) {
-    merchantProduct.description = productData.description;
+    merchantProduct.productAttributes.description = productData.description;
   }
 
   const material = getMerchantCenterProductMaterial(productData.parameters);
   if (material) {
-    merchantProduct.material = material;
+    merchantProduct.productAttributes.material = material;
   }
 
-  const brand = productData.brand;
   if (brand) {
-    merchantProduct.brand = brand;
+    merchantProduct.productAttributes.brand = brand;
   }
 
   return merchantProduct;

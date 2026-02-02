@@ -2,7 +2,11 @@
 
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import { Button } from "@/components/ui/button";
-import { syncOffersWithGoogleMerchantCenter } from "@/server-actions/merchantCenter/manageProducts";
+import {
+  getExistingGcpRegistration,
+  registerGcpWithMerchant,
+  syncOffersWithGoogleMerchantCenter,
+} from "@/server-actions/merchantCenter/manageProducts";
 import { useState } from "react";
 import BarLoader from "react-spinners/BarLoader";
 
@@ -11,6 +15,8 @@ export default function GoogleMerchantCenterPage() {
 
   const handleAddOffers = async () => {
     setIsLoading(true);
+    await getExistingGcpRegistration();
+    // await registerGcpWithMerchant();
     await syncOffersWithGoogleMerchantCenter();
     setIsLoading(false);
   };

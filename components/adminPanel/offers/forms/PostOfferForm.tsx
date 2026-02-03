@@ -59,14 +59,14 @@ export default function PostOfferForm({
 }) {
   const [sizes, setSizes] = useState<string[]>([]);
   const [sizingTable, setSizingTable] = useState<SizingTableWithId | null>(
-    null
+    null,
   );
   const [isPosting, setIsPosting] = useState(false);
 
   useEffect(() => {
     (async () => {
       const { data }: { data: SizingTableWithId } = await axios.get(
-        `/api/sizing-tables/${productData.sizingTableId}`
+        `/api/sizing-tables/${productData.sizingTableId}`,
       );
       const respSizes = data.insoleLengths.map((item) => item.size.toString());
       setSizes(respSizes);
@@ -122,7 +122,7 @@ export default function PostOfferForm({
     }
 
     const colorVariantsNames = productData.colorVariants?.map((variant) =>
-      getColorVariantName(variant)
+      getColorVariantName(variant),
     );
     const signatureWithoutColorVariant = `${
       productData.brand ? productData.brand : ""
@@ -137,7 +137,7 @@ export default function PostOfferForm({
     }
 
     const mainOfferThumbnail = productData.editedPhotos.find(
-      (photo) => photo.colorVariantName === colorVariantsNames[0]
+      (photo) => photo.colorVariantName === colorVariantsNames[0],
     )?.filePath;
 
     const formDataWithoutTitlesAndEAN = {
@@ -152,13 +152,13 @@ export default function PostOfferForm({
         return {
           [variant]: sku,
         };
-      })
+      }),
     );
 
     // Konwertujemy tablicę na obiekt
     const SKUs = SKUsArray.reduce(
       (acc, curr) => ({ ...acc, ...curr }),
-      {} as Record<string, string>
+      {} as Record<string, string>,
     );
 
     try {
@@ -181,7 +181,7 @@ export default function PostOfferForm({
           continue;
         }
         const offerThumbnail = productData.editedPhotos.find(
-          (photo) => photo.colorVariantName === colorVariantName
+          (photo) => photo.colorVariantName === colorVariantName,
         )?.filePath;
         const id = await createOfferForDifferentVariant({
           ...oldOfferData,
@@ -218,7 +218,7 @@ export default function PostOfferForm({
         const colorVariantName = getColorVariantName(variant);
 
         const imagesOfVariant = productData.editedPhotos.filter(
-          (image) => image.colorVariantName === colorVariantName
+          (image) => image.colorVariantName === colorVariantName,
         );
 
         const imagesPaths = imagesOfVariant.map((image) => image.filePath);
@@ -248,6 +248,8 @@ export default function PostOfferForm({
           creationStage: "done",
           SKU: SKUs,
         });
+
+        await axios.post(`/api/merchant-center/offer/${offerId}`); // Sync to Merchant Center
       }
 
       setIsPosting(false);
@@ -255,7 +257,7 @@ export default function PostOfferForm({
       router.replace("/admin-panel/create-products/post-offer");
     } catch (err: any) {
       handleError(err, "Nie udało się wystawić oferty", () =>
-        setIsPosting(false)
+        setIsPosting(false),
       );
       return;
     }
@@ -267,14 +269,14 @@ export default function PostOfferForm({
     } catch (err: any) {
       const errorMessage = handleApiError(
         err,
-        "Nie można zaktualizować głównej oferty"
+        "Nie można zaktualizować głównej oferty",
       );
       throw new Error(errorMessage);
     }
   };
 
   const createOfferForDifferentVariant = async (
-    offerData: Offer
+    offerData: Offer,
   ): Promise<string> => {
     try {
       const { data } = await axios.post("/api/offers", {
@@ -284,7 +286,7 @@ export default function PostOfferForm({
     } catch (err: any) {
       const errorMessage = handleApiError(
         err,
-        "Nie można utworzyć oferty dla wariantu"
+        "Nie można utworzyć oferty dla wariantu",
       );
       throw new Error(errorMessage);
     }
@@ -315,7 +317,7 @@ export default function PostOfferForm({
         <TitlesField
           colorVariants={
             productData.colorVariants?.map((variant) =>
-              getColorVariantName(variant)
+              getColorVariantName(variant),
             ) || []
           }
         />

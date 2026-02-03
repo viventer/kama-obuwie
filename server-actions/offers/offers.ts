@@ -16,6 +16,7 @@ import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { AllegroSalesChannel, SalesChannel } from "@/lib/constants";
 import { editAllegroOffer } from "../allegro/offers";
+import { changeIndividualSizeMerchantCenterAvailability } from "../merchantCenter/manageProducts";
 
 export const createOffer = async function (newOffer: Partial<Offer>) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -43,7 +44,7 @@ export const createOffer = async function (newOffer: Partial<Offer>) {
 
 export const updateOffer = async function (
   id: string,
-  updateData: Partial<Offer>
+  updateData: Partial<Offer>,
 ) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
@@ -83,7 +84,7 @@ export const getPostOfferBody = async ({
 }): Promise<Omit<PostOfferBody, "colorVariant" | "images" | "SKU">> => {
   const { data: category } = await getDocumentFromAdminDB<CategoryWithId>(
     "categories",
-    productData.categoryId as string
+    productData.categoryId as string,
   );
 
   const allegroCategoryId = category?.allegroCategoryId as string;
@@ -102,7 +103,7 @@ export const getPostOfferBody = async ({
 export const syncOffersAvailability = async function (
   orderItems: Order["lineItems"],
   salesChannel: SalesChannel,
-  eventType: "order" | "return"
+  eventType: "order" | "return",
 ) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
@@ -170,6 +171,16 @@ export const syncOffersAvailability = async function (
         revalidatePath(`/product/${offerId}`);
       }
 
+      // Zaktualizuj dostępność w Google Merchant Center
+      if (offer.isAddedToMerchantCenter && offer.SKU) {
+        const isAvailable = newAvailability > 0 ? true : false;
+        await changeIndividualSizeMerchantCenterAvailability(
+          offer.SKU,
+          size,
+          isAvailable,
+        );
+      }
+
       // Zaktualizuj dostępność na wszystkich przeciwnych kanałach Allegro
       const updateOfferData = {
         stock: {
@@ -190,13 +201,13 @@ export const syncOffersAvailability = async function (
           } catch (error) {
             console.error(
               `Błąd podczas aktualizacji oferty Allegro ${channelOfferId} na kanale ${channel}:`,
-              error
+              error,
             );
             // Nie przerywamy wykonywania funkcji, tylko logujemy błąd
           }
         } else {
           console.warn(
-            `Brak ID oferty Allegro dla SKU: ${SKU}, rozmiar: ${size}, kanał: ${channel}`
+            `Brak ID oferty Allegro dla SKU: ${SKU}, rozmiar: ${size}, kanał: ${channel}`,
           );
         }
       }
@@ -211,12 +222,12 @@ export const syncOffersAvailability = async function (
           await editAllegroOffer(
             mainChannelOfferId,
             salesChannel,
-            updateOfferData
+            updateOfferData,
           );
         } catch (error) {
           console.error(
             `Błąd podczas aktualizacji oferty Allegro ${mainChannelOfferId} na głównym kanale ${salesChannel}:`,
-            error
+            error,
           );
         }
       }

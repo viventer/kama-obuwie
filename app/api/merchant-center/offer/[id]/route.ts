@@ -43,7 +43,7 @@ export async function PATCH(
     return apiErrorResponse("Oferta nie posiada SKU.", 400);
   }
 
-  if (!offer.isAddedToMerchantCenter) {
+  if (!offer?.isAddedToMerchantCenter) {
     return apiErrorResponse(
       "Oferta nie została jeszcze dodana do Google Merchant Center.",
       400,

@@ -23,7 +23,7 @@ import { useRouter } from "next/navigation";
 
 function convertOfferPartialToAllegroOfferPartial(
   offerFragment: Partial<OfferWithId>,
-  salesChannel: "AL1" | "AL2"
+  salesChannel: "AL1" | "AL2",
 ): Partial<AllegroOffer> {
   const allegroOffer: Partial<AllegroOffer> = {};
 
@@ -125,7 +125,7 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
     } catch (err) {
       showToast(
         "Wystąpił błąd podczas aktualizacji oferty w bazie danych.",
-        "error"
+        "error",
       );
       stopLoading();
       return;
@@ -136,17 +136,17 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
     try {
       offersPartials.AL1 = convertOfferPartialToAllegroOfferPartial(
         formData,
-        "AL1"
+        "AL1",
       );
 
       offersPartials.AL2 = convertOfferPartialToAllegroOfferPartial(
         formData,
-        "AL2"
+        "AL2",
       );
     } catch (err) {
       showToast(
         "Wystąpił błąd podczas konwersji oferty na format Allegro.",
-        "error"
+        "error",
       );
       stopLoading();
       return;
@@ -165,7 +165,7 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
 
         return sizesToProcess.map(async (size) => {
           const availability = Number(
-            form.getValues(`availability.${size}.value`)
+            form.getValues(`availability.${size}.value`),
           );
 
           const offerPartial = {
@@ -194,7 +194,7 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
                 offerId: oldData.id,
                 size,
                 salesChannel,
-              }
+              },
             );
             return data.allegroOfferId as string;
           };
@@ -226,6 +226,11 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
       });
 
       await Promise.all(updatePromises);
+
+      if (oldData?.isAddedToMerchantCenter && oldData.SKU) {
+        await axios.patch(`/api/merchant-center/offer/${oldData.id}`);
+      }
+
       showToast("Oferty zostały zaaktualizowane.", "success");
       router.push("/admin-panel/offers");
     } catch (err) {

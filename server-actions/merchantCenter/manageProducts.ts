@@ -319,3 +319,16 @@ export async function changeIndividualSizeMerchantCenterAvailability(
     requestBody,
   });
 }
+
+export async function insertNewOfferToMerchantCenter(offer: OfferWithId) {
+  await verifyUser(["ADMIN"]);
+
+  const products = await convertOfferToMerchantCenterProducts(offer);
+  if (!products || products.length === 0) return null;
+
+  const insertResponse = await insertProductsToGoogleMerchantCenter(products);
+
+  await updateOffer(offer.id, { isAddedToMerchantCenter: true });
+
+  return insertResponse;
+}

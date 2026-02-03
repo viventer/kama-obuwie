@@ -77,3 +77,14 @@ export const getOfferPriceForDTC = (
   const { DTC, AL1 } = sellingPrices;
   return DTC || AL1 || null;
 };
+
+export function moneyValueToMicros(value: string): string {
+  const [wholePart, fractionalPart = "0"] = value.split(".");
+  const normalizedFraction = (fractionalPart + "00").slice(0, 2);
+  const whole = Number.parseInt(wholePart || "0", 10);
+  const fraction = Number.parseInt(normalizedFraction || "0", 10);
+  if (!Number.isFinite(whole) || !Number.isFinite(fraction)) {
+    throw new Error(`Nieprawidłowa kwota: ${value}`);
+  }
+  return String(whole * 1_000_000 + fraction * 10_000);
+}

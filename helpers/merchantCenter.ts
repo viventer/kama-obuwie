@@ -6,7 +6,10 @@ import {
   ColorVariant,
   ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
-import { getOfferPriceForDTC } from "./prices";
+import { getOfferPriceForDTC, moneyValueToMicros } from "./prices";
+import { toBase64UrlNoPadding } from "./encoding";
+import { getRequiredEnv } from "./env";
+import { google } from "googleapis";
 
 export function getMerchantCenterProductId({
   contentLanguage,
@@ -97,17 +100,6 @@ export type GetFootwearProductPayload = {
   size: string;
 };
 
-function moneyValueToMicros(value: string): string {
-  const [wholePart, fractionalPart = "0"] = value.split(".");
-  const normalizedFraction = (fractionalPart + "00").slice(0, 2);
-  const whole = Number.parseInt(wholePart || "0", 10);
-  const fraction = Number.parseInt(normalizedFraction || "0", 10);
-  if (!Number.isFinite(whole) || !Number.isFinite(fraction)) {
-    throw new Error(`Nieprawidłowa kwota: ${value}`);
-  }
-  return String(whole * 1_000_000 + fraction * 10_000);
-}
-
 export function getMerchantCenterFootwearProduct(
   payload: GetFootwearProductPayload,
 ): MerchantCenterFootwearProduct {
@@ -172,4 +164,40 @@ export function getMerchantCenterFootwearProduct(
   }
 
   return merchantProduct;
+}
+
+export function getMerchantCenterProductInputResourceName({
+  merchantId,
+  contentLanguage,
+  feedLabel,
+  offerId,
+}: {
+  merchantId: string;
+  contentLanguage: MerchantCenterFootwearProduct["contentLanguage"];
+  feedLabel: MerchantCenterFootwearProduct["feedLabel"];
+  offerId: MerchantCenterFootwearProduct["offerId"];
+}): string {
+  const rawId = `${contentLanguage}~${feedLabel}~${offerId}`;
+  const encodedId = toBase64UrlNoPadding(rawId);
+  return `accounts/${merchantId}/productInputs/${encodedId}`;
+}
+
+export function createGoogleMerchantServiceAccountAuth() {
+  const clientEmail = getRequiredEnv("GOOGLE_MERCHANT_CLIENT_EMAIL");
+  const privateKey = getRequiredEnv("GOOGLE_MERCHANT_PRIVATE_KEY").replace(
+    /\\n/g,
+    "\n",
+  );
+
+  return new google.auth.JWT({
+    email: clientEmail,
+    key: privateKey,
+    scopes: ["https://www.googleapis.com/auth/content"],
+  });
+}
+
+export function getMerchantApiDataSourceName(merchantId: string): string {
+  const dataSource = getRequiredEnv("GOOGLE_MERCHANT_DATASOURCE");
+  if (dataSource.includes("/")) return dataSource;
+  return `accounts/${merchantId}/dataSources/${dataSource}`;
 }

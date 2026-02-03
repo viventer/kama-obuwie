@@ -13,7 +13,11 @@ import {
 } from "@/firebase/schemas/productsSchemas";
 import {
   GetFootwearProductPayload,
+  getMerchantCenterProductAvaiability,
   getMerchantCenterFootwearProduct,
+  getMerchantCenterProductInputResourceName,
+  getMerchantApiDataSourceName,
+  createGoogleMerchantServiceAccountAuth,
 } from "@/helpers/merchantCenter";
 import { google } from "googleapis";
 
@@ -24,94 +28,8 @@ import { parseProductDescription } from "@/helpers/productInfo";
 import { isValidUrl } from "@/components/adminPanel/offers/helpers/validation";
 import { verifyUser } from "../auth/auth";
 import { updateOffer } from "../offers/offers";
-
-function getRequiredEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) throw new Error(`Missing env var: ${name}`);
-  return value;
-}
-
-function createGoogleMerchantServiceAccountAuth() {
-  const clientEmail = getRequiredEnv("GOOGLE_MERCHANT_CLIENT_EMAIL");
-  const privateKey = getRequiredEnv("GOOGLE_MERCHANT_PRIVATE_KEY").replace(
-    /\\n/g,
-    "\n",
-  );
-
-  return new google.auth.JWT({
-    email: clientEmail,
-    key: privateKey,
-    scopes: ["https://www.googleapis.com/auth/content"],
-  });
-}
-
-export async function registerGcpWithMerchant() {
-  const merchantId = getRequiredEnv("GOOGLE_MERCHANT_ID");
-  const auth = createGoogleMerchantServiceAccountAuth();
-  const merchantApi = google.merchantapi("accounts_v1");
-
-  try {
-    const res = await merchantApi.accounts.developerRegistration.registerGcp({
-      auth,
-      name: `accounts/${merchantId}/developerRegistration`,
-      requestBody: {
-        developerEmail: "studio.codebucket@gmail.com",
-      },
-    });
-    console.log("Project successfully registered:", res.data);
-    return res.data;
-  } catch (err: any) {
-    console.error(
-      "Failed to register GCP project:",
-      err.response?.data || err.message,
-    );
-    throw err;
-  }
-}
-
-export async function getExistingGcpRegistration() {
-  const auth = createGoogleMerchantServiceAccountAuth();
-  const merchantApi = google.merchantapi("accounts_v1");
-
-  const res =
-    await merchantApi.accounts.developerRegistration.getAccountForGcpRegistration(
-      {
-        auth,
-      },
-    );
-  console.log("Existing registration:", res.data);
-  return res.data;
-}
-
-function getMerchantApiDataSourceName(merchantId: string): string {
-  const dataSource = getRequiredEnv("GOOGLE_MERCHANT_DATASOURCE");
-  if (dataSource.includes("/")) return dataSource;
-  return `accounts/${merchantId}/dataSources/${dataSource}`;
-}
-
-async function mapWithConcurrency<T, R>(
-  items: T[],
-  concurrency: number,
-  mapper: (item: T, index: number) => Promise<R>,
-): Promise<R[]> {
-  const results: R[] = new Array(items.length);
-  let index = 0;
-
-  async function worker() {
-    while (true) {
-      const currentIndex = index++;
-      if (currentIndex >= items.length) return;
-      results[currentIndex] = await mapper(items[currentIndex], currentIndex);
-    }
-  }
-
-  const workers = Array.from(
-    { length: Math.max(1, Math.min(concurrency, items.length)) },
-    () => worker(),
-  );
-  await Promise.all(workers);
-  return results;
-}
+import { getRequiredEnv } from "@/helpers/env";
+import { mapWithConcurrency } from "@/helpers/other";
 
 export async function insertGoogleMerchantProduct(
   product: MerchantCenterFootwearProduct,
@@ -262,7 +180,7 @@ export async function syncOffersWithGoogleMerchantCenter() {
   await verifyUser(["ADMIN"]);
 
   const offers = await getDocumentsFromAdminDB<OfferWithId>("offers", (ref) =>
-    ref.limit(50),
+    ref.where("isAddedToMerchantCenter", "==", false).limit(10),
   );
 
   if (!offers || offers.length === 0) {
@@ -291,4 +209,113 @@ export async function syncOffersWithGoogleMerchantCenter() {
   );
 
   return insertResponse;
+}
+
+export async function syncMerchantCenterProductAvailability(
+  SKU: string,
+  availability: OfferWithId["availability"],
+) {
+  await verifyUser(["ADMIN"]);
+
+  const merchantId = getRequiredEnv("GOOGLE_MERCHANT_ID");
+  const auth = createGoogleMerchantServiceAccountAuth();
+  const merchantapi = google.merchantapi("products_v1");
+  const dataSource = getMerchantApiDataSourceName(merchantId);
+
+  const sizes = Object.keys(availability || {});
+  if (sizes.length === 0) return [];
+
+  const contentLanguage: MerchantCenterFootwearProduct["contentLanguage"] =
+    "pl";
+  const feedLabel: MerchantCenterFootwearProduct["feedLabel"] = "PL";
+
+  const responses = await mapWithConcurrency(sizes, 10, async (size) => {
+    const sizeAvailability = availability?.[size];
+    if (!sizeAvailability) {
+      throw new Error(`Brak dostępności dla rozmiaru '${size}' (SKU: ${SKU}).`);
+    }
+
+    const offerId: MerchantCenterFootwearProduct["offerId"] = `${SKU}r${size}`;
+    const name = getMerchantCenterProductInputResourceName({
+      merchantId,
+      contentLanguage,
+      feedLabel,
+      offerId,
+    });
+
+    const nextAvailability = getMerchantCenterProductAvaiability(
+      availability,
+      size,
+    );
+
+    const requestBody: merchantapi_products_v1.Schema$ProductInput = {
+      name,
+      offerId,
+      contentLanguage,
+      feedLabel,
+      productAttributes: {
+        availability: nextAvailability as any,
+      },
+    };
+
+    return merchantapi.accounts.productInputs.patch({
+      auth,
+      name,
+      dataSource,
+      updateMask: "productAttributes.availability",
+      requestBody,
+    });
+  });
+
+  return responses;
+}
+
+export async function changeIndividualSizeMerchantCenterAvailability(
+  SKU: string,
+  size: string,
+  isAvailable: boolean,
+) {
+  await verifyUser(["ADMIN"]);
+
+  if (!size) {
+    throw new Error(`Brak rozmiaru do zmiany dostępności (SKU: ${SKU}).`);
+  }
+
+  const merchantId = getRequiredEnv("GOOGLE_MERCHANT_ID");
+  const auth = createGoogleMerchantServiceAccountAuth();
+  const merchantapi = google.merchantapi("products_v1");
+  const dataSource = getMerchantApiDataSourceName(merchantId);
+
+  const contentLanguage: MerchantCenterFootwearProduct["contentLanguage"] =
+    "pl";
+  const feedLabel: MerchantCenterFootwearProduct["feedLabel"] = "PL";
+
+  const offerId: MerchantCenterFootwearProduct["offerId"] = `${SKU}r${size}`;
+  const name = getMerchantCenterProductInputResourceName({
+    merchantId,
+    contentLanguage,
+    feedLabel,
+    offerId,
+  });
+
+  const nextAvailability: MerchantCenterFootwearProduct["productAttributes"]["availability"] =
+    isAvailable ? "in_stock" : "out_of_stock";
+
+  const requestBody: merchantapi_products_v1.Schema$ProductInput = {
+    name,
+    offerId,
+    contentLanguage,
+    feedLabel,
+    productAttributes: {
+      availability: nextAvailability as any,
+    },
+  };
+
+  return merchantapi.accounts.productInputs.patch({
+    auth,
+    name,
+    dataSource,
+    updateMask: "productAttributes.availability",
+    requestBody,
+  });
 }

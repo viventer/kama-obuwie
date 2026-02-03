@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import {
   getExistingGcpRegistration,
   registerGcpWithMerchant,
-  syncOffersWithGoogleMerchantCenter,
-} from "@/server-actions/merchantCenter/manageProducts";
+} from "@/server-actions/merchantCenter/auth";
+import { syncOffersWithGoogleMerchantCenter } from "@/server-actions/merchantCenter/manageProducts";
 import { useState } from "react";
 import BarLoader from "react-spinners/BarLoader";
 

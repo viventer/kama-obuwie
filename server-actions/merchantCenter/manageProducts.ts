@@ -180,7 +180,7 @@ export async function syncOffersWithGoogleMerchantCenter() {
   await verifyUser(["ADMIN"]);
 
   const offers = await getDocumentsFromAdminDB<OfferWithId>("offers", (ref) =>
-    ref.limit(10),
+    ref.where("SKU", "==", "3VGG"),
   );
 
   if (!offers || offers.length === 0) {

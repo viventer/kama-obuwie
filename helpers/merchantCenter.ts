@@ -121,7 +121,11 @@ export function getMerchantCenterFootwearProduct(
     feedLabel: "PL",
     productAttributes: {
       title: offerData.title,
-      link: `https://kama-obuwie.pl/product/${productData.id}?colorVariantName=${offerData.colorVariantName}`,
+      link: `https://${
+        process.env.NEXT_PUBLIC_NODE_ENV == "production"
+          ? "kama-obuwie.pl"
+          : "kama-obuwie-dev--kama-obuwie-ap.europe-west4.hosted.app"
+      }/product/${productData.id}?colorVariantName=${offerData.colorVariantName}`,
       imageLink: thumbnailUrl,
       additionalImageLinks: productData.imagesUrls,
       availability: getMerchantCenterProductAvaiability(

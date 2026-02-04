@@ -40,7 +40,7 @@ export function getMerchantCenterProductAvaiability(
   availability: OfferWithId["availability"],
   size: string,
 ): MerchantCenterFootwearProduct["productAttributes"]["availability"] {
-  return availability[size].value ? "in_stock" : "out_of_stock";
+  return Number(availability[size].value) > 0 ? "in_stock" : "out_of_stock";
 }
 
 export function getMerchantCenterProductGender(
@@ -120,7 +120,7 @@ export function getMerchantCenterFootwearProduct(
     contentLanguage: "pl",
     feedLabel: "PL",
     productAttributes: {
-      title: offerData.title,
+      title: `${offerData.title} ${size}`,
       link: `https://${
         process.env.NEXT_PUBLIC_NODE_ENV == "production"
           ? "kama-obuwie.pl"

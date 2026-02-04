@@ -131,6 +131,19 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
       return;
     }
 
+    try {
+      if (oldData?.isAddedToMerchantCenter && oldData.SKU) {
+        await axios.patch(`/api/merchant-center/offer/${oldData.id}`);
+      }
+    } catch (err) {
+      showToast(
+        "Wystąpił błąd podczas aktualizacji oferty w Google Merchant Center.",
+        "error",
+      );
+      stopLoading();
+      return;
+    }
+
     const offersPartials = { AL1: {}, AL2: {} };
 
     try {
@@ -226,10 +239,6 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
       });
 
       await Promise.all(updatePromises);
-
-      if (oldData?.isAddedToMerchantCenter && oldData.SKU) {
-        await axios.patch(`/api/merchant-center/offer/${oldData.id}`);
-      }
 
       showToast("Oferty zostały zaaktualizowane.", "success");
       router.push("/admin-panel/offers");

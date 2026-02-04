@@ -184,7 +184,7 @@ export async function syncOffersWithGoogleMerchantCenter() {
   );
 
   if (!offers || offers.length === 0) {
-    return;
+    return { inserted: 0, updatedOffers: 0 };
   }
 
   const productsToInsert = await Promise.all(
@@ -198,12 +198,14 @@ export async function syncOffersWithGoogleMerchantCenter() {
   );
 
   if (!productsToInsert || productsToInsert.length === 0) {
-    return;
+    return { inserted: 0, updatedOffers: 0 };
   }
 
-  const insertResponse = await insertProductsToGoogleMerchantCenter(
-    productsToInsert.flat().filter((product) => product !== undefined),
-  );
+  const products = productsToInsert
+    .flat()
+    .filter((product) => product !== undefined);
+
+  await insertProductsToGoogleMerchantCenter(products);
 
   await Promise.all(
     offers.map(async (offer) => {
@@ -211,7 +213,7 @@ export async function syncOffersWithGoogleMerchantCenter() {
     }),
   );
 
-  return insertResponse;
+  return { inserted: products.length, updatedOffers: offers.length };
 }
 
 export async function syncMerchantCenterProductAvailability(

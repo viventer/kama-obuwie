@@ -18,7 +18,7 @@ export async function registerGcpWithMerchant() {
       },
     });
     console.log("Project successfully registered:", res.data);
-    return res.data;
+    return;
   } catch (err: any) {
     console.error(
       "Failed to register GCP project:",
@@ -39,5 +39,5 @@ export async function getExistingGcpRegistration() {
       },
     );
   console.log("Existing registration:", res.data);
-  return res.data;
+  return;
 }

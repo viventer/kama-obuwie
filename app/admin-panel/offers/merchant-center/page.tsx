@@ -15,8 +15,8 @@ export default function GoogleMerchantCenterPage() {
 
   const handleAddOffers = async () => {
     setIsLoading(true);
-    await getExistingGcpRegistration();
-    // await registerGcpWithMerchant();
+    // await getExistingGcpRegistration();
+    await registerGcpWithMerchant();
     await syncOffersWithGoogleMerchantCenter();
     setIsLoading(false);
   };

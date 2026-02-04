@@ -180,7 +180,7 @@ export async function syncOffersWithGoogleMerchantCenter() {
   await verifyUser(["ADMIN"]);
 
   const offers = await getDocumentsFromAdminDB<OfferWithId>("offers", (ref) =>
-    ref.where("isAddedToMerchantCenter", "==", false).limit(10),
+    ref.limit(10),
   );
 
   if (!offers || offers.length === 0) {
@@ -189,6 +189,9 @@ export async function syncOffersWithGoogleMerchantCenter() {
 
   const productsToInsert = await Promise.all(
     offers.map(async (offer) => {
+      if (offer?.isAddedToMerchantCenter) {
+        return;
+      }
       const products = await convertOfferToMerchantCenterProducts(offer);
       if (products && products.length > 0) return products;
     }),

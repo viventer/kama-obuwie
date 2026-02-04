@@ -45,7 +45,7 @@ export default function CreateProductsPhotosForm({
 
   const [newRawPhotos, setNewRawPhotos] = useState<RawPhoto[]>(rawPhotos || []);
   const [newEditedPhotos, setNewEditedPhotos] = useState<EditedPhoto[]>(
-    editedPhotos || []
+    editedPhotos || [],
   );
   const [isUploading, setIsUploading] = useState(false);
   const [activeUploads, setActiveUploads] = useState<number>(0);
@@ -71,7 +71,7 @@ export default function CreateProductsPhotosForm({
   const { handleError } = useErrorHandler();
 
   const editAllegroOffersPhotos = async (
-    newEditedPhotos: EditedPhotoWithUrl[]
+    newEditedPhotos: EditedPhotoWithUrl[],
   ) => {
     try {
       if (!productData?.SKU) {
@@ -109,8 +109,8 @@ export default function CreateProductsPhotosForm({
           (variant) =>
             getColorVariantName(variant) ===
             Object.keys(productData.SKU!).find(
-              (key) => productData.SKU![key] === offer.SKU
-            )
+              (key) => productData.SKU![key] === offer.SKU,
+            ),
         );
 
         if (!colorVariant) continue;
@@ -118,13 +118,13 @@ export default function CreateProductsPhotosForm({
         // Przygotuj zdjęcia dla tego wariantu kolorystycznego
         const colorVariantName = getColorVariantName(colorVariant);
         const variantPhotos = newEditedPhotos.filter(
-          (photo) => photo.colorVariantName === colorVariantName
+          (photo) => photo.colorVariantName === colorVariantName,
         );
 
         if (variantPhotos.length === 0) {
           showToast(
             `Brak zdjęć dla wariantu kolorystycznego: ${colorVariantName}`,
-            "error"
+            "error",
           );
           return;
         }
@@ -142,18 +142,35 @@ export default function CreateProductsPhotosForm({
               } else {
                 showToast(
                   `Nie udało się pobrać URL dla zdjęcia: ${photo.filePath}`,
-                  "error"
+                  "error",
                 );
                 return;
               }
             } catch (error) {
               showToast(
                 `Błąd podczas pobierania URL dla zdjęcia: ${photo.filePath}`,
-                "error"
+                "error",
               );
               return;
             }
           }
+        }
+
+        // Update offer.thumbnail
+        try {
+          const thumbnailUrl = imageUrls[0];
+          if (thumbnailUrl) {
+            await axios.patch(`/api/offers/${offer.id}`, {
+              thumbnail: thumbnailUrl,
+            });
+            console.log(thumbnailUrl);
+          }
+        } catch (error) {
+          showToast(
+            `Nie udało się podmienić miniaturki dla oferty: ${offer.id}.`,
+            "error",
+          );
+          return;
         }
 
         // Dodaj zdjęcie wyboru rozmiaru na końcu
@@ -173,7 +190,7 @@ export default function CreateProductsPhotosForm({
         if (imageUrls.length === 0) {
           showToast(
             `Brak dostępnych URL-ów zdjęć dla wariantu: ${colorVariantName}`,
-            "error"
+            "error",
           );
           return;
         }
@@ -201,7 +218,7 @@ export default function CreateProductsPhotosForm({
               axios.patch(`/api/allegro/offers/${AL1Offers[size]}`, {
                 offerPartial: updateData,
                 salesChannel: "AL1",
-              })
+              }),
             );
           }
 
@@ -210,7 +227,7 @@ export default function CreateProductsPhotosForm({
               axios.patch(`/api/allegro/offers/${AL2Offers[size]}`, {
                 offerPartial: updateData,
                 salesChannel: "AL2",
-              })
+              }),
             );
           }
         }
@@ -221,11 +238,11 @@ export default function CreateProductsPhotosForm({
         } catch (error) {
           handleError(
             error,
-            `Błąd podczas edycji zdjęć dla wariantu ${colorVariantName}`
+            `Błąd podczas edycji zdjęć dla wariantu ${colorVariantName}`,
           );
           showToast(
             `Błąd podczas edycji zdjęć dla wariantu ${colorVariantName}`,
-            "error"
+            "error",
           );
         }
       }
@@ -267,7 +284,7 @@ export default function CreateProductsPhotosForm({
           (photo, index) => ({
             ...photo,
             url: urls[index],
-          })
+          }),
         );
 
         await editAllegroOffersPhotos(editedPhotosWithUrls);

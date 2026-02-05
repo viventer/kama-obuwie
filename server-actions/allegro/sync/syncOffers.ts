@@ -58,7 +58,7 @@ const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
 export const getAllAllegroOffers = async (
   channel: "AL1" | "AL2",
-  userId?: string // Opcjonalny userId dla zadań w tle
+  userId?: string, // Opcjonalny userId dla zadań w tle
 ): Promise<AllegroOfferFromListing[]> => {
   if (!userId) {
     await verifyUser(["ADMIN", "VERIFIED"]);
@@ -84,7 +84,7 @@ export const getAllAllegroOffers = async (
   while (hasMore) {
     try {
       console.log(
-        `📥 Fetching offers ${offset}-${offset + limit} for ${channel}`
+        `📥 Fetching offers ${offset}-${offset + limit} for ${channel}`,
       );
 
       const response = await axios.get(`${ALLEGRO_API_BASE_URL}/sale/offers`, {
@@ -99,12 +99,12 @@ export const getAllAllegroOffers = async (
 
       if (!offers || offers.length === 0) {
         console.log(
-          `✅ No more offers found for ${channel} at offset ${offset}`
+          `✅ No more offers found for ${channel} at offset ${offset}`,
         );
         hasMore = false;
       } else {
         console.log(
-          `📦 Found ${offers.length} offers for ${channel} at offset ${offset}`
+          `📦 Found ${offers.length} offers for ${channel} at offset ${offset}`,
         );
         allOffers = [...allOffers, ...offers];
         offset += offers.length;
@@ -116,7 +116,7 @@ export const getAllAllegroOffers = async (
     } catch (error) {
       console.error(
         `❌ Error fetching offers for ${channel} at offset ${offset}:`,
-        error
+        error,
       );
       hasMore = false;
     }
@@ -126,7 +126,7 @@ export const getAllAllegroOffers = async (
 
   if (allOffers.length === 0) {
     console.warn(
-      `⚠️  No offers found for ${channel} in the specified price range`
+      `⚠️  No offers found for ${channel} in the specified price range`,
     );
   }
 
@@ -136,7 +136,7 @@ export const getAllAllegroOffers = async (
 export const transformAllegroAL1OfferToOffer = async (
   offer: AllegroOfferFromListing,
   SKU: string,
-  productId?: string
+  productId?: string,
 ): Promise<Offer> => {
   const size = extractSizeFromTitle(offer.name) as string;
   const cleanedTitle = removeSizeFromTitle(offer.name);
@@ -207,7 +207,7 @@ export const transformAllegroAL1OfferToOffer = async (
 };
 
 const shouldForceZeroAvailabilityForListingOffer = (
-  offer: AllegroOfferFromListing
+  offer: AllegroOfferFromListing,
 ): boolean => {
   return (
     (offer.publication?.status === "ENDED" ||
@@ -247,7 +247,7 @@ const syncAl1SizesForSignature = async (params: {
     try {
       if (forceZeroAvailability) {
         console.log(
-          `⚠️  AL1: Offer is ENDED but has stock.available=${offer.stock.available} (id=${offer.id}). Forcing stock to 0 on Allegro + DB.`
+          `⚠️  AL1: Offer is ENDED but has stock.available=${offer.stock.available} (id=${offer.id}). Forcing stock to 0 on Allegro + DB.`,
         );
 
         try {
@@ -264,12 +264,12 @@ const syncAl1SizesForSignature = async (params: {
                 unit: allegroOfferDetails.stock.unit,
               },
             },
-            { userId }
+            { userId },
           );
         } catch (e) {
           console.warn(
             `⚠️  AL1: Failed to force stock.available=0 on Allegro for offerId=${offer.id}. Will still store availability=0 in DB.`,
-            e
+            e,
           );
         }
       }
@@ -282,7 +282,7 @@ const syncAl1SizesForSignature = async (params: {
             id: buildExternalId({ signature, SKU, size }),
           },
         },
-        { userId }
+        { userId },
       );
 
       if (existingOffer?.id) {
@@ -294,7 +294,7 @@ const syncAl1SizesForSignature = async (params: {
             availability: availabilityForDb,
             SKU,
           },
-          "AL1"
+          "AL1",
         );
 
         existingOffer = await getOfferFromDBBySignature(signature);
@@ -302,7 +302,7 @@ const syncAl1SizesForSignature = async (params: {
         const transformedOffer = await transformAllegroAL1OfferToOffer(
           offer,
           SKU,
-          existingOffer?.productId || undefined
+          existingOffer?.productId || undefined,
         );
 
         if (forceZeroAvailability) {
@@ -321,7 +321,7 @@ const syncAl1SizesForSignature = async (params: {
         sizeError instanceof Error ? sizeError.message : String(sizeError);
       console.error(
         `❌ AL1: Error processing size ${size} for signature "${signature}":`,
-        message
+        message,
       );
     }
   }
@@ -350,12 +350,12 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
 
   try {
     const categoryFromDb = await getCategoryByAllegroCategoryId(
-      representativeOffer.category.id
+      representativeOffer.category.id,
     );
 
     if (!categoryFromDb) {
       throw new Error(
-        `Nie znaleziono kategorii dla allegroCategoryId: "${representativeOffer.category.id} (najpewniej akcesoria), pomijam wzbogacanie legacyProduct."`
+        `Nie znaleziono kategorii dla allegroCategoryId: "${representativeOffer.category.id} (najpewniej akcesoria), pomijam wzbogacanie legacyProduct."`,
       );
     }
 
@@ -365,7 +365,7 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
     const derivedLegacyProductId = legacyProductIdFromSignature(signature);
     if (!derivedLegacyProductId) {
       throw new Error(
-        `Brak signature do wyliczenia legacyProductId (AL1): "${signature}"`
+        `Brak signature do wyliczenia legacyProductId (AL1): "${signature}"`,
       );
     }
 
@@ -385,12 +385,12 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
         "AL1",
         {
           userId,
-        }
+        },
       );
     } catch (e) {
       console.warn(
         `⚠️  Failed to fetch AL1 template for legacy offer: ${representativeOffer.id}`,
-        e
+        e,
       );
     }
 
@@ -402,7 +402,7 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
           const allegroTable = await getAllegroSizingTable(
             allegroSizingTableId,
             "AL1",
-            userId ? { userId } : undefined
+            userId ? { userId } : undefined,
           );
 
           if (allegroTable) {
@@ -414,22 +414,23 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
 
             if (!existingSizingTable.empty) {
               // usunięcie starej (niepoprawnej) tabeli jeśli istnieje
-              existingSizingTable.docs[0].ref.delete();
-            }
-            const sizingTable = transformAllegroSizingTableToSizingTable({
-              ...allegroTable,
-              id: allegroSizingTableId,
-            });
+              sizingTableId = existingSizingTable.docs[0].id;
+            } else {
+              const sizingTable = transformAllegroSizingTableToSizingTable({
+                ...allegroTable,
+                id: allegroSizingTableId,
+              });
 
-            sizingTableId = await createSizingTable(
-              sizingTable,
-              userId ? { userId } : undefined
-            );
+              sizingTableId = await createSizingTable(
+                sizingTable,
+                userId ? { userId } : undefined,
+              );
+            }
           }
         } catch (e) {
           console.warn(
             `⚠️  Failed to fetch/save sizing table for legacy offer (sizeTable.id=${allegroSizingTableId})`,
-            e
+            e,
           );
         }
       }
@@ -441,7 +442,7 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
       ? allegroOfferDetails!.images
       : [];
     const productSetImages: string[] = Array.isArray(
-      allegroOfferDetails?.productSet?.[0]?.product?.images
+      allegroOfferDetails?.productSet?.[0]?.product?.images,
     )
       ? allegroOfferDetails!.productSet[0]!.product.images
       : [];
@@ -450,7 +451,7 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
       offerImages.length > 0 ? offerImages : productSetImages;
 
     const derivedAllegroDescription = normalizeLegacyAllegroDescription(
-      allegroOfferDetails?.description
+      allegroOfferDetails?.description,
     );
 
     const responsibleProducerRef = (allegroOfferDetails as any)?.productSet?.[0]
@@ -472,7 +473,7 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
         const producer = await getAllegroResponsibleProducer(
           responsibleProducerIdFromAllegro,
           "AL1",
-          userId ? { userId } : undefined
+          userId ? { userId } : undefined,
         );
         if (producer?.name) {
           derivedResponsibleProducerName = producer.name;
@@ -480,13 +481,13 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
       } catch (e) {
         console.warn(
           `⚠️  Failed to resolve responsibleProducer name (id=${responsibleProducerIdFromAllegro})`,
-          e
+          e,
         );
       }
     }
 
     const derivedParameters = allegroProductParametersToProductParameters(
-      allegroOfferDetails?.productSet?.[0]?.product?.parameters
+      allegroOfferDetails?.productSet?.[0]?.product?.parameters,
     );
 
     const mergedLegacyParameters: ProductParameters | undefined =
@@ -514,9 +515,9 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
                   representativeOffer.primaryImage.url,
                   ...imagesFromAllegro,
                 ].filter(
-                  (x): x is string => typeof x === "string" && x.length > 0
-                )
-              )
+                  (x): x is string => typeof x === "string" && x.length > 0,
+                ),
+              ),
             ),
           }
         : {}),
@@ -567,7 +568,7 @@ const maybeEnrichLegacyForAl1Signature = async (params: {
   } catch (e) {
     console.warn(
       `⚠️  Failed to enrich legacyProduct for signature: ${signature}`,
-      e
+      e,
     );
     return { existingOffer, legacySizingTableId: undefined };
   }
@@ -582,14 +583,14 @@ const updateOffersIdsForMatchingProductsStep = async (params: {
 
   if (matchingProducts.length === 0) {
     console.log(
-      `ℹ️  No matching products found for signature: ${existingOffer?.signature}, skipping offersIds update`
+      `ℹ️  No matching products found for signature: ${existingOffer?.signature}, skipping offersIds update`,
     );
     return;
   }
 
   if (!existingOffer?.id) {
     console.log(
-      `⚠️  Cannot update offersIds: existingOffer is null or missing ID for signature: ${existingOffer?.signature}`
+      `⚠️  Cannot update offersIds: existingOffer is null or missing ID for signature: ${existingOffer?.signature}`,
     );
     return;
   }
@@ -599,12 +600,12 @@ const updateOffersIdsForMatchingProductsStep = async (params: {
   }
 
   console.log(
-    `🔄 Updating offersIds for ${matchingProducts.length} products, variant: ${colorVariantName}, offerId: ${existingOffer.id}`
+    `🔄 Updating offersIds for ${matchingProducts.length} products, variant: ${colorVariantName}, offerId: ${existingOffer.id}`,
   );
   await updateProductOffersIds(
     matchingProducts,
     colorVariantName,
-    existingOffer.id as string
+    existingOffer.id as string,
   );
 };
 
@@ -634,7 +635,7 @@ const updateSkuForMatchingProductsStep = async (params: {
         `🔄 Updating product ${product.id} SKU from:`,
         currentSKU,
         `to:`,
-        updatedSKU
+        updatedSKU,
       );
 
       await updateProduct(product.id, {
@@ -642,7 +643,7 @@ const updateSkuForMatchingProductsStep = async (params: {
       });
 
       console.log(
-        `✅ Updated product ${product.id} SKU for variant: ${colorVariantName} = ${SKU}`
+        `✅ Updated product ${product.id} SKU for variant: ${colorVariantName} = ${SKU}`,
       );
     } catch (error) {
       console.error(`❌ Failed to update product ${product.id} SKU:`, error);
@@ -652,7 +653,7 @@ const updateSkuForMatchingProductsStep = async (params: {
 
 const syncAL1Offers = async (
   offers: AllegroOfferFromListing[],
-  userId?: string
+  userId?: string,
 ) => {
   console.log(`🚀 AL1: Starting synchronization of ${offers.length} offers`);
 
@@ -670,13 +671,13 @@ const syncAL1Offers = async (
     console.log(
       `🔄 AL1: Processing signature ${
         processedSignatures + 1
-      }/${totalSignatures}: "${signature}" with ${groupedOffers.length} sizes`
+      }/${totalSignatures}: "${signature}" with ${groupedOffers.length} sizes`,
     );
 
     let existingOffer = await getOfferFromDBBySignature(signature);
     const matchingProducts = await getProductsBySignature(signature);
     console.log(
-      `🎯 Found ${matchingProducts.length} matching products for signature: ${signature}`
+      `🎯 Found ${matchingProducts.length} matching products for signature: ${signature}`,
     );
 
     const SKU = await resolveSkuForOffer(existingOffer);
@@ -695,7 +696,7 @@ const syncAL1Offers = async (
     if (matchingProducts.length === 0 && existingOffer?.id) {
       const representativeOffer = groupedOffers[0];
       const representativeSize = extractSizeFromTitle(
-        representativeOffer.name
+        representativeOffer.name,
       ) as string;
 
       const result = await maybeEnrichLegacyForAl1Signature({
@@ -747,7 +748,7 @@ const syncAL1Offers = async (
         total: totalSignatures,
         percentage: progress,
         lastSignature: signature,
-      })
+      }),
     );
 
     // Delay między signature aby uniknąć rate limiting (150ms)
@@ -764,7 +765,7 @@ const syncAL1Offers = async (
 
 const syncAL2Offers = async (
   offers: AllegroOfferFromListing[],
-  userId?: string
+  userId?: string,
 ) => {
   console.log(`🚀 AL2: Starting synchronization of ${offers.length} offers`);
 
@@ -775,7 +776,7 @@ const syncAL2Offers = async (
     // Sprawdź czy oferta ma external.id
     if (!offer.external?.id) {
       console.log(
-        `⚠️  AL2: Skipping offer "${offer.name}" - missing external.id`
+        `⚠️  AL2: Skipping offer "${offer.name}" - missing external.id`,
       );
       continue;
     }
@@ -806,7 +807,7 @@ const syncAL2Offers = async (
       console.log(
         `🔄 AL2: Processing signature ${processedSignatures + 1}/${
           offersBySignature.size
-        }: "${signature}" with ${groupedOffers.length} sizes`
+        }: "${signature}" with ${groupedOffers.length} sizes`,
       );
 
       // Sprawdź czy oferta już istnieje (powinna istnieć po synchronizacji AL1)
@@ -814,7 +815,7 @@ const syncAL2Offers = async (
 
       if (!existingOffer?.id) {
         console.log(
-          `⚠️  AL2: No existing offer found for signature "${signature}" - skipping`
+          `⚠️  AL2: No existing offer found for signature "${signature}" - skipping`,
         );
         skippedSignatures++;
         continue;
@@ -823,14 +824,14 @@ const syncAL2Offers = async (
       const existingSku = existingOffer.SKU;
       if (!existingSku) {
         console.log(
-          `⚠️  AL2: Existing offer for signature "${signature}" has no SKU - skipping`
+          `⚠️  AL2: Existing offer for signature "${signature}" has no SKU - skipping`,
         );
         skippedSignatures++;
         continue;
       }
 
       console.log(
-        `✅ AL2: Found existing offer with SKU: ${existingOffer.SKU}`
+        `✅ AL2: Found existing offer with SKU: ${existingOffer.SKU}`,
       );
 
       // Przetwarzaj wszystkie rozmiary dla tej signature
@@ -846,7 +847,7 @@ const syncAL2Offers = async (
         // Sprawdź czy ten rozmiar już był przetwarzany
         if (processedSizes.has(size)) {
           console.log(
-            `⚠️  AL2: Skipping duplicate size ${size} for ${signature}`
+            `⚠️  AL2: Skipping duplicate size ${size} for ${signature}`,
           );
           continue;
         }
@@ -855,13 +856,13 @@ const syncAL2Offers = async (
         console.log(
           `📦 AL2: Processing size ${i + 1}/${
             groupedOffers.length
-          }: ${size} for ${signature}`
+          }: ${size} for ${signature}`,
         );
 
         try {
           if (forceZeroAvailability) {
             console.log(
-              `⚠️  AL2: Offer is ENDED but has stock.available=${offer.stock.available} (id=${offer.id}). Forcing stock to 0 on Allegro + DB.`
+              `⚠️  AL2: Offer is ENDED but has stock.available=${offer.stock.available} (id=${offer.id}). Forcing stock to 0 on Allegro + DB.`,
             );
 
             try {
@@ -870,7 +871,7 @@ const syncAL2Offers = async (
                 "AL2",
                 {
                   userId,
-                }
+                },
               );
 
               await editAllegroOffer(
@@ -882,12 +883,12 @@ const syncAL2Offers = async (
                     unit: allegroOfferDetails.stock.unit,
                   },
                 },
-                { userId }
+                { userId },
               );
             } catch (e) {
               console.warn(
                 `⚠️  AL2: Failed to force stock.available=0 on Allegro for offerId=${offer.id}. Will still store availability=0 in DB.`,
-                e
+                e,
               );
             }
           }
@@ -905,7 +906,7 @@ const syncAL2Offers = async (
                 }),
               },
             },
-            { userId }
+            { userId },
           );
 
           // Aktualizuj istniejącą ofertę z nowym rozmiarem dla AL2
@@ -917,7 +918,7 @@ const syncAL2Offers = async (
               allegroOffer: offer,
               ...(forceZeroAvailability ? { availability: "0" } : {}),
             },
-            "AL2"
+            "AL2",
           );
 
           // Pobierz zaktualizowaną ofertę z bazy danych
@@ -930,7 +931,7 @@ const syncAL2Offers = async (
         } catch (sizeError) {
           console.error(
             `❌ AL2: Error processing size ${size} for signature "${signature}":`,
-            sizeError
+            sizeError,
           );
           errorCount++;
           // Kontynuuj z następnym rozmiarem
@@ -942,7 +943,7 @@ const syncAL2Offers = async (
 
       // Progress tracking
       const progress = Math.round(
-        (processedSignatures / offersBySignature.size) * 100
+        (processedSignatures / offersBySignature.size) * 100,
       );
       await redis.set(
         "allegro:sync:progress:AL2",
@@ -951,7 +952,7 @@ const syncAL2Offers = async (
           total: offersBySignature.size,
           percentage: progress,
           lastSignature: signature,
-        })
+        }),
       );
 
       // Delay między signature aby uniknąć rate limiting (150ms)
@@ -961,7 +962,7 @@ const syncAL2Offers = async (
     } catch (signatureError) {
       console.error(
         `❌ AL2: Error processing signature "${signature}":`,
-        signatureError
+        signatureError,
       );
       errorCount++;
       // Kontynuuj z następną signature
@@ -977,12 +978,12 @@ const syncAL2Offers = async (
 export const syncAllegroOffers = async (
   userId?: string,
   channel: "AL1" | "AL2" = "AL1",
-  batch: number = 0
+  batch: number = 0,
 ) => {
   const BATCH_SIZE = 200; // Liczba ofert na batch (zmniejszona z uwagi na timeout)
 
   console.log(
-    `🚀 Starting Allegro offers synchronization for ${channel}, batch ${batch}...`
+    `🚀 Starting Allegro offers synchronization for ${channel}, batch ${batch}...`,
   );
   if (userId) {
     console.log(`👤 Running as background job for user: ${userId}`);
@@ -999,7 +1000,7 @@ export const syncAllegroOffers = async (
   const batchOffers = allOffers.slice(startIndex, endIndex);
 
   console.log(
-    `📦 Processing batch ${batch}: offers ${startIndex}-${endIndex} (${batchOffers.length} offers)`
+    `📦 Processing batch ${batch}: offers ${startIndex}-${endIndex} (${batchOffers.length} offers)`,
   );
 
   // Zapisz channel jako string przed zawężeniem typu
@@ -1066,7 +1067,7 @@ export const syncAllegroOffers = async (
   } catch (error) {
     console.error(
       `❌ ${channel} batch ${batch} synchronization failed:`,
-      error
+      error,
     );
     throw error;
   }

@@ -6,7 +6,7 @@ import {
   getExistingGcpRegistration,
   registerGcpWithMerchant,
 } from "@/server-actions/merchantCenter/auth";
-import { syncOffersWithGoogleMerchantCenter } from "@/server-actions/merchantCenter/manageProducts";
+import { syncAllOffersWithGoogleMerchantCenter } from "@/server-actions/merchantCenter/manageProducts";
 import { useState } from "react";
 import BarLoader from "react-spinners/BarLoader";
 
@@ -17,7 +17,7 @@ export default function GoogleMerchantCenterPage() {
     setIsLoading(true);
     await getExistingGcpRegistration();
     // await registerGcpWithMerchant();
-    await syncOffersWithGoogleMerchantCenter();
+    await syncAllOffersWithGoogleMerchantCenter(50);
     setIsLoading(false);
   };
 

@@ -20,6 +20,7 @@ import {
   createGoogleMerchantServiceAccountAuth,
 } from "@/helpers/merchantCenter";
 import { google } from "googleapis";
+import { FieldPath } from "firebase-admin/firestore";
 
 import type { merchantapi_products_v1 } from "googleapis";
 import { getImagesUrls, getImageUrl } from "../files/files";
@@ -176,11 +177,22 @@ export async function convertOfferToMerchantCenterProducts(
   return products;
 }
 
-export async function syncOffersWithGoogleMerchantCenter() {
+export type SyncOffersWithGoogleMerchantCenterBatch = {
+  lastOfferIndex?: number;
+  batchSize?: number;
+};
+
+export async function syncOffersWithGoogleMerchantCenter(
+  batch?: SyncOffersWithGoogleMerchantCenterBatch,
+) {
   await verifyUser(["ADMIN"]);
 
+  const batchSize = Math.max(1, batch?.batchSize ?? 50);
+  const lastOfferIndex = batch?.lastOfferIndex ?? -1;
+  const offset = Math.max(0, lastOfferIndex + 1);
+
   const offers = await getDocumentsFromAdminDB<OfferWithId>("offers", (ref) =>
-    ref.where("SKU", "==", "3VGG"),
+    ref.orderBy(FieldPath.documentId()).offset(offset).limit(batchSize),
   );
 
   if (!offers || offers.length === 0) {
@@ -214,6 +226,35 @@ export async function syncOffersWithGoogleMerchantCenter() {
   );
 
   return { inserted: products.length, updatedOffers: offers.length };
+}
+
+export async function syncAllOffersWithGoogleMerchantCenter(batchSize = 50) {
+  await verifyUser(["ADMIN"]);
+
+  let lastOfferIndex = -1;
+  let totalInserted = 0;
+  let totalUpdatedOffers = 0;
+
+  const maxIterations = 1000;
+  for (let i = 0; i < maxIterations; i++) {
+    const { inserted, updatedOffers } =
+      await syncOffersWithGoogleMerchantCenter({
+        lastOfferIndex,
+        batchSize,
+      });
+
+    totalInserted += inserted;
+    totalUpdatedOffers += updatedOffers;
+
+    if (updatedOffers <= 0) break;
+    lastOfferIndex += updatedOffers;
+    if (updatedOffers < batchSize) break;
+  }
+
+  console.log(
+    `Zsynchronizowano oferty z Google Merchant Center. Wstawiono: ${totalInserted}, Zaktualizowano ofert: ${totalUpdatedOffers}`,
+  );
+  return { inserted: totalInserted, updatedOffers: totalUpdatedOffers };
 }
 
 export async function syncMerchantCenterProductAvailability(

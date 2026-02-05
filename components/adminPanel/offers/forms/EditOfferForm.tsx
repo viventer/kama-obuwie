@@ -132,7 +132,11 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
     }
 
     try {
-      if (oldData?.isAddedToMerchantCenter && oldData.SKU) {
+      if (
+        oldData?.isAddedToMerchantCenter &&
+        oldData.SKU &&
+        process.env.NEXT_PUBLIC_NODE_ENV === "production"
+      ) {
         await axios.patch(`/api/merchant-center/offer/${oldData.id}`);
       }
     } catch (err) {

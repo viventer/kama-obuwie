@@ -172,7 +172,11 @@ export const syncOffersAvailability = async function (
       }
 
       // Zaktualizuj dostępność w Google Merchant Center
-      if (offer?.isAddedToMerchantCenter && offer.SKU) {
+      if (
+        offer?.isAddedToMerchantCenter &&
+        offer.SKU &&
+        process.env.NEXT_PUBLIC_NODE_ENV === "production"
+      ) {
         const isAvailable = newAvailability > 0 ? true : false;
         await changeIndividualSizeMerchantCenterAvailability(
           offer.SKU,

@@ -14,7 +14,7 @@ export default function MobileProductPageShopAdvantages({
   const { openDialog, closeDialog } = useDialogWindow();
 
   const openModal = (
-    type: "reviews" | "deliveryCost" | "deliveryAndPayment"
+    type: "reviews" | "deliveryCost" | "deliveryAndPayment",
   ) => {
     switch (type) {
       case "reviews":
@@ -57,7 +57,7 @@ export default function MobileProductPageShopAdvantages({
       <article className="flex gap-2 items-center justify-between">
         <div className="flex items-center gap-2">
           <ThumbsUpIcon className="size-4 text-success" />
-          <p className="font-medium">99,7% zadowolonych klientów</p>
+          <p className="font-medium">99,6% zadowolonych klientów</p>
         </div>
         <Button
           variant="ghost"

@@ -41,14 +41,14 @@ export default function ShopReviewsWidget({
       className={cn(
         "py-4 justify-between",
         className,
-        isProductPage ? "gap-2" : "gap-4"
+        isProductPage ? "gap-2" : "gap-4",
       )}
     >
       <CardHeader className="px-4 lg:px-6">
         <CardTitle className="flex items-center gap-2">
           <ThumbsUpIcon className="size-6 xl:size-8 text-success" />
           <h4 className="xl:text-2xl font-medium text-lg">
-            99,7% zadowolonych klientów
+            99,6% zadowolonych klientów
           </h4>
         </CardTitle>
         <CardDescription>

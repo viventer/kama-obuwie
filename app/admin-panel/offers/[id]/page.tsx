@@ -3,6 +3,7 @@ import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { notFound } from "next/navigation";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import EditOfferForm from "@/components/adminPanel/offers/forms/EditOfferForm";
+import OfferProductInfo from "@/components/adminPanel/offers/OfferProductInfo";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -27,8 +28,16 @@ export default async function OfferEditPage(props: Props) {
   }
 
   return (
-    <FormWrapper headingText="Edytuj ofertę">
-      <EditOfferForm oldData={oldData} />
-    </FormWrapper>
+    <>
+      <FormWrapper headingText="Edytuj ofertę">
+        <OfferProductInfo
+          thumbnail={oldData.thumbnail!}
+          SKU={oldData.SKU}
+          signature={oldData.signature}
+          className="mb-4"
+        />
+        <EditOfferForm oldData={oldData} />
+      </FormWrapper>
+    </>
   );
 }

@@ -37,7 +37,8 @@ export function OrderInfoDisplay({ order }: OrderInfoDisplayProps) {
           </div>
         )}
         <div className="text-xs text-white/75 flex items-center gap-1">
-          <UserIcon className="size-3" /> {order.buyer.login}
+          <UserIcon className="size-3" />{" "}
+          {order.buyer.login || order.buyer.email}
         </div>
       </div>
     </div>

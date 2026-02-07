@@ -25,6 +25,7 @@ import MiniLoader from "../../global/MiniLoader";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { choosingSizeImageFilePath } from "@/lib/constants";
+import { useFullPageLoading } from "../../global/FullPageLoader";
 
 export default function CreateProductsPhotosForm({
   productData,
@@ -51,6 +52,7 @@ export default function CreateProductsPhotosForm({
   const [activeUploads, setActiveUploads] = useState<number>(0);
 
   const { showToast } = useToast();
+  const { startLoading, stopLoading } = useFullPageLoading();
 
   // Funkcja do śledzenia aktywnych uploadów
   const handleUploadChange = (isStarting: boolean) => {
@@ -255,6 +257,7 @@ export default function CreateProductsPhotosForm({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    startLoading();
     let updateData: Partial<Product> | null = null;
 
     if (creationStage === "photos") {
@@ -289,6 +292,7 @@ export default function CreateProductsPhotosForm({
 
         await editAllegroOffersPhotos(editedPhotosWithUrls);
       } catch (error) {
+        stopLoading();
         showToast("Błąd podczas pobierania URL-ów zdjęć", "error");
         return;
       }
@@ -305,6 +309,8 @@ export default function CreateProductsPhotosForm({
       }
     } catch (err) {
       showToast("Nie udało się zapisać zmian w produkcie", "error");
+    } finally {
+      stopLoading();
     }
   };
 

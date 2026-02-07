@@ -34,6 +34,7 @@ import { getFormattedSizingTable } from "@/lib/utils";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { getImageUrl } from "@/server-actions/files/files";
 import { choosingSizeImageFilePath } from "@/lib/constants";
+import { useFullPageLoading } from "../../global/FullPageLoader";
 
 export interface DescriptionFormValues {
   description: Description;
@@ -58,7 +59,7 @@ export const EditProductDescriptionForm = ({
         description: DescriptionSchema,
         selectedRow: z.number(),
         reorderedPhotos: z.array(EditedPhotoWithUrlSchema),
-      })
+      }),
     ),
     defaultValues: {
       description: oldDescription ?? [
@@ -79,6 +80,7 @@ export const EditProductDescriptionForm = ({
 
   const { showDialog } = useConfirmDialog();
   const { showToast } = useToast();
+  const { startLoading, stopLoading } = useFullPageLoading();
   const { handleError } = useErrorHandler();
   const router = useRouter();
   const handleReject = async (e: FormEvent) => {
@@ -98,7 +100,7 @@ export const EditProductDescriptionForm = ({
 
   const editAllegroOfferDescription = async (
     newDescription: Description,
-    photosWithUrls: EditedPhotoWithUrl[]
+    photosWithUrls: EditedPhotoWithUrl[],
   ) => {
     try {
       if (!productData?.SKU) {
@@ -133,7 +135,7 @@ export const EditProductDescriptionForm = ({
       let sizingTable: SizingTableWithId | null = null;
       try {
         const sizingTableResponse = await axios.get(
-          `/api/sizing-tables/${productData.sizingTableId}`
+          `/api/sizing-tables/${productData.sizingTableId}`,
         );
         sizingTable = sizingTableResponse.data;
 
@@ -156,15 +158,15 @@ export const EditProductDescriptionForm = ({
           (variant) =>
             getColorVariantName(variant) ===
             Object.keys(productData.SKU!).find(
-              (key) => productData.SKU![key] === offer.SKU
-            )
+              (key) => productData.SKU![key] === offer.SKU,
+            ),
         );
 
         if (!colorVariant) continue;
 
         const colorVariantName = getColorVariantName(colorVariant);
         const variantPhotos = photosWithUrls.filter(
-          (photo) => photo.colorVariantName === colorVariantName
+          (photo) => photo.colorVariantName === colorVariantName,
         );
 
         const imagesUrls = variantPhotos.map((photo) => photo.url || "");
@@ -179,7 +181,7 @@ export const EditProductDescriptionForm = ({
           };
 
         const formattedSizingTable = getFormattedSizingTable(
-          sizingTable.insoleLengths
+          sizingTable.insoleLengths,
         );
         baseVariableValues.rozmiarówka = formattedSizingTable;
 
@@ -193,13 +195,13 @@ export const EditProductDescriptionForm = ({
 
         for (const size of allSizes) {
           const insoleLength = sizingTable.insoleLengths.find(
-            (insole) => Number(insole.size) === Number(size)
+            (insole) => Number(insole.size) === Number(size),
           )?.insoleLength;
 
           if (!insoleLength) {
             showToast(
               `Brak długości wkładki dla rozmiaru ${size} w tabeli rozmiarów`,
-              "error"
+              "error",
             );
             return;
           }
@@ -215,7 +217,7 @@ export const EditProductDescriptionForm = ({
           const allegroDescription = await convertToAllegroDescription(
             newDescription,
             imagesUrls,
-            sizeSpecificVariables
+            sizeSpecificVariables,
           );
 
           const updateData = {
@@ -229,7 +231,7 @@ export const EditProductDescriptionForm = ({
               axios.patch(`/api/allegro/offers/${AL1Offers[size]}`, {
                 offerPartial: updateData,
                 salesChannel: "AL1",
-              })
+              }),
             );
           }
 
@@ -238,7 +240,7 @@ export const EditProductDescriptionForm = ({
               axios.patch(`/api/allegro/offers/${AL2Offers[size]}`, {
                 offerPartial: updateData,
                 salesChannel: "AL2",
-              })
+              }),
             );
           }
 
@@ -247,7 +249,7 @@ export const EditProductDescriptionForm = ({
           } catch (error) {
             handleError(
               error,
-              `Błąd podczas edycji ofert dla rozmiaru ${size}`
+              `Błąd podczas edycji ofert dla rozmiaru ${size}`,
             );
             showToast(`Błąd podczas edycji niektórych ofert Allegro`, "error");
           }
@@ -262,6 +264,7 @@ export const EditProductDescriptionForm = ({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    startLoading();
 
     const data: DescriptionFormValues = form.getValues();
     const newEditedPhotos = data.reorderedPhotos.map((photo) => ({
@@ -272,6 +275,7 @@ export const EditProductDescriptionForm = ({
       DescriptionSchema.parse(data.description);
       z.array(EditedPhotoSchema).parse(newEditedPhotos);
     } catch (error) {
+      stopLoading();
       showToast(`Wystąpił błąd walidacji danych: ${error}`, "error");
       return;
     }
@@ -296,6 +300,8 @@ export const EditProductDescriptionForm = ({
       }
     } catch (error) {
       showToast(`Wystąpił błąd podczas edycji opisu: ${error}`, "error");
+    } finally {
+      stopLoading();
     }
   };
 

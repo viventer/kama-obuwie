@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Fragment, useEffect } from "react";
+import { useState, Fragment } from "react";
 import {
   Table,
   TableBody,
@@ -52,6 +52,7 @@ import ShipmentsDialogContent from "../ShipmentsDialogContent";
 import axios from "axios";
 import InvoiceInfo from "../InvoiceInfo";
 import { useToast } from "@/hooks/useToast";
+import SalesChannelFilterSelector from "./SalesChannelFilterSelector";
 
 interface OrdersDataTableProps {
   orders: Order[];
@@ -75,6 +76,9 @@ export default function OrdersDataTable({
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [globalFilter, setGlobalFilter] = useState("");
+  const [salesChannelFilter, setSalesChannelFilter] = useState<
+    "all" | "AL1" | "AL2" | "DTC" | "POS"
+  >("all");
 
   const actions = useOrderActions(phase);
   const router = useRouter();
@@ -159,6 +163,17 @@ export default function OrdersDataTable({
       cell: () => null,
       enableSorting: false,
       enableColumnFilter: false,
+      size: 0,
+      meta: { hidden: true },
+    },
+    {
+      accessorKey: "salesChannel",
+      id: "salesChannel",
+      header: "Kanał",
+      cell: () => null,
+      enableSorting: false,
+      enableColumnFilter: true,
+      filterFn: "equalsString",
       size: 0,
       meta: { hidden: true },
     },
@@ -279,7 +294,7 @@ export default function OrdersDataTable({
                     let returnsForOrder;
                     try {
                       const { data } = await axios.get(
-                        `/api/allegro/returns?allegroOrderId=${row.original.allegroId}`
+                        `/api/allegro/returns?allegroOrderId=${row.original.allegroId}`,
                       );
                       returnsForOrder = data;
                     } catch (err) {
@@ -303,7 +318,7 @@ export default function OrdersDataTable({
                         onCancel: () => {
                           showToast(
                             "Etykieta nie została wygenerowana.",
-                            "default"
+                            "default",
                           );
                           router.back();
                           return;
@@ -312,12 +327,12 @@ export default function OrdersDataTable({
                     }
 
                     router.push(
-                      `/admin-panel/orders/allegro/create-label/${row.original.id}`
+                      `/admin-panel/orders/allegro/create-label/${row.original.id}`,
                     );
                   }
 
                   router.push(
-                    `/admin-panel/orders/create-label/${row.original.id}`
+                    `/admin-panel/orders/create-label/${row.original.id}`,
                   );
 
                   return;
@@ -368,6 +383,7 @@ export default function OrdersDataTable({
         buyerPhone: false,
         buyerLogin: false,
         signatures: false,
+        salesChannel: false,
       },
       rowSelection,
       expanded,
@@ -390,12 +406,18 @@ export default function OrdersDataTable({
   return (
     <div className="w-full max-h-[70svh] max-w-[1440px]">
       {/* Pole wyszukiwania */}
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 gap-4 flex-wrap">
         <Input
           placeholder="Szukaj zamówień"
           value={globalFilter}
           onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-xs"
+        />
+
+        <SalesChannelFilterSelector
+          salesChannelFilter={salesChannelFilter}
+          setSalesChannelFilter={setSalesChannelFilter}
+          setColumnFilters={setColumnFilters}
         />
       </div>
 
@@ -411,7 +433,7 @@ export default function OrdersDataTable({
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -444,7 +466,7 @@ export default function OrdersDataTable({
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext()
+                          cell.getContext(),
                         )}
                       </TableCell>
                     ))}

@@ -175,6 +175,23 @@ export const AllegroOfferSchema = z.object({
     })
     .optional(),
   name: z.string().optional(),
+  payments: z
+    .object({
+      invoice: z.enum(["VAT", "VAT_MARGIN", "WITHOUT_VAT", "NO_INVOICE"]),
+    })
+    .optional(),
+  taxSettings: z
+    .object({
+      rates: z.array(
+        z.object({
+          rate: z.enum(["23.00"]),
+          countryCode: z.enum(["PL"]),
+        }),
+      ),
+      subject: z.string().optional(),
+      exemption: z.string().optional(),
+    })
+    .optional(),
 });
 
 export const PostOfferFormSchema = OfferSchema.pick({

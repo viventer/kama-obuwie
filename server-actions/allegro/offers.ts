@@ -71,7 +71,7 @@ export const editAllegroOffer = async (
   id: string,
   channel: "AL1" | "AL2",
   data: Partial<AllegroOffer>,
-  options?: { userId?: string; skipAuth?: boolean }
+  options?: { userId?: string; skipAuth?: boolean },
 ): Promise<void> => {
   // Pomiń weryfikację jeśli mamy userId (zadanie w tle) lub skipAuth
   if (!options?.userId && !options?.skipAuth) {
@@ -102,7 +102,7 @@ export const editAllegroOffer = async (
 export const getAllegroOffer = async (
   id: string,
   channel: "AL1" | "AL2",
-  options?: { userId?: string; skipAuth?: boolean }
+  options?: { userId?: string; skipAuth?: boolean },
 ): Promise<AllegroOffer> => {
   // Pomiń weryfikację jeśli mamy userId (zadanie w tle) lub skipAuth
   if (!options?.userId && !options?.skipAuth) {
@@ -134,7 +134,7 @@ export const getAllegroOffer = async (
 };
 
 export const postAllegroOffer = async (
-  data: PostOfferBody
+  data: PostOfferBody,
 ): Promise<{ AL1: Record<string, string>; AL2: Record<string, string> }> => {
   await verifyUser(["ADMIN", "VERIFIED"]);
   const {
@@ -192,6 +192,17 @@ export const postAllegroOffer = async (
         impliedWarranty: {
           id: offer.impliedWarranty![channel] as string,
         },
+      },
+      payments: {
+        invoice: "VAT" as const,
+      },
+      taxSettings: {
+        rates: [
+          {
+            rate: "23.00" as const,
+            countryCode: "PL" as const,
+          },
+        ],
       },
     };
 
@@ -263,7 +274,7 @@ export const postAllegroOffer = async (
 };
 
 export async function postIndividualAllegroOffer(
-  data: AllegroIndividualOffer
+  data: AllegroIndividualOffer,
 ): Promise<string> {
   const {
     images,
@@ -295,7 +306,7 @@ export async function postIndividualAllegroOffer(
   const formattedProductParameters = await formatAllegroProductParameters(
     product.parameters,
     allegroCategoryId,
-    product.brand
+    product.brand,
   );
 
   const allegroProductParameters = addMissingAllegroParameters(
@@ -304,7 +315,7 @@ export async function postIndividualAllegroOffer(
     insoleLength || null,
     colorVariant,
     product.manufacturerCode,
-    insoleLength ? offer.EAN?.[`r${insoleLength.size}`] : undefined
+    insoleLength ? offer.EAN?.[`r${insoleLength.size}`] : undefined,
   );
 
   if (!product?.responsibleProducer?.[channel]) {
@@ -355,7 +366,7 @@ export async function postIndividualAllegroOffer(
   const description = await convertToAllegroDescription(
     product.description as Description,
     images,
-    descriptionVariableValues
+    descriptionVariableValues,
   );
 
   const signature = `${product.brand ? product.brand : ""} ${
@@ -390,7 +401,7 @@ export async function postIndividualAllegroOffer(
   } catch (err) {
     return handleAllegroApiError(
       err,
-      "Błąd podczas tworzenia oferty na Allegro"
+      "Błąd podczas tworzenia oferty na Allegro",
     );
   }
 }
@@ -477,21 +488,21 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
   const shippingRateId = offer.shippingRates?.[channel]?.allegroId;
   if (!shippingRateId) {
     throw new Error(
-      `Brak stawek wysyłki (shippingRates) dla kanału ${channel}.`
+      `Brak stawek wysyłki (shippingRates) dla kanału ${channel}.`,
     );
   }
 
   const impliedWarrantyId = offer.impliedWarranty?.[channel];
   if (!impliedWarrantyId) {
     throw new Error(
-      `Brak warunków reklamacji (impliedWarranty) dla kanału ${channel}.`
+      `Brak warunków reklamacji (impliedWarranty) dla kanału ${channel}.`,
     );
   }
 
   const returnPolicyId = offer.returnPolicy?.[channel];
   if (!returnPolicyId) {
     throw new Error(
-      `Brak polityki zwrotów (returnPolicy) dla kanału ${channel}.`
+      `Brak polityki zwrotów (returnPolicy) dla kanału ${channel}.`,
     );
   }
 
@@ -574,7 +585,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
   } catch (err) {
     return handleAllegroApiError(
       err,
-      "Błąd podczas tworzenia oferty na Allegro (legacy)"
+      "Błąd podczas tworzenia oferty na Allegro (legacy)",
     );
   }
 }
@@ -582,7 +593,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
 export async function formatAllegroProductParameters(
   productParameters: ProductParameters,
   allegroCategoryId: string,
-  productBrand?: string
+  productBrand?: string,
 ): Promise<AllegroOfferParameters> {
   const result: AllegroOfferParameters = [];
 
@@ -620,7 +631,7 @@ export async function formatAllegroProductParameters(
       ) {
         if (!productBrand) {
           throw new Error(
-            "Brak marki produktu, ale marka 'inna' została wybrana."
+            "Brak marki produktu, ale marka 'inna' została wybrana.",
           );
         }
 
@@ -658,7 +669,7 @@ async function getAllegroBrandAmbiguousValueId(categoryId: string): Promise<{
   const parameters = resp.data.parameters;
 
   const brandParameter = parameters.find(
-    (p: { name: string }) => p.name === "Marka"
+    (p: { name: string }) => p.name === "Marka",
   );
 
   if (!brandParameter) {

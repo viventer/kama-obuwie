@@ -125,8 +125,12 @@ export async function convertOfferToMerchantCenterProducts(
 
     categoryId = legacyProduct.categoryId;
   } else {
+    const photos = product.editedPhotos?.filter(
+      (photo) => photo.colorVariantName === offer.colorVariantName,
+    );
+    if (!photos || photos.length === 0) return null;
     const imagesUrls = await getImagesUrls(
-      product.editedPhotos?.map((photo) => photo.filePath) || [],
+      photos.map((photo) => photo.filePath) || [],
     );
     if (!imagesUrls || imagesUrls.length === 0) return null;
     productData.imagesUrls = imagesUrls;

@@ -31,6 +31,7 @@ import { verifyUser } from "../auth/auth";
 import { updateOffer } from "../offers/offers";
 import { getRequiredEnv } from "@/helpers/env";
 import { mapWithConcurrency } from "@/helpers/other";
+import { stripEmoji } from "@/helpers/encoding";
 
 export async function insertGoogleMerchantProduct(
   product: MerchantCenterFootwearProduct,
@@ -119,7 +120,7 @@ export async function convertOfferToMerchantCenterProducts(
       legacyProduct.allegroDescription,
     );
     if (salesDescription) {
-      productData.description = salesDescription;
+      productData.description = stripEmoji(salesDescription);
     }
 
     categoryId = legacyProduct.categoryId;
@@ -131,7 +132,7 @@ export async function convertOfferToMerchantCenterProducts(
     productData.imagesUrls = imagesUrls;
     const { salesDescription } = parseProductDescription(product.description);
     if (salesDescription) {
-      productData.description = salesDescription;
+      productData.description = stripEmoji(salesDescription);
     }
 
     categoryId = product.categoryId;

@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { MoveRightIcon } from "lucide-react";
 import { allegroSalesChannels } from "@/lib/constants";
+import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
+import ChangeAvailabilityDialogContent from "../ChangeAvailabilityDialogContent";
+import { useToast } from "@/hooks/useToast";
 
 export default function OffersDataTable({
   data,
@@ -13,6 +16,8 @@ export default function OffersDataTable({
   data: OfferWithId[] | null;
 }) {
   const router = useRouter();
+  const { openDialog, closeDialog } = useDialogWindow();
+  const { showToast } = useToast();
 
   const columnNames = [
     { attributeName: "signature", displayName: "Sygnatura" },
@@ -25,6 +30,32 @@ export default function OffersDataTable({
       name: "Edytuj ofertę",
       onClick: (id) => {
         router.push(`/admin-panel/offers/${id}`);
+      },
+    },
+    {
+      name: "Zmień dostępność",
+      onClick: (id) => {
+        const offer = data?.find((offer) => offer.id === id);
+        if (!offer || !offer.availability) {
+          showToast(
+            "Nie można zmienić dostępności: brak danych oferty.",
+            "error",
+          );
+          return;
+        }
+
+        openDialog({
+          title: "Zmień dostępność",
+          content: (
+            <ChangeAvailabilityDialogContent
+              offerId={id!}
+              availability={offer.availability!}
+              allegroOffersIds={offer.allegroOffersIds}
+              isAddedToMerchantCenter={offer?.isAddedToMerchantCenter || false}
+            />
+          ),
+          hasCancelButton: false,
+        });
       },
     },
   ];

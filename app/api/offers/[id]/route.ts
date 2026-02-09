@@ -6,7 +6,7 @@ import { apiResponse } from "@/server-actions/helpers";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const data = await getDocumentFromAdminDB("offers", id);
@@ -18,11 +18,12 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const body: Partial<Offer> = await request.json();
 
+  console.log("Otrzymane dane do aktualizacji oferty:", body);
   await updateOffer(id, body);
 
   return apiResponse("Oferta została zaaktualizowana.", 200);
@@ -30,7 +31,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const { data, ref } = await getDocumentFromAdminDB("offers", id);

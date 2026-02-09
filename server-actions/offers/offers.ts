@@ -192,7 +192,7 @@ export const syncOffersAvailability = async function (
           unit: "PAIR" as const,
         },
         publication: {
-          status: newAvailability > 0 ? "ACTIVE" : "INACTIVE",
+          status: newAvailability > 0 ? "ACTIVE" : "ENDED",
         },
       };
 

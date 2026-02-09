@@ -16,69 +16,10 @@ import { Button } from "@/components/ui/button";
 import { useFullPageLoading } from "../../global/FullPageLoader";
 import { validateOfferForm } from "../helpers/validation";
 import { useToast } from "@/hooks/useToast";
-import { AllegroOffer } from "@/firebase/schemas/offersSchemas";
 import { allegroSalesChannels } from "@/lib/constants";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { useRouter } from "next/navigation";
-
-function convertOfferPartialToAllegroOfferPartial(
-  offerFragment: Partial<OfferWithId>,
-  salesChannel: "AL1" | "AL2",
-): Partial<AllegroOffer> {
-  const allegroOffer: Partial<AllegroOffer> = {};
-
-  if (offerFragment.sellingPrices?.[salesChannel]) {
-    allegroOffer.sellingMode = {
-      price: {
-        amount: offerFragment.sellingPrices[salesChannel],
-        currency: "PLN",
-      },
-    };
-  } else {
-    throw new Error(`Brak ceny sprzedaży dla kanału ${salesChannel}`);
-  }
-
-  if (offerFragment.shippingRates?.[salesChannel]?.allegroId) {
-    allegroOffer.delivery = {
-      shippingRates: {
-        id: offerFragment.shippingRates[salesChannel].allegroId,
-      },
-    };
-  } else {
-    throw new Error(`Brak stawek wysyłki dla kanału ${salesChannel}`);
-  }
-
-  const afterSalesServices: AllegroOffer["afterSalesServices"] = {
-    impliedWarranty: { id: "" },
-    returnPolicy: { id: "" },
-  };
-
-  if (offerFragment.returnPolicy?.[salesChannel]) {
-    afterSalesServices.returnPolicy = {
-      id: offerFragment.returnPolicy[salesChannel],
-    };
-  } else {
-    throw new Error(`Brak polityki zwrotów dla kanału ${salesChannel}`);
-  }
-
-  if (offerFragment.impliedWarranty?.[salesChannel]) {
-    afterSalesServices.impliedWarranty = {
-      id: offerFragment.impliedWarranty[salesChannel],
-    };
-  } else {
-    throw new Error(`Brak warunków reklamacji dla kanału ${salesChannel}`);
-  }
-
-  if (offerFragment.warranty?.[salesChannel]) {
-    afterSalesServices.warranty = {
-      id: offerFragment.warranty[salesChannel],
-    };
-  }
-
-  allegroOffer.afterSalesServices = afterSalesServices;
-
-  return allegroOffer;
-}
+import { convertOfferPartialToAllegroOfferPartial } from "../helpers/offers";
 
 export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
   const { startLoading, stopLoading } = useFullPageLoading();
@@ -91,23 +32,12 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
       title: oldData.title || "",
       sellingPrices: oldData.sellingPrices || {},
       shippingRates: oldData.shippingRates || {},
-      availability: oldData.availability || {},
       returnPolicy: oldData.returnPolicy || {},
       warranty: oldData.warranty || {},
       impliedWarranty: oldData.impliedWarranty || {},
     },
     mode: "onChange",
   });
-
-  const sizes = Object.keys(oldData.availability);
-  useEffect(() => {
-    sizes.forEach((size) => {
-      const current = form.getValues(`availability.${size}.value`);
-      if (current == null) {
-        form.setValue(`availability.${size}.value`, "1");
-      }
-    });
-  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -170,8 +100,7 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
     }
 
     try {
-      const availabilityMap = formData.availability || {};
-      const sizesToProcess = Object.keys(availabilityMap);
+      const sizesToProcess = Object.keys(oldData.availability);
 
       const updatePromises = allegroSalesChannels.flatMap((salesChannel) => {
         const offersIds =
@@ -181,20 +110,9 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
           >) || {};
 
         return sizesToProcess.map(async (size) => {
-          const availability = Number(
-            form.getValues(`availability.${size}.value`),
-          );
-
           const offerPartial = {
             ...offersPartials[salesChannel],
-            stock: {
-              available: availability || 0,
-              unit: "PAIR",
-            },
             name: `${form.getValues("title")} ${size != "null" && size ? size : ""}`.trim(),
-            publication: {
-              status: availability > 0 ? "ACTIVE" : "INACTIVE",
-            },
           };
 
           const existingOfferId = offersIds[size];
@@ -292,7 +210,6 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
         <ReturnPolicySelector />
         <ImpliedWarrantySelector />
         <WarrantySelector />
-        <AvailabilityField sizes={sizes} mode={"edit"} />
       </div>
       <div className="flex mt-8 gap-4">
         <Button onClick={(e) => handleSubmit(e)} className="w-fit">

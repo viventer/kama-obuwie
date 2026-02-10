@@ -5,30 +5,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
 import { MailIcon, PhoneIcon, ClockIcon, InfoIcon } from "lucide-react";
 import LinkText from "@/components/adminPanel/global/LinkText";
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 
 export default function ContactPage() {
   return (
     <div className="container mx-auto max-w-4xl space-y-8">
-      {/* Nagłówek strony */}
-      <div className="text-center space-y-2">
-        <h2 className="text-xl font-bold text-foreground">Obsługa klienta</h2>
-        <p className=" text-lg">
-          Skontaktuj się z nami lub znajdź odpowiedzi na najczęściej zadawane
-          pytania
-        </p>
-      </div>
+      <SubpageHeading text="Obsługa klienta" />
 
       {/* Sekcja danych kontaktowych */}
-      <Card>
+      <Card className="gap-2">
         <CardHeader>
           <CardTitle className="text-lg">Dane kontaktowe</CardTitle>
-          <CardDescription>
-            Jesteśmy do Twojej dyspozycji w godzinach pracy
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Kontakt */}
@@ -85,7 +74,7 @@ export default function ContactPage() {
             </a>
             .
           </CardDescription>
-          <CardContent>
+          <CardContent className="px-0">
             <p>Anna Kamińska - "KAM-A"</p>
             <p>ul. Krzęczków 42a</p>
             <p>32-700 Bochnia</p>

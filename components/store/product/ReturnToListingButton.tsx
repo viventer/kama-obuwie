@@ -33,8 +33,8 @@ export default function ReturnToListingButton({
   return (
     <Card
       className={cn(
-        "flex-row gap-2 items-center pl-2 pr-2 cursor-pointer transition-colors md:hover:bg-secondary/50 active:bg-secondary/75 w-fit border-none py-0 bg-transparent md:py-1 md:pr-4",
-        className
+        "flex-row gap-2 items-center pl-2 pr-2 cursor-pointer transition-colors md:hover:bg-text/10 active:bg-text/15 w-fit shadow-none border-none py-0 bg-transparent md:py-1 md:pr-4",
+        className,
       )}
       onClick={clickHandler}
     >

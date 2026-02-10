@@ -1,12 +1,11 @@
 import LinkText from "@/components/adminPanel/global/LinkText";
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function RegulationsPage() {
   return (
     <section>
-      <h1 className="text-2xl font-bold mb-4">
-        Regulamin sklepu internetowego kama-obuwie
-      </h1>
+      <SubpageHeading text="Regulamin sklepu internetowego" />
       <p className="text-muted-foreground mb-8">
         Niniejszy regulamin określa zasady korzystania ze sklepu internetowego
         kama-obuwie, dostępnego pod adresem internetowym{" "}

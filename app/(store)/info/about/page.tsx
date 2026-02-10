@@ -1,3 +1,4 @@
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import {
   Card,
   CardContent,
@@ -5,100 +6,159 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  MapPinIcon,
-  ClockIcon,
-  ShoppingBagIcon,
-  StarIcon,
-  InfoIcon,
-} from "lucide-react";
+import { MapPinIcon, ClockIcon, InfoIcon } from "lucide-react";
 
 export default function AboutPage() {
   return (
     <div className="container mx-auto max-w-4xl space-y-8">
       {/* Nagłówek strony */}
-      <div className="text-center space-y-2">
-        <h2 className="text-xl font-bold text-foreground">O firmie</h2>
-        <p className="text-foreground text-lg">
-          Poznaj naszą historię i dowiedz się, dlaczego warto nam zaufać
-        </p>
-      </div>
+      <SubpageHeading text="Informacje o firmie" />
 
       {/* Główna sekcja o firmie */}
-      <Card>
+      <Card className=" gap-2">
         <CardHeader>
           <CardTitle className="text-lg">Nasza historia</CardTitle>
           <CardDescription>
             Ponad 13 lat doświadczenia w branży obuwniczej
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="prose prose-neutral max-w-none">
-            <p className="text-foreground leading-relaxed">
-              Działamy już od ponad{" "}
-              <span className="font-semibold text-foreground">13 lat</span> jako
-              sklep z obuwiem dla całej rodziny. Przez te wszystkie lata
-              zdobyliśmy zaufanie tysięcy zadowolonych klientów, oferując
-              szeroki wybór wysokiej jakości obuwia.
-            </p>
+        <CardContent>
+          <p className="text-text">
+            Od ponad 13 lat prowadzimy sklep z obuwiem dla całej rodziny,
+            zdobywając zaufanie tysięcy klientów. Oferujemy szeroki wybór butów
+            damskich, męskich i dziecięcych – codziennych, eleganckich i
+            sportowych. Stawiamy na jakość, komfort i atrakcyjne ceny oraz
+            zapewniamy szybką realizację zamówień i profesjonalną obsługę.
+          </p>
+        </CardContent>
+      </Card>
 
-            <p className="text-foreground leading-relaxed">
-              Oferujemy szeroki wybór obuwia damskiego, męskiego i dziecięcego –
-              od codziennego po eleganckie i sportowe modele. Stawiamy na
-              sprawdzoną jakość, komfort i atrakcyjne ceny, dzięki czemu zaufały
-              nam już tysiące klientów.
-            </p>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <InfoIcon className="text-brand" />
+            <h2>Dane firmy</h2>
+          </CardTitle>
+          <CardDescription>
+            Informacje prawne o firmie. Podany adres <b>nie</b> służy do
+            zwrotów. Adres do zwrotów znajdziesz{" "}
+            <a href="/info/returns" className="underline hover:text-brand">
+              tutaj
+            </a>
+            .
+          </CardDescription>
+          <CardContent className="px-0">
+            <p>Anna Kamińska - "KAM-A"</p>
+            <p>ul. Krzęczków 42a</p>
+            <p>32-700 Bochnia</p>
+            <p>NIP: 8681255945</p>
+          </CardContent>
+        </CardHeader>
+      </Card>
 
-            <p className="text-foreground leading-relaxed">
-              Dbamy o szybką realizację zamówień oraz profesjonalną obsługę, by
-              zakupy były zawsze wygodne i bezproblemowe.
-            </p>
-          </div>
+      {/* Nasze wartości */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Dlaczego warto nam zaufać?</CardTitle>
+          <CardDescription>
+            Dowiedz się co wyróżnia nas na tle konkurencji
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">
+                    Sprawdzona jakość
+                  </h3>
+                  <p className="text-sm text-foreground">
+                    Współpracujemy tylko z renomowanymi markami i dostawcami
+                  </p>
+                </div>
+              </div>
 
-          {/* Wyróżniki */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mt-8">
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-sm">
-              <ClockIcon className="text-brand w-8 h-8 mb-3" />
-              <h3 className="font-semibold text-foreground text-sm mb-1">
-                13+ lat doświadczenia
-              </h3>
-              <p className="text-xs text-foreground">Sprawdzona jakość usług</p>
+              <div className="flex items-start space-x-3">
+                <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">
+                    Darmowe, łatwe zwroty
+                  </h3>
+                  <p className="text-sm text-foreground">
+                    30 dni na bezpłatny zwrot poprzez Paczkomat InPost
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">
+                    Szybka dostawa
+                  </h3>
+                  <p className="text-sm text-foreground">
+                    Zamówienia złożone do godziny 13:00 otrzymasz zwykle
+                    kolejnego dnia roboczego
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-sm">
-              <ShoppingBagIcon className="text-brand w-8 h-8 mb-3" />
-              <h3 className="font-semibold text-foreground text-sm mb-1">
-                Szeroki asortyment
-              </h3>
-              <p className="text-xs text-foreground">
-                Obuwie dla całej rodziny
-              </p>
-            </div>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">
+                    Profesjonalna obsługa
+                  </h3>
+                  <p className="text-sm text-foreground">
+                    Nasz zespół zawsze służy pomocą i doradztwem
+                  </p>
+                </div>
+              </div>
 
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-sm">
-              <StarIcon className="text-brand w-8 h-8 mb-3" />
-              <h3 className="font-semibold text-foreground text-sm mb-1">
-                Zadowoleni klienci
-              </h3>
-              <p className="text-xs text-foreground">
-                Tysiące pozytywnych opinii
-              </p>
-            </div>
+              <div className="flex items-start space-x-3">
+                <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">
+                    Darmowa dostawa przez InPost
+                  </h3>
+                  <p className="text-sm text-foreground">
+                    Dostawa gratis przy zamówieniach powyżej 55 zł
+                  </p>
+                </div>
+              </div>
 
-            <div className="flex flex-col items-center text-center p-4 bg-muted rounded-sm">
-              <MapPinIcon className="text-brand w-8 h-8 mb-3" />
-              <h3 className="font-semibold text-foreground text-sm mb-1">
-                Sklep stacjonarny
-              </h3>
-              <p className="text-xs text-foreground">
-                Sprawdź nasze lokalizację
-              </p>
+              <div className="flex items-start space-x-3">
+                <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">
+                    Bezpieczne i szybkie metody płatności
+                  </h3>
+                  <p className="text-sm text-foreground">
+                    Metody płatności online są realizowane przez Przelewy24.
+                    Istnieje również możliwość płatności przy odbiorze.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3">
+                <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">
+                    Długoletnie doświadczenie
+                  </h3>
+                  <p className="text-sm text-foreground">
+                    Ponad 13 lat na rynku to gwarancja niezawodności
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Sekcja sklepu stacjonarnego */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Sklep stacjonarny</CardTitle>
@@ -148,131 +208,6 @@ export default function AboutPage() {
             </div>
           </div>
         </CardContent>
-      </Card>
-
-      {/* Nasze wartości */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Dlaczego warto nam zaufać?</CardTitle>
-          <CardDescription>
-            Poznaj nasze główne wartości i podejście do biznesu
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-brand mt-2"></div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">
-                    Sprawdzona jakość
-                  </h3>
-                  <p className="text-sm text-foreground">
-                    Współpracujemy tylko z renomowanymi markami i dostawcami
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-brand mt-2"></div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">
-                    Darmowe, łatwe zwroty
-                  </h3>
-                  <p className="text-sm text-foreground">
-                    30 dni na bezpłatny zwrot poprzez Paczkomat InPost
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-brand mt-2"></div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">
-                    Szybka dostawa
-                  </h3>
-                  <p className="text-sm text-foreground">
-                    Zamówienia złożone do godziny 13:00 otrzymasz zwykle
-                    kolejnego dnia roboczego
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-brand mt-2"></div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">
-                    Profesjonalna obsługa
-                  </h3>
-                  <p className="text-sm text-foreground">
-                    Nasz zespół zawsze służy pomocą i doradztwem
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-brand mt-2"></div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">
-                    Darmowa dostawa przez InPost
-                  </h3>
-                  <p className="text-sm text-foreground">
-                    Dostawa gratis przy zamówieniach powyżej 55 zł
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-brand mt-2"></div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">
-                    Bezpieczne i szybkie metody płatności
-                  </h3>
-                  <p className="text-sm text-foreground">
-                    Oferujemy różnorodne metody płatności, aby zakupy były
-                    wygodne i bezpieczne
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-brand mt-2"></div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-1">
-                    Długoletnie doświadczenie
-                  </h3>
-                  <p className="text-sm text-foreground">
-                    Ponad 13 lat na rynku to gwarancja niezawodności
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <InfoIcon className="text-brand" />
-            <h2>Dane firmy</h2>
-          </CardTitle>
-          <CardDescription>
-            Informacje prawne o firmie. Podany adres <b>nie</b> służy do
-            zwrotów. Adres do zwrotów znajdziesz{" "}
-            <a href="/info/returns" className="underline hover:text-brand">
-              tutaj
-            </a>
-            .
-          </CardDescription>
-          <CardContent>
-            <p>Anna Kamińska - "KAM-A"</p>
-            <p>ul. Krzęczków 42a</p>
-            <p>32-700 Bochnia</p>
-            <p>NIP: 8681255945</p>
-          </CardContent>
-        </CardHeader>
       </Card>
     </div>
   );

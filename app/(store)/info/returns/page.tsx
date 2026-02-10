@@ -1,5 +1,6 @@
 "use client";
 
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,7 +13,7 @@ import {
 export default function ReturnsPage() {
   return (
     <section>
-      <h2 className="text-xl font-bold mb-2">Jak zwrócić produkt?</h2>
+      <SubpageHeading text="Jak zwrócić produkt?" />
       <ol className="list-decimal list-inside space-y-2">
         <li>Wypełnij formularz zwrotu.</li>
         <li>
@@ -32,7 +33,32 @@ export default function ReturnsPage() {
         </a>
       </Button>
 
-      <section className="mt-8 space-y-6">
+      <Card className="gap-2 mt-8">
+        <CardHeader className="text-lg">
+          <CardTitle>Adres do zwrotów</CardTitle>
+          <CardDescription>
+            W przypadku zwrotu metodą własną, użyj tego adresu.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div>
+            <p>Anna Kamińska - "KAM-A"</p>
+            <p>ul. Plac Gazaris 11</p>
+            <p>
+              <b>nr lokalu:</b> stoisko nr 39
+            </p>
+            <p>32-700 Bochnia</p>
+            <p>
+              <b>nr tel.:</b> 664097737
+            </p>
+            <p>
+              <b>email:</b> kontakt.obuwie.kama@gmail.com
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <section className="space-y-6 mt-8">
         <Card className="gap-0">
           <CardHeader className="font-bold text-lg">
             <h3>Ile kosztuje zwrot?</h3>
@@ -79,30 +105,6 @@ export default function ReturnsPage() {
               adres podany poniżej. W takim przypadku pokrywasz koszty zwrotu
               samodzielnie. Nie przyjmujemy zwrotów nadanych za pobraniem.
             </p>
-          </CardContent>
-        </Card>
-        <Card className="gap-2">
-          <CardHeader className="text-lg">
-            <CardTitle>Adres do zwrotów</CardTitle>
-            <CardDescription>
-              W przypadku zwrotu metodą własną, użyj tego adresu.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <p>Anna Kamińska - "KAM-A"</p>
-              <p>ul. Plac Gazaris 11</p>
-              <p>
-                <b>nr lokalu:</b> stoisko nr 39
-              </p>
-              <p>32-700 Bochnia</p>
-              <p>
-                <b>nr tel.:</b> 664097737
-              </p>
-              <p>
-                <b>email:</b> kontakt.obuwie.kama@gmail.com
-              </p>
-            </div>
           </CardContent>
         </Card>
       </section>

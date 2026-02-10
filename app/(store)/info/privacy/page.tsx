@@ -1,12 +1,11 @@
 import LinkText from "@/components/adminPanel/global/LinkText";
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function PrivacyPage() {
   return (
     <section>
-      <h1 className="text-2xl font-bold mb-4">
-        Polityka prywatności i cookies
-      </h1>
+      <SubpageHeading text="Polityka prywatności i cookies" />
       <p className="text-muted-foreground mb-8">
         Niniejsza polityka określa zasady przetwarzania danych osobowych oraz
         wykorzystania plików cookies w sklepie internetowym Kama-Obuwie, zgodnie

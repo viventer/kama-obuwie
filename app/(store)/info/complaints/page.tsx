@@ -1,11 +1,12 @@
 import LinkText from "@/components/adminPanel/global/LinkText";
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 
 export default function ComplaintsPage() {
   return (
     <section>
-      <h2 className="text-xl font-bold mb-2">Jak złożyć reklamację?</h2>
+      <SubpageHeading text="Jak złożyć reklamację?" />
       <ol className="list-decimal list-inside space-y-4">
         <li>
           <strong>Pobierz formularz reklamacyjny</strong>

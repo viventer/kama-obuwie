@@ -1,3 +1,4 @@
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import GoogleIcon from "@/components/icons/GoogleIcon";
 import {
   Card,
@@ -7,26 +8,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  BanknoteIcon,
-  CreditCardIcon,
-  LandmarkIcon,
-  SmartphoneIcon,
-} from "lucide-react";
+import { BanknoteIcon } from "lucide-react";
 import Image from "next/image";
 
 export default function ShippingAndPaymentMethods() {
   return (
     <div className="container mx-auto max-w-4xl space-y-8">
-      {/* Nagłówek strony */}
-      <div className="text-center space-y-2">
-        <h2 className="text-xl font-bold text-foreground">
-          Dostawa i płatność
-        </h2>
-        <p className="text-muted-foreground text-lg">
-          Sprawdź dostępne opcje dostawy i płatności w naszym sklepie
-        </p>
-      </div>
+      <SubpageHeading text="Dostawa i płatności" />
 
       {/* Sekcja dostaw */}
       <Card>

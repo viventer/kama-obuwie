@@ -48,7 +48,7 @@ export default function SelectProductVariant({
                 <div
                   className={`
                     relative
-                    after:rounded-b-sm
+                    after:rounded-b-xs
                     after:absolute after:left-0 after:right-0 after:bottom-0
                     after:h-1 md:after:h-1.5
                     after:bg-brand

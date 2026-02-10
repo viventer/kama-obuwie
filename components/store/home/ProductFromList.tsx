@@ -28,7 +28,7 @@ export default function ProductFromList({
       {/* <button className="bg-success text-white rounded-full p-2 absolute top-1 left-1 md:top-2 md:left-2 z-10 hover:brightness-115 hover:shadow-lg hover:shadow-success transition-all cursor-pointer">
         <ShoppingBasketIcon className="size-6 md:size-8" />
       </button> */}
-      <div className="w-full aspect-square bg-white rounded-t-sm flex justify-center items-center">
+      <div className="w-full aspect-square bg-white rounded-t-xs flex justify-center items-center">
         <Image
           src={product.thumbnailUrl}
           alt=""

@@ -2,6 +2,8 @@
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Availability } from "@/firebase/schemas/offersSchemas";
+import { cn } from "@/lib/utils";
+import { XIcon } from "lucide-react";
 
 interface ProductPageSizeSelectorProps {
   availability: Record<string, Availability>;
@@ -52,26 +54,25 @@ export default function ProductPageSizeSelector({
                 disabled={!available}
                 className={`
                   p-3 w-10 h-10 max-w-10 md:w-12 md:h-12 md:max-w-12 aspect-square
-                  data-[state=active]:bg-transparent data-[state=active]:shadow-none 
-                  bg-transparent rounded-lg
+                  data-[state=active]:bg-primary 
+                   rounded-lg
                   transition-all font-medium
-                  hover:bg-transparent
                   relative
-                  border-1 
-                  border-text/25
-                  ${
-                    available
-                      ? isSelected
-                        ? "border-2 border-success"
-                        : "hover:border-text"
-                      : "border-destructive border-2 cursor-not-allowed opacity-50"
-                  }
+                  data-[state=inactive]:text-text
+                  data-[state=active]:text-white
+                  text-base bg-secondary/15 hover:bg-primary/30 shadow-none
+                  border-none
+                  ${available ? "" : " cursor-not-allowed !opacity-30"}
                 `}
               >
-                <span className="text-sm text-text">{size}</span>
-                {isSelected && available && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-success rounded-full"></div>
-                )}
+                <span
+                  className={cn(
+                    "text-sm",
+                    !available && "line-through decoration-2",
+                  )}
+                >
+                  {size}
+                </span>
               </TabsTrigger>
             );
           })}

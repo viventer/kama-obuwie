@@ -38,7 +38,7 @@ export default function Footer() {
           url: "/info/shipping-and-payment-methods",
         },
         {
-          label: "O nas",
+          label: "O firmie",
           url: "/info/about",
         },
       ],

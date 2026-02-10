@@ -1,7 +1,6 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { PostOfferFormValues } from "./PostOfferForm";
 import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import MiniLoader from "../../global/MiniLoader";
@@ -9,15 +8,19 @@ import MiniLoader from "../../global/MiniLoader";
 export default function AvailabilityField({
   sizes,
   mode,
+  namePrefix = "availability",
+  isModal = false,
 }: {
   sizes: string[];
   mode: "edit" | "create";
+  namePrefix?: string;
+  isModal?: boolean;
 }) {
-  const { control } = useFormContext<PostOfferFormValues>();
+  const { control } = useFormContext();
 
   return (
     <div>
-      <h3 className="font-medium">Dostępność</h3>
+      {!isModal && <h3 className="font-medium">Dostępność</h3>}
       <div className="mt-2 flex gap-3 flex-wrap max-w-md">
         {sizes.length === 0 ? (
           <MiniLoader />
@@ -27,7 +30,11 @@ export default function AvailabilityField({
               rules={{ required: "Wartość dostępności jest wymagana." }}
               key={size}
               control={control}
-              name={`availability.${size}.value`}
+              name={
+                (namePrefix
+                  ? `${namePrefix}.${size}.value`
+                  : `${size}.value`) as any
+              }
               render={({ field }) => (
                 <FormItem className="w-[70px]">
                   <FormLabel className="text-sm opacity-85 font-normal">

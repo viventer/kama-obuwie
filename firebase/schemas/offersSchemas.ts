@@ -67,6 +67,12 @@ export const OfferSchema = z.object({
       }),
     )
     .optional(),
+  allegroIndividualPrices: z
+    .object({
+      areActive: z.boolean(),
+      values: z.record(z.string(), z.string()).optional(), // { "41": "123.45", "42": "67.89" }
+    })
+    .optional(),
   EAN: z.record(z.string(), z.string().optional()).optional(), // { "31": "1234567890123", "32": "9876543210987" }
   SKU: z.string().optional(),
   isAddedToMerchantCenter: z.boolean().optional(),

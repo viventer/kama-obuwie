@@ -61,10 +61,6 @@ export default function ProductPage({
   const { currentBreakpoint } = useBreakpoint();
   const [filteredVariants, setFilteredVariants] = useState<ColorVariant[]>([]);
 
-  useEffect(() => {
-    console.log(currentBreakpoint);
-  }, [currentBreakpoint]);
-
   if (!productData.colorVariants) {
     console.log(
       "Brak wariantów kolorystycznych dla produktu o ID:",

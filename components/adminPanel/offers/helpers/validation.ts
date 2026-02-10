@@ -3,7 +3,7 @@ import { UseFormReturn } from "react-hook-form";
 
 export const validateOfferForm = async (
   form: UseFormReturn,
-  mode: "edit" | "create"
+  mode: "edit" | "create",
 ): Promise<{ message: string; isValid: boolean }> => {
   // Sprawdź walidację pól formularza
   const isValid = await form.trigger();
@@ -20,33 +20,18 @@ export const validateOfferForm = async (
   }
 
   // Dodatkowa walidacja dostępności
-  const availability = form.getValues(
-    "availability"
-  ) as OfferWithId["availability"];
-
-  if (!availability || Object.keys(availability).length === 0) {
-    return {
-      message: "Brak dostępności produktu",
-      isValid: false,
-    };
-  }
-
-  for (const [size, sizeAvailability] of Object.entries(availability)) {
-    if (
-      !sizeAvailability?.value ||
-      sizeAvailability.value === "" ||
-      (sizeAvailability.value === "0" && mode === "create")
-    ) {
-      return {
-        message: `Minimalna dostępność dla rozmiaru ${size} wynosi 1.`,
-        isValid: false,
-      };
+  if (mode === "create") {
+    const availabilityCheck = validateAvailability(
+      form.getValues("availability") as OfferWithId["availability"],
+    );
+    if (availabilityCheck && !availabilityCheck.isValid) {
+      return availabilityCheck;
     }
   }
 
   // Walidacja cen sprzedaży
   const sellingPrices = form.getValues(
-    "sellingPrices"
+    "sellingPrices",
   ) as OfferWithId["sellingPrices"];
 
   if (!sellingPrices || Object.keys(sellingPrices).length === 0) {
@@ -67,7 +52,7 @@ export const validateOfferForm = async (
 
   // Walidacja stawek wysyłki
   const shippingRates = form.getValues(
-    "shippingRates"
+    "shippingRates",
   ) as OfferWithId["shippingRates"];
 
   if (!shippingRates || Object.keys(shippingRates).length === 0) {
@@ -88,7 +73,7 @@ export const validateOfferForm = async (
 
   // Walidacja polityki zwrotów
   const returnPolicy = form.getValues(
-    "returnPolicy"
+    "returnPolicy",
   ) as OfferWithId["returnPolicy"];
 
   if (!returnPolicy || Object.keys(returnPolicy).length === 0) {
@@ -109,7 +94,7 @@ export const validateOfferForm = async (
 
   // Walidacja warunków reklamacji
   const impliedWarranty = form.getValues(
-    "impliedWarranty"
+    "impliedWarranty",
   ) as OfferWithId["impliedWarranty"];
 
   if (!impliedWarranty || Object.keys(impliedWarranty).length === 0) {
@@ -138,5 +123,30 @@ export const isValidUrl = (value: any): value is string => {
     return true;
   } catch {
     return false;
+  }
+};
+
+export const validateAvailability = (
+  availability: OfferWithId["availability"],
+  mode: "edit" | "create" = "create",
+) => {
+  if (!availability || Object.keys(availability).length === 0) {
+    return {
+      message: "Brak dostępności produktu",
+      isValid: false,
+    };
+  }
+
+  for (const [size, sizeAvailability] of Object.entries(availability)) {
+    if (
+      !sizeAvailability?.value ||
+      sizeAvailability.value === "" ||
+      (sizeAvailability.value === "0" && mode === "create")
+    ) {
+      return {
+        message: `Minimalna dostępność dla rozmiaru ${size} wynosi 1.`,
+        isValid: false,
+      };
+    }
   }
 };

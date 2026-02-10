@@ -27,7 +27,7 @@ export default function ColorVariantValuesSelector({
       const selectedColor = value[index].color;
 
       const selectedColorWithShades = colorsWithShades.find(
-        (color) => color.color === selectedColor
+        (color) => color.color === selectedColor,
       );
 
       if (selectedColorWithShades) {
@@ -49,7 +49,7 @@ export default function ColorVariantValuesSelector({
   };
 
   return (
-    <div className="flex flex-col gap-2 px-3 py-2 border-solid border-primary/50 border-[0.1rem] rounded-sm">
+    <div className="flex flex-col gap-2 px-3 py-2 border-solid border-primary/50 border-[0.1rem] rounded-xs">
       <div className="flex items-center justify-between">
         <p className="font-black text-xl">{index + 1}</p>
         {index !== 0 ? (

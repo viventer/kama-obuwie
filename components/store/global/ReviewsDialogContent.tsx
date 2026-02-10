@@ -6,7 +6,7 @@ export default function ReviewsDialogContent() {
   return (
     <section className="flex flex-col gap-4 overflow-hidden">
       <header>
-        <div className="flex gap-2 items-center bg-border px-3 py-2 rounded-sm w-fit mb-4">
+        <div className="flex gap-2 items-center bg-border px-3 py-2 rounded-xs w-fit mb-4">
           <Image
             src={"/other/logoAllegro.svg"}
             alt="Allegro logo"
@@ -28,7 +28,7 @@ export default function ReviewsDialogContent() {
           {allegroReviews.map((review, index) => (
             <li
               key={index}
-              className="flex items-center gap-2 border-success border-1 rounded-sm px-3 py-2 bg-secondary/15"
+              className="flex items-center gap-2 border-success border-1 rounded-xs px-3 py-2 bg-secondary/15"
             >
               <ThumbsUpIcon className="size-4 text-success flex-shrink-0" />"
               {review}"

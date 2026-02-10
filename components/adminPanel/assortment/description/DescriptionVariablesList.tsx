@@ -9,7 +9,7 @@ export default function DescriptionVariablesList() {
   return (
     <section className="mb-4">
       <h3 className="font-medium mb-2">Zmienne opisu</h3>
-      <ul className="list-none flex gap-4 bg-primary/10 rounded-sm px-2 py-1 scrollbar overflow-x-auto text-nowrap">
+      <ul className="list-none flex gap-4 bg-primary/10 rounded-xs px-2 py-1 scrollbar overflow-x-auto text-nowrap">
         {DescriptionVariables.map((variable) => (
           <li key={variable}>
             <button

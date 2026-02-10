@@ -38,7 +38,7 @@ export default function PaymentMethodSelector({
           <RadioGroup onValueChange={field.onChange} value={field.value}>
             {filteredPaymentMethods.map((method, index) => (
               <div
-                className={`flex items-center gap-2 border-2 px-2 py-1 rounded-sm transition-colors ${
+                className={`flex items-center gap-2 border-2 px-2 py-1 rounded-xs transition-colors ${
                   field.value === method ? "border-brand" : "border-border"
                 }`}
                 key={index}

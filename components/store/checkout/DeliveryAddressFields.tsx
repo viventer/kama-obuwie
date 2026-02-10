@@ -15,7 +15,7 @@ export default function DeliveryAddressFields({
   form: UseFormReturn<CheckoutData>;
 }) {
   return (
-    <section className="flex flex-col gap-4 border-1 px-4 py-3 rounded-sm max-w-2xl">
+    <section className="flex flex-col gap-4 border-1 px-4 py-3 rounded-xs max-w-2xl">
       <h2 className="text-xl mb-1 font-medium">Adres dostawy</h2>
       <div className="flex gap-4 flex-wrap w-full">
         <FormField

@@ -158,7 +158,7 @@ export default function InPostSelector({
           </div>
         </Card>
       ) : (
-        <div className="md:rounded-sm overflow-hidden md:aspect-[3/2] md:h-auto flex items-center justify-center fixed top-0 left-0 h-screen md:relative w-full z-100 backdrop-blur-md">
+        <div className="md:rounded-xs overflow-hidden md:aspect-[3/2] md:h-auto flex items-center justify-center fixed top-0 left-0 h-screen md:relative w-full z-100 backdrop-blur-md">
           <div className="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]">
             <Loader />
           </div>

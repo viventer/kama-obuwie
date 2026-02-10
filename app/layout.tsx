@@ -85,7 +85,7 @@ gtag('config', '${googleAdsTagId}');
             toastOptions={{
               unstyled: true,
               className:
-                "bg-background flex gap-2 backdrop-blur-[0.2rem] items-center border-[0.1rem]  px-4 py-3 rounded-sm",
+                "bg-background flex gap-2 backdrop-blur-[0.2rem] items-center border-[0.1rem]  px-4 py-3 rounded-xs",
             }}
           />
         </ConfirmDialogProvider>

@@ -36,7 +36,7 @@ export default function DeliveryMethodSelector({
             className="flex gap-4 flex-wrap"
           >
             <div
-              className={`flex items-center gap-4 border-2 px-4 py-2 rounded-sm transition-colors flex-1 ${
+              className={`flex items-center gap-4 border-2 px-4 py-2 rounded-xs transition-colors flex-1 ${
                 field.value === "courier" ? "border-brand" : "border-border"
               } min-w-fit`}
             >
@@ -60,7 +60,7 @@ export default function DeliveryMethodSelector({
               </Label>
             </div>
             <div
-              className={`flex items-center gap-4 border-2 px-4 py-2 rounded-sm transition-colors flex-1 ${
+              className={`flex items-center gap-4 border-2 px-4 py-2 rounded-xs transition-colors flex-1 ${
                 field.value === "parcelLocker"
                   ? "border-brand"
                   : "border-border"

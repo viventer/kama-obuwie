@@ -31,7 +31,7 @@ export default function DescriptionRow({
 
   return (
     <div
-      className={`mb-8 px-3 py-2 rounded-sm border ${
+      className={`mb-8 px-3 py-2 rounded-xs border ${
         selectedRow === index ? "border-primary/50" : "border-transparent"
       } transition-all`}
       onClick={() => form.setValue("selectedRow", index)}

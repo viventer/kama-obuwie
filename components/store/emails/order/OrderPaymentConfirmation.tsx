@@ -82,7 +82,7 @@ const OrderPaymentConfirmation = ({
     <Tailwind config={emailTailwindConfig}>
       <Body className="font-[ubuntu,roboto,arial,sans-serif] text-text text-base">
         <Preview>Potwierdzenie płatności</Preview>
-        <Container className="my-[10px] mx-auto w-[600px] max-w-full border-2 border-primary rounded-sm">
+        <Container className="my-[10px] mx-auto w-[600px] max-w-full border-2 border-primary rounded-xs">
           <EmailHeader
             baseUrl={baseUrl}
             headingText="Zamówienie opłacone"

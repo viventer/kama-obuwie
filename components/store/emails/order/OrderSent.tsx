@@ -78,7 +78,7 @@ const OrderSent = ({ emailOrderData }: { emailOrderData: EmailOrderData }) => (
     <Tailwind config={emailTailwindConfig}>
       <Body className="font-[ubuntu,roboto,arial,sans-serif] text-text text-base">
         <Preview>Twoje zamówienie jest już w drodze</Preview>
-        <Container className="my-[10px] mx-auto w-[600px] max-w-full border-2 border-primary rounded-sm">
+        <Container className="my-[10px] mx-auto w-[600px] max-w-full border-2 border-primary rounded-xs">
           <EmailHeader
             baseUrl={baseUrl}
             headingText="Zamówienie wysłane!"

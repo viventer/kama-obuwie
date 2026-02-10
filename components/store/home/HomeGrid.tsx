@@ -55,7 +55,7 @@ export default function HomeGrid({ icon, title, categories }: HomeGridProps) {
               <Image
                 src={category.imageSrc}
                 alt={category.displayName}
-                className="h-12 w-12 rounded-sm sm:h-16 sm:w-16"
+                className="h-12 w-12 rounded-xs sm:h-16 sm:w-16"
                 width={128}
                 height={128}
               />

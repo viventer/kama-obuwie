@@ -76,7 +76,7 @@ export default function ShoppingCartItem({
               src={cartItem.item.thumbnailUrl}
               alt={`${cartItem.item.brand || ""} ${cartItem.item.categoryName}`}
               fill
-              className={`object-contain rounded-sm bg-white`}
+              className={`object-contain rounded-xs bg-white`}
               sizes="80px"
             />
           </div>

@@ -19,7 +19,7 @@ export default function AllegroReceiverAddressField() {
       type="single"
       collapsible
       defaultValue=""
-      className="shadow-md bg-background/50 rounded-sm max-w-md px-4"
+      className="shadow-md bg-background/50 rounded-xs max-w-md px-4"
     >
       <AccordionItem value="optional">
         <AccordionTrigger className="font-semibold text-lg hover:cursor-pointer">

@@ -39,7 +39,7 @@ export default async function ProductEditPage(props: Props) {
             alt="Zdjęcie poglądowe"
             width={500}
             height={500}
-            className="w-[10rem] aspect-square object-contain bg-primary/15 border-primary border-[0.1rem] border-solid rounded-sm mb-2"
+            className="w-[10rem] aspect-square object-contain bg-primary/15 border-primary border-[0.1rem] border-solid rounded-xs mb-2"
           />
           <p className="font-bold">{data.manufacturerCode}</p>
         </section>

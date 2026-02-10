@@ -23,7 +23,7 @@ export default function DescriptionElementImageSelector({
   const form = useFormContext();
   const photos = form.watch("reorderedPhotos") as EditedPhotoWithUrl[];
   const firstVariantPhotos = photos.filter(
-    (photo) => photo.colorVariantName === photos[0].colorVariantName
+    (photo) => photo.colorVariantName === photos[0].colorVariantName,
   );
   const availableOptions = firstVariantPhotos.map((photo, index) => ({
     name: (index + 1).toString(),
@@ -52,7 +52,7 @@ export default function DescriptionElementImageSelector({
             alt=""
             width="300"
             height="300"
-            className="bg-primary/15 w-full rounded-sm object-contain aspect-auto"
+            className="bg-primary/15 w-full rounded-xs object-contain aspect-auto"
           />
         ) : firstVariantPhotos[Number(value) - 1]?.url ? (
           <Image
@@ -60,7 +60,7 @@ export default function DescriptionElementImageSelector({
             alt=""
             width="300"
             height="300"
-            className="bg-primary/15 w-full rounded-sm object-contain aspect-auto"
+            className="bg-primary/15 w-full rounded-xs object-contain aspect-auto"
           />
         ) : (
           <ImageIcon className="size-48 text-primary" />

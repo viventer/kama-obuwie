@@ -84,13 +84,13 @@ export default function OffersDataTable({
                   row.initialSellingPrices[salesChannel] !==
                     row.sellingPrices[salesChannel] && (
                     <>
-                      <div className="bg-destructive/25 rounded-sm px-2 py-1 w-fit">
+                      <div className="bg-destructive/25 rounded-xs px-2 py-1 w-fit">
                         {row.initialSellingPrices[salesChannel]} zł
                       </div>
                       <MoveRightIcon />
                     </>
                   )}
-                <div className="bg-primary/25 rounded-sm px-2 py-1 w-fit">
+                <div className="bg-primary/25 rounded-xs px-2 py-1 w-fit">
                   {row.sellingPrices?.[salesChannel]} zł
                 </div>
               </section>
@@ -99,7 +99,7 @@ export default function OffersDataTable({
             <h4 className="font-bold mt-2 mb-1">Dostępność:</h4>
             <section className="flex gap-2">
               {Object.entries(row.availability).map(([size, availability]) => (
-                <div key={size} className="bg-primary/25 rounded-sm px-2 py-1">
+                <div key={size} className="bg-primary/25 rounded-xs px-2 py-1">
                   <span className="font-medium">{size}:</span>{" "}
                   {availability.value}
                 </div>

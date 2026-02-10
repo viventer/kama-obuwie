@@ -43,13 +43,13 @@ export default function AllegroParametersSection({
 
   const updateCurrentParams = (
     paramsList: AllegroProductParameter[],
-    type: "optional" | "required"
+    type: "optional" | "required",
   ) => {
     const allowedParamNames = paramsList.map((p) => p.name);
     const filteredParams = Object.fromEntries(
       Object.entries(currentParams[type]).filter(([key]) =>
-        allowedParamNames.includes(key)
-      )
+        allowedParamNames.includes(key),
+      ),
     );
     setValue(`parameters.${type}`, filteredParams);
   };
@@ -60,20 +60,20 @@ export default function AllegroParametersSection({
     const fetchParameters = async () => {
       try {
         const { data } = await axios.get(
-          `/api/allegro/parameters/${allegroCategoryId}`
+          `/api/allegro/parameters/${allegroCategoryId}`,
         );
 
         const listData: AllegroProductParameter[] = Object.values(data);
         const optional = listData.filter(
           (p) =>
             (p.required === false || p.name === "EAN (GTIN)") &&
-            !allegroParametersToSkip.includes(p.name)
+            !allegroParametersToSkip.includes(p.name),
         );
         const required = listData.filter(
           (p) =>
             p.required === true &&
             p.name !== "EAN (GTIN)" &&
-            !allegroParametersToSkip.includes(p.name)
+            !allegroParametersToSkip.includes(p.name),
         );
 
         updateCurrentParams(optional, "optional");
@@ -123,7 +123,7 @@ export default function AllegroParametersSection({
         type="single"
         collapsible
         defaultValue=""
-        className="shadow-md bg-background/50 rounded-sm max-w-md px-4"
+        className="shadow-md bg-background/50 rounded-xs max-w-md px-4"
       >
         <AccordionItem value="optional">
           <AccordionTrigger className="font-semibold text-lg hover:cursor-pointer">

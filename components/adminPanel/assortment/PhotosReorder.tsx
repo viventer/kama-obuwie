@@ -28,7 +28,7 @@ export default function PhotosReorder({
 }) {
   if (!readonly && !setPhotos) {
     throw new Error(
-      "If PhotosReorder is not readonly, photos and setPhotos props are required."
+      "If PhotosReorder is not readonly, photos and setPhotos props are required.",
     );
   }
 
@@ -37,8 +37,8 @@ export default function PhotosReorder({
     useState<EditedPhotoWithUrl[]>(photos);
   const uniqueVariants = Array.from(
     new Set(
-      photos.map((p) => p.colorVariantName).filter((n): n is string => !!n)
-    )
+      photos.map((p) => p.colorVariantName).filter((n): n is string => !!n),
+    ),
   );
 
   if (uniqueVariants.length === 0) {
@@ -55,7 +55,7 @@ export default function PhotosReorder({
     const { active, over } = event;
     if (over && active.id !== over.id) {
       const oldIndex = photosWithUrls.findIndex(
-        (i) => i.filePath === active.id
+        (i) => i.filePath === active.id,
       );
       const newIndex = photosWithUrls.findIndex((i) => i.filePath === over.id);
       const reordered = arrayMove(photosWithUrls, oldIndex, newIndex);
@@ -81,12 +81,12 @@ export default function PhotosReorder({
           >
             {uniqueVariants.map((variant, index) => {
               const photosForVariant = photosWithUrls.filter(
-                (p) => p.colorVariantName === variant
+                (p) => p.colorVariantName === variant,
               );
 
               return (
                 <section
-                  className="px-4 py-3 bg-primary/5 rounded-sm mb-4"
+                  className="px-4 py-3 bg-primary/5 rounded-xs mb-4"
                   key={index}
                 >
                   {variant && (
@@ -99,7 +99,7 @@ export default function PhotosReorder({
                         className="flex-col items-center gap-2 relative"
                       >
                         <SortableImage id={photo.filePath} url={photo.url} />
-                        <div className="absolute top-1 left-2 bg-black/50 rounded-sm px-2 py-1 text-sm font-bold text-white">
+                        <div className="absolute top-1 left-2 bg-black/50 rounded-xs px-2 py-1 text-sm font-bold text-white">
                           {idx + 1}
                         </div>
                       </div>

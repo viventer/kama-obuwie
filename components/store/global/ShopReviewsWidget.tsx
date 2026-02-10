@@ -39,7 +39,7 @@ export default function ShopReviewsWidget({
 
   return (
     <Card className={cn("py-0 justify-between gap-2", className)}>
-      <div className="flex gap-2 items-center bg-border px-3 py-2 rounded-sm rounded-tr-none rounded-bl-none w-fit mb-2">
+      <div className="flex gap-2 items-center bg-border px-3 py-2 rounded-xs rounded-tr-none rounded-bl-none w-fit mb-2">
         <Image
           src={"/other/logoAllegro.svg"}
           alt="Allegro logo"

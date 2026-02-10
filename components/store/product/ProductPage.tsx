@@ -274,7 +274,7 @@ export default function ProductPage({
         </div>
         <div className="flex flex-col gap-2 w-full flex-1">
           {productData?.brand && productData.brand != "bez marki" && (
-            <h2 className="capitalize font-bold text-xl text-text md:text-2xl md:bg-brand/70 md:px-4 md:py-2 md:rounded-sm md:flex md:flex-col md:mb-4 md:text-white">
+            <h2 className="capitalize font-bold text-xl text-text md:text-2xl md:bg-brand/70 md:px-4 md:py-2 md:rounded-xs md:flex md:flex-col md:mb-4 md:text-white">
               {category.name}
               <span className="font-normal">
                 {" "}
@@ -282,7 +282,7 @@ export default function ProductPage({
               </span>
             </h2>
           )}
-          <div className="border-2 border-success w-fit px-4 py-2 rounded-sm flex gap-2 items-center mb-4">
+          <div className="border-2 border-success w-fit px-4 py-2 rounded-xs flex gap-2 items-center mb-4">
             <TagIcon className="text-success size-5 md:size-6" />
             <p className="text-xl md:text-2xl font-medium">
               {new Intl.NumberFormat("pl-PL", {

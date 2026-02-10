@@ -42,7 +42,7 @@ export default function ProductImagesSlider({
               thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
           }}
           modules={[FreeMode, Navigation, Thumbs, EffectFade]}
-          className="w-full  rounded-sm "
+          className="w-full  rounded-xs "
         >
           {imagesUrls.map((image, index) => (
             <SwiperSlide key={index}>
@@ -50,7 +50,7 @@ export default function ProductImagesSlider({
                 <Image
                   src={image}
                   alt={""}
-                  className="block h-full w-full object-contain bg-white rounded-sm max-w-[400px]  md:max-w-full aspect-square"
+                  className="block h-full w-full object-contain bg-white rounded-xs max-w-[400px]  md:max-w-full aspect-square"
                   height={1000}
                   width={1000}
                 />
@@ -92,7 +92,7 @@ export default function ProductImagesSlider({
               <Image
                 src={image}
                 alt={""}
-                className="block w-full object-cover bg-white opacity-50 rounded-sm hover:opacity-100 transition-opacity cursor-pointer aspect-square"
+                className="block w-full object-cover bg-white opacity-50 rounded-xs hover:opacity-100 transition-opacity cursor-pointer aspect-square"
                 height={200}
                 width={200}
               />

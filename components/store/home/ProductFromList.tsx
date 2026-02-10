@@ -18,11 +18,11 @@ export default function ProductFromList({
       onClick={() => {
         router.push(
           `/product/${product.id}?colorVariantName=${encodeURIComponent(
-            product.colorVariantName
-          )}`
+            product.colorVariantName,
+          )}`,
         );
       }}
-      className="md:hover:translate-y-[-1rem] transition-all duration-200 delay-75 cursor-pointer relative p-0 hover:bg-secondary/50 active:bg-secondary/75 gap-0 rounded-sm"
+      className="md:hover:translate-y-[-1rem] transition-all duration-200 delay-75 cursor-pointer relative p-0 hover:bg-secondary/50 active:bg-secondary/75 gap-0 rounded-xs"
     >
       {/* Button for adding to cart - todo */}
       {/* <button className="bg-success text-white rounded-full p-2 absolute top-1 left-1 md:top-2 md:left-2 z-10 hover:brightness-115 hover:shadow-lg hover:shadow-success transition-all cursor-pointer">
@@ -34,7 +34,7 @@ export default function ProductFromList({
           alt=""
           width={300}
           height={300}
-          className="object-contain rounded-t-sm w-full"
+          className="object-contain rounded-t-xs w-full"
         />
       </div>
 

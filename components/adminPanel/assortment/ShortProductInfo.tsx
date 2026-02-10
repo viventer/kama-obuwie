@@ -22,7 +22,7 @@ export default async function ShortProductInfo({
         alt=""
         width={200}
         height={200}
-        className="bg-foreground/15 rounded-sm"
+        className="bg-foreground/15 rounded-xs"
       />
       <section>
         {product.brand && (

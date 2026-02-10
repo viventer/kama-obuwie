@@ -48,12 +48,12 @@ export default async function MainNav() {
             return (
               <NavigationMenuItem
                 key={mainCategory.rootCategory}
-                className="w-full"
+                className="w-full "
               >
-                <NavigationMenuTrigger className="bg-primary/15 font-medium px-3 capitalize">
+                <NavigationMenuTrigger className="bg-primary/5 rounded-xs font-medium px-3 capitalize text-base">
                   {mainCategory.label}
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-background !max-w-[100svw] !w-[100svw] bottom-0 relative max-h-fit !h-[calc(100svh-160px)] overflow-auto scrollbar sm:!max-w-fit">
+                <NavigationMenuContent className="bg-background !max-w-[100svw] !w-[100svw] bottom-0 relative max-h-fit !h-[calc(100svh-160px)] overflow-auto scrollbar sm:!max-w-fit ">
                   <NavOptionContent subcategories={subcategories} />
                 </NavigationMenuContent>
               </NavigationMenuItem>

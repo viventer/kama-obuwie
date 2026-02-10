@@ -16,14 +16,14 @@ export default function OrderStatusAndPayment({
       {emailOrderData.orderDetails.status === "SENT" && (
         <Link
           href={`https://inpost.pl/sledzenie-przesylek?number=${emailOrderData.delivery.parcelNumber}`}
-          className="bg-primary border-2 border-primary text-white font-medium px-3 py-1 rounded-sm inline-block mr-6a"
+          className="bg-primary border-2 border-primary text-white font-medium px-3 py-1 rounded-xs inline-block mr-6a"
         >
           Śledź przesyłkę
         </Link>
       )}
       <Link
         href={`${baseUrl}/order/details/${emailOrderData.orderDetails.id}`}
-        className="border-primary border-2 text-primary font-medium px-3 py-1 rounded-sm inline-block"
+        className="border-primary border-2 text-primary font-medium px-3 py-1 rounded-xs inline-block"
       >
         Szczegóły zamówienia
       </Link>
@@ -34,7 +34,7 @@ export default function OrderStatusAndPayment({
           </Heading>
           <Link
             href={`${baseUrl}/order/details/${emailOrderData.orderDetails.id}`}
-            className="bg-primary border-2 border-primary text-white font-medium px-3 py-1 rounded-sm inline-block"
+            className="bg-primary border-2 border-primary text-white font-medium px-3 py-1 rounded-xs inline-block"
           >
             Ponów płatność
           </Link>

@@ -38,7 +38,7 @@ export default function SelectProductDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="px-3 py-2 bg-transparent border-primary border-solid border-1 rounded-sm hover:border-accent hover:cursor-pointer">
+      <DialogTrigger className="px-3 py-2 bg-transparent border-primary border-solid border-1 rounded-xs hover:border-accent hover:cursor-pointer">
         {triggerText}
       </DialogTrigger>
       <DialogContent className="max-h-[90svh]">

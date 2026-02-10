@@ -51,7 +51,7 @@ export default function ProductSpecifications({
     return (
       <article
         className={cn(
-          "flex flex-col gap-2 border-secondary border-1 px-4 py-3 rounded-sm w-full",
+          "flex flex-col gap-2 border-secondary border-1 px-4 py-3 rounded-xs w-full",
           className,
         )}
       >

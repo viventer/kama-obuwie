@@ -159,7 +159,7 @@
 
   /* Custom breakpoints */
   --breakpoint-xs: 30rem;
-  --breakpoint-2xs: 24rem;
+  --breakpoint-2xs: 22.5rem;
 }
 
 * {

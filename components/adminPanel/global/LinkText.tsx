@@ -21,7 +21,7 @@ export default function LinkText({
       target={target}
       className={cn(
         "decoration-1 decoration-brand underline underline-offset-3 hover:decoration-accent/0 transition-all duration-150 font-medium text-text",
-        className
+        className,
       )}
     >
       {children}

@@ -13,7 +13,7 @@ export default async function layout({
       <div className="min-h-screen flex flex-col">
         <div className="sticky top-0 z-100 left-0 right-0">
           <Header />
-          <div className="bg-card py-2 flex justify-center">
+          <div className="border-b-1 py-2 flex justify-center">
             <MainNav />
           </div>
         </div>

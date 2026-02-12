@@ -32,10 +32,10 @@ export default async function MainNav() {
     ) || {};
 
   return (
-    <div className="w-[90%] max-w-[1440px] flex justify-start ">
-      <NavigationMenu>
+    <div className="w-[100%] max-w-[1440px] flex justify-start ">
+      <NavigationMenu className="justify-center ">
         <p className="hidden font-bold pr-6 sm:inline">Obuwie</p>
-        <NavigationMenuList className="gap-2">
+        <NavigationMenuList className="2xs:gap-2 w-full  gap-0 2xs:w-[90%]   2xs:justify-between">
           {mainCategories.map((mainCategory) => {
             const subcategories =
               categoriesByRoot[mainCategory.rootCategory] || [];
@@ -48,12 +48,12 @@ export default async function MainNav() {
             return (
               <NavigationMenuItem
                 key={mainCategory.rootCategory}
-                className="w-full "
+                className="w-full"
               >
-                <NavigationMenuTrigger className="bg-primary/5 rounded-xs font-medium px-3 capitalize text-base">
+                <NavigationMenuTrigger className="rounded-xs font-medium px-3 capitalize text-base">
                   {mainCategory.label}
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-background !max-w-[100svw] !w-[100svw] bottom-0 relative max-h-fit !h-[calc(100svh-160px)] overflow-auto scrollbar sm:!max-w-fit ">
+                <NavigationMenuContent className="bg-background !max-w-[100svw] !w-[100svw] bottom-0 relative max-h-fit !h-[calc(100svh-160px)] overflow-auto scrollbar sm:!max-w-fit">
                   <NavOptionContent subcategories={subcategories} />
                 </NavigationMenuContent>
               </NavigationMenuItem>

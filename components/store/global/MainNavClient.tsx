@@ -69,12 +69,12 @@ export default function MainNavClient({
       />
 
       <NavigationMenu
-        className="justify-center z-50"
+        className="justify-center z-50 2xs:justify-start"
         value={value}
         onValueChange={setValue}
       >
         <p className="hidden font-bold pr-6 sm:inline">Obuwie</p>
-        <NavigationMenuList className="2xs:gap-2 w-full gap-0 2xs:w-[90%] 2xs:justify-between">
+        <NavigationMenuList className=" w-full gap-0 2xs:w-fit 2xs:ml-[5%]">
           {mainCategories.map((mainCategory) => {
             const subcategories =
               categoriesByRoot[mainCategory.rootCategory] || [];

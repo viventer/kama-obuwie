@@ -24,7 +24,7 @@ export default function SizeSelector({
             value={size}
             aria-label={`Toggle size ${size}`}
             className="text-base hover:text-text data-[state=inactive]:text-text
-                  data-[state=active]:text-white bg-secondary/15 size-10 min-w-10 md:size-11 data-[state=on]:bg-primary border-none hover:bg-primary/30 shadow-none cursor-pointer"
+                  data-[state=active]:text-white bg-secondary/20 size-10 min-w-10 md:size-11 data-[state=on]:bg-primary border-none hover:bg-primary/30 shadow-none cursor-pointer"
             onClick={() => {
               if (selectedSizes.includes(size)) {
                 onChange(selectedSizes.filter((s) => s !== size));

@@ -60,7 +60,7 @@ export default function ProductPageSizeSelector({
                   relative
                   data-[state=inactive]:text-text
                   data-[state=active]:text-white
-                  text-base bg-secondary/15 hover:bg-primary/30 shadow-none
+                  text-base bg-secondary/20 hover:bg-primary/30 shadow-none
                   border-none
                   ${available ? "" : " cursor-not-allowed !opacity-30"}
                 `}

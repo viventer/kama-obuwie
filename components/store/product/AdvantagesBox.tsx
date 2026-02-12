@@ -15,7 +15,7 @@ export default function AdvantagesBox({
         <ul className="flex flex-col gap-2">
           <li className="flex items-center gap-2 font-medium">
             <TruckIcon className="size-5 text-success" />
-            {price >= 55 ? "Darmowa dostawa" : "Darmowa dostawa od 55 zł"}
+            Darmowa dostawa od 55 zł
           </li>
           <li className="flex items-center gap-2 font-medium">
             <UndoIcon className="size-5 text-success" />

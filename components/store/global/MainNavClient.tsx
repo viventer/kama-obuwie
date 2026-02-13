@@ -61,7 +61,7 @@ export default function MainNavClient({
       <div
         style={{ top: overlayTop }}
         className={
-          "fixed left-0 right-0 bottom-0 z-40 bg-foreground/20 backdrop-blur-xs transition-opacity duration-150 " +
+          "fixed left-0 right-0 bottom-0 z-40 bg-black/20 backdrop-blur-xs transition-opacity duration-150 " +
           (isOpen ? "opacity-100" : "opacity-0 pointer-events-none")
         }
         onClick={() => setValue("")}
@@ -69,12 +69,12 @@ export default function MainNavClient({
       />
 
       <NavigationMenu
-        className="justify-center z-50 2xs:justify-start"
+        className="justify-center z-50 2xs:justify-start max-w-[1440px]"
         value={value}
         onValueChange={setValue}
       >
         <p className="hidden font-bold pr-6 sm:inline">Obuwie</p>
-        <NavigationMenuList className=" w-full gap-0 2xs:w-fit 2xs:ml-[5%]">
+        <NavigationMenuList className=" w-full gap-0 2xs:w-fit 2xs:ml-[5%] sm:ml-0">
           {mainCategories.map((mainCategory) => {
             const subcategories =
               categoriesByRoot[mainCategory.rootCategory] || [];
@@ -92,7 +92,7 @@ export default function MainNavClient({
                 <NavigationMenuTrigger className="rounded-xs font-medium px-3 capitalize text-base">
                   {mainCategory.label}
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-background !max-w-[100svw] !w-[100svw] bottom-0 relative max-h-fit !h-[calc(100svh-160px)] overflow-auto scrollbar sm:!max-w-fit">
+                <NavigationMenuContent className="bg-background !max-w-[100svw] !w-[100svw] bottom-0 relative max-h-fit !h-[calc(100svh-160px)] overflow-auto scrollbar sm:!max-w-fit ">
                   <NavOptionContent subcategories={subcategories} />
                 </NavigationMenuContent>
               </NavigationMenuItem>

@@ -15,6 +15,7 @@ import {
 import { orderByProductAvailability } from "@/helpers/availability";
 import ShopReviewsWidget from "@/components/store/global/ShopReviewsWidget";
 import AdvantagesBox from "@/components/store/product/AdvantagesBox";
+import HomeSlider from "@/components/store/home/HomeSlider";
 
 export default async function Page() {
   // Pobierz kategorie z bazy danych
@@ -56,7 +57,8 @@ export default async function Page() {
   });
 
   return (
-    <>
+    <div className="flex flex-col gap-8 mt-4">
+      <HomeSlider />
       <div className="flex gap-4 mt-6 mb-8 md:mt-10 md:mb-12">
         <ShopReviewsWidget className="flex-2" />
         <AdvantagesBox price={0} className="hidden xl:flex" />
@@ -95,6 +97,6 @@ export default async function Page() {
           );
         })}
       </div>
-    </>
+    </div>
   );
 }

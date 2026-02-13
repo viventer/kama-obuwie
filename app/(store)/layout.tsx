@@ -14,7 +14,7 @@ export default async function layout({
         <div className="sticky top-0 z-100 left-0 right-0">
           <Header />
           <div
-            className="border-b-1 py-2 flex justify-center sm:px-[5%]"
+            className="border-b-1 py-2 flex justify-center sm:px-[5%] bg-background"
             data-main-nav-bar
           >
             <MainNav />

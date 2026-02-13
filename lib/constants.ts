@@ -189,3 +189,32 @@ export const homeGridCategories: Omit<HomeGridCategory, "id">[] = [
     imageSrc: "/main-grid/baleriny-damskie.jpg",
   },
 ];
+
+export type HomeSliderBanner = {
+  imageSrc: string;
+  heading: string;
+  subheading: string;
+};
+
+export const homeSliderBanners: HomeSliderBanner[] = [
+  {
+    imageSrc: "/home-slider/1.jpg",
+    heading: "Czółenka",
+    subheading: "Eleganckie i wygodne czółenka na każdą okazję",
+  },
+  {
+    imageSrc: "/home-slider/2.jpg",
+    heading: "Półbuty",
+    subheading: "Klasyczne półbuty męskie - styl i komfort w jednym",
+  },
+  {
+    imageSrc: "/home-slider/3.jpg",
+    heading: "Kapcie Damskie",
+    subheading: "Wygodne kapcie od polskiego producenta - idealne na co dzień",
+  },
+  {
+    imageSrc: "/home-slider/4.jpg",
+    heading: "Kapcie Męskie",
+    subheading: "Wygodne kapcie od polskiego producenta - idealne na co dzień",
+  },
+];

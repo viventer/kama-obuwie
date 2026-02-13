@@ -69,7 +69,7 @@ export default function MainNavClient({
       />
 
       <NavigationMenu
-        className="justify-center z-50 2xs:justify-start max-w-[1440px]"
+        className="justify-center z-50 2xs:justify-start max-w-[1440px] "
         value={value}
         onValueChange={setValue}
       >

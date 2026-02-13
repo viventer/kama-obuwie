@@ -29,7 +29,7 @@ export default function HomeSlider({ className }: { className?: string }) {
           {homeSliderBanners.map((banner, index) => (
             <CarouselItem key={index}>
               <div className="relative">
-                <div className="absolute top-2 left-2 w-[calc(100%-1rem)] md:top-3 md:left-4 md:w-fit bg-black/30 text-white backdrop-blur-xs px-4 py-2 md:px-8 md:py-4 rounded-xs">
+                <div className="absolute top-1 left-2 right-2 w-[calc(100%-1rem)] md:top-3 md:left-4 md:w-fit bg-black/30 text-white backdrop-blur-xs px-3 py-2 md:px-8 md:py-4 rounded-xs">
                   <h2 className="font-bold text-xl md:text-3xl">
                     {banner.heading}
                   </h2>
@@ -49,7 +49,7 @@ export default function HomeSlider({ className }: { className?: string }) {
       </Carousel>
       <Button
         variant={"important"}
-        className="w-full mt-2 md:mt-0 md:w-fit md:absolute md:right-4 md:bottom-3 static text-xl font-medium md:text-3xl md:px-12 md:py-8 uppercase z-999999"
+        className="md:w-fit absolute right-2 bottom-1 md:right-4 md:bottom-3  text-xl font-medium md:text-3xl md:px-12 md:py-8 uppercase z-999999"
       >
         Sprawdź
       </Button>

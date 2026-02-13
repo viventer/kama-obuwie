@@ -205,16 +205,16 @@ export const homeSliderBanners: HomeSliderBanner[] = [
   {
     imageSrc: "/home-slider/2.jpg",
     heading: "Półbuty",
-    subheading: "Klasyczne półbuty męskie - styl i komfort w jednym",
+    subheading: "Klasyczne półbuty - styl i komfort w jednym",
   },
   {
     imageSrc: "/home-slider/3.jpg",
     heading: "Kapcie Damskie",
-    subheading: "Wygodne kapcie od polskiego producenta - idealne na co dzień",
+    subheading: "Wygodne kapcie od polskiego producenta",
   },
   {
     imageSrc: "/home-slider/4.jpg",
     heading: "Kapcie Męskie",
-    subheading: "Wygodne kapcie od polskiego producenta - idealne na co dzień",
+    subheading: "Wygodne kapcie od polskiego producenta",
   },
 ];

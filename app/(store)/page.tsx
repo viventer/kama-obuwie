@@ -55,12 +55,14 @@ export default async function Page() {
   });
 
   return (
-    <div className="flex flex-col gap-12 mt-4 md:mt-8 ">
-      <HomeSlider banners={homeSliderBannersWithCategoryIds} />
-      <div className="flex gap-8 flex-col lg:flex-row">
-        <ShopReviewsWidget className="flex-2" />
-        <AdvantagesBox className="bg-transparent px-0 py-0 lg:bg-card lg:px-6 lg:py-4" />
-      </div>
+    <div className="flex flex-col gap-12 mt-8 md:mt-12">
+      <section className="flex flex-col gap-8">
+        <HomeSlider banners={homeSliderBannersWithCategoryIds} />
+        <div className="flex gap-8 flex-col lg:flex-row">
+          <ShopReviewsWidget className="flex-2" />
+          <AdvantagesBox className="bg-transparent px-0 py-0 lg:bg-card lg:px-6 lg:py-4" />
+        </div>
+      </section>
       <div className="flex flex-col gap-12">
         {Object.entries(products).map(([categoryId, productsInCategory]) => {
           const filteredProducts = productsInCategory

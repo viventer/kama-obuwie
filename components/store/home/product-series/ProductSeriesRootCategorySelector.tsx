@@ -4,15 +4,18 @@ import { RootCategory } from "@/firebase/schemas/productsSchemas";
 export default function ProductSeriesRootCategorySelector({
   selectedRootCategory,
   setSelectedRootCategory,
+  className,
 }: {
   selectedRootCategory: RootCategory;
   setSelectedRootCategory: (rootCategory: RootCategory) => void;
+  className?: string;
 }) {
   return (
     <Tabs
       defaultValue={selectedRootCategory}
       value={selectedRootCategory}
       onValueChange={(value) => setSelectedRootCategory(value as RootCategory)}
+      className={className}
     >
       <TabsList>
         <TabsTrigger value="obuwie męskie">

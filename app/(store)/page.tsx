@@ -57,7 +57,7 @@ export default async function Page() {
   });
 
   return (
-    <div className="flex flex-col gap-12 mt-7 md:mt-11">
+    <div className="flex flex-col gap-16 mt-4">
       <section className="flex flex-col gap-8">
         <HomeSlider banners={homeSliderBannersWithCategoryIds} />
         <div className="flex gap-8 flex-col lg:flex-row">
@@ -66,7 +66,6 @@ export default async function Page() {
         </div>
       </section>
       <ProductSeriesSection categories={productSeriesCategories} />
-      <div className="flex flex-col gap-12"></div>
     </div>
   );
 }

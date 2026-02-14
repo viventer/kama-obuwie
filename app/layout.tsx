@@ -38,7 +38,7 @@ export default async function RootLayout({
   return (
     <html
       lang="pl"
-      className="scrollbar scrollbar-track-transparent scrollbar-thumb-primary"
+      className="scrollbar scrollbar-track-transparent scrollbar-thumb-secondary"
     >
       <head>
         {isProduction ? (

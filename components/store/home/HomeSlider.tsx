@@ -51,11 +51,11 @@ export default function HomeSlider({
   return (
     <section className={cn("relative", className)}>
       <Carousel
-        // plugins={[
-        //   Autoplay({
-        //     delay: 14000,
-        //   }),
-        // ]}
+        plugins={[
+          Autoplay({
+            delay: 14000,
+          }),
+        ]}
         opts={{
           align: "end",
           loop: true,
@@ -79,7 +79,7 @@ export default function HomeSlider({
                   alt=""
                   width={1600}
                   height={450}
-                  className="rounded-xs w-full aspect-[3/2] md:aspect-[24/9] object-cover"
+                  className="rounded-xs w-full aspect-[3/2] md:aspect-[21/9] object-cover"
                 />
               </div>
             </CarouselItem>

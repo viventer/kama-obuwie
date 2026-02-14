@@ -6,7 +6,7 @@ export default function AdvantagesBox({ className }: { className?: string }) {
   return (
     <Card className={cn("flex-1 gap-0 py-5 px-6 justify-center", className)}>
       <CardContent className="px-0 py-0">
-        <ul className="flex flex-col gap-4">
+        <ul className="flex flex-col gap-3">
           <li className="flex items-center gap-2 lg:font-medium">
             <TruckIcon className="size-5 text-success" />
             Darmowa dostawa od 55 zł
@@ -18,10 +18,6 @@ export default function AdvantagesBox({ className }: { className?: string }) {
           <li className="flex items-center gap-2 lg:font-medium">
             <PackageIcon className="size-5 text-success" />
             Dostawa do Paczkomatu lub kurierem
-          </li>
-          <li className="flex items-center gap-2 lg:font-medium">
-            <CreditCardIcon className="size-5 text-success" />
-            Płatność online lub przy odbiorze
           </li>
         </ul>
       </CardContent>

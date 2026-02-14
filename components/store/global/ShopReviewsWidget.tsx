@@ -34,33 +34,35 @@ export default function ShopReviewsWidget({
   };
 
   return (
-    <Card className={cn("py-0 justify-between gap-2 lg:gap-4", className)}>
-      <div className="flex gap-2 items-center bg-border px-3 py-2 rounded-xs rounded-tr-none rounded-bl-none w-fit mb-2">
+    <Card className={cn("py-0 justify-between gap-0", className)}>
+      <div className="flex gap-2 items-center bg-border px-3 py-2 rounded-xs rounded-tr-none rounded-bl-none w-fit">
         <Image
           src={"/other/logoAllegro.svg"}
           alt="Allegro logo"
-          width={48}
-          height={48}
+          width={64}
+          height={64}
           className="h-4 md:h-5 w-auto"
         />
         <p className="text-sm md:text-base font-medium">kama-obuwie_pl</p>
       </div>
-      <CardHeader className="px-4 lg:px-6">
-        <CardTitle className="flex items-center gap-2">
-          <ThumbsUpIcon className="size-6 xl:size-8 text-success" />
-          <h3 className="xl:text-xl font-medium text-lg">
-            99,6% pozytywnych opinii
-          </h3>
-        </CardTitle>
-        <CardDescription>Na podstawie 600+ ocen sprzedawcy</CardDescription>
-      </CardHeader>
-      <CardContent
-        className={`flex items-end pb-4 lg:pb-6 ${isProductPage ? "justify-end" : ""} px-4`}
-      >
-        <Button variant={"outline"} onClick={openModal}>
-          Zobacz opinie
-        </Button>
-      </CardContent>
+      <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-center lg:flex-1 py-4 lg:py-6">
+        <CardHeader className="px-4 lg:px-6 flex-1">
+          <CardTitle className="flex items-center gap-2">
+            <ThumbsUpIcon className="size-6 xl:size-8 text-success" />
+            <h3 className="xl:text-xl font-medium text-lg">
+              99,6% pozytywnych opinii
+            </h3>
+          </CardTitle>
+          <CardDescription>Na podstawie 600+ ocen sprzedawcy</CardDescription>
+        </CardHeader>
+        <CardContent
+          className={`flex items-end  ${isProductPage ? "justify-end" : ""} px-4`}
+        >
+          <Button variant={"outline"} onClick={openModal}>
+            Zobacz opinie
+          </Button>
+        </CardContent>
+      </div>
     </Card>
   );
 }

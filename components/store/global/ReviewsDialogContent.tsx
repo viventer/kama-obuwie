@@ -6,24 +6,24 @@ export default function ReviewsDialogContent() {
   return (
     <section className="flex flex-col gap-4 overflow-hidden">
       <header>
-        <div className="flex gap-2 items-center bg-border px-3 py-2 rounded-xs w-fit mb-4">
+        <div className="flex gap-2 items-center bg-border px-4 py-2 rounded-xs w-fit mb-4">
           <Image
             src={"/other/logoAllegro.svg"}
             alt="Allegro logo"
-            width={64}
-            height={64}
+            width={48}
+            height={48}
           />
-          <p className="text-base font-medium">kama-obuwie_pl</p>
+          <p className="text-sm font-medium">kama-obuwie_pl</p>
         </div>
         <div className="flex items-center gap-2">
           <ThumbsUpIcon className="size-6 text-success md:size-8" />
           <h4 className="text-lg font-medium md:text-xl">
-            99,6% pozytywnych opinii na Allegro
+            99,6% pozytywnych opinii
           </h4>
         </div>
         <p>Na podstawie 600+ ocen sprzedawcy z ostatnich 12 miesięcy.</p>
       </header>
-      <article className="pb-4 border-b-1 border-secondary h-[17rem]">
+      <article className="pb-4 border-b-1 border-secondary h-[14rem]">
         <ul className="flex flex-col gap-2 overflow-auto scrollbar pt-1 pr-2 h-full">
           {allegroReviews.map((review, index) => (
             <li

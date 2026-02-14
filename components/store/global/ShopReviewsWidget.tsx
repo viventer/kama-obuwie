@@ -53,7 +53,7 @@ export default function ShopReviewsWidget({
               99,6% pozytywnych opinii
             </h3>
           </CardTitle>
-          <CardDescription>Na podstawie 600+ ocen sprzedawcy</CardDescription>
+          <CardDescription>Na podstawie 600+ ocen z allegro.pl</CardDescription>
         </CardHeader>
         <CardContent
           className={`flex items-end  ${isProductPage ? "justify-end" : ""} px-4`}

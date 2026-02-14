@@ -412,6 +412,10 @@ export const getProductsListingData = async function (
 
     productsListingData.push(...legacyOffersListingData);
 
+    if (productsListingData.length === 0) {
+      continue;
+    }
+
     products[categoryId] = productsListingData;
   }
 

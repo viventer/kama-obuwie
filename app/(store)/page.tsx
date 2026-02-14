@@ -1,16 +1,10 @@
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
-import {
-  RootCategory,
-  CategoryWithId,
-} from "@/firebase/schemas/productsSchemas";
+import { CategoryWithId } from "@/firebase/schemas/productsSchemas";
 import ProductsList from "@/components/store/home/ProductsList";
 import { getProductsListingData } from "@/server-actions/products/products";
-import HomeGrid from "@/components/store/home/HomeGrid";
-import { StarIcon } from "lucide-react";
 import {
   categoriesFromMainPage,
   CategoryFromMainPage,
-  homeGridCategories,
   homeSliderBanners,
 } from "@/lib/constants";
 import { orderByProductAvailability } from "@/helpers/availability";
@@ -61,11 +55,11 @@ export default async function Page() {
   });
 
   return (
-    <div className="flex flex-col gap-8 mt-4 md:mt-8">
+    <div className="flex flex-col gap-12 md:gap-16 mt-4 md:mt-8 ">
       <HomeSlider banners={homeSliderBannersWithCategoryIds} />
-      <div className="flex gap-4 mt-6 mb-8 md:mt-10 md:mb-12">
+      <div className="flex gap-8 flex-col xl:flex-row">
         <ShopReviewsWidget className="flex-2" />
-        <AdvantagesBox price={0} className="hidden xl:flex" />
+        <AdvantagesBox className="bg-transparent px-0 py-0 lg:bg-card lg:px-6 lg:py-5" />
       </div>
       <div className="flex flex-col gap-12">
         {Object.entries(products).map(([categoryId, productsInCategory]) => {

@@ -77,11 +77,11 @@ export default function ShoppingCartPage() {
               size: cartItem.item.size,
               quantity: cartItem.item.quantity,
               item_variant: cartItem.item.formattedMainColor,
-            }) as ItemType
+            }) as ItemType,
         ),
         value: cart.reduce(
           (sum, cartItem) => sum + cartItem.item.price * cartItem.item.quantity,
-          0
+          0,
         ),
         currency: "PLN",
       });
@@ -205,12 +205,12 @@ export default function ShoppingCartPage() {
                         size: cartItem.item.size,
                         quantity: cartItem.item.quantity,
                         item_variant: cartItem.item.formattedMainColor,
-                      }) as ItemType
+                      }) as ItemType,
                   ),
                   value: cart.reduce(
                     (sum, cartItem) =>
                       sum + cartItem.item.price * cartItem.item.quantity,
-                    0
+                    0,
                   ),
                   currency: "PLN",
                 });
@@ -223,7 +223,7 @@ export default function ShoppingCartPage() {
           </Button>
           <ShippingInfo />
         </div>
-        <AdvantagesBox price={totalPrice} className="h-fit" />
+        <AdvantagesBox className="h-fit" />
       </div>
     </div>
   );

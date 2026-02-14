@@ -362,7 +362,7 @@ export default function ProductPage({
                     className="mt-6 mb-6"
                     isProductPage={true}
                   />
-                  <AdvantagesBox price={price} className="h-fit flex-0" />
+                  <AdvantagesBox className="h-fit flex-0" />
                 </>
               )}
             </article>

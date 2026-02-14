@@ -31,7 +31,7 @@
     --card-foreground: #ececec;
 
     --muted: #2e3439;
-    --muted-foreground: #606060;
+    --muted-foreground: #999999;
 
     --border: #424242;
     --input: #3a3a3a;
@@ -77,7 +77,7 @@
       --card-foreground: #1b1b1b;
 
       --muted: #f3f4f6;
-      --muted-foreground: #707070;
+      --muted-foreground: #555555;
 
       --border: #cdcdcd;
       --input: #cdcdcd;

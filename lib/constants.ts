@@ -194,6 +194,11 @@ export type HomeSliderBanner = {
   imageSrc: string;
   heading: string;
   subheading: string;
+  destination: {
+    rootCategory: RootCategory;
+    categoryName: string;
+    categoryId?: string;
+  };
 };
 
 export const homeSliderBanners: HomeSliderBanner[] = [
@@ -201,20 +206,36 @@ export const homeSliderBanners: HomeSliderBanner[] = [
     imageSrc: "/home-slider/1.jpg",
     heading: "Czółenka",
     subheading: "Eleganckie i wygodne czółenka na każdą okazję",
+    destination: {
+      rootCategory: "obuwie damskie",
+      categoryName: "czółenka",
+    },
   },
   {
     imageSrc: "/home-slider/2.jpg",
     heading: "Półbuty",
     subheading: "Klasyczne półbuty - styl i komfort w jednym",
+    destination: {
+      rootCategory: "obuwie męskie",
+      categoryName: "półbuty",
+    },
   },
   {
     imageSrc: "/home-slider/3.jpg",
     heading: "Kapcie Damskie",
     subheading: "Wygodne kapcie od polskiego producenta",
+    destination: {
+      rootCategory: "obuwie damskie",
+      categoryName: "kapcie",
+    },
   },
   {
     imageSrc: "/home-slider/4.jpg",
     heading: "Kapcie Męskie",
     subheading: "Wygodne kapcie od polskiego producenta",
+    destination: {
+      rootCategory: "obuwie męskie",
+      categoryName: "kapcie",
+    },
   },
 ];

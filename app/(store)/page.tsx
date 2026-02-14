@@ -11,6 +11,7 @@ import {
   categoriesFromMainPage,
   CategoryFromMainPage,
   homeGridCategories,
+  homeSliderBanners,
 } from "@/lib/constants";
 import { orderByProductAvailability } from "@/helpers/availability";
 import ShopReviewsWidget from "@/components/store/global/ShopReviewsWidget";
@@ -43,33 +44,29 @@ export default async function Page() {
 
   const products = await getProductsListingData(mainPageCategoriesIds, 12);
 
-  const homeGridCategoriesWithIds = homeGridCategories.map((category) => {
+  const homeSliderBannersWithCategoryIds = homeSliderBanners.map((banner) => {
     const matchingCategory = categoriesFromDB?.find(
       (dbCategory) =>
-        dbCategory.name === category.name &&
-        dbCategory.rootCategory === category.rootCategory,
+        dbCategory.name === banner.destination.categoryName &&
+        dbCategory.rootCategory === banner.destination.rootCategory,
     );
 
     return {
-      ...category,
-      id: matchingCategory?.id as string,
+      ...banner,
+      destination: {
+        ...banner.destination,
+        categoryId: matchingCategory?.id,
+      },
     };
   });
 
   return (
-    <div className="flex flex-col gap-8 mt-4">
-      <HomeSlider />
+    <div className="flex flex-col gap-8 mt-4 md:mt-8">
+      <HomeSlider banners={homeSliderBannersWithCategoryIds} />
       <div className="flex gap-4 mt-6 mb-8 md:mt-10 md:mb-12">
         <ShopReviewsWidget className="flex-2" />
         <AdvantagesBox price={0} className="hidden xl:flex" />
       </div>
-      <HomeGrid
-        icon={
-          <StarIcon className="min-w-8 min-h-8 lg:min-w-12 lg:min-h-12 text-brand" />
-        }
-        title="Elegancja na ważne okazje"
-        categories={homeGridCategoriesWithIds}
-      />
       <div className="flex flex-col gap-12">
         {Object.entries(products).map(([categoryId, productsInCategory]) => {
           const filteredProducts = productsInCategory

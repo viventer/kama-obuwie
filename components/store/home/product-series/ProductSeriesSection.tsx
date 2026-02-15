@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ProductSeriesRootCategorySelector from "./ProductSeriesRootCategorySelector";
 import { RootCategory } from "@/firebase/schemas/productsSchemas";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export type ProductSeriesCategory = {
   name: string;
@@ -28,6 +29,8 @@ export default function ProductSeriesSection({
     setFilteredCategories(newFilteredCategories);
   }, [selectedRootCategory]);
 
+  const router = useRouter();
+
   return (
     <section className="flex flex-col gap-2">
       <h2 className="text-xl md:text-2xl font-medium pb-2">Czego szukasz?</h2>
@@ -40,7 +43,8 @@ export default function ProductSeriesSection({
           {filteredCategories.map((category) => (
             <div
               key={category.id}
-              className="bg-card p-4 w-[48vw] xs:w-[40vw] max-w-[250px] rounded-xs"
+              className="bg-card p-4 w-[48vw] xs:w-[40vw] max-w-[250px] rounded-xs hover:bg-primary/50 transition-all cursor-pointer active:bg-primary"
+              onClick={() => router.push(`/listing/${category.id}`)}
             >
               <Image
                 src={category.thumbnailUrl}

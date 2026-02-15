@@ -51,7 +51,7 @@ export default function ProductSeriesSection({
                 alt={category.name}
                 width={400}
                 height={400}
-                className="p-2 w-full rounded-xs bg-white mb-4"
+                className="p-2 w-full rounded-xs bg-white mb-4 aspect-square object-contain"
               />
               <h3 className="text-center font-medium sm:text-lg md:text-xl capitalize">
                 {category.name}

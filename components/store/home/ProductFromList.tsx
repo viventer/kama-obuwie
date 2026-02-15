@@ -22,7 +22,7 @@ export default function ProductFromList({
           )}`,
         );
       }}
-      className="md:hover:translate-y-[-1rem] transition-all duration-200 delay-75 cursor-pointer relative p-0 hover:bg-card/75 gap-0 rounded-xs hover:shadow-md"
+      className="md:hover:translate-y-[-1rem] transition-all duration-200 delay-75 cursor-pointer relative p-0 hover:bg-card/50 gap-0 rounded-xs hover:shadow-md"
     >
       {/* Button for adding to cart - todo */}
       {/* <button className="bg-success text-white rounded-full p-2 absolute top-1 left-1 md:top-2 md:left-2 z-10 hover:brightness-115 hover:shadow-lg hover:shadow-success transition-all cursor-pointer">

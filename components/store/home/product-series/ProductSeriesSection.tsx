@@ -43,7 +43,7 @@ export default function ProductSeriesSection({
           {filteredCategories.map((category) => (
             <div
               key={category.id}
-              className="bg-card p-4 w-[48vw] xs:w-[40vw] max-w-[250px] rounded-xs hover:bg-primary/50 transition-all cursor-pointer active:bg-primary"
+              className="bg-card p-4 w-[48vw] xs:w-[40vw] max-w-[250px] rounded-xs hover:bg-card/50 transition-all cursor-pointer active:bg-transparent"
               onClick={() => router.push(`/listing/${category.id}`)}
             >
               <Image

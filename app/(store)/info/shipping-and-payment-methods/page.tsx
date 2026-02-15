@@ -13,7 +13,7 @@ import Image from "next/image";
 
 export default function ShippingAndPaymentMethods() {
   return (
-    <div className="container mx-auto max-w-4xl space-y-8">
+    <div className="container  space-y-8">
       <SubpageHeading text="Dostawa i płatności" />
 
       {/* Sekcja dostaw */}
@@ -50,7 +50,7 @@ export default function ShippingAndPaymentMethods() {
           <Separator />
 
           {/* Ceny dostaw */}
-          <article>
+          <article className="max-w-md">
             <h3 className="font-bold text-lg mb-2">Koszty dostawy</h3>
             <div className="flex justify-between items-center">
               <span className="text-foreground">Cena podstawowa:</span>

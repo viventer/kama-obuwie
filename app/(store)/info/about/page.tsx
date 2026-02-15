@@ -10,7 +10,7 @@ import { MapPinIcon, ClockIcon, InfoIcon } from "lucide-react";
 
 export default function AboutPage() {
   return (
-    <div className="container mx-auto max-w-4xl space-y-8">
+    <div className="container space-y-8">
       {/* Nagłówek strony */}
       <SubpageHeading text="Informacje o firmie" />
 

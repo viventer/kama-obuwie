@@ -180,8 +180,8 @@ export default function ShoppingCartPage() {
             </Card>
           ) : !termsAccepted ? (
             <Card className="py-0 border-destructive mb-4 max-w-fit">
-              <CardContent className="px-4 py-3 flex items-start gap-2">
-                <InfoIcon className="size-6 text-destructive" />
+              <CardContent className="px-4 py-3 flex items-center gap-2">
+                <InfoIcon className="size-8 text-destructive" />
                 Aby przejść do kasy, zaakceptuj regulamin sklepu i politykę
                 prywatności.
               </CardContent>

@@ -274,7 +274,7 @@ export default function ProductPage({
         </div>
         <div className="flex flex-col gap-2 w-full flex-1">
           {productData?.brand && productData.brand != "bez marki" && (
-            <h2 className="capitalize font-bold text-xl text-text md:text-2xl md:bg-brand/70 md:px-4 md:py-2 md:rounded-xs md:flex md:flex-col md:mb-4 md:text-white">
+            <h2 className="capitalize font-bold text-xl text-text md:text-2xl md:bg-primary md:px-4 md:py-2 md:rounded-xs md:flex md:flex-col md:mb-4 md:text-white">
               {category.name}
               <span className="font-normal">
                 {" "}

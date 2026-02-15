@@ -16,7 +16,7 @@ export default function IconButton({
 }) {
   return (
     <button
-      className={cn("hover:text-accent hover:cursor-pointer", className)}
+      className={cn("hover:text-primary hover:cursor-pointer", className)}
       onClick={onClick}
       disabled={disabled}
       title={title}

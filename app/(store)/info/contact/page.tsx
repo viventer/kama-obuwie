@@ -11,7 +11,7 @@ import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 
 export default function ContactPage() {
   return (
-    <div className="container mx-auto max-w-4xl space-y-8">
+    <div className="container space-y-8">
       <SubpageHeading text="Obsługa klienta" />
 
       {/* Sekcja danych kontaktowych */}

@@ -28,7 +28,7 @@ export default function FooterDeliveryAndPaymentMethods() {
         ))}
         <div className="flex bg-transparent border-success border-1 px-2 py-0.5 gap-1.5 font-medium text-sm items-center rounded-xs">
           <BanknoteIcon className="text-success" />
-          Płatnośc za pobraniem
+          Płatność za pobraniem
         </div>
       </div>
     </section>

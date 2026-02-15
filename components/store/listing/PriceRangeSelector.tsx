@@ -23,7 +23,7 @@ export default function PriceRangeSelector({
 
   return (
     <article className="hidden md:block">
-      <h3 className="font-bold md:text-lg mb-1">Wybierz przedział cenowy</h3>
+      <h3 className="font-medium md:text-lg mb-1">Wybierz przedział cenowy</h3>
       <ToggleGroup
         value={selectedPriceRange.map((range) => `${range.from}-${range.to}`)}
         onValueChange={handleValueChange}
@@ -36,7 +36,7 @@ export default function PriceRangeSelector({
           <ToggleGroupItem
             key={`${priceRange.from}-${priceRange.to}`}
             value={`${priceRange.from}-${priceRange.to}`}
-            className="text-base h-11 data-[state=on]:bg-primary border-2 hover:bg-primary/50 shadow-none data-[state=on]:border-primary data-[state=off]:border-secondary/25 px-4 w-fit"
+            className="text-base h-11 bg-card border-none data-[state=on]:bg-primary border-2 hover:bg-primary/30 shadow-none  px-4 w-fit hover:text-text cursor-pointer"
           >
             {priceRange.from === 0
               ? `Do ${priceRange.to} zł`

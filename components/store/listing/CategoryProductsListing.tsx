@@ -76,7 +76,7 @@ export default function CategoryProductsListing({
       />
 
       {filteredProducts && filteredProducts.length > 0 ? (
-        <section className="grid gap-4 md:gap-6 grid-cols-[repeat(auto-fill,_minmax(9rem,_1fr))] md:grid-cols-[repeat(auto-fill,_minmax(14rem,_1fr))]">
+        <section className="grid gap-x-2 gap-y-8 md:gap-8 grid-cols-[repeat(auto-fill,_minmax(9rem,_1fr))] md:grid-cols-[repeat(auto-fill,_minmax(16rem,_1fr))]">
           {filteredProducts.map((product) => (
             <ProductFromList
               key={`${product.id}-${product.colorVariantName}`}

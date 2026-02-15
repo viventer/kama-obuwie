@@ -18,7 +18,7 @@ export default function ListingFilters({
   availablePriceRanges: PriceRange[];
 }) {
   return (
-    <section className="mb-4 md:mb-6 flex flex-col gap-4">
+    <section className="mb-6 md:mb-8 flex flex-col gap-4">
       {availableSizes.length > 0 && (
         <SizeSelector
           selectedSizes={selectedSizes}

@@ -3,21 +3,24 @@
 import Image from "next/image";
 import { ProductSeriesCategory } from "./ProductSeriesSection";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function ProductSeriesCategoriesList({
   filteredCategories,
+  className,
 }: {
   filteredCategories: ProductSeriesCategory[];
+  className?: string;
 }) {
   const router = useRouter();
 
   return (
-    <article className="overflow-x-auto scrollbar">
+    <article className={cn("overflow-x-auto scrollbar", className)}>
       <div className="grid grid-rows-2 grid-flow-col gap-2 pb-2 w-fit">
         {filteredCategories.map((category) => (
           <div
             key={category.id}
-            className="bg-card p-4 w-[48vw] xs:w-[40vw] max-w-[250px] rounded-xs hover:bg-card/50 transition-all cursor-pointer active:bg-transparent"
+            className="bg-card border-card border-1 p-4 w-[48vw] xs:w-[40vw] max-w-[250px] rounded-xs hover:bg-transparent hover:border-border transition-all cursor-pointer active:bg-transparent"
             onClick={() => router.push(`/listing/${category.id}`)}
           >
             <Image

@@ -5,11 +5,11 @@ import ProductSeriesRootCategorySelector from "./ProductSeriesRootCategorySelect
 import { RootCategory } from "@/firebase/schemas/productsSchemas";
 import ProductSeriesCategoriesList from "./ProductSeriesCategoriesList";
 import BestsellersSection from "./BestsellersSection";
-import type { Bestsellers } from "@/lib/bestsellers";
+import type { Bestsellers, BestsellersRootCategory } from "@/lib/bestsellers";
 
 export type ProductSeriesCategory = {
   name: string;
-  rootCategory: RootCategory;
+  rootCategory: BestsellersRootCategory;
   id: string;
   thumbnailUrl: string;
 };
@@ -22,7 +22,7 @@ export default function ProductSeriesSection({
   bestsellersData: Bestsellers;
 }) {
   const [selectedRootCategory, setSelectedRootCategory] =
-    useState<RootCategory>("obuwie męskie");
+    useState<BestsellersRootCategory>("obuwie męskie");
   const [filteredCategories, setFilteredCategories] = useState(categories);
 
   useEffect(() => {
@@ -34,14 +34,21 @@ export default function ProductSeriesSection({
 
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="text-xl md:text-2xl font-medium">Czego szukasz?</h2>
+      <h2 className="text-xl md:text-2xl font-medium pb-2">
+        Znajdź idealną parę
+      </h2>
       <ProductSeriesRootCategorySelector
         selectedRootCategory={selectedRootCategory}
         setSelectedRootCategory={setSelectedRootCategory}
-        className="mb-4"
       />
-      <ProductSeriesCategoriesList filteredCategories={filteredCategories} />
-      <BestsellersSection bestsellersData={bestsellersData} />
+      <ProductSeriesCategoriesList
+        filteredCategories={filteredCategories}
+        className="mb-8"
+      />
+      <BestsellersSection
+        bestsellersData={bestsellersData}
+        rootCategory={selectedRootCategory}
+      />
     </section>
   );
 }

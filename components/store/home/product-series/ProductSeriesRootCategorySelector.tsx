@@ -1,31 +1,33 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RootCategory } from "@/firebase/schemas/productsSchemas";
+import { BestsellersRootCategory } from "@/lib/bestsellers";
 
 export default function ProductSeriesRootCategorySelector({
   selectedRootCategory,
   setSelectedRootCategory,
   className,
 }: {
-  selectedRootCategory: RootCategory;
-  setSelectedRootCategory: (rootCategory: RootCategory) => void;
+  selectedRootCategory: BestsellersRootCategory;
+  setSelectedRootCategory: (rootCategory: BestsellersRootCategory) => void;
   className?: string;
 }) {
   return (
     <Tabs
       defaultValue={selectedRootCategory}
       value={selectedRootCategory}
-      onValueChange={(value) => setSelectedRootCategory(value as RootCategory)}
+      onValueChange={(value) =>
+        setSelectedRootCategory(value as BestsellersRootCategory)
+      }
       className={className}
     >
-      <TabsList className="md:py-6">
-        <TabsTrigger value="obuwie męskie" className="md:px-6 md:py-4">
-          <p className="md:text-lg">Męskie</p>
+      <TabsList>
+        <TabsTrigger value="obuwie męskie">
+          <p className="text-base">Męskie</p>
         </TabsTrigger>
-        <TabsTrigger value="obuwie damskie" className="md:px-6 md:py-4">
-          <p className="md:text-lg">Damskie</p>
+        <TabsTrigger value="obuwie damskie">
+          <p className="text-base">Damskie</p>
         </TabsTrigger>
-        <TabsTrigger value="obuwie dziecięce" className="md:px-6 md:py-4">
-          <p className="md:text-lg">Dziecięce</p>
+        <TabsTrigger value="obuwie dziecięce">
+          <p className="text-base">Dziecięce</p>
         </TabsTrigger>
       </TabsList>
     </Tabs>

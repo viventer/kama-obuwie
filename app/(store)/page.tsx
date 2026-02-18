@@ -12,7 +12,7 @@ import HomeSlider from "@/components/store/home/HomeSlider";
 import ProductSeriesSection, {
   ProductSeriesCategory,
 } from "@/components/store/home/product-series/ProductSeriesSection";
-import { getBestsellersData } from "@/lib/bestsellers";
+import { BestsellersRootCategory, getBestsellersData } from "@/lib/bestsellers";
 
 export default async function Page() {
   // Pobierz kategorie z bazy danych
@@ -37,7 +37,7 @@ export default async function Page() {
 
     return {
       name: matchingCategory!.name,
-      rootCategory: matchingCategory!.rootCategory,
+      rootCategory: matchingCategory!.rootCategory as BestsellersRootCategory,
       id: matchingCategory!.id,
       thumbnailUrl: sortedProducts[0].thumbnailUrl,
     };

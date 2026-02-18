@@ -28,7 +28,7 @@ export function formatDate(dateString?: string): string | null {
 }
 
 export function getFormattedSizingTable(
-  insoleLengths: { size: string; insoleLength: number }[]
+  insoleLengths: { size: string; insoleLength: number }[],
 ): string {
   const header = `
 <h2>Jak dobrać rozmiar?</h2>
@@ -40,9 +40,18 @@ export function getFormattedSizingTable(
   const listItems = insoleLengths
     .map(
       ({ size, insoleLength }) =>
-        `<ul><li><b>r. ${size}</b> - ${insoleLength} cm</li></ul>`
+        `<ul><li><b>r. ${size}</b> - ${insoleLength} cm</li></ul>`,
     )
     .join("");
 
   return header + listItems;
 }
+
+export const shuffleArray = <T>(items: T[]): T[] => {
+  const array = [...items];
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};

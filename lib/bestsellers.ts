@@ -3,6 +3,7 @@ import type {
   ProductListingData,
   RootCategory,
 } from "@/firebase/schemas/productsSchemas";
+import { shuffleArray } from "./utils";
 
 export const bestsellersRootCategories = [
   "obuwie damskie",
@@ -86,7 +87,7 @@ export const getBestsellersData = (
       }
     }
 
-    bestsellersData[rootCategory] = picked.slice(0, 12);
+    bestsellersData[rootCategory] = shuffleArray(picked.slice(0, 12));
   }
 
   return bestsellersData;

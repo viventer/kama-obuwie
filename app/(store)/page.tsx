@@ -1,8 +1,10 @@
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { CategoryWithId } from "@/firebase/schemas/productsSchemas";
-import ProductsList from "@/components/store/home/ProductsList";
 import { getProductsListingData } from "@/server-actions/products/products";
-import { homeSliderBanners } from "@/lib/constants";
+import {
+  bestsellersSectionCategories,
+  homeSliderBanners,
+} from "@/lib/constants";
 import { orderByProductAvailability } from "@/helpers/availability";
 import ShopReviewsWidget from "@/components/store/global/ShopReviewsWidget";
 import AdvantagesBox from "@/components/store/product/AdvantagesBox";
@@ -10,6 +12,7 @@ import HomeSlider from "@/components/store/home/HomeSlider";
 import ProductSeriesSection, {
   ProductSeriesCategory,
 } from "@/components/store/home/product-series/ProductSeriesSection";
+import { getBestsellersData } from "@/lib/bestsellers";
 
 export default async function Page() {
   // Pobierz kategorie z bazy danych
@@ -18,7 +21,7 @@ export default async function Page() {
 
   const products = await getProductsListingData(
     categoriesFromDB!.map((category) => category.id),
-    4,
+    6,
   );
 
   const productSeriesCategories: ProductSeriesCategory[] = Object.entries(
@@ -56,6 +59,21 @@ export default async function Page() {
     };
   });
 
+  const bestsellersCategoriesWithCategoryIds = bestsellersSectionCategories.map(
+    (category) => {
+      const matchingCategory = categoriesFromDB?.find(
+        (dbCategory) =>
+          dbCategory.name === category.name &&
+          dbCategory.rootCategory === category.rootCategory,
+      );
+
+      return {
+        ...category,
+        id: matchingCategory?.id,
+      };
+    },
+  );
+
   return (
     <div className="flex flex-col gap-16 mt-4">
       <section className="flex flex-col gap-8">
@@ -65,7 +83,13 @@ export default async function Page() {
           <AdvantagesBox className="bg-transparent px-0 py-0 lg:bg-card lg:px-6 lg:py-4" />
         </div>
       </section>
-      <ProductSeriesSection categories={productSeriesCategories} />
+      <ProductSeriesSection
+        categories={productSeriesCategories}
+        bestsellersData={getBestsellersData(
+          products,
+          bestsellersCategoriesWithCategoryIds,
+        )}
+      />
     </div>
   );
 }

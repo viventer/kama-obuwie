@@ -17,15 +17,15 @@ export default function ProductSeriesRootCategorySelector({
       onValueChange={(value) => setSelectedRootCategory(value as RootCategory)}
       className={className}
     >
-      <TabsList>
-        <TabsTrigger value="obuwie męskie">
-          <p>Męskie</p>
+      <TabsList className="md:py-6">
+        <TabsTrigger value="obuwie męskie" className="md:px-6 md:py-4">
+          <p className="md:text-lg">Męskie</p>
         </TabsTrigger>
-        <TabsTrigger value="obuwie damskie">
-          <p>Damskie</p>
+        <TabsTrigger value="obuwie damskie" className="md:px-6 md:py-4">
+          <p className="md:text-lg">Damskie</p>
         </TabsTrigger>
-        <TabsTrigger value="obuwie dziecięce">
-          <p>Dziecięce</p>
+        <TabsTrigger value="obuwie dziecięce" className="md:px-6 md:py-4">
+          <p className="md:text-lg">Dziecięce</p>
         </TabsTrigger>
       </TabsList>
     </Tabs>

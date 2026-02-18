@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import ProductSeriesRootCategorySelector from "./ProductSeriesRootCategorySelector";
 import { RootCategory } from "@/firebase/schemas/productsSchemas";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import ProductSeriesCategoriesList from "./ProductSeriesCategoriesList";
+import BestsellersSection from "./BestsellersSection";
+import type { Bestsellers } from "@/lib/bestsellers";
 
 export type ProductSeriesCategory = {
   name: string;
@@ -15,8 +16,10 @@ export type ProductSeriesCategory = {
 
 export default function ProductSeriesSection({
   categories,
+  bestsellersData,
 }: {
   categories: ProductSeriesCategory[];
+  bestsellersData: Bestsellers;
 }) {
   const [selectedRootCategory, setSelectedRootCategory] =
     useState<RootCategory>("obuwie męskie");
@@ -29,37 +32,16 @@ export default function ProductSeriesSection({
     setFilteredCategories(newFilteredCategories);
   }, [selectedRootCategory]);
 
-  const router = useRouter();
-
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="text-xl md:text-2xl font-medium pb-2">Czego szukasz?</h2>
+      <h2 className="text-xl md:text-2xl font-medium">Czego szukasz?</h2>
       <ProductSeriesRootCategorySelector
         selectedRootCategory={selectedRootCategory}
         setSelectedRootCategory={setSelectedRootCategory}
+        className="mb-4"
       />
-      <div className="overflow-x-auto scrollbar">
-        <div className="grid grid-rows-2 grid-flow-col gap-2 pb-2 w-fit">
-          {filteredCategories.map((category) => (
-            <div
-              key={category.id}
-              className="bg-card p-4 w-[48vw] xs:w-[40vw] max-w-[250px] rounded-xs hover:bg-card/50 transition-all cursor-pointer active:bg-transparent"
-              onClick={() => router.push(`/listing/${category.id}`)}
-            >
-              <Image
-                src={category.thumbnailUrl}
-                alt={category.name}
-                width={400}
-                height={400}
-                className="p-2 w-full rounded-xs bg-white mb-4 aspect-square object-contain"
-              />
-              <h3 className="text-center font-medium sm:text-lg md:text-xl capitalize">
-                {category.name}
-              </h3>
-            </div>
-          ))}
-        </div>
-      </div>
+      <ProductSeriesCategoriesList filteredCategories={filteredCategories} />
+      <BestsellersSection bestsellersData={bestsellersData} />
     </section>
   );
 }

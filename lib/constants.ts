@@ -104,91 +104,62 @@ export const orderStatusTranslations: Record<string, string> = {
   RETURNED: "zwrócone",
 };
 
-export type CategoryFromMainPage = {
+export type BestsellersSectionCategory = {
   name: string;
   rootCategory: RootCategory;
   id?: string;
-  displayName: string;
 };
 
-export const categoriesFromMainPage: CategoryFromMainPage[] = [
+export const bestsellersSectionCategories: BestsellersSectionCategory[] = [
   {
-    name: "botki",
+    name: "czółenka",
     rootCategory: "obuwie damskie",
-    displayName: "Botki Damskie",
   },
   {
-    name: "trzewiki",
-    rootCategory: "obuwie męskie",
-    displayName: "Trzewiki Męskie",
-  },
-  {
-    name: "kozaki",
+    name: "klapki basenowe",
     rootCategory: "obuwie damskie",
-    displayName: "Kozaki Damskie",
   },
   {
     name: "kapcie",
     rootCategory: "obuwie damskie",
-    displayName: "Kapcie Damskie",
-  },
-  {
-    name: "kapcie",
-    rootCategory: "obuwie męskie",
-    displayName: "Kapcie Męskie",
-  },
-  {
-    name: "kapcie",
-    rootCategory: "obuwie dziecięce",
-    displayName: "Kapcie Dziecięce",
   },
   {
     name: "baleriny",
-    rootCategory: "obuwie dziecięce",
-    displayName: "Baleriny Dziewczęce",
+    rootCategory: "obuwie damskie",
   },
   {
     name: "trampki",
     rootCategory: "obuwie dziecięce",
-    displayName: "Trampki Dziecięce",
   },
   {
     name: "sportowe",
     rootCategory: "obuwie dziecięce",
-    displayName: "Sportowe Dziecięce",
   },
   {
-    name: "klapki basenowe (sportowe)",
-    rootCategory: "obuwie damskie",
-    displayName: "Klapki Basenowe Damskie",
+    name: "baleriny",
+    rootCategory: "obuwie dziecięce",
+  },
+  {
+    name: "klapki",
+    rootCategory: "obuwie dziecięce",
+  },
+  {
+    name: "półbuty",
+    rootCategory: "obuwie męskie",
   },
   {
     name: "klapki",
     rootCategory: "obuwie męskie",
-    displayName: "Klapki Męskie",
+  },
+  {
+    name: "kapcie",
+    rootCategory: "obuwie męskie",
+  },
+  {
+    name: "halówki",
+    rootCategory: "obuwie męskie",
   },
 ] as const;
-
-export const homeGridCategories: Omit<HomeGridCategory, "id">[] = [
-  {
-    name: "półbuty",
-    rootCategory: "obuwie męskie",
-    displayName: "Półbuty Męskie",
-    imageSrc: "/main-grid/polbuty-meskie.jpg",
-  },
-  {
-    name: "czółenka",
-    rootCategory: "obuwie damskie",
-    displayName: "Czółenka Damskie",
-    imageSrc: "/main-grid/czolenka-damskie.jpg",
-  },
-  {
-    name: "baleriny",
-    rootCategory: "obuwie damskie",
-    displayName: "Baleriny Damskie",
-    imageSrc: "/main-grid/baleriny-damskie.jpg",
-  },
-];
 
 export type HomeSliderBanner = {
   imageSrc: string;

@@ -76,7 +76,7 @@ export default async function Page() {
 
   return (
     <div className="flex flex-col gap-16 mt-4">
-      <section className="flex flex-col gap-8">
+      <section className="flex flex-col gap-8 border-b-1 pb-16">
         <HomeSlider banners={homeSliderBannersWithCategoryIds} />
         <div className="flex gap-8 flex-col lg:flex-row">
           <ShopReviewsWidget className="flex-2" />

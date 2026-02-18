@@ -10,7 +10,7 @@ export default function BestsellersSection({
 }) {
   return (
     <article className="max-w-full">
-      <h2 className="text-xl md:text-2xl mb-2 md:mb-0">
+      <h2 className="text-xl md:text-2xl pb-4 md:pb-0">
         <span className="font-medium capitalize">Hity sezonu</span> -{" "}
         {rootCategory}
       </h2>
@@ -18,7 +18,7 @@ export default function BestsellersSection({
         {bestsellersData[rootCategory].map((product) => (
           <div
             key={`${product.id}-${product.colorVariantName}`}
-            className="w-[36vw] max-w-[200px]"
+            className="w-[38vw] max-w-[250px]"
           >
             <ProductFromList product={product} />
           </div>

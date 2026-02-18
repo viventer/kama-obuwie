@@ -33,18 +33,17 @@ export default function ProductSeriesSection({
   }, [selectedRootCategory]);
 
   return (
-    <section className="flex flex-col gap-2">
-      <h2 className="text-xl md:text-2xl font-medium pb-2">
-        Znajdź idealną parę
-      </h2>
-      <ProductSeriesRootCategorySelector
-        selectedRootCategory={selectedRootCategory}
-        setSelectedRootCategory={setSelectedRootCategory}
-      />
-      <ProductSeriesCategoriesList
-        filteredCategories={filteredCategories}
-        className="mb-8"
-      />
+    <section className="flex flex-col gap-14">
+      <div className="flex flex-col gap-2">
+        <h2 className="text-xl md:text-2xl font-medium pb-2">
+          Znajdź idealną parę
+        </h2>
+        <ProductSeriesRootCategorySelector
+          selectedRootCategory={selectedRootCategory}
+          setSelectedRootCategory={setSelectedRootCategory}
+        />
+        <ProductSeriesCategoriesList filteredCategories={filteredCategories} />
+      </div>
       <BestsellersSection
         bestsellersData={bestsellersData}
         rootCategory={selectedRootCategory}

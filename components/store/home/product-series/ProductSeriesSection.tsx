@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
+import { AnimatePresence, cubicBezier, motion } from "framer-motion";
 import ProductSeriesRootCategorySelector from "./ProductSeriesRootCategorySelector";
-import { RootCategory } from "@/firebase/schemas/productsSchemas";
 import ProductSeriesCategoriesList from "./ProductSeriesCategoriesList";
 import BestsellersSection from "./BestsellersSection";
 import type { Bestsellers, BestsellersRootCategory } from "@/lib/bestsellers";
@@ -23,14 +23,20 @@ export default function ProductSeriesSection({
 }) {
   const [selectedRootCategory, setSelectedRootCategory] =
     useState<BestsellersRootCategory>("obuwie męskie");
-  const [filteredCategories, setFilteredCategories] = useState(categories);
 
-  useEffect(() => {
-    const newFilteredCategories = categories.filter(
+  const filteredCategories = useMemo(() => {
+    return categories.filter(
       (category) => category.rootCategory === selectedRootCategory,
     );
-    setFilteredCategories(newFilteredCategories);
-  }, [selectedRootCategory]);
+  }, [categories, selectedRootCategory]);
+
+  const variants = {
+    hidden: { opacity: 0, x: -24 },
+    visible: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: 24 },
+  };
+
+  const transition = { duration: 0.35, ease: cubicBezier(0.22, 1, 0.36, 1) };
 
   return (
     <section className="flex flex-col gap-14">
@@ -42,12 +48,40 @@ export default function ProductSeriesSection({
           selectedRootCategory={selectedRootCategory}
           setSelectedRootCategory={setSelectedRootCategory}
         />
-        <ProductSeriesCategoriesList filteredCategories={filteredCategories} />
+
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={`categories-${selectedRootCategory}`}
+            variants={variants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            transition={transition}
+            className="overflow-hidden will-change-[transform,opacity]"
+          >
+            <ProductSeriesCategoriesList
+              filteredCategories={filteredCategories}
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
-      <BestsellersSection
-        bestsellersData={bestsellersData}
-        rootCategory={selectedRootCategory}
-      />
+
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={`bestsellers-${selectedRootCategory}`}
+          variants={variants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          transition={transition}
+          className="overflow-hidden will-change-[transform,opacity]"
+        >
+          <BestsellersSection
+            bestsellersData={bestsellersData}
+            rootCategory={selectedRootCategory}
+          />
+        </motion.div>
+      </AnimatePresence>
     </section>
   );
 }

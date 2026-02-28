@@ -36,7 +36,7 @@ export default function ProductSeriesSection({
     exit: { opacity: 0, x: 24 },
   };
 
-  const transition = { duration: 0.35, ease: cubicBezier(0.22, 1, 0.36, 1) };
+  const transition = { duration: 0.3, ease: cubicBezier(0.22, 1, 0.36, 1) };
 
   return (
     <section className="flex flex-col gap-14">

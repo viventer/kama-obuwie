@@ -43,6 +43,7 @@ import {
   Offer,
   AllegroOfferParameters,
 } from "@/firebase/schemas/offersSchemas";
+import { AllegroProductParametersResponse } from "@/server-actions/allegro/products";
 
 export type ProductParametersFormData = Omit<Product, "rangeSizes"> & {
   rangeSizes: RangeSizeString[];
@@ -109,7 +110,7 @@ export default function EditProductParametersForm({
 
     (async function () {
       const { data } = await axios.get<DocumentDataWithRef<CategoryWithId>>(
-        `/api/categories/${categoryId}`
+        `/api/categories/${categoryId}`,
       );
       if (!data?.data) {
         showToast("Błąd pobierania kategorii.", "error");
@@ -121,7 +122,7 @@ export default function EditProductParametersForm({
   }, [categoryId]);
 
   const editAllegroOfferParams = async (
-    formData: ProductParametersFormData
+    formData: ProductParametersFormData,
   ) => {
     startLoading();
 
@@ -131,11 +132,23 @@ export default function EditProductParametersForm({
       return;
     }
 
+    const { data: availableAllegroParameters } =
+      await axios.get<AllegroProductParametersResponse>(
+        `/api/allegro/parameters/${allegroCategoryId}`,
+      );
+
+    const parametersNames = Object.values(availableAllegroParameters).map((p) =>
+      p.name.toLowerCase(),
+    );
+
     try {
       const formattedParameters = await formatAllegroProductParameters(
-        formData.parameters,
-        allegroCategoryId,
-        formData.brand
+        {
+          productParameters: formData.parameters,
+          allegroCategoryId,
+          productBrand: formData.brand,
+        },
+        parametersNames,
       );
 
       // Pobierz SKU dla wszystkich wariantów kolorystycznych
@@ -166,7 +179,7 @@ export default function EditProductParametersForm({
               const channel = salesChannel as "AL1" | "AL2";
               const offerIds = Object.values(sizeToIdMap);
               allegroOffersIds[channel].push(...offerIds);
-            }
+            },
           );
         }
       });
@@ -179,7 +192,7 @@ export default function EditProductParametersForm({
 
             // Pobierz aktualną ofertę Allegro dla tego konkretnego ID
             const allegroOfferResponse = await axios.get(
-              `/api/allegro/offers/${allegroOfferId}?salesChannel=${channel}`
+              `/api/allegro/offers/${allegroOfferId}?salesChannel=${channel}`,
             );
 
             const currentAllegroOffer =
@@ -201,7 +214,7 @@ export default function EditProductParametersForm({
             const newParameters = Array.isArray(formattedParameters)
               ? formattedParameters
               : (Object.values(
-                  formattedParameters
+                  formattedParameters,
                 ) as AllegroOfferParameters[0][]);
 
             // Połącz parametry - jeśli parametr o tej samej nazwie istnieje, zastąp go nowym
@@ -240,14 +253,14 @@ export default function EditProductParametersForm({
               offerPartial: updateData,
               salesChannel: channel,
             });
-          })
+          }),
       );
 
       await Promise.all(allUpdates);
     } catch (error) {
       handleError(
         error,
-        "Wystąpił błąd podczas aktualizacji parametrów na Allegro."
+        "Wystąpił błąd podczas aktualizacji parametrów na Allegro.",
       );
       return;
     } finally {
@@ -285,7 +298,7 @@ export default function EditProductParametersForm({
     ) {
       showToast(
         "Nazwa marki jest wymagana, jeśli wybrano 'inna' w parametrach Allegro.",
-        "error"
+        "error",
       );
       return;
     }
@@ -334,7 +347,7 @@ export default function EditProductParametersForm({
     } catch (error) {
       showToast(
         `Wystąpił błąd podczas aktualizacji parametrów: ${error}`,
-        "error"
+        "error",
       );
     } finally {
       stopLoading();
@@ -486,7 +499,7 @@ export default function EditProductParametersForm({
                   val.every(
                     (r) =>
                       Number.isInteger(Number(r.from)) &&
-                      Number.isInteger(Number(r.to))
+                      Number.isInteger(Number(r.to)),
                   ) || "Wszystkie wartości muszą być liczbami całkowitymi",
                 minGreaterThanTen: (val) =>
                   val.every((r) => Number(r.from) > 10 && Number(r.to) > 10) ||

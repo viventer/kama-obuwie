@@ -31,7 +31,7 @@ export type AllegroProductParametersResponse = {
 };
 
 export async function getProductParameters(
-  allegroCategoryId: string
+  allegroCategoryId: string,
 ): Promise<AllegroProductParametersResponse> {
   const accessToken = await getAllegroClientAccessToken();
   const allegroHeaders = getSingleAllegroHeaders(accessToken);
@@ -46,4 +46,11 @@ export async function getProductParameters(
 
   const parameters = response.data.parameters;
   return parameters;
+}
+
+export async function getProductParametersNames(
+  allegroCategoryId: string,
+): Promise<string[]> {
+  const parameters = await getProductParameters(allegroCategoryId);
+  return Object.values(parameters).map((p) => p.name.toLowerCase());
 }

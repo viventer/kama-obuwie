@@ -22,6 +22,7 @@ import { updateOffer } from "@/server-actions/offers/offers";
 import { parseSignature } from "@/helpers/signature";
 import type { LegacyProductWithId } from "@/firebase/schemas/legacyProductsSchemas";
 import { resolveSingleAvailabilityKey } from "@/helpers/availability";
+import { getProductParametersNames } from "@/server-actions/allegro/products";
 
 export type PostIndividualAllegroOfferBody = {
   offerId: string;
@@ -30,7 +31,7 @@ export type PostIndividualAllegroOfferBody = {
 };
 
 async function tryFindProductIdForOffer(
-  offer: OfferWithId
+  offer: OfferWithId,
 ): Promise<string | null> {
   if (!offer.signature) return null;
 
@@ -41,13 +42,13 @@ async function tryFindProductIdForOffer(
 
   const products =
     (await getDocumentsFromAdminDB<ProductWithId>("products", (ref) =>
-      ref.where("manufacturerCode", "==", manufacturerCode)
+      ref.where("manufacturerCode", "==", manufacturerCode),
     )) || [];
 
   const matching = products.filter((p) =>
     (p.colorVariants || []).some(
-      (variant) => getColorVariantName(variant) === colorVariantName
-    )
+      (variant) => getColorVariantName(variant) === colorVariantName,
+    ),
   );
 
   if (matching.length === 1) {
@@ -74,10 +75,11 @@ export async function POST(request: NextRequest) {
 
     const { data: offer } = await getDocumentFromAdminDB<OfferWithId>(
       "offers",
-      offerId
+      offerId,
     );
 
     if (!offer) {
+      console.log(`Nie znaleziono oferty o id ${offerId}`);
       return apiErrorResponse("Nie znaleziono oferty w bazie danych.", 404);
     }
 
@@ -86,7 +88,7 @@ export async function POST(request: NextRequest) {
         `Rozmiar ${requestedSize} nie istnieje w dostępności oferty.`,
         400,
         null,
-        { step: "offer_creation" }
+        { step: "offer_creation" },
       );
     }
 
@@ -112,22 +114,25 @@ export async function POST(request: NextRequest) {
             "Oferta nie ma przypisanego produktu i nie udało się go automatycznie dopasować po signature. Brak legacyProductId, aby odtworzyć ofertę z danych legacy.",
             409,
             null,
-            { step: "offer_creation" }
+            { step: "offer_creation" },
           );
         }
 
         const { data: legacy } =
           await getDocumentFromAdminDB<LegacyProductWithId>(
             "legacyProducts",
-            offer.legacyProductId
+            offer.legacyProductId,
           );
 
         if (!legacy) {
+          console.log(
+            `Nie znaleziono legacyProduct o id ${offer.legacyProductId}`,
+          );
           return apiErrorResponse(
             "Nie znaleziono legacyProduct dla oferty.",
             404,
             null,
-            { step: "offer_creation" }
+            { step: "offer_creation" },
           );
         }
 
@@ -136,7 +141,7 @@ export async function POST(request: NextRequest) {
             "Brak rozmiaru w żądaniu. Dla oferty legacy (bez productId) rozmiar jest wymagany.",
             400,
             null,
-            { step: "offer_creation" }
+            { step: "offer_creation" },
           );
         }
 
@@ -145,14 +150,14 @@ export async function POST(request: NextRequest) {
             "LegacyProduct nie ma categoryId.",
             409,
             null,
-            { step: "offer_creation" }
+            { step: "offer_creation" },
           );
         }
 
         const { data: legacyCategory } =
           await getDocumentFromAdminDB<CategoryWithId>(
             "categories",
-            legacy.categoryId
+            legacy.categoryId,
           );
         const allegroCategoryId = legacyCategory?.allegroCategoryId;
         if (!allegroCategoryId) {
@@ -160,7 +165,7 @@ export async function POST(request: NextRequest) {
             "Brak allegroCategoryId dla kategorii legacyProduct.",
             409,
             null,
-            { step: "offer_creation" }
+            { step: "offer_creation" },
           );
         }
 
@@ -172,7 +177,7 @@ export async function POST(request: NextRequest) {
             "Brak colorVariantName w ofercie (nie można dobrać zdjęć legacy).",
             409,
             null,
-            { step: "offer_creation" }
+            { step: "offer_creation" },
           );
         }
 
@@ -189,7 +194,7 @@ export async function POST(request: NextRequest) {
             "Brak zdjęć do odtworzenia oferty legacy (legacy.imagesUrls ani offer.thumbnail).",
             409,
             null,
-            { step: "offer_creation" }
+            { step: "offer_creation" },
           );
         }
 
@@ -197,10 +202,17 @@ export async function POST(request: NextRequest) {
           required: {},
           optional: {},
         };
+
+        const availableParameterNames =
+          await getProductParametersNames(allegroCategoryId);
+
         const productParameters = await formatAllegroProductParameters(
-          legacyProductParameters as any,
-          allegroCategoryId,
-          legacy.brand
+          {
+            productParameters: legacyProductParameters as any,
+            allegroCategoryId,
+            productBrand: legacy.brand,
+          },
+          availableParameterNames,
         );
 
         if (!legacy.sizingTableId) {
@@ -208,27 +220,30 @@ export async function POST(request: NextRequest) {
             "LegacyProduct nie ma sizingTableId (nie można uzupełnić długości wkładki w opisie).",
             409,
             null,
-            { step: "offer_creation" }
+            { step: "offer_creation" },
           );
         }
 
         const { data: legacySizingTable } =
           await getDocumentFromAdminDB<SizingTableWithId>(
             "sizingTables",
-            legacy.sizingTableId
+            legacy.sizingTableId,
           );
 
         if (!legacySizingTable) {
+          console.log(
+            `Nie znaleziono tabeli rozmiarów legacyProduct o id ${legacy.sizingTableId}`,
+          );
           return apiErrorResponse(
             "Nie znaleziono tabeli rozmiarów legacyProduct.",
             404,
             null,
-            { step: "offer_creation" }
+            { step: "offer_creation" },
           );
         }
 
         const legacyInsoleLength = legacySizingTable.insoleLengths.find(
-          (item) => item.size.toString() === requestedSize.toString()
+          (item) => item.size.toString() === requestedSize.toString(),
         );
 
         if (!legacyInsoleLength) {
@@ -236,7 +251,7 @@ export async function POST(request: NextRequest) {
             `Rozmiar ${requestedSize} nie istnieje w tabeli rozmiarów legacyProduct (nie można uzupełnić opisu).`,
             409,
             null,
-            { step: "offer_creation" }
+            { step: "offer_creation" },
           );
         }
 
@@ -256,7 +271,7 @@ export async function POST(request: NextRequest) {
         ).getSingleAllegroHeaders(
           await (
             await import("@/server-actions/allegro/auth")
-          ).getAllegroUserAccessToken(salesChannel)
+          ).getAllegroUserAccessToken(salesChannel),
         ) as any;
 
         const allegroOfferId = await postIndividualAllegroOfferFromLegacy({
@@ -292,7 +307,7 @@ export async function POST(request: NextRequest) {
 
     const { data: product } = await getDocumentFromAdminDB<ProductWithId>(
       "products",
-      effectiveProductId
+      effectiveProductId,
     );
 
     if (!product) {
@@ -306,7 +321,7 @@ export async function POST(request: NextRequest) {
     if (hasRequestedSize && !product.sizingTableId) {
       return apiErrorResponse(
         "Produkt nie ma przypisanej tabeli rozmiarów.",
-        400
+        400,
       );
     }
 
@@ -314,18 +329,22 @@ export async function POST(request: NextRequest) {
       ? (
           await getDocumentFromAdminDB<SizingTableWithId>(
             "sizingTables",
-            product.sizingTableId as string
+            product.sizingTableId as string,
           )
         ).data || null
       : null;
 
     if (hasRequestedSize && !sizingTable) {
+      console.log(
+        "Nie znaleziono tabeli rozmiarów o id",
+        product.sizingTableId,
+      );
       return apiErrorResponse("Nie znaleziono tabeli rozmiarów.", 404);
     }
 
     const { data: category } = await getDocumentFromAdminDB<CategoryWithId>(
       "categories",
-      product.categoryId as string
+      product.categoryId as string,
     );
 
     const allegroCategoryId = category?.allegroCategoryId;
@@ -334,9 +353,12 @@ export async function POST(request: NextRequest) {
         "Brak allegroCategoryId dla kategorii produktu.",
         400,
         null,
-        { step: "offer_creation" }
+        { step: "offer_creation" },
       );
     }
+
+    const availableParameterNames =
+      await getProductParametersNames(allegroCategoryId);
 
     const colorVariantName = offer.colorVariantName;
     if (!colorVariantName) {
@@ -346,7 +368,7 @@ export async function POST(request: NextRequest) {
     }
 
     const colorVariant = (product.colorVariants || []).find(
-      (v) => getColorVariantName(v) === colorVariantName
+      (v) => getColorVariantName(v) === colorVariantName,
     );
 
     if (!colorVariant) {
@@ -354,12 +376,12 @@ export async function POST(request: NextRequest) {
         `Nie znaleziono wariantu kolorystycznego '${colorVariantName}' w produkcie.`,
         400,
         null,
-        { step: "offer_creation" }
+        { step: "offer_creation" },
       );
     }
 
     const imagesOfVariant = (product.editedPhotos || []).filter(
-      (image) => image.colorVariantName === colorVariantName
+      (image) => image.colorVariantName === colorVariantName,
     );
 
     const imagesPaths = imagesOfVariant.map((image) => image.filePath);
@@ -370,13 +392,13 @@ export async function POST(request: NextRequest) {
         "Brak zdjęć produktu dla danego wariantu.",
         400,
         null,
-        { step: "offer_creation" }
+        { step: "offer_creation" },
       );
     }
 
     const insoleLength = hasRequestedSize
       ? (sizingTable?.insoleLengths || []).find(
-          (item) => item.size.toString() === requestedSize.toString()
+          (item) => item.size.toString() === requestedSize.toString(),
         ) || null
       : null;
 
@@ -385,7 +407,7 @@ export async function POST(request: NextRequest) {
         `Rozmiar ${requestedSize} nie istnieje w tabeli rozmiarów.`,
         400,
         null,
-        { step: "offer_creation" }
+        { step: "offer_creation" },
       );
     }
 
@@ -422,27 +444,30 @@ export async function POST(request: NextRequest) {
 
     const url = `${process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL}/sale/product-offers`;
 
-    const allegroOfferId = await postIndividualAllegroOffer({
-      allegroOfferData: allegroOfferData as any,
-      insoleLength,
-      insoleLengths: hasRequestedSize ? sizingTable?.insoleLengths || [] : [],
-      availabilityKey,
-      offer,
-      product,
-      colorVariant,
-      allegroHeaders: (
-        await import("@/server-actions/allegro/global")
-      ).getSingleAllegroHeaders(
-        await (
-          await import("@/server-actions/allegro/auth")
-        ).getAllegroUserAccessToken(salesChannel)
-      ) as any,
-      url,
-      allegroCategoryId,
-      images: imagesUrls,
-      channel: salesChannel,
-      SKU: offer.SKU,
-    });
+    const allegroOfferId = await postIndividualAllegroOffer(
+      {
+        allegroOfferData: allegroOfferData as any,
+        insoleLength,
+        insoleLengths: hasRequestedSize ? sizingTable?.insoleLengths || [] : [],
+        availabilityKey,
+        offer,
+        product,
+        colorVariant,
+        allegroHeaders: (
+          await import("@/server-actions/allegro/global")
+        ).getSingleAllegroHeaders(
+          await (
+            await import("@/server-actions/allegro/auth")
+          ).getAllegroUserAccessToken(salesChannel),
+        ) as any,
+        url,
+        allegroCategoryId,
+        images: imagesUrls,
+        channel: salesChannel,
+        SKU: offer.SKU,
+      },
+      availableParameterNames,
+    );
 
     const newAllegroOffersIds = {
       ...(offer.allegroOffersIds || { AL1: {}, AL2: {} }),
@@ -466,7 +491,7 @@ export async function POST(request: NextRequest) {
         {
           step: "offer_creation",
           originalMessage: err.message,
-        }
+        },
       );
     }
 

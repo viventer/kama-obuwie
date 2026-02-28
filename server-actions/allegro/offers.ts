@@ -40,6 +40,10 @@ import { getFormattedSizingTable } from "@/lib/utils";
 import type { LegacyProductWithId } from "@/firebase/schemas/legacyProductsSchemas";
 import { buildExternalId } from "@/helpers/externalId";
 import { resolveSingleAvailabilityKey } from "@/helpers/availability";
+import {
+  AllegroProductParametersResponse,
+  getProductParametersNames,
+} from "./products";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -166,6 +170,8 @@ export const postAllegroOffer = async (
     AL2: Record<string, string>;
   };
 
+  const parametersNames = await getProductParametersNames(allegroCategoryId);
+
   // Przetwórz oba konta równolegle
   const channelPromises = (["AL1", "AL2"] as const).map(async (channel) => {
     const allegroOfferData: Omit<
@@ -221,11 +227,36 @@ export const postAllegroOffer = async (
 
     if (hasSizes) {
       for (const insoleLength of insoleLengths) {
-        const allegroId = await postIndividualAllegroOffer({
+        const allegroId = await postIndividualAllegroOffer(
+          {
+            allegroOfferData,
+            insoleLength,
+            insoleLengths,
+            availabilityKey: insoleLength.size.toString(),
+            offer,
+            product,
+            colorVariant,
+            allegroHeaders: allegroHeaders[channel],
+            url,
+            allegroCategoryId,
+            images,
+            channel,
+            SKU,
+          },
+          parametersNames,
+        );
+
+        channelResults[insoleLength.size.toString()] = allegroId;
+      }
+    } else {
+      const availabilityKey = resolveSingleAvailabilityKey(offer.availability);
+
+      const allegroId = await postIndividualAllegroOffer(
+        {
           allegroOfferData,
-          insoleLength,
-          insoleLengths,
-          availabilityKey: insoleLength.size.toString(),
+          insoleLength: null,
+          insoleLengths: [],
+          availabilityKey,
           offer,
           product,
           colorVariant,
@@ -235,28 +266,9 @@ export const postAllegroOffer = async (
           images,
           channel,
           SKU,
-        });
-
-        channelResults[insoleLength.size.toString()] = allegroId;
-      }
-    } else {
-      const availabilityKey = resolveSingleAvailabilityKey(offer.availability);
-
-      const allegroId = await postIndividualAllegroOffer({
-        allegroOfferData,
-        insoleLength: null,
-        insoleLengths: [],
-        availabilityKey,
-        offer,
-        product,
-        colorVariant,
-        allegroHeaders: allegroHeaders[channel],
-        url,
-        allegroCategoryId,
-        images,
-        channel,
-        SKU,
-      });
+        },
+        parametersNames,
+      );
 
       channelResults[availabilityKey] = allegroId;
     }
@@ -275,6 +287,7 @@ export const postAllegroOffer = async (
 
 export async function postIndividualAllegroOffer(
   data: AllegroIndividualOffer,
+  parametersNames: string[],
 ): Promise<string> {
   const {
     images,
@@ -304,9 +317,12 @@ export async function postIndividualAllegroOffer(
   }
 
   const formattedProductParameters = await formatAllegroProductParameters(
-    product.parameters,
-    allegroCategoryId,
-    product.brand,
+    {
+      productParameters: product.parameters,
+      allegroCategoryId,
+      productBrand: product.brand,
+    },
+    parametersNames,
   );
 
   const allegroProductParameters = addMissingAllegroParameters(
@@ -591,11 +607,15 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
 }
 
 export async function formatAllegroProductParameters(
-  productParameters: ProductParameters,
-  allegroCategoryId: string,
-  productBrand?: string,
+  productData: {
+    productParameters: ProductParameters;
+    allegroCategoryId: string;
+    productBrand?: string;
+  },
+  parametersNames: string[],
 ): Promise<AllegroOfferParameters> {
   const result: AllegroOfferParameters = [];
+  const { productParameters, allegroCategoryId, productBrand } = productData;
 
   // 1. Scalamy wszystkie required + optional
   const allEntries: [string, Primitive | Primitive[]][] = [
@@ -604,6 +624,12 @@ export async function formatAllegroProductParameters(
   ];
 
   for (const [name, rawValue] of allEntries) {
+    if (!parametersNames.includes(name.toLowerCase())) {
+      console.warn(
+        `Parametr "${name}" nie jest dostępny w Allegro dla kategorii ${allegroCategoryId} i zostanie pominięty.`,
+      );
+      continue;
+    }
     // 2. Usuń puste stringi
     if (Array.isArray(rawValue)) {
       // Tablica → przefiltruj

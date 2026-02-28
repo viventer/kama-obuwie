@@ -18,7 +18,7 @@ export default function BestsellersSection({
         {bestsellersData[rootCategory].map((product) => (
           <div
             key={`${product.id}-${product.colorVariantName}`}
-            className="w-[38vw] max-w-[250px]"
+            className="w-[40vw] max-w-[250px]"
           >
             <ProductFromList product={product} />
           </div>

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
+import { truncateString } from "@/lib/utils";
 
 export default function ProductFromList({
   product,
@@ -38,8 +39,8 @@ export default function ProductFromList({
         />
       </div>
 
-      <div className="py-2 px-3">
-        <p className="text-lg capitalize">
+      <div className="py-2 px-2 xs:px-3">
+        <p className="text-base xs:text-lg capitalize">
           {product.brand && product.brand != "bez marki"
             ? product.brand
             : "\u00A0"}

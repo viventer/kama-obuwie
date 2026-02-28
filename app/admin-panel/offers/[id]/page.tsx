@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import EditOfferForm from "@/components/adminPanel/offers/forms/EditOfferForm";
 import OfferProductInfo from "@/components/adminPanel/offers/OfferProductInfo";
+import { isValidUrl } from "@/components/adminPanel/offers/helpers/validation";
+import { getImageUrl } from "@/server-actions/files/files";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -27,11 +29,15 @@ export default async function OfferEditPage(props: Props) {
     notFound();
   }
 
+  const thumbnailUrl = isValidUrl(oldData.thumbnail)
+    ? oldData.thumbnail
+    : await getImageUrl(oldData.thumbnail!);
+
   return (
     <>
       <FormWrapper headingText="Edytuj ofertę">
         <OfferProductInfo
-          thumbnail={oldData.thumbnail!}
+          thumbnail={thumbnailUrl!}
           SKU={oldData.SKU}
           signature={oldData.signature}
           className="mb-4"

@@ -65,7 +65,10 @@ export const getBestsellersData = (
     // 1) Po 3 produkty z każdej kategorii (3 * 4 = 12)
     const sortedByCategoryId = new Map<string, ProductListingData[]>();
     for (const categoryId of categoryIds) {
-      const values = productsByCategoryId[categoryId] || [];
+      const values =
+        productsByCategoryId[categoryId]?.filter(
+          (product) => product.isActive,
+        ) || [];
       const sorted = [...values].sort(orderByProductAvailability);
       sortedByCategoryId.set(categoryId, sorted);
 

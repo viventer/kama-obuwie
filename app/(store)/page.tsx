@@ -21,7 +21,7 @@ export default async function Page() {
 
   const products = await getProductsListingData(
     categoriesFromDB!.map((category) => category.id),
-    6,
+    8,
   );
 
   const productSeriesCategories: ProductSeriesCategory[] = Object.entries(

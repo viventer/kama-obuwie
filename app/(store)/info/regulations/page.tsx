@@ -1,6 +1,6 @@
 import LinkText from "@/components/adminPanel/global/LinkText";
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function RegulationsPage() {
   return (
@@ -27,6 +27,24 @@ export default function RegulationsPage() {
             <p>32-700 Bochnia</p>
             <p>NIP: 8681255945</p>
           </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <h2>Prawa do znaków towarowych</h2>
+            </CardTitle>
+            <CardContent className="px-0">
+              <p>
+                {" "}
+                Wszystkie nazwy marek, znaki towarowe i nazwy produktów są
+                własnością ich odpowiednich właścicieli. Nasz sklep nie jest
+                oficjalnym przedstawicielem ani autoryzowanym dystrybutorem tych
+                marek, o ile nie wskazano inaczej. Oferujemy oryginalne produkty
+                pochodzące z legalnej dystrybucji.
+              </p>
+            </CardContent>
+          </CardHeader>
         </Card>
 
         {/* <Card className="gap-0">

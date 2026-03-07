@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { MapPinIcon, ClockIcon, InfoIcon } from "lucide-react";
+import { MapPinIcon, ClockIcon, InfoIcon, CopyrightIcon } from "lucide-react";
 
 export default function AboutPage() {
   return (
@@ -52,6 +52,25 @@ export default function AboutPage() {
             <p>ul. Krzęczków 42a</p>
             <p>32-700 Bochnia</p>
             <p>NIP: 8681255945</p>
+          </CardContent>
+        </CardHeader>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <CopyrightIcon className="text-brand" />
+            <h2>Prawa do znaków towarowych</h2>
+          </CardTitle>
+          <CardContent className="px-0">
+            <p>
+              {" "}
+              Wszystkie nazwy marek, znaki towarowe i nazwy produktów są
+              własnością ich odpowiednich właścicieli. Nasz sklep nie jest
+              oficjalnym przedstawicielem ani autoryzowanym dystrybutorem tych
+              marek, o ile nie wskazano inaczej. Oferujemy oryginalne produkty
+              pochodzące z legalnej dystrybucji.
+            </p>
           </CardContent>
         </CardHeader>
       </Card>

@@ -37,13 +37,13 @@ import TextEditor from "../description/TextEditor";
 import ResponsibleProducerSelector from "./ResponsibleProducerSelector";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { useFullPageLoading } from "../../global/FullPageLoader";
-import { formatAllegroProductParameters } from "@/server-actions/allegro/offers";
 import {
   AllegroOffer,
   Offer,
   AllegroOfferParameters,
 } from "@/firebase/schemas/offersSchemas";
 import { AllegroProductParametersResponse } from "@/server-actions/allegro/products";
+import { formatAllegroProductParameters } from "@/server-actions/allegro/offers/parameters";
 
 export type ProductParametersFormData = Omit<Product, "rangeSizes"> & {
   rangeSizes: RangeSizeString[];

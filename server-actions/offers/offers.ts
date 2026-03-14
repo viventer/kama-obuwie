@@ -15,8 +15,8 @@ import {
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { AllegroSalesChannel, SalesChannel } from "@/lib/constants";
-import { editAllegroOffer } from "../allegro/offers";
 import { changeIndividualSizeMerchantCenterAvailability } from "../merchantCenter/manageProducts";
+import { editAllegroOffer } from "../allegro/offers/edit";
 
 export const createOffer = async function (newOffer: Partial<Offer>) {
   await verifyUser(["ADMIN", "VERIFIED"]);

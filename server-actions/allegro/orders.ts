@@ -13,12 +13,11 @@ import {
 import { createOrder, updateOrder } from "@/server-actions/orders/orders";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { Offer } from "@/firebase/schemas/offersSchemas";
-import { AllegroSalesChannel } from "@/lib/constants";
-import { getAllegroOffer } from "./offers";
 import { handleAllegroApiError } from "../errorHandlers";
 import { parseExternalId } from "@/helpers/externalId";
 import { generateOrderNumber } from "../helpers";
 import { getCurrentDateTimeInPoland } from "@/helpers/datetime";
+import { getAllegroOffer } from "./offers/get";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 

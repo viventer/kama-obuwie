@@ -15,7 +15,6 @@ import {
 } from "../auth";
 import { getSingleAllegroHeaders } from "../global";
 import axios from "axios";
-import { editAllegroOffer, getAllegroOffer } from "../offers";
 import { getAllegroSizingTable } from "../sizingTables";
 import { getAllegroResponsibleProducer } from "../responsibleProducers";
 import { adminDB } from "@/firebase/firebaseAdmin";
@@ -53,6 +52,8 @@ import {
   updateOfferInDB,
   updateProductOffersIds,
 } from "./syncOffersHelpers";
+import { editAllegroOffer } from "../offers/edit";
+import { getAllegroOffer } from "../offers/get";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 

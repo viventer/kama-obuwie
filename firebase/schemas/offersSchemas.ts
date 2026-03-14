@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { SalesChannelSchema } from "./otherSchemas";
-import { ParamValueSchema } from "./productsSchemas";
+import { ColorVariant, ParamValueSchema, Product } from "./productsSchemas";
+import { AllegroHeaders } from "@/server-actions/allegro/global";
 
 export const shippingRateSchema = z.object({
   name: z.string().min(3).max(64),
@@ -290,6 +291,28 @@ export const AllegroOfferFromListingSchema = z.object({
     })
     .optional(),
 });
+
+export type AllegroIndividualOffer = {
+  allegroOfferData: Omit<AllegroOffer, "stock" | "description" | "productSet">;
+  insoleLength?: {
+    size: string;
+    insoleLength: number;
+  } | null;
+  insoleLengths?: {
+    size: string;
+    insoleLength: number;
+  }[];
+  availabilityKey: string;
+  offer: Offer;
+  product: Product;
+  colorVariant: ColorVariant;
+  allegroHeaders: AllegroHeaders;
+  url: string;
+  allegroCategoryId: string;
+  images: string[];
+  channel: "AL1" | "AL2";
+  SKU: string;
+};
 
 export type ShippingRate = z.infer<typeof shippingRateSchema>;
 export type ShippingRates = z.infer<typeof ShippingRatesSchema>;

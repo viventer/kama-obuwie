@@ -1,8 +1,6 @@
 import { AllegroOffer } from "@/firebase/schemas/offersSchemas";
-import {
-  editAllegroOffer,
-  getAllegroOffer,
-} from "@/server-actions/allegro/offers";
+import { editAllegroOffer } from "@/server-actions/allegro/offers/edit";
+import { getAllegroOffer } from "@/server-actions/allegro/offers/get";
 import { apiErrorResponse, apiResponse } from "@/server-actions/helpers";
 import { NextRequest } from "next/server";
 
@@ -13,7 +11,7 @@ export type PatchAllegroOfferBody = {
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { offerPartial, salesChannel }: PatchAllegroOfferBody =
@@ -33,7 +31,7 @@ export async function PATCH(
         {
           step: "offer_update",
           originalMessage: err.message,
-        }
+        },
       );
     }
 
@@ -44,14 +42,14 @@ export async function PATCH(
       {
         step: "offer_update",
         originalMessage: err?.message,
-      }
+      },
     );
   }
 }
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { searchParams } = new URL(request.url);
@@ -61,7 +59,7 @@ export async function GET(
     if (!salesChannel || !["AL1", "AL2"].includes(salesChannel)) {
       return apiResponse(
         "Parametr salesChannel jest wymagany i musi być AL1 lub AL2.",
-        400
+        400,
       );
     }
 
@@ -77,7 +75,7 @@ export async function GET(
         {
           step: "offer_get",
           originalMessage: err.message,
-        }
+        },
       );
     }
 
@@ -88,7 +86,7 @@ export async function GET(
       {
         step: "offer_get",
         originalMessage: err?.message,
-      }
+      },
     );
   }
 }

@@ -13,16 +13,14 @@ import type {
 } from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { getImagesUrls } from "@/server-actions/files/files";
-import {
-  formatAllegroProductParameters,
-  postIndividualAllegroOffer,
-  postIndividualAllegroOfferFromLegacy,
-} from "@/server-actions/allegro/offers";
 import { updateOffer } from "@/server-actions/offers/offers";
 import { parseSignature } from "@/helpers/signature";
 import type { LegacyProductWithId } from "@/firebase/schemas/legacyProductsSchemas";
 import { resolveSingleAvailabilityKey } from "@/helpers/availability";
 import { getProductParametersNames } from "@/server-actions/allegro/products";
+import { formatAllegroProductParameters } from "@/server-actions/allegro/offers/parameters";
+import { postIndividualAllegroOfferFromLegacy } from "@/server-actions/allegro/offers/postLegacy";
+import { postIndividualAllegroOffer } from "@/server-actions/allegro/offers/post";
 
 export type PostIndividualAllegroOfferBody = {
   offerId: string;

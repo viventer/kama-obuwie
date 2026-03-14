@@ -4,7 +4,7 @@ import {
   Product,
   SizingTable,
 } from "@/firebase/schemas/productsSchemas";
-import { postAllegroOffer } from "@/server-actions/allegro/offers";
+import { postAllegroOffer } from "@/server-actions/allegro/offers/post";
 import { apiResponse, apiErrorResponse } from "@/server-actions/helpers";
 import { NextRequest } from "next/server";
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
         {
           step: "offer_creation",
           originalMessage: err.message,
-        }
+        },
       );
     }
 

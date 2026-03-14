@@ -3,7 +3,7 @@ import { AllegroAuthError } from "@/firebase/schemas/shipmentsSchemas";
 export function formatAllegroError(
   baseMessage: string,
   allegroErrors: any[],
-  step?: string
+  step?: string,
 ): string {
   const allegroMessages = allegroErrors
     .map((error: any) => {
@@ -64,7 +64,7 @@ export function handleApiError(error: any, defaultMessage: string): string {
       return formatAllegroError(
         defaultMessage,
         errorData.errors,
-        errorData.details?.step
+        errorData.details?.step,
       );
     } else if (errorData.message) {
       // Standardowy błąd z message
@@ -87,7 +87,7 @@ export function handleApiError(error: any, defaultMessage: string): string {
  */
 export function handleAllegroApiError(
   error: any,
-  defaultMessage: string
+  defaultMessage: string,
 ): never {
   if (error.response) {
     console.error("Status:", error.response.status);
@@ -97,7 +97,7 @@ export function handleAllegroApiError(
     if (error.response.status === 401 && "error" in error.response.data) {
       const authError = error.response.data as AllegroAuthError;
       const allegroError = new Error(
-        `Błąd autoryzacji: ${authError.error_description || authError.error}`
+        `Błąd autoryzacji: ${authError.error_description || authError.error}`,
       );
       (allegroError as any).allegroErrors = [
         {
@@ -150,7 +150,7 @@ export function handleAllegroApiError(
  */
 export function handleInpostApiError(
   error: any,
-  defaultMessage: string
+  defaultMessage: string,
 ): never {
   if (error.response) {
     console.error("InPost Status:", error.response.status);
@@ -187,7 +187,7 @@ export function handleInpostApiError(
       if (inpostErrorData.details) {
         const detailsMessages = Object.entries(inpostErrorData.details)
           .map(
-            ([field, errors]) => `${field}: ${(errors as string[]).join(", ")}`
+            ([field, errors]) => `${field}: ${(errors as string[]).join(", ")}`,
           )
           .join("; ");
 

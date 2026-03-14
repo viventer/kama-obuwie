@@ -23,7 +23,6 @@ export async function PATCH(
   const { id } = await params;
   const body: Partial<Offer> = await request.json();
 
-  console.log("Otrzymane dane do aktualizacji oferty:", body);
   await updateOffer(id, body);
 
   return apiResponse("Oferta została zaaktualizowana.", 200);

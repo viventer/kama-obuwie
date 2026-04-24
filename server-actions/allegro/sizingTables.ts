@@ -29,7 +29,7 @@ export async function getAllegroSizingTables(account: "AL1" | "AL2" = "AL1") {
   } catch (error) {
     handleAllegroApiError(
       error,
-      "Błąd podczas pobierania tabel rozmiarów z Allegro"
+      "Błąd podczas pobierania tabel rozmiarów z Allegro",
     );
   }
 }
@@ -37,7 +37,7 @@ export async function getAllegroSizingTables(account: "AL1" | "AL2" = "AL1") {
 export async function getAllegroSizingTable(
   id: string,
   account: "AL1" | "AL2" = "AL1",
-  opts?: { userId?: string }
+  opts?: { userId?: string },
 ): Promise<AllegroSizingTable | undefined> {
   if (!id || id.trim() === "") {
     throw new Error("Brak id tabeli rozmiarów.");
@@ -61,13 +61,13 @@ export async function getAllegroSizingTable(
   } catch (error) {
     handleAllegroApiError(
       error,
-      "Błąd podczas pobierania tabeli rozmiarów z Allegro"
+      "Błąd podczas pobierania tabeli rozmiarów z Allegro",
     );
   }
 }
 
 export async function createAllegroSizingTable(
-  allegroSizingTable: Omit<AllegroSizingTable, "template">
+  allegroSizingTable: Omit<AllegroSizingTable, "template">,
 ) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
@@ -88,7 +88,7 @@ export async function createAllegroSizingTable(
     }
 
     const shoesTemplate = templates.find(
-      (template) => template.name === "Obuwie"
+      (template) => template.name === "Obuwie - wkładka",
     );
 
     if (!shoesTemplate) {
@@ -100,20 +100,20 @@ export async function createAllegroSizingTable(
       { ...allegroSizingTable, template: { id: shoesTemplate.id } },
       {
         headers: allegroHeaders,
-      }
+      },
     );
     return response.data.id as string;
   } catch (error) {
     handleAllegroApiError(
       error,
-      "Błąd podczas tworzenia tabeli rozmiarów w Allegro"
+      "Błąd podczas tworzenia tabeli rozmiarów w Allegro",
     );
   }
 }
 
 export async function updateAllegroSizingTable(
   id: string,
-  updateData: Omit<AllegroSizingTable, "template">
+  updateData: Omit<AllegroSizingTable, "template">,
 ) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
@@ -130,7 +130,7 @@ export async function updateAllegroSizingTable(
   } catch (error) {
     handleAllegroApiError(
       error,
-      "Błąd podczas aktualizacji tabeli rozmiarów w Allegro"
+      "Błąd podczas aktualizacji tabeli rozmiarów w Allegro",
     );
   }
 }

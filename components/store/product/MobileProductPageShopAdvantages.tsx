@@ -57,7 +57,7 @@ export default function MobileProductPageShopAdvantages({
       <article className="flex gap-2 items-center justify-between">
         <div className="flex items-center gap-2">
           <ThumbsUpIcon className="size-4 text-success" />
-          <p className="font-medium">99,6% pozytywnych opinii na Allegro</p>
+          <p className="font-medium">99,4% pozytywnych opinii na Allegro</p>
         </div>
         <Button
           variant="ghost"

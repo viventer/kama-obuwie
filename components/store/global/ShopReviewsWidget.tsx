@@ -50,7 +50,7 @@ export default function ShopReviewsWidget({
           <CardTitle className="flex items-center gap-2">
             <ThumbsUpIcon className="size-6 xl:size-8 text-success" />
             <h3 className="xl:text-xl font-medium text-lg">
-              99,6% pozytywnych opinii
+              99,4% pozytywnych opinii
             </h3>
           </CardTitle>
           <CardDescription>Na podstawie 600+ ocen z allegro.pl</CardDescription>

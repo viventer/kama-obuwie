@@ -52,7 +52,7 @@ export default function ReturnsPage() {
               <b>nr tel.:</b> 664097737
             </p>
             <p>
-              <b>email:</b> kontakt.obuwie.kama@gmail.com
+              <b>email:</b> kontakt@kama-obuwie.pl
             </p>
           </div>
         </CardContent>

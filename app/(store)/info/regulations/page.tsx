@@ -172,10 +172,10 @@ export default function RegulationsPage() {
               reklamacyjny, dołączyć zdjęcia dokumentujące wadę oraz przesłać
               zgłoszenie mailowo na adres{" "}
               <LinkText
-                href="mailto:kontakt.obuwie.kama@gmail.com"
+                href="mailto:reklamacje@kama-obuwie.pl"
                 className="font-medium"
               >
-                kontakt.obuwie.kama@gmail.com
+                reklamacje@kama-obuwie.pl
               </LinkText>
               .
             </p>
@@ -218,10 +218,10 @@ export default function RegulationsPage() {
             <p>
               Kontakt do obsługi sklepu:{" "}
               <LinkText
-                href="mailto:kontakt.obuwie.kama@gmail.com"
+                href="mailto:kontakt@kama-obuwie.pl"
                 className="font-medium"
               >
-                kontakt.obuwie.kama@gmail.com
+                kontakt@kama-obuwie.pl
               </LinkText>
               .
             </p>

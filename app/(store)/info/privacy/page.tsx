@@ -25,8 +25,8 @@ export default function PrivacyPage() {
             <p>NIP: 8681255945</p>
             <p className="mt-3">
               Kontakt z administratorem jest możliwy poprzez adres e-mail:{" "}
-              <LinkText href="mailto:kontakt.obuwie.kama@gmail.com">
-                kontakt.obuwie.kama@gmail.com
+              <LinkText href="mailto:kontakt@kama-obuwie.pl">
+                kontakt@kama-obuwie.pl
               </LinkText>
               . W sprawach związanych z przetwarzaniem danych można również
               wysłać korespondencję na adres siedziby wskazany powyżej.
@@ -220,8 +220,8 @@ export default function PrivacyPage() {
             <p>
               W celu realizacji swoich praw użytkownik może kontaktować się z
               administratorem poprzez e-mail:{" "}
-              <LinkText href="mailto:kontakt.obuwie.kama@gmail.com">
-                kontakt.obuwie.kama@gmail.com
+              <LinkText href="mailto:kontakt@kama-obuwie.pl">
+                kontakt@kama-obuwie.pl
               </LinkText>{" "}
               lub przesyłając korespondencję na adres siedziby.
             </p>

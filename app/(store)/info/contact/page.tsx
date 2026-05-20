@@ -27,8 +27,8 @@ export default function ContactPage() {
                 <MailIcon className="text-brand w-6 h-6" />
                 <div>
                   <h3 className="font-semibold text-foreground">Email</h3>
-                  <LinkText href="mailto:kontakt.kama.obuwie@gmail.com">
-                    kontakt.kama.obuwie@gmail.com
+                  <LinkText href="mailto:kontakt@kama-obuwie.pl">
+                    kontakt@kama-obuwie.pl
                   </LinkText>
                 </div>
               </div>

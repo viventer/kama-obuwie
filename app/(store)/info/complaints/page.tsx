@@ -35,8 +35,8 @@ export default function ComplaintsPage() {
           <strong>Wyślij zgłoszenie e-mailowe</strong>
           <br />
           Prześlij zdjęcia oraz formularz na adres:{" "}
-          <a href="mailto:kontakt.obuwie.kama@gmail.com">
-            kontakt.obuwie.kama@gmail.com
+          <a href="mailto:reklamacje@kama-obuwie.pl">
+            reklamacje@kama-obuwie.pl
           </a>
         </li>
         <li>

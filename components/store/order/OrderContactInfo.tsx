@@ -18,8 +18,8 @@ export default function OrderContactInfo() {
       <CardContent>
         <p>
           E-mail:{" "}
-          <LinkText href="mailto:kontakt.kama.obuwie@gmail.com">
-            kontakt.kama.obuwie@gmail.com
+          <LinkText href="mailto:kontakt@kama-obuwie.pl">
+            kontakt@kama-obuwie.pl
           </LinkText>
         </p>
         <p className="mb-2">

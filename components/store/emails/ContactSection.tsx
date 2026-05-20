@@ -12,10 +12,10 @@ export default function ContactSection() {
       <Text className="text-base font-medium">
         E-mail:{" "}
         <Link
-          href="mailto:kontakt.kama.obuwie@gmail.com"
+          href="mailto:kontakt@kama-obuwie.pl"
           className="text-text decoration-brand underline"
         >
-          kontakt.kama.obuwie@gmail.com
+          kontakt@kama-obuwie.pl
         </Link>
       </Text>
 

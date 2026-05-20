@@ -53,7 +53,7 @@ export const senderAddress: CreateShipmentData["sender"] = {
   city: "Bochnia",
   postalCode: "32-700",
   countryCode: "PL",
-  email: "kontakt.obuwie.kama@gmail.com",
+  email: "biuro@kama-obuwie.pl",
   phone: "664097737",
 };
 

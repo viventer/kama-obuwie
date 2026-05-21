@@ -249,9 +249,9 @@ export default function PostOfferForm({
           SKU: SKUs,
         });
 
-        if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
-          await axios.post(`/api/merchant-center/offer/${offerId}`); // Sync to Merchant Center
-        }
+        // if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
+        //   await axios.post(`/api/merchant-center/offer/${offerId}`); // Sync to Merchant Center
+        // }
       }
 
       setIsPosting(false);

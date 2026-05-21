@@ -21,7 +21,7 @@ export default function ReviewsDialogContent() {
             99,4% pozytywnych opinii
           </h4>
         </div>
-        <p>Na podstawie 600+ ocen sprzedawcy z ostatnich 12 miesięcy.</p>
+        <p>Na podstawie 800+ ocen sprzedawcy z ostatnich 12 miesięcy.</p>
       </header>
       <article className="pb-4 border-b-1 border-secondary h-[14rem]">
         <ul className="flex flex-col gap-2 overflow-auto scrollbar pt-1 pr-2 h-full">

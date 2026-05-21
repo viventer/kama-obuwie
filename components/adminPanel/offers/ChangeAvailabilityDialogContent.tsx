@@ -117,7 +117,15 @@ export default function ChangeAvailabilityDialogContent({
   };
 
   const updateOfferInMerchantCenter = async () => {
-    await axios.patch(`/api/merchant-center/offer/${offerId}`);
+    try {
+      await axios.patch(`/api/merchant-center/offer/${offerId}`);
+    } catch (err) {
+      showToast(
+        `Błąd podczas aktualizacji oferty o id ${offerId} w Merchant Center.`,
+        "error",
+      );
+      console.error(err);
+    }
   };
 
   const handleSubmit = async (e: FormEvent) => {

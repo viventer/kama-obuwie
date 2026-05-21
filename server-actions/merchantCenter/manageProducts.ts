@@ -375,7 +375,11 @@ export async function insertNewOfferToMerchantCenter(offer: OfferWithId) {
   await verifyUser(["ADMIN"]);
 
   const products = await convertOfferToMerchantCenterProducts(offer);
-  if (!products || products.length === 0) return null;
+  console.log("Converted offer to products:", products);
+  if (!products || products.length === 0)
+    throw new Error(
+      "Nie można przekonwertować oferty na produkty Google Merchant Center.",
+    );
 
   const insertResponse = await insertProductsToGoogleMerchantCenter(products);
 

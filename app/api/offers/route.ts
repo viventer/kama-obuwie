@@ -14,6 +14,8 @@ export async function GET(request: NextRequest) {
   const productIdParam = request.nextUrl.searchParams.get("productId");
   const signatureParam = request.nextUrl.searchParams.get("signature");
   const SKUParam = request.nextUrl.searchParams.get("SKU");
+  const merchantCenterParam =
+    request.nextUrl.searchParams.get("merchantCenter");
 
   const queryFn = (ref: FirebaseFirestore.CollectionReference) => {
     let query: FirebaseFirestore.Query = ref;
@@ -28,6 +30,16 @@ export async function GET(request: NextRequest) {
 
     if (SKUParam) {
       query = query.where("SKU", "==", SKUParam);
+    }
+
+    if (merchantCenterParam) {
+      const isAddedToMerchantCenter =
+        merchantCenterParam.toLowerCase() === "true";
+      query = query.where(
+        "isAddedToMerchantCenter",
+        "==",
+        isAddedToMerchantCenter,
+      );
     }
 
     return query;

@@ -1,37 +1,30 @@
-"use client";
-
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import { Button } from "@/components/ui/button";
-import {
-  getExistingGcpRegistration,
-  registerGcpWithMerchant,
-} from "@/server-actions/merchantCenter/auth";
-import { syncAllOffersWithGoogleMerchantCenter } from "@/server-actions/merchantCenter/manageProducts";
-import { useState } from "react";
-import BarLoader from "react-spinners/BarLoader";
+import AddOfferToGMCButton from "@/components/adminPanel/offers/AddOfferToGMCButton";
+import OffersInGMCDataTable from "@/components/adminPanel/offers/tables/OffersInGMCDataTable";
+import { getDocumentsFromAdminDB } from "@/firebase/getters";
+import { OfferWithId } from "@/firebase/schemas/offersSchemas";
+import { notFound } from "next/navigation";
 
-export default function GoogleMerchantCenterPage() {
-  const [isLoading, setIsLoading] = useState(false);
+export default async function GoogleMerchantCenterPage() {
+  const offers = await getDocumentsFromAdminDB<OfferWithId>("offers");
 
-  const handleAddOffers = async () => {
-    setIsLoading(true);
-    await getExistingGcpRegistration();
-    // await registerGcpWithMerchant();
-    await syncAllOffersWithGoogleMerchantCenter(50);
-    setIsLoading(false);
-  };
+  if (!offers) {
+    return notFound();
+  }
+
+  const offersAdded = offers.filter((offer) => offer.isAddedToMerchantCenter);
+  const offersNotAdded = offers.filter(
+    (offer) => !offer.isAddedToMerchantCenter,
+  );
 
   return (
     <section>
       <SubpageHeading text="Google Merchant Center" />
       <h3 className="text-lg font-medium mb-2">
-        Dodaj brakujące oferty do Google Merchant Center
+        Oferty dodane do Google Merchant Center
       </h3>
-      {isLoading ? (
-        <BarLoader />
-      ) : (
-        <Button onClick={handleAddOffers}>Dodaj</Button>
-      )}
+      <AddOfferToGMCButton offers={offersNotAdded} />
+      <OffersInGMCDataTable data={offersAdded} />
     </section>
   );
 }

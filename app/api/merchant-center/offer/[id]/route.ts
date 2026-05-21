@@ -20,7 +20,14 @@ export async function POST(
     return apiErrorResponse("Oferta nie istnieje.", 404);
   }
 
-  await insertNewOfferToMerchantCenter(offer);
+  try {
+    await insertNewOfferToMerchantCenter(offer);
+  } catch (err) {
+    return apiErrorResponse(
+      "Błąd podczas dodawania oferty do Google Merchant Center (brakujące dane).",
+      400,
+    );
+  }
 
   return apiResponse("Oferta została dodana do Google Merchant Center.", 200);
 }

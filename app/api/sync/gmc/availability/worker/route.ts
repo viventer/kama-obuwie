@@ -1,6 +1,6 @@
-import { syncAllegroOffers } from "@/server-actions/allegro/sync/syncOffers";
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/upstash/redis";
+import { syncGMCAvailability } from "@/server-actions/allegro/sync/syncGMCAvailability";
 
 async function handler(req: NextRequest) {
   try {
@@ -10,7 +10,7 @@ async function handler(req: NextRequest) {
     const userId = body?.userId || null;
     const batch = body.batch ?? 0;
 
-    console.log(`👤 Running sync  batch: ${batch}`);
+    console.log(`👤 Running sync batch: ${batch}`);
 
     // Ustaw status na "running" tylko dla pierwszego batcha
     if (batch === 0) {
@@ -20,7 +20,7 @@ async function handler(req: NextRequest) {
     }
 
     // Wykonaj synchronizację dla tego batcha
-    const result = await syncAllegroOffers(userId, batch);
+    const result = await syncGMCAvailability(userId, batch);
 
     // Sprawdź czy są kolejne batche do przetworzenia
     if (result.hasMore) {
@@ -28,7 +28,7 @@ async function handler(req: NextRequest) {
 
       // Zakolejkuj następny batch
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/sync/gmc:offers`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/sync/gmc/availability`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -46,8 +46,7 @@ async function handler(req: NextRequest) {
       }
     } else {
       // To był ostatni batch - ustaw status na completed
-      const hasAnySuccess = result.AL1?.success || result.AL2?.success;
-      const status = hasAnySuccess ? "completed" : "error";
+      const status = result.success ? "completed" : "error";
 
       await redis.set("gmc:sync:status", status);
       await redis.set("gmc:sync:completed", new Date().toISOString());

@@ -1,7 +1,6 @@
 import { syncAllegroOffers } from "@/server-actions/allegro/sync/syncOffers";
 import { NextRequest, NextResponse } from "next/server";
 import { redis } from "@/upstash/redis";
-import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 
 async function handler(req: NextRequest) {
   try {
@@ -27,7 +26,7 @@ async function handler(req: NextRequest) {
     // Sprawdź czy są kolejne batche do przetworzenia
     if (result.hasMore) {
       console.log(
-        `🔗 Queueing next batch: ${result.nextBatch} for ${result.nextChannel}`
+        `🔗 Queueing next batch: ${result.nextBatch} for ${result.nextChannel}`,
       );
 
       // Zakolejkuj następny batch
@@ -41,12 +40,12 @@ async function handler(req: NextRequest) {
             batch: result.nextBatch,
             channel: result.nextChannel,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
         console.error(
-          `❌ Failed to queue next batch: ${await response.text()}`
+          `❌ Failed to queue next batch: ${await response.text()}`,
         );
       }
     } else {
@@ -62,7 +61,7 @@ async function handler(req: NextRequest) {
     }
 
     console.log(
-      "✅ QStash worker: Background Allegro sync job completed successfully"
+      "✅ QStash worker: Background Allegro sync job completed successfully",
     );
 
     return NextResponse.json({
@@ -75,13 +74,13 @@ async function handler(req: NextRequest) {
   } catch (error) {
     console.error(
       "❌ QStash worker: Background Allegro sync job failed:",
-      error
+      error,
     );
 
     await redis.set("allegro:sync:status", "error");
     await redis.set(
       "allegro:sync:error",
-      error instanceof Error ? error.message : "Unknown error"
+      error instanceof Error ? error.message : "Unknown error",
     );
 
     return NextResponse.json(
@@ -89,7 +88,7 @@ async function handler(req: NextRequest) {
         success: false,
         error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

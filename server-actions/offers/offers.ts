@@ -178,11 +178,18 @@ export const syncOffersAvailability = async function (
         process.env.NEXT_PUBLIC_NODE_ENV === "production"
       ) {
         const isAvailable = newAvailability > 0 ? true : false;
-        await changeIndividualSizeMerchantCenterAvailability(
-          offer.SKU,
-          size,
-          isAvailable,
-        );
+        try {
+          await changeIndividualSizeMerchantCenterAvailability(
+            offer.SKU,
+            size,
+            isAvailable,
+          );
+        } catch (err) {
+          console.error(
+            `Błąd podczas aktualizacji dostępności w Google Merchant Center dla SKU: ${offer.SKU}, rozmiar: ${size}:`,
+            err,
+          );
+        }
       }
 
       // Zaktualizuj dostępność na wszystkich przeciwnych kanałach Allegro

@@ -73,8 +73,6 @@ export default function EditOfferForm({ oldData }: { oldData: OfferWithId }) {
         "Wystąpił błąd podczas aktualizacji oferty w Google Merchant Center.",
         "error",
       );
-      stopLoading();
-      return;
     }
 
     const offersPartials = { AL1: {}, AL2: {} };

@@ -72,12 +72,10 @@ export const triggerGMCSync = async () => {
   }
 };
 
-export const syncGMCAvailability = async (userId: string, batch: number) => {
+export const syncGMCAvailability = async (batch: number) => {
   const BATCH_SIZE = 50;
 
-  console.log(
-    `🚀 Starting GMC availability synchronization for user ${userId}, batch ${batch}...`,
-  );
+  console.log(`🚀 Starting GMC availability synchronization batch ${batch}...`);
 
   const offers = await getDocumentsFromAdminDB<OfferWithId>("offers", (ref) =>
     ref

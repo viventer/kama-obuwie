@@ -7,7 +7,6 @@ async function handler(req: NextRequest) {
     console.log("🚀 QStash worker: Starting background GMC sync job...");
 
     const body = await req.json();
-    const userId = body?.userId || null;
     const batch = body.batch ?? 0;
 
     console.log(`👤 Running sync batch: ${batch}`);
@@ -20,7 +19,7 @@ async function handler(req: NextRequest) {
     }
 
     // Wykonaj synchronizację dla tego batcha
-    const result = await syncGMCAvailability(userId, batch);
+    const result = await syncGMCAvailability(batch);
 
     // Sprawdź czy są kolejne batche do przetworzenia
     if (result.hasMore) {
@@ -33,7 +32,6 @@ async function handler(req: NextRequest) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userId,
             batch: result.nextBatch,
           }),
         },

@@ -33,7 +33,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const isProduction = process.env.NEXT_PUBLIC_NODE_ENV === "production";
-  const googleAdsTagId = "AW-17853144337";
+  const googleTagManagerId = "GTM-W5BW5CCQ";
 
   return (
     <html
@@ -43,18 +43,13 @@ export default async function RootLayout({
       <head>
         {isProduction ? (
           <>
-            <Script
-              async
-              src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsTagId}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-ads-gtag" strategy="afterInteractive">
+            <Script id="gtm-script" strategy="afterInteractive">
               {`
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-
-gtag('config', '${googleAdsTagId}');
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','${googleTagManagerId}');
               `.trim()}
             </Script>
             <meta
@@ -72,6 +67,16 @@ gtag('config', '${googleAdsTagId}');
       <body
         className={`${ubuntuSans.variable} ${ubuntuMono.variable} antialiased font-sans bg-background text-text max-h-screen`}
       >
+        {isProduction ? (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${googleTagManagerId}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            />
+          </noscript>
+        ) : null}
         <ConfirmDialogProvider>
           <AuthProvider>
             <FullPageLoaderProvider>

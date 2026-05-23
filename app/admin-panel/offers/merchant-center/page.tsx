@@ -3,6 +3,7 @@ import AddOfferToGMCButton from "@/components/adminPanel/offers/AddOfferToGMCBut
 import OffersInGMCDataTable from "@/components/adminPanel/offers/tables/OffersInGMCDataTable";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
+import { registerGcpWithMerchant } from "@/server-actions/merchantCenter/auth";
 import { notFound } from "next/navigation";
 
 export default async function GoogleMerchantCenterPage() {
@@ -16,6 +17,8 @@ export default async function GoogleMerchantCenterPage() {
   const offersNotAdded = offers.filter(
     (offer) => !offer.isAddedToMerchantCenter,
   );
+
+  await registerGcpWithMerchant();
 
   return (
     <section>

@@ -430,7 +430,20 @@ export async function insertNewOfferToMerchantCenter(offer: OfferWithId) {
       "Nie można przekonwertować oferty na produkty Google Merchant Center.",
     );
 
-  const insertResponse = await insertProductsToGoogleMerchantCenter(products);
+  let insertResponse;
+  try {
+    insertResponse = await insertProductsToGoogleMerchantCenter(products);
+  } catch (err) {
+    console.error(
+      `Błąd podczas wstawiania produktów do Google Merchant Center dla oferty (ID: ${offer.id}): ${err}`,
+      err,
+    );
+    throw new Error(
+      `Błąd podczas wstawiania produktów do Google Merchant Center: ${
+        err instanceof Error ? err.message : "Unknown error"
+      }`,
+    );
+  }
 
   await updateOffer(offer.id, { isAddedToMerchantCenter: true });
 

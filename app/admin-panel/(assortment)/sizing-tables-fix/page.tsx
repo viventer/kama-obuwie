@@ -33,6 +33,6 @@ export default async function SizingTablesFix() {
   }
 
   return productsWithoutSizingTable.map((product) => (
-    <div>{product.manufacturerCode}</div>
+    <div key={product.id}>{product.manufacturerCode}</div>
   ));
 }

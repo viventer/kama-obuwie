@@ -93,15 +93,32 @@ export async function convertOfferToMerchantCenterProducts(
     legacyProduct = data;
   }
 
-  if (!product) return null;
-  if (!offer.colorVariantName) return null;
+  if (!product) {
+    console.log(
+      "⚠️ Nie można znaleźć produktu powiązanego z ofertą (ID: " +
+        offer.id +
+        ").",
+    );
+    return null;
+  }
+  if (!offer.colorVariantName) {
+    console.log(
+      `⚠️ Oferta (ID: ${offer.id}) nie ma ustawionego colorVariantName.`,
+    );
+    return null;
+  }
 
   let categoryId = null;
 
   const colorVariant = product.colorVariants?.find(
     (variant) => getColorVariantName(variant) === offer.colorVariantName,
   );
-  if (!colorVariant) return null;
+  if (!colorVariant) {
+    console.log(
+      `⚠️ Oferta (ID: ${offer.id}) ma colorVariantName='${offer.colorVariantName}', ale produkt nie zawiera takiej warianty.`,
+    );
+    return null;
+  }
 
   const productData = {
     id: product.id,
@@ -113,7 +130,12 @@ export async function convertOfferToMerchantCenterProducts(
     description: "",
   };
   if (legacyProduct) {
-    if (!legacyProduct.imagesUrls) return null;
+    if (!legacyProduct.imagesUrls) {
+      console.log(
+        `⚠️ Oferta (ID: ${offer.id}) pochodzi z legacyProduct, ale brak pola imagesUrls w produkcie legacy.`,
+      );
+      return null;
+    }
     productData.imagesUrls = legacyProduct.imagesUrls[offer.colorVariantName];
 
     const { salesDescription } = parseProductDescription(
@@ -128,11 +150,21 @@ export async function convertOfferToMerchantCenterProducts(
     const photos = product.editedPhotos?.filter(
       (photo) => photo.colorVariantName === offer.colorVariantName,
     );
-    if (!photos || photos.length === 0) return null;
+    if (!photos || photos.length === 0) {
+      console.log(
+        `⚠️ Oferta (ID: ${offer.id}) nie ma zdjęć edytowanych dla colorVariantName='${offer.colorVariantName}'.`,
+      );
+      return null;
+    }
     const imagesUrls = await getImagesUrls(
       photos.map((photo) => photo.filePath) || [],
     );
-    if (!imagesUrls || imagesUrls.length === 0) return null;
+    if (!imagesUrls || imagesUrls.length === 0) {
+      console.log(
+        `⚠️ Oferta (ID: ${offer.id}) ma zdjęcia, ale nie udało się pobrać adresów URL obrazów.`,
+      );
+      return null;
+    }
     productData.imagesUrls = imagesUrls;
     const { salesDescription } = parseProductDescription(product.description);
     if (salesDescription) {
@@ -142,19 +174,37 @@ export async function convertOfferToMerchantCenterProducts(
     categoryId = product.categoryId;
   }
 
-  if (!categoryId) return null;
-  if (!offer.thumbnail) return null;
+  if (!categoryId) {
+    console.log(
+      `⚠️ Oferta (ID: ${offer.id}) nie ma przypisanej kategorii (categoryId).`,
+    );
+    return null;
+  }
+  if (!offer.thumbnail) {
+    console.log(`⚠️ Oferta (ID: ${offer.id}) nie ma pola thumbnail.`);
+    return null;
+  }
 
   const { data: category } = await getDocumentFromAdminDB<CategoryWithId>(
     "categories",
     categoryId,
   );
-  if (!category) return null;
+  if (!category) {
+    console.log(
+      `⚠️ Oferta (ID: ${offer.id}) ma nieprawidłowy categoryId='${categoryId}', brak kategorii w DB.`,
+    );
+    return null;
+  }
 
   const thumbnailUrl = isValidUrl(offer.thumbnail)
     ? offer.thumbnail
     : await getImageUrl(offer.thumbnail);
-  if (!thumbnailUrl) return null;
+  if (!thumbnailUrl) {
+    console.log(
+      `⚠️ Oferta (ID: ${offer.id}) ma niepoprawny thumbnail ('${offer.thumbnail}') i nie udało się go pobrać.`,
+    );
+    return null;
+  }
 
   const data: Omit<GetFootwearProductPayload, "size"> = {
     offerData: {

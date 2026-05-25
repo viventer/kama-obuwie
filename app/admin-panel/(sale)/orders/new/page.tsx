@@ -18,7 +18,7 @@ export default async function OrdersNewPage() {
     ref
       .where("fulfillment.status", "==", "NEW")
       .orderBy("createdAt", "desc")
-      .limit(60)
+      .limit(200),
   );
 
   return (

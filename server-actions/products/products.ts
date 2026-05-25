@@ -333,12 +333,23 @@ export const createProduct = async function (newProduct: Product) {
 export const updateProduct = async function (
   id: string,
   updateData: Partial<Product>,
+  legacy: boolean = false,
 ) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
-  ProductPartialSchema.parse(updateData);
-  const productRef = adminDB.collection("products").doc(id);
-  const productDoc = await productRef.get();
+  let productRef;
+  let productDoc;
+  if (legacy) {
+    productRef = adminDB.collection("legacyProducts").doc(id);
+    productDoc = await productRef.get();
+
+    await productRef.update(updateData);
+  } else {
+    ProductPartialSchema.parse(updateData);
+    productRef = adminDB.collection("products").doc(id);
+    productDoc = await productRef.get();
+  }
+
   if (!productDoc.exists) {
     throw new Error("Produkt nie istnieje.");
   }

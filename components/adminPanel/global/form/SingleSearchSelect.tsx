@@ -41,7 +41,7 @@ export default function SingleSearchSelect({
   const [open, setOpen] = useState(false);
 
   const filtered = options.filter((opt) =>
-    opt.label.toLowerCase().includes(query.toLowerCase())
+    opt.label.toLowerCase().includes(query.toLowerCase()),
   );
 
   const selectedLabel = options.find((opt) => opt.value === value)?.label;
@@ -62,7 +62,7 @@ export default function SingleSearchSelect({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[var(--radix-popover-trigger-width)] max-h-60 p-0 overflow-hidden">
+            <PopoverContent disablePortal className="w-[var(--radix-popover-trigger-width)] max-h-60 p-0 overflow-hidden z-[100000]">
               <Command className="max-h-60">
                 <CommandInput
                   placeholder="Szukaj…"

@@ -6,7 +6,7 @@ import { apiResponse } from "@/server-actions/helpers";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const data = await getDocumentFromAdminDB(id, "products");
@@ -18,19 +18,20 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const body: Partial<Product> = await request.json();
+  const isLegacy = request.nextUrl.searchParams.get("isLegacy") === "true";
 
-  await updateProduct(id, body);
+  await updateProduct(id, body, isLegacy);
 
   return apiResponse("Produkt został zaktualizowany.", 200);
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
   const { data, ref } = await getDocumentFromAdminDB("products", id);

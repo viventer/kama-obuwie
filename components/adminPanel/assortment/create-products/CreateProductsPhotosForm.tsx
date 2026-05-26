@@ -1,12 +1,14 @@
 "use client";
 
 import {
+  DescriptionVariable,
   EditedPhoto,
   EditedPhotoWithUrl,
   Product,
   ProductCreationStage,
   ProductWithId,
   RawPhoto,
+  SizingTableWithId,
 } from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "../helpers/productsHelpers";
 import ProductImagesUploader from "../ProductImagesUploader";
@@ -26,13 +28,16 @@ import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { choosingSizeImageFilePath } from "@/lib/constants";
 import { useFullPageLoading } from "../../global/FullPageLoader";
+import { convertToAllegroDescription } from "@/helpers/allegroOffers";
 
 export default function CreateProductsPhotosForm({
   productData,
   creationStage,
+  sizingTable,
 }: {
   productData: ProductWithId;
   creationStage: ProductCreationStage;
+  sizingTable?: SizingTableWithId;
 }) {
   const { id, colorVariants, rawPhotos, editedPhotos } = productData;
 
@@ -43,6 +48,11 @@ export default function CreateProductsPhotosForm({
   const urlEndpoint = creationStage === "photos" ? "photos" : "photos-edit";
 
   const folderPath = `products/${storageEndpoint}/${productType}/${id}`;
+
+  const oldPhotosNum =
+    creationStage === "photos"
+      ? rawPhotos?.length || 0
+      : editedPhotos?.length || 0;
 
   const [newRawPhotos, setNewRawPhotos] = useState<RawPhoto[]>(rawPhotos || []);
   const [newEditedPhotos, setNewEditedPhotos] = useState<EditedPhoto[]>(
@@ -213,12 +223,48 @@ export default function CreateProductsPhotosForm({
         // Edytuj wszystkie rozmiary równolegle
         const editPromises: Promise<any>[] = [];
 
+        const baseVariableValues: Partial<Record<DescriptionVariable, string>> =
+          {
+            kolor: colorVariant.color,
+            marka: productData.brand || "",
+            "kod producenta": productData.manufacturerCode || "",
+            "tytuł oferty": offer.title,
+          };
+
         for (const size of allSizes) {
+          const insoleLength = sizingTable!.insoleLengths.find(
+            (insole) => Number(insole.size) === Number(size),
+          )?.insoleLength;
+
+          if (!insoleLength) {
+            showToast(
+              `Brak długości wkładki dla rozmiaru ${size} w tabeli rozmiarów`,
+              "error",
+            );
+            return;
+          }
+
+          const sizeSpecificVariables: Record<DescriptionVariable, string> = {
+            ...baseVariableValues,
+            rozmiar: size,
+            "długość wkładki": `${insoleLength
+              .toString()
+              .replace(".", ",")} cm`,
+          } as Record<DescriptionVariable, string>;
+
+          const newDescription = await convertToAllegroDescription(
+            productData.description!,
+            imageUrls,
+            sizeSpecificVariables,
+          );
+
+          console.log("Nowy opis dla rozmiaru", size, newDescription);
+
           // Edytuj oferty na obu kontach
           if (AL1Offers[size]) {
             editPromises.push(
               axios.patch(`/api/allegro/offers/${AL1Offers[size]}`, {
-                offerPartial: updateData,
+                offerPartial: { ...updateData, description: newDescription },
                 salesChannel: "AL1",
               }),
             );
@@ -227,7 +273,7 @@ export default function CreateProductsPhotosForm({
           if (AL2Offers[size]) {
             editPromises.push(
               axios.patch(`/api/allegro/offers/${AL2Offers[size]}`, {
-                offerPartial: updateData,
+                offerPartial: { ...updateData, description: newDescription },
                 salesChannel: "AL2",
               }),
             );
@@ -274,11 +320,21 @@ export default function CreateProductsPhotosForm({
       // Pobierz wszystkie URLs za jednym razem przez getImagesUrls
       const filePaths = newEditedPhotos.map((photo) => photo.filePath);
 
+      if (filePaths.length < oldPhotosNum) {
+        showToast(
+          "Nowa liczba zdjęć nie może być mniejsza niż poprzednia",
+          "error",
+        );
+        stopLoading();
+        return;
+      }
+
       try {
         const urls = await getImagesUrls(filePaths);
 
         if (!urls) {
           showToast("Nie udało się pobrać URL-ów dla zdjęć", "error");
+          stopLoading();
           return;
         }
 

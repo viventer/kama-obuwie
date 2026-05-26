@@ -1,6 +1,9 @@
 import FormWrapper from "@/components/adminPanel/global/form/FormWrapper";
 import CreateProductsPhotosForm from "@/components/adminPanel/assortment/create-products/CreateProductsPhotosForm";
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  ProductWithId,
+  SizingTableWithId,
+} from "@/firebase/schemas/productsSchemas";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { getImageUrl } from "@/server-actions/files/files";
 import Image from "next/image";
@@ -30,8 +33,16 @@ export default async function ProductEditPage(props: Props) {
     samplePhotoUrl = await getImageUrl(data.samplePhoto);
   }
 
+  const sizingTable = await getDocumentFromAdminDB<SizingTableWithId>(
+    "sizingTables",
+    data.sizingTableId!,
+  );
+  if (!sizingTable.data) {
+    notFound();
+  }
+
   return (
-    <FormWrapper headingText="Dodaj zdjęcia do produktu">
+    <FormWrapper headingText="Edytuj zdjęcia produktu">
       {samplePhotoUrl && (
         <section className="mb-8">
           <Image
@@ -44,7 +55,11 @@ export default async function ProductEditPage(props: Props) {
           <p className="font-bold">{data.manufacturerCode}</p>
         </section>
       )}
-      <CreateProductsPhotosForm productData={data} creationStage="done" />
+      <CreateProductsPhotosForm
+        productData={data}
+        creationStage="done"
+        sizingTable={sizingTable.data}
+      />
     </FormWrapper>
   );
 }

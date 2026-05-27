@@ -92,7 +92,7 @@ export default function MainNavClient({
                 <NavigationMenuTrigger className="rounded-xs font-medium px-3 capitalize text-base">
                   {mainCategory.label}
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="bg-background !max-w-[100svw] !w-[100svw] bottom-0 relative max-h-fit !h-[calc(100svh-160px)] overflow-auto scrollbar sm:!max-w-fit ">
+                <NavigationMenuContent className="bg-background md:!max-w-[600px] !w-[100svw] bottom-0 relative h-fit overflow-auto scrollbar  ">
                   <NavOptionContent subcategories={subcategories} />
                 </NavigationMenuContent>
               </NavigationMenuItem>

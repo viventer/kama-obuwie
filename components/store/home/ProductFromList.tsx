@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
-import { truncateString } from "@/lib/utils";
 import Link from "next/link";
 
 export default function ProductFromList({

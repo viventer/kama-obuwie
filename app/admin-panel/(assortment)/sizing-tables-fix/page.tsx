@@ -38,7 +38,7 @@ export default async function SizingTablesFix() {
         <div key={product.id} className="flex items-center gap-4">
           <Image
             src={
-              product?.imagesUrls?.[product?.colorVariantName || ""][0] || ""
+              product?.imagesUrls?.[product?.colorVariantName || ""]?.[0] || ""
             }
             alt={product.manufacturerCode!}
             height={200}

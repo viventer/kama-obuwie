@@ -19,7 +19,7 @@ export default function PrivacyPage() {
           </CardHeader>
           <CardContent>
             <p className="mb-2">Administratorem danych osobowych jest:</p>
-            <p className="font-semibold">Anna Kamińska – „KAM-A”</p>
+            <p className="font-semibold">Anna Kamińska - "KAM-A"</p>
             <p>ul. Krzęczków 42a</p>
             <p>32-700 Bochnia</p>
             <p>NIP: 8681255945</p>

@@ -55,7 +55,7 @@ export default function ImagesSliderContent({
               thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null,
           }}
           modules={[FreeMode, Navigation, Thumbs, EffectFade, Zoom]}
-          zoom={true}
+          zoom={{ maxRatio: 3 }}
           className="w-full  rounded-xs "
         >
           {imagesUrls.map((image, index) => (
@@ -64,13 +64,15 @@ export default function ImagesSliderContent({
                 className="flex h-full items-center justify-center"
                 onClick={() => setOpen(true)}
               >
-                <Image
-                  src={image}
-                  alt={""}
-                  className={`block w-full ${isFullPage ? " md:h-[70vh] md:w-auto" : "h-full"} object-contain bg-white rounded-xs max-w-[400px]  md:max-w-full aspect-square`}
-                  height={1000}
-                  width={1000}
-                />
+                <div className="swiper-zoom-container flex items-center justify-center">
+                  <Image
+                    src={image}
+                    alt={""}
+                    className={`block w-full ${isFullPage ? " md:h-[70vh] md:w-auto" : "h-full"} object-contain bg-white rounded-xs max-w-[400px]  md:max-w-full aspect-square`}
+                    height={1000}
+                    width={1000}
+                  />
+                </div>
               </div>
             </SwiperSlide>
           ))}

@@ -1,5 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { BanknoteIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function FooterDeliveryAndPaymentMethods() {
   const logos = [
@@ -13,9 +15,9 @@ export default function FooterDeliveryAndPaymentMethods() {
   ];
 
   return (
-    <section>
+    <section className="shrink">
       <h3 className="font-medium md:text-lg">Metody płatności i dostawy</h3>
-      <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2 items-center">
+      <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2 items-center mb-4">
         {logos.map((logo) => (
           <Image
             key={logo}
@@ -31,6 +33,11 @@ export default function FooterDeliveryAndPaymentMethods() {
           Płatność za pobraniem
         </div>
       </div>
+      <Link href="/info/shipping-and-payment-methods">
+        <Button variant="outline">
+          Więcej informacji o dostawie i płatnościach
+        </Button>
+      </Link>
     </section>
   );
 }

@@ -1,7 +1,8 @@
 import React from "react";
 import MobileFooterLinks from "./MobileFooterLinks";
 import FooterDeliveryAndPaymentMethods from "./FooterDeliveryAndPaymentMethods";
-import DesktopFooterLinks from "./DesktopFooterLinks";
+import DesktopHelpLinks from "./DesktopHelpLinks";
+import DesktopCompanyInfo from "./DesktopCompanyInfo";
 
 export type NavOption = {
   groupLabel: string;
@@ -12,62 +13,40 @@ export type NavOption = {
 };
 
 export default function Footer() {
-  const navOptions: NavOption[] = [
-    {
-      groupLabel: "Obsługa klienta",
-      links: [
-        {
-          label: "Kontakt",
-          url: "/info/contact",
-        },
-        {
-          label: "Zwroty",
-          url: "/info/returns",
-        },
-        {
-          label: "Reklamacje",
-          url: "/info/complaints",
-        },
-      ],
-    },
-    {
-      groupLabel: "Informacje o sklepie",
-      links: [
-        {
-          label: "Metody dostaw i płatności",
-          url: "/info/shipping-and-payment-methods",
-        },
-        {
-          label: "O nas",
-          url: "/info/about",
-        },
-      ],
-    },
-    {
-      groupLabel: "Regulaminy",
-      links: [
-        {
-          label: "Regulamin",
-          url: "/info/regulations",
-        },
-        {
-          label: "Polityka prywatności",
-          url: "/info/privacy",
-        },
-      ],
-    },
-  ];
+  const helpLinks: NavOption = {
+    groupLabel: "Pomoc",
+    links: [
+      {
+        label: "Kontakt",
+        url: "/info/contact",
+      },
+      {
+        label: "Zwroty",
+        url: "/info/returns",
+      },
+      {
+        label: "Reklamacje",
+        url: "/info/complaints",
+      },
+      {
+        label: "Regulamin",
+        url: "/info/regulations",
+      },
+      {
+        label: "Polityka prywatności",
+        url: "/info/privacy",
+      },
+    ],
+  };
 
   return (
     <footer className="bg-card border-t border-border mt-auto py-2 md:py-6 ">
-      <div className="max-w-[1440px] w-[90vw] mx-auto xl:flex justify-between items-start">
-        <nav className=" w-full mb-3 md:mb-6">
-          <DesktopFooterLinks
-            navOptions={navOptions}
-            className="hidden md:flex"
-          />
-          <MobileFooterLinks navOptions={navOptions} className="md:hidden" />
+      <div className="max-w-[1440px] w-[90vw] mx-auto xl:flex justify-start items-start gap-16">
+        <nav className=" mb-3 md:mb-6 border-r-1 border-secondary/50 pr-16 shrink-0">
+          <DesktopHelpLinks helpLinks={helpLinks} className="hidden md:flex" />
+          {/* <MobileFooterLinks navOptions={navOptions} className="md:hidden" /> */}
         </nav>
+        <DesktopCompanyInfo className="hidden md:block border-r-1 border-secondary/50 pr-16 shrink-0" />
         <FooterDeliveryAndPaymentMethods />
       </div>
     </footer>

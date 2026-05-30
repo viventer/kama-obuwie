@@ -2,7 +2,7 @@ import React from "react";
 import MobileFooterLinks from "./MobileFooterLinks";
 import FooterDeliveryAndPaymentMethods from "./FooterDeliveryAndPaymentMethods";
 import DesktopHelpLinks from "./DesktopHelpLinks";
-import DesktopCompanyInfo from "./DesktopCompanyInfo";
+import CompanyInfo from "./CompanyInfo";
 
 export type NavOption = {
   groupLabel: string;
@@ -40,13 +40,18 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-card border-t border-border mt-auto py-2 md:py-6 ">
-      <div className="max-w-[1440px] w-[90vw] mx-auto xl:flex justify-start items-start gap-16">
-        <nav className=" mb-3 md:mb-6 border-r-1 border-secondary/50 pr-16 shrink-0">
-          <DesktopHelpLinks helpLinks={helpLinks} className="hidden md:flex" />
-          {/* <MobileFooterLinks navOptions={navOptions} className="md:hidden" /> */}
-        </nav>
-        <DesktopCompanyInfo className="hidden md:block border-r-1 border-secondary/50 pr-16 shrink-0" />
+    <footer className="bg-card border-t border-border mt-auto py-6 ">
+      <div className="max-w-[1440px] w-[90vw] mx-auto lg:flex justify-start items-start gap-16">
+        <div className="flex gap-x-8 gap-y-4 sm:gap-x-16 mb-8 lg:border-r-1 border-secondary/50 lg:pr-16 flex-col xs:flex-row">
+          <nav className=" mb-3 md:mb-6 xs:border-r-1 border-secondary/50 xs:pr-8 sm:pr-16 shrink-0">
+            <DesktopHelpLinks
+              helpLinks={helpLinks}
+              className="hidden md:flex"
+            />
+            {/* <MobileFooterLinks navOptions={navOptions} className="md:hidden" /> */}
+          </nav>
+          <CompanyInfo className="shrink-0 lg:pr-16" />
+        </div>
         <FooterDeliveryAndPaymentMethods />
       </div>
     </footer>

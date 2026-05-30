@@ -1,11 +1,7 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function DesktopCompanyInfo({
-  className,
-}: {
-  className?: string;
-}) {
+export default function CompanyInfo({ className }: { className?: string }) {
   return (
     <article className={className}>
       <h3 className="font-medium text-lg mb-2">Dane firmy</h3>

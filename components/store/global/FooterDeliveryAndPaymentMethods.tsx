@@ -16,7 +16,7 @@ export default function FooterDeliveryAndPaymentMethods() {
 
   return (
     <section className="shrink">
-      <h3 className="font-medium md:text-lg">Metody płatności i dostawy</h3>
+      <h3 className="font-medium text-lg">Metody płatności i dostawy</h3>
       <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2 items-center mb-4">
         {logos.map((logo) => (
           <Image
@@ -28,14 +28,15 @@ export default function FooterDeliveryAndPaymentMethods() {
             className="w-12 object-contain h-fit"
           />
         ))}
-        <div className="flex bg-transparent border-success border-1 px-2 py-0.5 gap-1.5 font-medium text-sm items-center rounded-xs">
+        <div className="flex bg-secondary/30  px-2 py-0.5 gap-1.5 font-medium text-sm items-center rounded-xs">
           <BanknoteIcon className="text-success" />
           Płatność za pobraniem
         </div>
       </div>
       <Link href="/info/shipping-and-payment-methods">
         <Button variant="outline">
-          Więcej informacji o dostawie i płatnościach
+          Więcej informacji
+          <span className="hidden 2xs:inline"> o dostawie i płatnościach</span>
         </Button>
       </Link>
     </section>

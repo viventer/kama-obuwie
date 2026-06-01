@@ -2,6 +2,7 @@ import { ProductWithId } from "@/firebase/schemas/productsSchemas";
 import { getImageUrl } from "@/server-actions/files/files";
 import Image from "next/image";
 import { getColorVariantName } from "./helpers/productsHelpers";
+import { roundToPsychologicalPrice } from "@/helpers/prices";
 
 export default async function ShortProductInfo({
   product,
@@ -41,6 +42,11 @@ export default async function ShortProductInfo({
             <b>Cena sugerowana:</b> {product.suggestedPrice}
           </p>
         )}
+        <p>
+          <b>Cena docelowa:</b>{" "}
+          {roundToPsychologicalPrice(product.purchasePrice * 2.73)} (
+          {product.purchasePrice * 2.73})
+        </p>
         {colorVariantsNames && (
           <p>
             <b>Warianty:</b> {colorVariantsNames}

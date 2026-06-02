@@ -5,7 +5,7 @@ import { DataTable } from "../../global/data-table/DataTable";
 import { useRouter } from "next/navigation";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { MoveRightIcon } from "lucide-react";
-import { allegroSalesChannels } from "@/lib/constants";
+import { allegroSalesChannels, salesChannels } from "@/lib/constants";
 import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import ChangeAvailabilityDialogContent from "../ChangeAvailabilityDialogContent";
 import { useToast } from "@/hooks/useToast";
@@ -91,27 +91,29 @@ export default function OffersDataTable({
         return (
           <>
             <h4 className="font-bold">Ceny sprzedaży:</h4>
-            {allegroSalesChannels.map((salesChannel) => (
-              <section
-                key={salesChannel}
-                className="flex gap-2 items-center mt-1"
-              >
-                <p className="font-medium">{salesChannel}</p>
-                {row.initialSellingPrices?.[salesChannel] &&
-                  row.initialSellingPrices[salesChannel] !==
-                    row.sellingPrices[salesChannel] && (
-                    <>
-                      <div className="bg-destructive/25 rounded-xs px-2 py-1 w-fit">
-                        {row.initialSellingPrices[salesChannel]} zł
-                      </div>
-                      <MoveRightIcon />
-                    </>
-                  )}
-                <div className="bg-primary/25 rounded-xs px-2 py-1 w-fit">
-                  {row.sellingPrices?.[salesChannel]} zł
-                </div>
-              </section>
-            ))}
+            {salesChannels
+              .filter((channel) => channel !== "POS")
+              .map((salesChannel) => (
+                <section
+                  key={salesChannel}
+                  className="flex gap-2 items-center mt-1"
+                >
+                  <p className="font-medium">{salesChannel}</p>
+                  {row.initialSellingPrices?.[salesChannel] &&
+                    row.initialSellingPrices[salesChannel] !==
+                      row.sellingPrices[salesChannel] && (
+                      <>
+                        <div className="bg-destructive/25 rounded-xs px-2 py-1 w-fit">
+                          {row.initialSellingPrices[salesChannel]} zł
+                        </div>
+                        <MoveRightIcon />
+                      </>
+                    )}
+                  <div className="bg-primary/25 rounded-xs px-2 py-1 w-fit">
+                    {row.sellingPrices?.[salesChannel]} zł
+                  </div>
+                </section>
+              ))}
 
             <h4 className="font-bold mt-2 mb-1">Dostępność:</h4>
             <section className="flex gap-2">

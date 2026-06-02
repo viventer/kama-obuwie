@@ -51,7 +51,7 @@ export default function ProductImagesUploader({
 
     setNewPhotos((prev) => {
       const otherVariants = prev.filter(
-        (photo) => photo.colorVariantName !== colorVariantName
+        (photo) => photo.colorVariantName !== colorVariantName,
       );
       return [...otherVariants, ...newPhotos];
     });

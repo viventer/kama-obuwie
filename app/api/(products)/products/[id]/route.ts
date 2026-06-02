@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const data = await getDocumentFromAdminDB(id, "products");
+  const { data } = await getDocumentFromAdminDB("products", id);
   if (!data) {
     return apiResponse("Produkt nie istnieje.", 404);
   }

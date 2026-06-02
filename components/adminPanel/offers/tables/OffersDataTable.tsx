@@ -9,6 +9,7 @@ import { allegroSalesChannels } from "@/lib/constants";
 import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import ChangeAvailabilityDialogContent from "../ChangeAvailabilityDialogContent";
 import { useToast } from "@/hooks/useToast";
+import ChangePricesDialogContent from "../ChangePricesDialogContent";
 
 export default function OffersDataTable({
   data,
@@ -54,6 +55,22 @@ export default function OffersDataTable({
               isAddedToMerchantCenter={offer?.isAddedToMerchantCenter || false}
             />
           ),
+          hasCancelButton: false,
+        });
+      },
+    },
+    {
+      name: "Zmień ceny",
+      onClick: (id) => {
+        const offer = data?.find((offer) => offer.id === id);
+        if (!offer || !offer.sellingPrices) {
+          showToast("Nie można zmienić cen: brak danych oferty.", "error");
+          return;
+        }
+
+        openDialog({
+          title: "Zmień ceny sprzedaży",
+          content: <ChangePricesDialogContent offerData={offer} />,
           hasCancelButton: false,
         });
       },

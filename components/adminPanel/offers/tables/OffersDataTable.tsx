@@ -75,6 +75,31 @@ export default function OffersDataTable({
         });
       },
     },
+    {
+      name: "Zobacz dane produktu",
+      onClick: (id) => {
+        const offer = data?.find((offer) => offer.id === id);
+        if (!offer) {
+          showToast(
+            "Nie można wyświetlić danych produktu: brak danych oferty.",
+            "error",
+          );
+          return;
+        }
+
+        if (!offer.productId) {
+          showToast(
+            "Nie można wyświetlić danych produktu: oferta nie jest powiązana z produktem.",
+            "error",
+          );
+          return;
+        }
+
+        router.push(
+          `/admin-panel/create-products/product-data/${offer.productId}`,
+        );
+      },
+    },
   ];
 
   return (
@@ -90,7 +115,6 @@ export default function OffersDataTable({
         if (!row?.sellingPrices) return;
         return (
           <>
-            <h4 className="font-bold">Ceny sprzedaży:</h4>
             {salesChannels
               .filter((channel) => channel !== "POS")
               .map((salesChannel) => (
@@ -115,8 +139,7 @@ export default function OffersDataTable({
                 </section>
               ))}
 
-            <h4 className="font-bold mt-2 mb-1">Dostępność:</h4>
-            <section className="flex gap-2">
+            <section className="flex gap-2 mt-2">
               {Object.entries(row.availability).map(([size, availability]) => (
                 <div key={size} className="bg-primary/25 rounded-xs px-2 py-1">
                   <span className="font-medium">{size}:</span>{" "}

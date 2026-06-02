@@ -41,7 +41,7 @@ export default async function ProductEditPage(props: Props) {
     (photo, idx) => ({
       ...photo,
       url: urls[idx],
-    })
+    }),
   );
 
   return (

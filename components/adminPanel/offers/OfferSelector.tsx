@@ -4,26 +4,27 @@ import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { DataTable } from "../global/data-table/DataTable";
 
 export default function OfferSelector({
-  offers,
+  availableOffers,
   setSelectedOfferId,
 }: {
-  offers: OfferWithId[];
+  availableOffers: OfferWithId[];
   setSelectedOfferId: (offerId: string) => void;
 }) {
   const columnNames = [
-    { attributeName: "signature", displayName: "Sygnatura" },
     { attributeName: "title", displayName: "Tytuł" },
+    { attributeName: "signature", displayName: "Sygnatura" },
     { attributeName: "SKU", displayName: "SKU" },
   ];
 
   return (
     <DataTable
-      data={offers}
+      data={availableOffers}
       columnNames={columnNames}
+      searchPlaceholder="Szukaj oferty"
+      searchColumns={["title", "signature", "SKU"]}
       hasImages={true}
       imageAttribute="thumbnail"
-      searchPlaceholder="Szukaj ofert"
-      searchColumns={["signature", "title"]}
+      imageFolderPath={`offers/thumbnails`}
       maxSelectable={1}
       onSelectionChange={(rows) => {
         if (rows.length > 0) {

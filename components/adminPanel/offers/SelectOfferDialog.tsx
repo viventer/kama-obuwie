@@ -11,37 +11,36 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import OfferSelector from "./OfferSelector";
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useToast } from "@/hooks/useToast";
-import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 
 export default function SelectOfferDialog({
   triggerText = "Wybierz ofertę",
   title = "Wybierz ofertę",
   description,
-  offers,
+  availableOffers,
   setSelectedOfferId,
   selectedOfferId,
   onConfirm,
-  confirmText,
+  actionText,
 }: {
   triggerText?: string;
   title?: string;
   description?: string;
-  offers: OfferWithId[];
+  availableOffers: OfferWithId[];
   setSelectedOfferId: (offer: string) => void;
   selectedOfferId: string;
   onConfirm?: () => void;
-  confirmText?: string;
+  actionText?: string;
 }) {
   const [open, setOpen] = useState(false);
   const { showToast } = useToast();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="px-3 py-2 bg-transparent border-primary border-solid border-1 rounded-xs hover:border-accent hover:cursor-pointer">
+      <DialogTrigger className="px-3 py-2 bg-transparent border-primary border-solid border-1 rounded-xs hover:border-accent hover:cursor-pointer w-fit">
         {triggerText}
       </DialogTrigger>
       <DialogContent className="max-h-[90svh]">
@@ -50,7 +49,7 @@ export default function SelectOfferDialog({
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         <OfferSelector
-          offers={offers}
+          availableOffers={availableOffers}
           setSelectedOfferId={setSelectedOfferId}
         />
         <DialogFooter>
@@ -67,7 +66,7 @@ export default function SelectOfferDialog({
               }
             }}
           >
-            {confirmText || "Potwierdź"}
+            {actionText || "Połącz"}
           </Button>
         </DialogFooter>
       </DialogContent>

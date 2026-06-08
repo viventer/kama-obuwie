@@ -100,6 +100,18 @@ export default function OffersDataTable({
         );
       },
     },
+    {
+      name: "Edytuj wielowariant",
+      onClick: (id) => {
+        const offer = data?.find((offer) => offer.id === id);
+        if (!offer) {
+          showToast("Nie można edytować wariantów oferty.", "error");
+          return;
+        }
+
+        router.push(`/admin-panel/offers/multivariants/${offer.id}`);
+      },
+    },
   ];
 
   return (

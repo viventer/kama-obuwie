@@ -32,14 +32,7 @@ import { useBreakpoint } from "@/hooks/useBreakpoint";
 import MobileProductPageShopAdvantages from "./MobileProductPageShopAdvantages";
 import ReturnToListingButton from "./ReturnToListingButton";
 import ProductInfo from "./ProductInfo";
-
-type StoreProductData = {
-  id: string;
-  brand?: string;
-  manufacturerCode: string;
-  colorVariants: ColorVariant[];
-  parameters: ProductParameters;
-};
+import { StoreProductDataForStore } from "@/server-actions/store/getStoreProductPageData";
 
 export default function ProductPage({
   imagesUrls,
@@ -51,7 +44,7 @@ export default function ProductPage({
   choosingSizeImageUrl,
 }: {
   imagesUrls: Record<string, string[]>;
-  productData: StoreProductData;
+  productData: StoreProductDataForStore;
   category: CategoryWithId;
   initialColorVariantName?: string;
   offersData: Record<string, OfferWithId>;

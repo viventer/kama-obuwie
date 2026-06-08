@@ -24,6 +24,13 @@ export type StoreProductDataForStore = {
   description?:
     | ProductWithId["description"]
     | LegacyProductWithId["allegroDescription"];
+  connectedOffers?: connectedOfferData[];
+};
+
+export type connectedOfferData = {
+  offerId: string;
+  thumbnail: string;
+  colorVariantName: string;
 };
 
 export type StoreProductPageData = {
@@ -53,12 +60,12 @@ export async function getStoreProductPageData(params: {
 
   const productResult = await getDocumentFromAdminDB<ProductWithId>(
     "products",
-    id
+    id,
   );
   const product = productResult.data;
 
   const isProduct = Boolean(
-    product && product.editedPhotos && product.categoryId
+    product && product.editedPhotos && product.categoryId,
   );
 
   const imagesUrls: Record<string, string[]> = {};
@@ -80,7 +87,7 @@ export async function getStoreProductPageData(params: {
 
     for (const variantName of Object.keys(imagesUrls)) {
       const variantImages = editedPhotos.filter(
-        (image) => image.colorVariantName === variantName
+        (image) => image.colorVariantName === variantName,
       );
       const filePaths = variantImages.map((image) => image.filePath);
       if (filePaths.length === 0) continue;
@@ -93,7 +100,7 @@ export async function getStoreProductPageData(params: {
 
     const categoryResult = await getDocumentFromAdminDB<CategoryWithId>(
       "categories",
-      product.categoryId as string
+      product.categoryId as string,
     );
     if (!categoryResult.data) return null;
     category = categoryResult.data;
@@ -105,7 +112,7 @@ export async function getStoreProductPageData(params: {
         }
         const { data: offer } = await getDocumentFromAdminDB<OfferWithId>(
           "offers",
-          offerId
+          offerId,
         );
         if (offer) {
           offersData[variantName] = offer;
@@ -117,7 +124,7 @@ export async function getStoreProductPageData(params: {
       const { data: sizingTableData } =
         await getDocumentFromAdminDB<SizingTableWithId>(
           "sizingTables",
-          product.sizingTableId
+          product.sizingTableId,
         );
       if (sizingTableData) {
         sizingTable = sizingTableData;
@@ -136,7 +143,7 @@ export async function getStoreProductPageData(params: {
     // Fallback: id wskazuje na offerId (legacy)
     const { data: offer } = await getDocumentFromAdminDB<OfferWithId>(
       "offers",
-      id
+      id,
     );
 
     if (!offer) {
@@ -149,7 +156,7 @@ export async function getStoreProductPageData(params: {
 
     const { data: legacy } = await getDocumentFromAdminDB<LegacyProductWithId>(
       "legacyProducts",
-      offer.legacyProductId
+      offer.legacyProductId,
     );
 
     if (!legacy) {
@@ -176,7 +183,7 @@ export async function getStoreProductPageData(params: {
 
     const categoryResult = await getDocumentFromAdminDB<CategoryWithId>(
       "categories",
-      legacyCategoryId
+      legacyCategoryId,
     );
     if (!categoryResult.data) {
       return null;
@@ -187,7 +194,7 @@ export async function getStoreProductPageData(params: {
       const { data: sizingTableData } =
         await getDocumentFromAdminDB<SizingTableWithId>(
           "sizingTables",
-          legacy.sizingTableId
+          legacy.sizingTableId,
         );
       if (sizingTableData) {
         sizingTable = sizingTableData;
@@ -211,12 +218,32 @@ export async function getStoreProductPageData(params: {
         : ([{ color: baseColorVariantName }] as ColorVariant[]);
 
     const hasVariant = legacyColorVariants.some(
-      (v) => getColorVariantName(v) === baseColorVariantName
+      (v) => getColorVariantName(v) === baseColorVariantName,
     );
 
     const finalColorVariants = hasVariant
       ? legacyColorVariants
       : ([{ color: baseColorVariantName }] as ColorVariant[]);
+
+    const connectedOffers = offer.connectedOffers || [];
+    const connectedOffersData: connectedOfferData[] = [];
+    for (const connectedOfferId of connectedOffers) {
+      if (connectedOfferId === offer.id) continue;
+      const { data: connectedOffer } =
+        await getDocumentFromAdminDB<OfferWithId>("offers", connectedOfferId);
+      if (connectedOffer) {
+        const connectedColorVariantName =
+          connectedOffer.colorVariantName ||
+          parseSignature(connectedOffer.signature || "").colorVariantName;
+        if (connectedColorVariantName) {
+          connectedOffersData.push({
+            offerId: connectedOffer.id,
+            thumbnail: connectedOffer.thumbnail || "",
+            colorVariantName: connectedColorVariantName,
+          });
+        }
+      }
+    }
 
     productData = {
       id,
@@ -229,6 +256,10 @@ export async function getStoreProductPageData(params: {
         ({ required: {}, optional: {} } as ProductParameters),
       description: legacy.allegroDescription,
     };
+
+    if (connectedOffersData.length > 0) {
+      productData.connectedOffers = connectedOffersData;
+    }
   }
 
   if (!category || !productData) {

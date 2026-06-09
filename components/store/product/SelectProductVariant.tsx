@@ -4,17 +4,16 @@ import { ColorVariant } from "@/firebase/schemas/productsSchemas";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import Image from "next/image";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { VariantToChoose } from "./ProductPage";
 
 interface SelectProductVariantProps {
-  colorVariants: ColorVariant[];
-  imagesUrls: Record<string, string[]>;
+  colorVariants: VariantToChoose[];
   selectedColorVariant: string;
   onVariantChange: (variant: string) => void;
 }
 
 export default function SelectProductVariant({
   colorVariants,
-  imagesUrls,
   selectedColorVariant,
   onVariantChange,
 }: SelectProductVariantProps) {
@@ -35,14 +34,13 @@ export default function SelectProductVariant({
     grid-cols-[repeat(auto-fit,minmax(70px,max-content))]  justify-start w-full"
         >
           {colorVariants.map((colorVariant) => {
-            const variantName = getColorVariantName(colorVariant);
-            const isSelected = selectedColorVariant === variantName;
-            const imageUrl = imagesUrls[variantName]?.[0];
+            const isSelected = selectedColorVariant === colorVariant.name;
+            const imageUrl = colorVariant.imageUrl;
 
             return (
               <TabsTrigger
-                key={variantName}
-                value={variantName}
+                key={colorVariant.name}
+                value={colorVariant.name}
                 className="p-0 h-auto data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 hover:bg-transparent max-w-fit"
               >
                 <div
@@ -61,7 +59,7 @@ export default function SelectProductVariant({
                 >
                   <Image
                     src={imageUrl}
-                    alt={`Wariant ${variantName}`}
+                    alt={`Wariant ${colorVariant.name}`}
                     width={120}
                     height={120}
                     className={`object-contain min-w-0 aspect-square bg-white rounded-xs`}
@@ -72,7 +70,7 @@ export default function SelectProductVariant({
           })}
         </TabsList>
         {colorVariants.map((colorVariant) => {
-          const variantName = getColorVariantName(colorVariant);
+          const variantName = colorVariant.name;
           return (
             <TabsContent key={variantName} value={variantName}>
               <div className="text-sm text-muted-foreground">

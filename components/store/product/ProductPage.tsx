@@ -37,6 +37,11 @@ import {
   StoreProductDataForStore,
 } from "@/server-actions/store/getStoreProductPageData";
 
+export type VariantToChoose = {
+  name: string;
+  imageUrl: string;
+};
+
 export default function ProductPage({
   imagesUrls,
   productData,
@@ -57,7 +62,9 @@ export default function ProductPage({
   connectedOffers?: connectedOfferData[];
 }) {
   const { currentBreakpoint } = useBreakpoint();
-  const [filteredVariants, setFilteredVariants] = useState<ColorVariant[]>([]);
+  const [filteredVariants, setFilteredVariants] = useState<VariantToChoose[]>(
+    [],
+  );
 
   if (!productData.colorVariants) {
     console.log(
@@ -68,8 +75,6 @@ export default function ProductPage({
   }
 
   useEffect(() => {
-    console.log(connectedOffers);
-
     const availableVariants = productData.colorVariants.filter((variant) => {
       const variantName = getColorVariantName(variant);
       const offer = offersData[variantName];
@@ -83,7 +88,30 @@ export default function ProductPage({
 
       return isActive;
     });
-    setFilteredVariants(availableVariants);
+
+    let variantsToChoose: VariantToChoose[] = availableVariants.map(
+      (variant) => {
+        const name = getColorVariantName(variant);
+        const imageUrl = imagesUrls[name]?.[0];
+
+        return {
+          name,
+          imageUrl,
+        };
+      },
+    );
+
+    const additionalVariants: VariantToChoose[] | undefined =
+      connectedOffers?.map((offer) => ({
+        name: offer.colorVariantName,
+        imageUrl: offer.thumbnail,
+      }));
+
+    if (additionalVariants) {
+      variantsToChoose = [...variantsToChoose, ...additionalVariants];
+    }
+
+    setFilteredVariants(variantsToChoose);
 
     if (analytics) {
       logEvent(analytics, "view_item", {
@@ -144,14 +172,25 @@ export default function ProductPage({
   }, [searchParams, productData.colorVariants]);
 
   const handleVariantChange = (newVariant: string) => {
-    setSelectedColorVariant(newVariant);
-    setSelectedSize("");
+    if (imagesUrls[newVariant]) {
+      setSelectedColorVariant(newVariant);
+      setSelectedSize("");
+      const params = new URLSearchParams(searchParams);
+      params.set("colorVariantName", newVariant);
+      router.replace(`/product/${productData.id}?${params.toString()}`, {
+        scroll: false,
+      });
+    } else {
+      const selectedOffer = connectedOffers?.find(
+        (o) => o.colorVariantName === newVariant,
+      );
+      if (!selectedOffer || !selectedOffer?.offerId) {
+        showToast("Nie udało się zmienić wariantu", "error");
+        return;
+      }
 
-    const params = new URLSearchParams(searchParams);
-    params.set("colorVariantName", newVariant);
-    router.replace(`/product/${productData.id}?${params.toString()}`, {
-      scroll: false,
-    });
+      router.push(`/product/${selectedOffer?.offerId}`);
+    }
   };
 
   const currentOffer = offersData[selectedColorVariant];
@@ -295,7 +334,6 @@ export default function ProductPage({
           <div className="w-full flex flex-col gap-4">
             <SelectProductVariant
               colorVariants={filteredVariants}
-              imagesUrls={imagesUrls}
               selectedColorVariant={selectedColorVariant}
               onVariantChange={handleVariantChange}
             />

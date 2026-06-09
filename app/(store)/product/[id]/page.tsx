@@ -12,12 +12,12 @@ export const dynamicParams = true;
 export async function generateStaticParams() {
   const productsWithOffers =
     (await getDocumentsFromAdminDB<ProductWithId>("products", (ref) =>
-      ref.where("offersIds", "!=", null)
+      ref.where("offersIds", "!=", null),
     )) ?? [];
 
   const legacyOffers =
     (await getDocumentsFromAdminDB<OfferWithId>("offers", (ref) =>
-      ref.where("legacyProductId", ">", "")
+      ref.where("legacyProductId", ">", ""),
     )) ?? [];
 
   return [...productsWithOffers, ...legacyOffers]
@@ -56,6 +56,7 @@ export default async function ProductDetails({ params }: Props) {
       offersData={pageData.offersData}
       sizingTable={pageData.sizingTable}
       choosingSizeImageUrl={pageData.choosingSizeImageUrl}
+      connectedOffers={pageData?.connectedOffers}
     />
   );
 }

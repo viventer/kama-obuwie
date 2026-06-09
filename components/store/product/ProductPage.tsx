@@ -32,7 +32,10 @@ import { useBreakpoint } from "@/hooks/useBreakpoint";
 import MobileProductPageShopAdvantages from "./MobileProductPageShopAdvantages";
 import ReturnToListingButton from "./ReturnToListingButton";
 import ProductInfo from "./ProductInfo";
-import { StoreProductDataForStore } from "@/server-actions/store/getStoreProductPageData";
+import {
+  connectedOfferData,
+  StoreProductDataForStore,
+} from "@/server-actions/store/getStoreProductPageData";
 
 export default function ProductPage({
   imagesUrls,
@@ -42,6 +45,7 @@ export default function ProductPage({
   offersData,
   sizingTable,
   choosingSizeImageUrl,
+  connectedOffers,
 }: {
   imagesUrls: Record<string, string[]>;
   productData: StoreProductDataForStore;
@@ -50,6 +54,7 @@ export default function ProductPage({
   offersData: Record<string, OfferWithId>;
   sizingTable?: SizingTableWithId;
   choosingSizeImageUrl?: string;
+  connectedOffers?: connectedOfferData[];
 }) {
   const { currentBreakpoint } = useBreakpoint();
   const [filteredVariants, setFilteredVariants] = useState<ColorVariant[]>([]);
@@ -63,6 +68,8 @@ export default function ProductPage({
   }
 
   useEffect(() => {
+    console.log(connectedOffers);
+
     const availableVariants = productData.colorVariants.filter((variant) => {
       const variantName = getColorVariantName(variant);
       const offer = offersData[variantName];

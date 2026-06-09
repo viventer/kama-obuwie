@@ -40,6 +40,7 @@ export type StoreProductPageData = {
   sizingTable?: SizingTableWithId;
   productData: StoreProductDataForStore;
   choosingSizeImageUrl?: string;
+  connectedOffers?: connectedOfferData[];
 };
 
 async function getChoosingSizeImageUrl(): Promise<string | undefined> {
@@ -74,6 +75,7 @@ export async function getStoreProductPageData(params: {
   let category: CategoryWithId | undefined;
   let sizingTable: SizingTableWithId | undefined;
   let productData: StoreProductDataForStore | undefined;
+  let connectedOffersData: connectedOfferData[] = [];
 
   if (isProduct && product) {
     const editedPhotos = product.editedPhotos || [];
@@ -226,7 +228,6 @@ export async function getStoreProductPageData(params: {
       : ([{ color: baseColorVariantName }] as ColorVariant[]);
 
     const connectedOffers = offer.connectedOffers || [];
-    const connectedOffersData: connectedOfferData[] = [];
     for (const connectedOfferId of connectedOffers) {
       if (connectedOfferId === offer.id) continue;
       const { data: connectedOffer } =
@@ -268,7 +269,7 @@ export async function getStoreProductPageData(params: {
 
   const choosingSizeImageUrl = await getChoosingSizeImageUrl();
 
-  return {
+  const result = {
     imagesUrls,
     productData,
     category,
@@ -276,4 +277,9 @@ export async function getStoreProductPageData(params: {
     sizingTable,
     choosingSizeImageUrl,
   };
+
+  if (connectedOffersData)
+    return { ...result, connectedOffers: connectedOffersData };
+
+  return result;
 }

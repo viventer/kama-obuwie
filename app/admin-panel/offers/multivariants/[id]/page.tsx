@@ -9,6 +9,7 @@ import { getImageUrl } from "@/server-actions/files/files";
 import { isValidUrl } from "@/components/adminPanel/offers/helpers/validation";
 import Image from "next/image";
 import ConnectOffer from "@/components/adminPanel/offers/ConnectOffer";
+import DisconnectOffer from "@/components/adminPanel/offers/DisconnectOffer";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -78,22 +79,29 @@ export default async function Multivariants(props: Props) {
             connectedOffersData.map((offer) => (
               <div
                 key={offer.id}
-                className="p-4 border rounded mb-4 flex items-center gap-4"
+                className="p-4 border rounded mb-4 flex items-center gap-4 justify-between"
               >
-                {connectedOffersThumbnails[offer.id] ? (
-                  <Image
-                    src={connectedOffersThumbnails[offer.id]!}
-                    alt={offer.signature}
-                    width={100}
-                    height={100}
-                  />
-                ) : (
-                  <div className="w-24 h-24 bg-muted-foreground/10 rounded" />
-                )}
-                <div>
-                  <p className="font-medium">{offer.signature}</p>
-                  <p className="text-sm text-muted-foreground">{offer.SKU}</p>
+                <div className="flex gap-4 items-center">
+                  {connectedOffersThumbnails[offer.id] ? (
+                    <Image
+                      src={connectedOffersThumbnails[offer.id]!}
+                      alt={offer.signature}
+                      width={100}
+                      height={100}
+                    />
+                  ) : (
+                    <div className="w-24 h-24 bg-muted-foreground/10 rounded" />
+                  )}
+                  <div>
+                    <p className="font-medium">{offer.signature}</p>
+                    <p className="text-sm text-muted-foreground">{offer.SKU}</p>
+                  </div>
                 </div>
+                <DisconnectOffer
+                  offerId={offerData?.id!}
+                  offerToDisconnectId={offer.id!}
+                  oldConnectedOfferIds={offerData?.connectedOffers || []}
+                />
               </div>
             ))
           ) : (

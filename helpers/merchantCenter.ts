@@ -11,6 +11,17 @@ import { toBase64UrlNoPadding } from "./encoding";
 import { getRequiredEnv } from "./env";
 import { google } from "googleapis";
 
+const NO_BRAND_SENTINELS = new Set(["bez marki"]);
+
+export function normalizeMerchantCenterBrand(
+  brand?: string,
+): string | undefined {
+  const trimmed = brand?.trim();
+  if (!trimmed) return undefined;
+  if (NO_BRAND_SENTINELS.has(trimmed.toLowerCase())) return undefined;
+  return trimmed;
+}
+
 export function getMerchantCenterProductId({
   contentLanguage,
   feedLabel,
@@ -112,7 +123,7 @@ export function getMerchantCenterFootwearProduct(
     );
   }
 
-  const brand = productData.brand;
+  const brand = normalizeMerchantCenterBrand(productData.brand);
   const mpn = productData.manufacturerCode;
 
   const merchantProduct: MerchantCenterFootwearProduct = {

@@ -85,9 +85,10 @@ export default function ComplaintsPage() {
             <h4>Ile mam czasu na złożenie reklamacji?</h4>
           </CardHeader>
           <CardContent>
-            Masz prawo złożyć reklamację w ciągu{" "}
-            <span className="font-semibold">2 lat od zakupu</span>, zgodnie z
-            obowiązującymi przepisami.
+            Możesz zgłosić niezgodność towaru z umową, jeśli ujawni się ona w
+            ciągu{" "}
+            <span className="font-semibold">2 lat od otrzymania towaru</span>,
+            zgodnie z obowiązującymi przepisami (ustawa o prawach konsumenta).
           </CardContent>
         </Card>
 

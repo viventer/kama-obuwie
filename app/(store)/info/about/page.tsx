@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { MapPinIcon, ClockIcon, InfoIcon, CopyrightIcon } from "lucide-react";
+import { companyData } from "@/lib/constants";
 
 export default function AboutPage() {
   return (
@@ -48,10 +49,13 @@ export default function AboutPage() {
             .
           </CardDescription>
           <CardContent className="px-0">
-            <p>Anna Kamińska - "KAM-A"</p>
-            <p>ul. Krzęczków 42a</p>
-            <p>32-700 Bochnia</p>
-            <p>NIP: 8681255945</p>
+            <p>{companyData.name}</p>
+            <p>{companyData.street}</p>
+            <p>
+              {companyData.postalCode} {companyData.city}
+            </p>
+            <p>NIP: {companyData.nip}</p>
+            <p>REGON: {companyData.regon}</p>
           </CardContent>
         </CardHeader>
       </Card>
@@ -195,7 +199,7 @@ export default function AboutPage() {
                   <h3 className="font-semibold text-foreground mb-2">Adres</h3>
                   <div className="text-foreground space-y-1">
                     <p className="font-medium">Hala Targowa Gazaris</p>
-                    <p>stoisko nr 39</p>
+                    <p>pl. Gazaris 10, box 39</p>
                     <p>32-700 Bochnia</p>
                   </div>
                 </div>

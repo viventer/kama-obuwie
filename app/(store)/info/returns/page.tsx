@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { companyData, returnsAddress } from "@/lib/constants";
 
 export default function ReturnsPage() {
   return (
@@ -42,17 +43,19 @@ export default function ReturnsPage() {
         </CardHeader>
         <CardContent>
           <div>
-            <p>Anna Kamińska - "KAM-A"</p>
-            <p>ul. Plac Gazaris 11</p>
+            <p>{returnsAddress.name}</p>
+            <p>{returnsAddress.line1}</p>
             <p>
-              <b>nr lokalu:</b> stoisko nr 39
-            </p>
-            <p>32-700 Bochnia</p>
-            <p>
-              <b>nr tel.:</b> 664097737
+              <b>nr lokalu:</b> {returnsAddress.line2}
             </p>
             <p>
-              <b>email:</b> kontakt@kama-obuwie.pl
+              {returnsAddress.postalCode} {returnsAddress.city}
+            </p>
+            <p>
+              <b>nr tel.:</b> {companyData.phone}
+            </p>
+            <p>
+              <b>email:</b> {companyData.email}
             </p>
           </div>
         </CardContent>

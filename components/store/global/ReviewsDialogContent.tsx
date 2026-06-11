@@ -41,8 +41,9 @@ export default function ReviewsDialogContent() {
           Sprawdzony sprzedawca – 99,4% poleceń
         </h5>
         <p className="text-sm">
-          Wszystkie opinie pochodzą z serwisu{" "}
-          <b className="font-medium">allegro.pl</b> i są potwierdzone zakupem
+          Prezentowane oceny dotyczą sprzedawcy kama-obuwie_pl i pochodzą z
+          serwisu <b className="font-medium">allegro.pl</b>. Wszystkie opinie są
+          potwierdzone zakupem i wystawione przez kupujących.
         </p>
       </article>
     </section>

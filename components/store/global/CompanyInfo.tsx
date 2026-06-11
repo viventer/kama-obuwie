@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { companyData } from "@/lib/constants";
 import Link from "next/link";
 
 export default function CompanyInfo({ className }: { className?: string }) {
@@ -6,14 +7,17 @@ export default function CompanyInfo({ className }: { className?: string }) {
     <article className={className}>
       <h3 className="font-medium text-lg mb-2">Dane firmy</h3>
       <div className="mb-2">
-        <p>Anna Kamińska - "KAM-A"</p>
-        <p>ul. Krzęczków 42a</p>
-        <p>32-700 Bochnia</p>
-        <p>NIP: 8681255945</p>
+        <p>{companyData.name}</p>
+        <p>{companyData.street}</p>
+        <p>
+          {companyData.postalCode} {companyData.city}
+        </p>
+        <p>NIP: {companyData.nip}</p>
+        <p>REGON: {companyData.regon}</p>
       </div>
       <div className="mb-4">
-        <p>+48 664 097 737</p>
-        <p>kontakt@kama-obuwie.pl</p>
+        <p>{companyData.phone}</p>
+        <p>{companyData.email}</p>
       </div>
       <Link href="/info/about">
         <Button variant="outline">Więcej informacji o sklepie</Button>

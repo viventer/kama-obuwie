@@ -8,6 +8,7 @@ import {
 import { MailIcon, PhoneIcon, ClockIcon, InfoIcon } from "lucide-react";
 import LinkText from "@/components/adminPanel/global/LinkText";
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
+import { companyData } from "@/lib/constants";
 
 export default function ContactPage() {
   return (
@@ -27,8 +28,8 @@ export default function ContactPage() {
                 <MailIcon className="text-brand w-6 h-6" />
                 <div>
                   <h3 className="font-semibold text-foreground">Email</h3>
-                  <LinkText href="mailto:kontakt@kama-obuwie.pl">
-                    kontakt@kama-obuwie.pl
+                  <LinkText href={`mailto:${companyData.email}`}>
+                    {companyData.email}
                   </LinkText>
                 </div>
               </div>
@@ -37,7 +38,9 @@ export default function ContactPage() {
                 <PhoneIcon className="text-brand w-6 h-6" />
                 <div>
                   <h3 className="font-semibold text-foreground">Telefon</h3>
-                  <LinkText href="tel:664097737">664 097 737</LinkText>
+                  <LinkText href={companyData.phoneHref}>
+                    {companyData.phone}
+                  </LinkText>
                 </div>
               </div>
             </div>
@@ -75,10 +78,13 @@ export default function ContactPage() {
             .
           </CardDescription>
           <CardContent className="px-0">
-            <p>Anna Kamińska - "KAM-A"</p>
-            <p>ul. Krzęczków 42a</p>
-            <p>32-700 Bochnia</p>
-            <p>NIP: 8681255945</p>
+            <p>{companyData.name}</p>
+            <p>{companyData.street}</p>
+            <p>
+              {companyData.postalCode} {companyData.city}
+            </p>
+            <p>NIP: {companyData.nip}</p>
+            <p>REGON: {companyData.regon}</p>
           </CardContent>
         </CardHeader>
       </Card>

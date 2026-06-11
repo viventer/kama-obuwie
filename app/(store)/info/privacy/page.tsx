@@ -1,6 +1,7 @@
 import LinkText from "@/components/adminPanel/global/LinkText";
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { companyData } from "@/lib/constants";
 
 export default function PrivacyPage() {
   return (
@@ -19,14 +20,17 @@ export default function PrivacyPage() {
           </CardHeader>
           <CardContent>
             <p className="mb-2">Administratorem danych osobowych jest:</p>
-            <p className="font-semibold">Anna Kamińska - "KAM-A"</p>
-            <p>ul. Krzęczków 42a</p>
-            <p>32-700 Bochnia</p>
-            <p>NIP: 8681255945</p>
+            <p className="font-semibold">{companyData.name}</p>
+            <p>{companyData.street}</p>
+            <p>
+              {companyData.postalCode} {companyData.city}
+            </p>
+            <p>NIP: {companyData.nip}</p>
+            <p>REGON: {companyData.regon}</p>
             <p className="mt-3">
               Kontakt z administratorem jest możliwy poprzez adres e-mail:{" "}
-              <LinkText href="mailto:kontakt@kama-obuwie.pl">
-                kontakt@kama-obuwie.pl
+              <LinkText href={`mailto:${companyData.email}`}>
+                {companyData.email}
               </LinkText>
               . W sprawach związanych z przetwarzaniem danych można również
               wysłać korespondencję na adres siedziby wskazany powyżej.
@@ -112,8 +116,14 @@ export default function PrivacyPage() {
                 przesyłek
               </li>
               <li>
-                <span className="font-semibold">Przelewy24</span> – obsługa
-                płatności
+                <span className="font-semibold">Przelewy24</span> (PayPro S.A.)
+                – obsługa płatności
+              </li>
+              <li>
+                <span className="font-semibold">Google</span> (Google Ireland
+                Limited / Google LLC) – statystyki (Google Analytics) oraz
+                reklama i pomiar konwersji (Google Ads), wyłącznie po wyrażeniu
+                zgody na odpowiednie pliki cookies
               </li>
             </ul>
             <p>
@@ -162,12 +172,23 @@ export default function PrivacyPage() {
               <span className="font-semibold">
                 nie udostępnia funkcji zakładania kont użytkowników
               </span>
-              . Dane nie są wykorzystywane do działań marketingowych, o ile
-              użytkownik nie wyrazi na to odrębnej zgody.
+              .
+            </p>
+            <p className="mb-3">
+              Działania marketingowe z wykorzystaniem plików cookies i narzędzi
+              Google (Google Ads – śledzenie konwersji oraz remarketing)
+              prowadzone są{" "}
+              <span className="font-semibold">
+                wyłącznie po wyrażeniu przez użytkownika zgody
+              </span>{" "}
+              za pośrednictwem banera zgód (Consent Mode v2). Szczegóły opisano
+              w sekcji „Google Analytics, Google Ads i inne usługi zewnętrzne"
+              poniżej.
             </p>
             <p>
-              W przypadku wyrażenia zgody użytkownik ma prawo w każdej chwili ją
-              wycofać.
+              Zgodę można w każdej chwili wycofać poprzez odnośnik „Ustawienia
+              cookies" w stopce strony, bez wpływu na zgodność z prawem
+              przetwarzania dokonanego przed jej wycofaniem.
             </p>
           </CardContent>
         </Card>
@@ -178,13 +199,40 @@ export default function PrivacyPage() {
           </CardHeader>
           <CardContent>
             <p className="mb-3">
-              Witryna korzysta z{" "}
-              <span className="font-semibold">Google Analytics</span> w celu
-              prowadzenia anonimowych statystyk odwiedzin oraz z{" "}
-              <span className="font-semibold">Google Ads</span> w celu pomiaru
-              skuteczności reklam i prowadzenia działań remarketingowych. Usługi
-              te wykorzystują pliki cookies. Dane przekazywane do Google są
-              przetwarzane zgodnie z polityką Google.
+              Witryna korzysta z usług dostarczanych przez{" "}
+              <span className="font-semibold">
+                Google Ireland Limited
+              </span>{" "}
+              (oraz Google LLC):
+            </p>
+            <ul className="list-disc list-inside space-y-1 mb-3">
+              <li>
+                <span className="font-semibold">Google Analytics</span> – do
+                prowadzenia statystyk korzystania ze strony. Dane mają charakter
+                pseudonimowy i zbiorczy (identyfikatory cookies, adres IP,
+                zdarzenia) i nie służą identyfikacji konkretnej osoby przez
+                Administratora.
+              </li>
+              <li>
+                <span className="font-semibold">Google Ads</span> – do{" "}
+                <span className="font-semibold">
+                  pomiaru konwersji (śledzenie konwersji)
+                </span>{" "}
+                oraz <span className="font-semibold">remarketingu</span>, czyli
+                wyświetlania reklam dopasowanych do wcześniejszych odwiedzin w
+                Sklepie.
+              </li>
+            </ul>
+            <p className="mb-3">
+              Korzystanie z Google Ads wiąże się z{" "}
+              <span className="font-semibold">profilowaniem</span> w celach
+              marketingowych (dopasowanie reklam). Profilowanie to{" "}
+              <span className="font-semibold">
+                nie wywołuje wobec użytkownika skutków prawnych ani nie wpływa w
+                istotny sposób na jego sytuację
+              </span>{" "}
+              w rozumieniu art. 22 RODO. Podstawą prawną tych działań jest zgoda
+              użytkownika (art. 6 ust. 1 lit. a RODO).
             </p>
             <p className="mb-3">
               Cookies statystyczne (Google Analytics) oraz marketingowe (Google
@@ -192,10 +240,25 @@ export default function PrivacyPage() {
               <span className="font-semibold">
                 wyłącznie po wyrażeniu przez użytkownika zgody
               </span>
-              . Do momentu udzielenia zgody powyższe usługi nie zapisują plików
-              cookies na urządzeniu użytkownika. Stosujemy mechanizm Google
-              Consent Mode v2, w którym domyślnym stanem jest brak zgody
-              (denied) na cookies analityczne i marketingowe.
+              . Do momentu udzielenia zgody usługi te nie zapisują plików
+              cookies na urządzeniu użytkownika. Stosujemy mechanizm{" "}
+              <span className="font-semibold">Google Consent Mode v2</span>, w
+              którym domyślnym stanem jest brak zgody (denied) na cookies
+              analityczne i marketingowe.
+            </p>
+            <p className="mb-3">
+              W związku z korzystaniem z usług Google dane (w tym dane
+              zbierane przez cookies) mogą być{" "}
+              <span className="font-semibold">
+                przekazywane do państw trzecich, w tym do USA
+              </span>
+              . Google deklaruje stosowanie odpowiednich zabezpieczeń, w
+              szczególności certyfikacji w ramach{" "}
+              <span className="font-semibold">
+                EU‑US Data Privacy Framework
+              </span>{" "}
+              oraz standardowych klauzul umownych (SCC) zatwierdzonych przez
+              Komisję Europejską.
             </p>
             <p>
               Administrator może korzystać także z innych usług zewnętrznych
@@ -289,14 +352,14 @@ export default function PrivacyPage() {
               </li>
               <li>
                 <span className="font-semibold">Statystyczne</span> (Google
-                Analytics) – służą do zbierania anonimowych informacji o
-                korzystaniu ze strony. Uruchamiane wyłącznie za zgodą
-                użytkownika.
+                Analytics) – służą do zbierania pseudonimowych, zbiorczych
+                informacji o korzystaniu ze strony. Uruchamiane wyłącznie za
+                zgodą użytkownika.
               </li>
               <li>
                 <span className="font-semibold">Marketingowe</span> (Google Ads)
-                – służą do pomiaru skuteczności reklam i remarketingu.
-                Uruchamiane wyłącznie za zgodą użytkownika.
+                – służą do pomiaru konwersji oraz remarketingu (dopasowania
+                reklam). Uruchamiane wyłącznie za zgodą użytkownika.
               </li>
             </ul>
             <p className="mb-3">
@@ -339,7 +402,7 @@ export default function PrivacyPage() {
               Niniejsza polityka obowiązuje od dnia publikacji na stronie.
             </p>
             <p className="font-semibold">
-              Data ostatniej aktualizacji: 17 listopada 2025
+              Data ostatniej aktualizacji: 11 czerwca 2026
             </p>
           </CardContent>
         </Card>

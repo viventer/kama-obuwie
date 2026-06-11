@@ -62,6 +62,26 @@ export const bankAccountData = {
   iban: "PL66 1140 2004 0000 3302 8572 0482",
 };
 
+export const companyData = {
+  name: 'Anna Kamińska - "KAM-A"',
+  street: "ul. Krzęczków 42a",
+  postalCode: "32-700",
+  city: "Bochnia",
+  nip: "8681255945",
+  regon: "851796282",
+  email: "kontakt@kama-obuwie.pl",
+  phone: "+48 664 097 737",
+  phoneHref: "tel:+48664097737",
+} as const;
+
+export const returnsAddress = {
+  name: 'Anna Kamińska - "KAM-A"',
+  line1: "pl. Gazaris 10 (Hala Targowa)",
+  line2: "box 39",
+  postalCode: "32-700",
+  city: "Bochnia",
+} as const;
+
 export const reasonTranslations: Record<string, string> = {
   NONE: "Nie podano",
   MISTAKE: "Pomyłka",

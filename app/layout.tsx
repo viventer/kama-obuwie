@@ -8,6 +8,7 @@ import { AuthProvider } from "./providers/AuthProvider";
 import { FullPageLoaderProvider } from "@/components/adminPanel/global/FullPageLoader";
 import { DialogWindowProvider } from "@/app/providers/DialogWindowProvider";
 import GlobalDialogWindow from "@/components/adminPanel/global/GlobalDialogWindow";
+import CookieConsentBanner from "@/components/store/global/cookie-consent/CookieConsentBanner";
 
 const ubuntuSans = Ubuntu({
   variable: "--font-ubuntu-sans",
@@ -41,6 +42,43 @@ export default async function RootLayout({
       className="scrollbar scrollbar-track-transparent scrollbar-thumb-secondary"
     >
       <head>
+        <Script id="consent-default" strategy="beforeInteractive">
+          {`
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+window.gtag = gtag;
+gtag('set', 'ads_data_redaction', true);
+gtag('set', 'url_passthrough', true);
+gtag('consent', 'default', {
+  ad_storage: 'denied',
+  ad_user_data: 'denied',
+  ad_personalization: 'denied',
+  analytics_storage: 'denied',
+  personalization_storage: 'denied',
+  functionality_storage: 'granted',
+  security_storage: 'granted',
+  wait_for_update: 500
+});
+try {
+  var consentMatch = document.cookie.split('; ').find(function(row){
+    return row.indexOf('kama_cookie_consent=') === 0;
+  });
+  if (consentMatch) {
+    var stored = JSON.parse(decodeURIComponent(consentMatch.substring('kama_cookie_consent='.length)));
+    if (stored && stored.version === 1) {
+      var marketing = stored.marketing ? 'granted' : 'denied';
+      gtag('consent', 'update', {
+        analytics_storage: stored.analytics ? 'granted' : 'denied',
+        ad_storage: marketing,
+        ad_user_data: marketing,
+        ad_personalization: marketing,
+        personalization_storage: marketing
+      });
+    }
+  }
+} catch (e) {}
+          `.trim()}
+        </Script>
         {isProduction ? (
           <>
             <Script id="gtm-script" strategy="afterInteractive">
@@ -93,6 +131,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 "bg-background flex gap-2 backdrop-blur-[0.2rem] items-center border-[0.1rem]  px-4 py-3 rounded-xs",
             }}
           />
+          <CookieConsentBanner />
         </ConfirmDialogProvider>
       </body>
     </html>

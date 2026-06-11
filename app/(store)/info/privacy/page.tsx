@@ -174,15 +174,28 @@ export default function PrivacyPage() {
 
         <Card className="gap-0">
           <CardHeader className="font-bold text-lg">
-            <h2>Google Analytics i inne usługi zewnętrzne</h2>
+            <h2>Google Analytics, Google Ads i inne usługi zewnętrzne</h2>
           </CardHeader>
           <CardContent>
             <p className="mb-3">
               Witryna korzysta z{" "}
               <span className="font-semibold">Google Analytics</span> w celu
-              prowadzenia anonimowych statystyk odwiedzin. Google Analytics
-              wykorzystuje pliki cookies do analizy zachowań użytkowników. Dane
-              przekazywane do Google są przetwarzane zgodnie z polityką Google.
+              prowadzenia anonimowych statystyk odwiedzin oraz z{" "}
+              <span className="font-semibold">Google Ads</span> w celu pomiaru
+              skuteczności reklam i prowadzenia działań remarketingowych. Usługi
+              te wykorzystują pliki cookies. Dane przekazywane do Google są
+              przetwarzane zgodnie z polityką Google.
+            </p>
+            <p className="mb-3">
+              Cookies statystyczne (Google Analytics) oraz marketingowe (Google
+              Ads) są uruchamiane{" "}
+              <span className="font-semibold">
+                wyłącznie po wyrażeniu przez użytkownika zgody
+              </span>
+              . Do momentu udzielenia zgody powyższe usługi nie zapisują plików
+              cookies na urządzeniu użytkownika. Stosujemy mechanizm Google
+              Consent Mode v2, w którym domyślnym stanem jest brak zgody
+              (denied) na cookies analityczne i marketingowe.
             </p>
             <p>
               Administrator może korzystać także z innych usług zewnętrznych
@@ -266,27 +279,39 @@ export default function PrivacyPage() {
               urządzeniu użytkownika.
             </p>
             <p className="mb-3">
-              Przykładowe rodzaje cookies używane na stronie:
+              Rodzaje cookies używane na stronie:
             </p>
             <ul className="list-disc list-inside space-y-1 mb-3">
               <li>
-                Cookies niezbędne do działania sklepu (np. utrzymanie zawartości
-                koszyka).
+                <span className="font-semibold">Niezbędne</span> – konieczne do
+                działania sklepu (np. utrzymanie zawartości koszyka). Nie
+                wymagają zgody i są zawsze aktywne.
               </li>
               <li>
-                Cookies statystyczne (np. Google Analytics) – służą do zbierania
-                anonimowych informacji o korzystaniu ze strony.
+                <span className="font-semibold">Statystyczne</span> (Google
+                Analytics) – służą do zbierania anonimowych informacji o
+                korzystaniu ze strony. Uruchamiane wyłącznie za zgodą
+                użytkownika.
+              </li>
+              <li>
+                <span className="font-semibold">Marketingowe</span> (Google Ads)
+                – służą do pomiaru skuteczności reklam i remarketingu.
+                Uruchamiane wyłącznie za zgodą użytkownika.
               </li>
             </ul>
-            <p>
-              Użytkownik może w każdej chwili zmienić ustawienia przeglądarki,
-              by zablokować lub usunąć cookies. Należy jednak pamiętać, że
-              wyłączenie niektórych plików cookies może ograniczyć
-              funkcjonalność serwisu.
+            <p className="mb-3">
+              Przy pierwszej wizycie wyświetlamy baner umożliwiający wyrażenie
+              lub odrzucenie zgody na poszczególne kategorie cookies. Zgodę
+              można w każdej chwili zmienić lub wycofać, korzystając z odnośnika{" "}
+              <span className="font-semibold">„Ustawienia cookies"</span> w
+              stopce strony. Wycofanie zgody jest równie proste jak jej
+              udzielenie.
             </p>
-            <p className="mt-3">
-              W razie potrzeby administrator może udostępnić szczegółową listę
-              wykorzystywanych cookies oraz okresy ich przechowywania.
+            <p>
+              Użytkownik może również w każdej chwili zmienić ustawienia
+              przeglądarki, by zablokować lub usunąć cookies. Należy jednak
+              pamiętać, że wyłączenie niektórych plików cookies może ograniczyć
+              funkcjonalność serwisu.
             </p>
           </CardContent>
         </Card>

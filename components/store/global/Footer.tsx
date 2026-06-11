@@ -3,6 +3,7 @@ import MobileFooterLinks from "./MobileFooterLinks";
 import FooterDeliveryAndPaymentMethods from "./FooterDeliveryAndPaymentMethods";
 import DesktopHelpLinks from "./DesktopHelpLinks";
 import CompanyInfo from "./CompanyInfo";
+import CookieSettingsTrigger from "./cookie-consent/CookieSettingsTrigger";
 
 export type NavOption = {
   groupLabel: string;
@@ -48,6 +49,7 @@ export default function Footer() {
               helpLinks={helpLinks}
               className="hidden md:flex"
             />
+            <CookieSettingsTrigger className="mt-2 text-base" />
             {/* <MobileFooterLinks navOptions={navOptions} className="md:hidden" /> */}
           </nav>
           <CompanyInfo className="shrink-0 lg:pr-16" />

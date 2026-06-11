@@ -26,6 +26,7 @@ Online shoe store with its own CRM and integration with Allegro.
 - Server Actions when possible
 - No any types
 - avoid unnecessary client components
+- use shadcn components when possible
 
 # Communication Rules
 

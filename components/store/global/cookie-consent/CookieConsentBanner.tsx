@@ -6,6 +6,16 @@ import { Cookie } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import {
   applyConsent,
   type ConsentCategories,
   OPEN_COOKIE_SETTINGS_EVENT,
@@ -57,100 +67,101 @@ export default function CookieConsentBanner() {
       aria-label="Zgoda na pliki cookie"
       className="fixed inset-x-0 bottom-0 z-200 flex justify-center px-3 pb-3 sm:px-4 sm:pb-4"
     >
-      <div className="w-full max-w-3xl rounded-xs border bg-card text-card-foreground shadow-lg">
-        <div className="p-4 sm:p-6">
-          <div className="flex items-start gap-3">
-            <Cookie className="mt-0.5 size-5 shrink-0 text-primary" />
-            <div className="space-y-2">
-              <h2 className="text-base font-semibold sm:text-lg">
-                Szanujemy Twoją prywatność
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Używamy plików cookies niezbędnych do działania sklepu oraz –
-                za Twoją zgodą – plików statystycznych (Google Analytics) i
-                marketingowych (Google Ads). Możesz zaakceptować wszystkie,
-                odrzucić opcjonalne lub samodzielnie wybrać kategorie. Szczegóły
-                znajdziesz w{" "}
-                <Link
-                  href="/info/privacy"
-                  className="underline underline-offset-3 decoration-brand hover:decoration-transparent"
-                >
-                  polityce prywatności
-                </Link>
-                .
-              </p>
-            </div>
-          </div>
-
-          {showSettings ? (
-            <div className="mt-4 space-y-3 border-t pt-4">
-              <ConsentRow
-                title="Niezbędne"
-                description="Konieczne do działania sklepu (np. zawartość koszyka). Zawsze aktywne."
-                checked
-                disabled
-              />
-              <ConsentRow
-                title="Statystyczne"
-                description="Google Analytics – anonimowe statystyki korzystania ze strony."
-                checked={analytics}
-                onChange={setAnalytics}
-              />
-              <ConsentRow
-                title="Marketingowe"
-                description="Google Ads – mierzenie skuteczności reklam i remarketing."
-                checked={marketing}
-                onChange={setMarketing}
-              />
-            </div>
-          ) : null}
-
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
-            {showSettings ? (
-              <Button
-                variant="important"
-                className="sm:order-3"
-                onClick={() => persist({ analytics, marketing })}
-              >
-                Zapisz wybór
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                className="sm:order-1"
-                onClick={() => setShowSettings(true)}
-              >
-                Ustawienia
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              className="sm:order-2"
-              onClick={() => persist({ analytics: false, marketing: false })}
+      <Card className="w-full max-w-3xl gap-4 border shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Cookie className="size-5 shrink-0 text-primary" />
+            Szanujemy Twoją prywatność
+          </CardTitle>
+          <CardDescription>
+            Używamy plików cookies niezbędnych do działania sklepu oraz – za
+            Twoją zgodą – plików statystycznych (Google Analytics) i
+            marketingowych (Google Ads). Możesz zaakceptować wszystkie, odrzucić
+            opcjonalne lub samodzielnie wybrać kategorie. Szczegóły znajdziesz w{" "}
+            <Link
+              href="/info/privacy"
+              className="underline underline-offset-3 decoration-brand hover:decoration-transparent"
             >
-              Odrzuć wszystkie
-            </Button>
+              polityce prywatności
+            </Link>
+            .
+          </CardDescription>
+        </CardHeader>
+
+        {showSettings ? (
+          <CardContent className="space-y-3">
+            <Separator />
+            <ConsentRow
+              id="consent-necessary"
+              title="Niezbędne"
+              description="Konieczne do działania sklepu (np. zawartość koszyka). Zawsze aktywne."
+              checked
+              disabled
+            />
+            <ConsentRow
+              id="consent-analytics"
+              title="Statystyczne"
+              description="Google Analytics – anonimowe statystyki korzystania ze strony."
+              checked={analytics}
+              onChange={setAnalytics}
+            />
+            <ConsentRow
+              id="consent-marketing"
+              title="Marketingowe"
+              description="Google Ads – mierzenie skuteczności reklam i remarketing."
+              checked={marketing}
+              onChange={setMarketing}
+            />
+          </CardContent>
+        ) : null}
+
+        <CardFooter className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
+          {showSettings ? (
             <Button
               variant="important"
-              className="sm:order-4"
-              onClick={() => persist({ analytics: true, marketing: true })}
+              className="w-full sm:order-3 sm:w-auto"
+              onClick={() => persist({ analytics, marketing })}
             >
-              Akceptuj wszystkie
+              Zapisz wybór
             </Button>
-          </div>
-        </div>
-      </div>
+          ) : (
+            <Button
+              variant="outline"
+              className="w-full sm:order-1 sm:w-auto"
+              onClick={() => setShowSettings(true)}
+            >
+              Ustawienia
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            className="w-full sm:order-2 sm:w-auto"
+            onClick={() => persist({ analytics: false, marketing: false })}
+          >
+            Odrzuć wszystkie
+          </Button>
+          <Button
+            variant="important"
+            className="w-full sm:order-4 sm:w-auto"
+            onClick={() => persist({ analytics: true, marketing: true })}
+          >
+            Akceptuj wszystkie
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }
 
 function ConsentRow({
+  id,
   title,
   description,
   checked,
   disabled,
   onChange,
 }: {
+  id: string;
   title: string;
   description: string;
   checked: boolean;
@@ -158,8 +169,9 @@ function ConsentRow({
   onChange?: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-start gap-3">
+    <Label htmlFor={id} className="items-start gap-3 font-normal">
       <Checkbox
+        id={id}
         checked={checked}
         disabled={disabled}
         onCheckedChange={(value) => onChange?.(value === true)}
@@ -171,6 +183,6 @@ function ConsentRow({
           {description}
         </span>
       </span>
-    </label>
+    </Label>
   );
 }

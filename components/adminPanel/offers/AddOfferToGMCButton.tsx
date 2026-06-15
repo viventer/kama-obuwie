@@ -39,12 +39,11 @@ export default function AddOfferToGMCButton({
 
   return (
     <SelectOfferDialog
-      offers={offers}
-      triggerText="Dodaj ofertę"
-      selectedOfferId={selectedOfferId}
+      availableOffers={offers}
       setSelectedOfferId={setSelectedOfferId}
+      selectedOfferId={selectedOfferId}
       onConfirm={addOfferToGMC}
-      confirmText="Dodaj do GMC"
+      actionText="Dodaj do GMC"
     />
   );
 }

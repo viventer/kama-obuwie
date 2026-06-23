@@ -12,6 +12,7 @@ import {
   ProductType,
   RootCategory,
 } from "@/firebase/schemas/productsSchemas";
+import { getCategoryDisplayName } from "@/helpers/categories";
 import { ColumnFiltersState } from "@tanstack/react-table";
 import { Dispatch, SetStateAction, useMemo } from "react";
 import { getRootCategoriesForProductType } from "./RootCategoryFilterSelector";
@@ -42,7 +43,9 @@ export default function CategoryFilterSelector({
         }
         return rootCategoriesForProductType.includes(category.rootCategory);
       })
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .sort((a, b) =>
+        getCategoryDisplayName(a).localeCompare(getCategoryDisplayName(b)),
+      );
   }, [categories, rootCategoryFilter, productType]);
 
   return (
@@ -69,7 +72,7 @@ export default function CategoryFilterSelector({
         <SelectItem value="all">Wszystkie kategorie</SelectItem>
         {availableCategories.map((category) => (
           <SelectItem key={category.id} value={category.id}>
-            {category.name}
+            {getCategoryDisplayName(category)}
           </SelectItem>
         ))}
       </SelectContent>

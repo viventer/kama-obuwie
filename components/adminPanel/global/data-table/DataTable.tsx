@@ -95,14 +95,14 @@ export function DataTable<T extends { id: string }>({
   const globalFilterFn = (
     row: Row<T>,
     columnId: string,
-    filterValue: string
+    filterValue: string,
   ) => {
     return searchColumns.some((colKey) => {
       const cellValue = row.getValue(colKey as string);
       if (cellValue == null) return false;
       return String(cellValue)
         .toLowerCase()
-        .includes(filterValue.toLowerCase());
+        .includes(filterValue.toLowerCase().trim());
     });
   };
 
@@ -127,7 +127,7 @@ export function DataTable<T extends { id: string }>({
                 setRowSelection((prev) => {
                   const next = { ...prev, [row.id]: true };
                   const selectedObjs = data.filter((item) =>
-                    Object.keys(next).includes(item.id)
+                    Object.keys(next).includes(item.id),
                   );
                   onSelectionChange?.(selectedObjs);
                   return next;
@@ -143,7 +143,7 @@ export function DataTable<T extends { id: string }>({
                   const copy = { ...prev };
                   delete copy[row.id];
                   const selectedObjs = data.filter((item) =>
-                    Object.keys(copy).includes(item.id)
+                    Object.keys(copy).includes(item.id),
                   );
                   onSelectionChange?.(selectedObjs);
                   return copy;
@@ -241,7 +241,7 @@ export function DataTable<T extends { id: string }>({
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   ))}

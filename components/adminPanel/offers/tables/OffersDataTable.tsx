@@ -17,7 +17,7 @@ export default function OffersDataTable({
   data: OfferWithId[] | null;
 }) {
   const router = useRouter();
-  const { openDialog, closeDialog } = useDialogWindow();
+  const { openDialog } = useDialogWindow();
   const { showToast } = useToast();
 
   const columnNames = [
@@ -120,7 +120,7 @@ export default function OffersDataTable({
       columnNames={columnNames}
       actions={actions}
       searchPlaceholder="Szukaj ofert"
-      searchColumns={["signature", "title"]}
+      searchColumns={["signature", "title", "SKU", "id"]}
       hasImages={true}
       imageAttribute="thumbnail"
       additionalContent={(row) => {

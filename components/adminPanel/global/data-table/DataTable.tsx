@@ -32,7 +32,7 @@ import {
   getDataTableColumns,
   TableAction,
 } from "@/lib/dataTableColumns";
-import { Fragment, useState } from "react";
+import { Dispatch, Fragment, ReactNode, SetStateAction, useState } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -61,6 +61,11 @@ export function DataTable<T extends { id: string }>({
   onSelectionChange,
   disableSelection = false,
   additionalContent,
+  filterColumns,
+  defaultHiddenColumnIds,
+  renderToolbarFilters,
+  columnFilters: controlledColumnFilters,
+  onColumnFiltersChange,
 }: {
   data: T[];
   columnNames: ColumnName<T>[];
@@ -77,6 +82,13 @@ export function DataTable<T extends { id: string }>({
   onSelectionChange?: (selected: T[]) => void;
   disableSelection?: boolean;
   additionalContent?: (row: T) => React.ReactNode;
+  filterColumns?: ColumnDef<T>[];
+  defaultHiddenColumnIds?: string[];
+  renderToolbarFilters?: (ctx: {
+    setColumnFilters: Dispatch<SetStateAction<ColumnFiltersState>>;
+  }) => ReactNode;
+  columnFilters?: ColumnFiltersState;
+  onColumnFiltersChange?: Dispatch<SetStateAction<ColumnFiltersState>>;
 }) {
   const [pagination, setPagination] = useState<{
     pageIndex: number;
@@ -87,7 +99,10 @@ export function DataTable<T extends { id: string }>({
   });
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [internalColumnFilters, setInternalColumnFilters] =
+    useState<ColumnFiltersState>([]);
+  const columnFilters = controlledColumnFilters ?? internalColumnFilters;
+  const setColumnFilters = onColumnFiltersChange ?? setInternalColumnFilters;
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
@@ -160,9 +175,14 @@ export function DataTable<T extends { id: string }>({
     size: 40,
   };
 
-  const allColumns = disableSelection
+  const dataColumns = disableSelection
     ? basicColumns
     : [selectionColumn, ...basicColumns];
+  const allColumns = [...(filterColumns ?? []), ...dataColumns];
+
+  const hiddenColumnVisibility = Object.fromEntries(
+    (defaultHiddenColumnIds ?? []).map((id) => [id, false]),
+  );
 
   const table = useReactTable({
     data,
@@ -172,7 +192,10 @@ export function DataTable<T extends { id: string }>({
       globalFilter,
       sorting,
       columnFilters,
-      columnVisibility,
+      columnVisibility: {
+        ...columnVisibility,
+        ...hiddenColumnVisibility,
+      },
       expanded,
       pagination,
       rowSelection,
@@ -193,13 +216,14 @@ export function DataTable<T extends { id: string }>({
 
   return (
     <div className="w-full max-h-[70svh]">
-      <div className="flex items-center py-4 gap-4">
+      <div className="flex items-center py-4 gap-4 flex-wrap">
         <Input
           placeholder={searchPlaceholder}
           value={globalFilter}
           onChange={(e) => setGlobalFilter(e.target.value)}
           className="max-w-sm"
         />
+        {renderToolbarFilters?.({ setColumnFilters })}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

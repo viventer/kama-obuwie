@@ -1,21 +1,58 @@
 "use client";
 
-import { ProductWithId } from "@/firebase/schemas/productsSchemas";
+import {
+  CategoryWithId,
+  ProductWithId,
+  RootCategory,
+} from "@/firebase/schemas/productsSchemas";
 import { ColumnName, TableAction } from "@/lib/dataTableColumns";
+import { ColumnDef, ColumnFiltersState } from "@tanstack/react-table";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { DataTable } from "../../global/data-table/DataTable";
 import { useProductTypeContext } from "../ProductsTypeContext";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import CategoryFilterSelector from "./CategoryFilterSelector";
+import RootCategoryFilterSelector from "./RootCategoryFilterSelector";
+
+const filterColumns: ColumnDef<ProductWithId>[] = [
+  {
+    accessorKey: "rootCategory",
+    id: "rootCategory",
+    header: "Kategoria główna",
+    cell: () => null,
+    enableSorting: false,
+    enableColumnFilter: true,
+    enableHiding: false,
+    filterFn: "equalsString",
+  },
+  {
+    accessorKey: "categoryId",
+    id: "categoryId",
+    header: "Kategoria",
+    cell: () => null,
+    enableSorting: false,
+    enableColumnFilter: true,
+    enableHiding: false,
+    filterFn: "equalsString",
+  },
+];
 
 export default function ProductsDataTable({
   data,
+  categories,
 }: {
   data: ProductWithId[] | null;
+  categories: CategoryWithId[];
 }) {
   const { productType } = useProductTypeContext();
   const [filteredData, setFilteredData] = useState<ProductWithId[] | null>(
-    null
+    null,
   );
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [rootCategoryFilter, setRootCategoryFilter] = useState<
+    RootCategory | "all"
+  >("all");
+  const [categoryFilter, setCategoryFilter] = useState<string | "all">("all");
 
   const elementaryColumnNames = [
     { attributeName: "brand", displayName: "Marka" },
@@ -28,7 +65,7 @@ export default function ProductsDataTable({
     { attributeName: "colorVariants", displayName: "Warianty" },
   ];
   const [columnNames, setColumnNames] = useState<ColumnName<ProductWithId>[]>(
-    elementaryColumnNames
+    elementaryColumnNames,
   );
 
   const router = useRouter();
@@ -39,7 +76,7 @@ export default function ProductsDataTable({
     }
 
     const newData = data.filter(
-      (product) => product.productType === productType
+      (product) => product.productType === productType,
     );
     setFilteredData(newData);
 
@@ -53,6 +90,55 @@ export default function ProductsDataTable({
     }
   }, [data, productType]);
 
+  useEffect(() => {
+    setRootCategoryFilter("all");
+    setCategoryFilter("all");
+    setColumnFilters([]);
+  }, [productType]);
+
+  const handleRootCategoryChange = useCallback(() => {
+    setCategoryFilter("all");
+    setColumnFilters((prev) =>
+      prev.filter((filter) => filter.id !== "categoryId"),
+    );
+  }, []);
+
+  const toolbarFilters = useMemo(
+    () =>
+      function renderToolbarFilters({
+        setColumnFilters: setTableColumnFilters,
+      }: {
+        setColumnFilters: typeof setColumnFilters;
+      }) {
+        return (
+          <>
+            <RootCategoryFilterSelector
+              rootCategoryFilter={rootCategoryFilter}
+              setRootCategoryFilter={setRootCategoryFilter}
+              setColumnFilters={setTableColumnFilters}
+              productType={productType}
+              onRootCategoryChange={handleRootCategoryChange}
+            />
+            <CategoryFilterSelector
+              categoryFilter={categoryFilter}
+              setCategoryFilter={setCategoryFilter}
+              setColumnFilters={setTableColumnFilters}
+              categories={categories}
+              rootCategoryFilter={rootCategoryFilter}
+              productType={productType}
+            />
+          </>
+        );
+      },
+    [
+      rootCategoryFilter,
+      categoryFilter,
+      categories,
+      productType,
+      handleRootCategoryChange,
+    ],
+  );
+
   const actions: TableAction[] = [
     {
       name: "Zobacz dane",
@@ -60,7 +146,7 @@ export default function ProductsDataTable({
         window.open(
           `/admin-panel/create-products/product-data/${id}`,
           "_blank",
-          "noopener,noreferrer"
+          "noopener,noreferrer",
         );
       },
     },
@@ -94,6 +180,11 @@ export default function ProductsDataTable({
       hasImages={true}
       imageAttribute="samplePhoto"
       imageFolderPath={`products/sample-photos/${productType}`}
+      filterColumns={filterColumns}
+      defaultHiddenColumnIds={["rootCategory", "categoryId"]}
+      columnFilters={columnFilters}
+      onColumnFiltersChange={setColumnFilters}
+      renderToolbarFilters={toolbarFilters}
     />
   );
 }

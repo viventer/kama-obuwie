@@ -44,6 +44,11 @@ import {
   AllegroProductParametersResponse,
   getProductParametersNames,
 } from "./products";
+import {
+  getAllegroResponsibleProducers,
+  resolveAllegroResponsibleProducerName,
+  type ResponsibleProducer,
+} from "./responsibleProducers";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -69,6 +74,7 @@ type AllegroIndividualOffer = {
   images: string[];
   channel: "AL1" | "AL2";
   SKU: string;
+  availableResponsibleProducers?: ResponsibleProducer[];
 };
 
 export const editAllegroOffer = async (
@@ -171,6 +177,7 @@ export const postAllegroOffer = async (
   };
 
   const parametersNames = await getProductParametersNames(allegroCategoryId);
+  const responsibleProducers = await getAllegroResponsibleProducers();
 
   // Przetwórz oba konta równolegle
   const channelPromises = (["AL1", "AL2"] as const).map(async (channel) => {
@@ -242,6 +249,8 @@ export const postAllegroOffer = async (
             images,
             channel,
             SKU,
+            availableResponsibleProducers:
+              responsibleProducers?.[channel] ?? undefined,
           },
           parametersNames,
         );
@@ -266,6 +275,8 @@ export const postAllegroOffer = async (
           images,
           channel,
           SKU,
+          availableResponsibleProducers:
+            responsibleProducers?.[channel] ?? undefined,
         },
         parametersNames,
       );
@@ -338,11 +349,17 @@ export async function postIndividualAllegroOffer(
     throw new Error(`Brak producenta odpowiedzialnego dla kanału ${channel}.`);
   }
 
+  const responsibleProducerName = await resolveAllegroResponsibleProducerName(
+    product.responsibleProducer[channel],
+    channel,
+    { availableProducers: data.availableResponsibleProducers },
+  );
+
   const productSet = [
     {
       responsibleProducer: {
         type: "NAME" as const,
-        name: product.responsibleProducer[channel],
+        name: responsibleProducerName,
       },
       safetyInformation: {
         type: "TEXT" as const,
@@ -435,6 +452,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
   images: string[];
   productParameters: AllegroOfferParameters;
   sizeTableAllegroId?: string;
+  availableResponsibleProducers?: ResponsibleProducer[];
 }): Promise<string> {
   const {
     offer,
@@ -449,6 +467,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
     images: inputImages,
     productParameters,
     sizeTableAllegroId,
+    availableResponsibleProducers,
   } = params;
 
   if (!offer.SKU) {
@@ -472,6 +491,12 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
   if (!legacy.responsibleProducer) {
     throw new Error("Brak responsibleProducer w legacyProduct.");
   }
+
+  const responsibleProducerName = await resolveAllegroResponsibleProducerName(
+    legacy.responsibleProducer,
+    channel,
+    { availableProducers: availableResponsibleProducers },
+  );
 
   const insoleLengthParamName =
     legacy.rootCategory === "obuwie dziecięce"
@@ -526,7 +551,7 @@ export async function postIndividualAllegroOfferFromLegacy(params: {
     {
       responsibleProducer: {
         type: "NAME" as const,
-        name: legacy.responsibleProducer,
+        name: responsibleProducerName,
       },
       safetyInformation: {
         type: "TEXT" as const,

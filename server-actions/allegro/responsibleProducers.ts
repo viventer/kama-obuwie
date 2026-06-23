@@ -34,6 +34,57 @@ export type ResponsibleProducersResponse = {
   AL2: ResponsibleProducer[];
 };
 
+export const DEFAULT_ALLEGRO_RESPONSIBLE_PRODUCER_NAME = "Wolka24Hurt.eu";
+
+export async function getAllegroResponsibleProducersForChannel(
+  channel: "AL1" | "AL2",
+  options?: { userId?: string; skipAuth?: boolean },
+): Promise<ResponsibleProducer[]> {
+  let accessToken: string;
+  if (options?.userId) {
+    const tokens = await getAllegroAccessTokensForBackgroundJob();
+    accessToken = tokens[channel];
+  } else {
+    accessToken = await getAllegroUserAccessToken(channel);
+  }
+
+  const headers = getSingleAllegroHeaders(accessToken);
+  const url = `${ALLEGRO_API_BASE_URL}/sale/responsible-producers`;
+
+  try {
+    const resp = await axios.get(url, { headers });
+    return (resp.data?.responsibleProducers || []) as ResponsibleProducer[];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+export async function resolveAllegroResponsibleProducerName(
+  producerName: string,
+  channel: "AL1" | "AL2",
+  options?: {
+    availableProducers?: ResponsibleProducer[];
+    userId?: string;
+    skipAuth?: boolean;
+  },
+): Promise<string> {
+  const trimmedName = producerName.trim();
+  const availableProducers =
+    options?.availableProducers ??
+    (await getAllegroResponsibleProducersForChannel(channel, options));
+
+  if (availableProducers.some((producer) => producer.name === trimmedName)) {
+    return trimmedName;
+  }
+
+  console.warn(
+    `Producent odpowiedzialny "${trimmedName}" nie jest dostępny na koncie Allegro (${channel}). Używam domyślnego: ${DEFAULT_ALLEGRO_RESPONSIBLE_PRODUCER_NAME}.`,
+  );
+
+  return DEFAULT_ALLEGRO_RESPONSIBLE_PRODUCER_NAME;
+}
+
 export async function getAllegroResponsibleProducers() {
   const { AL1: AL1AccessToken, AL2: AL2AccessToken } =
     await getAllegroUserAccessTokens();

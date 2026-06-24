@@ -1,9 +1,7 @@
 import axios from "axios";
 import { redis } from "@/upstash/redis";
 import { adminDB } from "@/firebase/firebaseAdmin";
-import { cookies } from "next/headers";
 import { getSingleAllegroHeaders } from "./global";
-import { redirect } from "next/navigation";
 
 // client access token jest używany do autoryzacji zapytań do Allegro API, które nie wymagają dostępu do danych użytkownika
 const ALLEGRO_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_BASE_URL!;
@@ -17,9 +15,12 @@ export async function getAllegroClientAccessToken() {
     tokenUrl,
     new URLSearchParams({ grant_type: "client_credentials" }).toString(),
     {
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": process.env.ALLEGRO_USER_AGENT!,
+      },
       auth: { username: clientId, password: clientSecret },
-    }
+    },
   );
 
   return resp.data.access_token;
@@ -58,7 +59,7 @@ export async function getAllegroUserAccessTokens(): Promise<{
       | undefined;
     const expiryTs = parseInt(
       (redisTokens[`${account}TokenExpiry`] as string) || "0",
-      10
+      10,
     );
 
     // 4. Jeśli token jest nadal ważny (z buforem), użyj go
@@ -97,8 +98,11 @@ export async function getAllegroUserAccessTokens(): Promise<{
       `${tokenEndpoint}?${params.toString()}`,
       null,
       {
-        headers: { Authorization: `Basic ${basic}` },
-      }
+        headers: {
+          Authorization: `Basic ${basic}`,
+          "User-Agent": process.env.ALLEGRO_USER_AGENT!,
+        },
+      },
     );
     const { access_token, refresh_token, expires_in } = resp.data;
 
@@ -127,7 +131,7 @@ export async function getAllegroUserAccessTokens(): Promise<{
 
 // Funkcja pomocnicza dla kompatybilności wstecznej - domyślnie zwraca token AL1
 export async function getAllegroUserAccessToken(
-  account: "AL1" | "AL2" = "AL1"
+  account: "AL1" | "AL2" = "AL1",
 ): Promise<string> {
   const tokens = await getAllegroUserAccessTokens();
   return tokens[account];
@@ -136,7 +140,7 @@ export async function getAllegroUserAccessToken(
 export async function exchangeCodeForTokens(
   code: string,
   redirectUri: string,
-  account: string
+  account: string,
 ) {
   const tokenEndpoint = `${ALLEGRO_BASE_URL}/auth/oauth/token`;
 
@@ -158,6 +162,7 @@ export async function exchangeCodeForTokens(
   const response = await axios.post(url.toString(), null, {
     headers: {
       Authorization: `Basic ${basic}`,
+      "User-Agent": process.env.ALLEGRO_USER_AGENT!,
     },
   });
 
@@ -170,7 +175,7 @@ export async function exchangeCodeForTokens(
 
 export async function checkAccountInfo(
   accessToken: string,
-  correctAccount: string
+  correctAccount: string,
 ): Promise<boolean> {
   const headers = getSingleAllegroHeaders(accessToken);
 
@@ -179,7 +184,7 @@ export async function checkAccountInfo(
       `${process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL}/me`,
       {
         headers,
-      }
+      },
     );
     const login = response.data.login;
     if (correctAccount === "AL1") {
@@ -222,7 +227,7 @@ export async function getAllegroAccessTokensForBackgroundJob(): Promise<{
       | undefined;
     const cachedExpiry = parseInt(
       (redisTokens?.[`${account}TokenExpiry`] as string) || "0",
-      10
+      10,
     );
 
     // 3. Jeśli token jest nadal ważny (z buforem), użyj go
@@ -261,8 +266,11 @@ export async function getAllegroAccessTokensForBackgroundJob(): Promise<{
       `${tokenEndpoint}?${params.toString()}`,
       null,
       {
-        headers: { Authorization: `Basic ${basic}` },
-      }
+        headers: {
+          Authorization: `Basic ${basic}`,
+          "User-Agent": process.env.ALLEGRO_USER_AGENT!,
+        },
+      },
     );
 
     const { access_token, refresh_token, expires_in } = resp.data;

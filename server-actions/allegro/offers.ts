@@ -102,6 +102,8 @@ export const editAllegroOffer = async (
 
   const url = `${ALLEGRO_API_BASE_URL}/sale/product-offers/${id}`;
 
+  console.log(headers);
+
   try {
     await axios.patch(url, data, { headers });
   } catch (error) {

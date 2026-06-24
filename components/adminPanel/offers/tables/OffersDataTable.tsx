@@ -120,14 +120,7 @@ export default function OffersDataTable({
       columnNames={columnNames}
       actions={actions}
       searchPlaceholder="Szukaj ofert"
-      searchColumns={[
-        "signature",
-        "title",
-        "SKU",
-        "id",
-        "productId",
-        "legacyProductId",
-      ]}
+      searchColumns={["signature", "title", "SKU"]}
       hasImages={true}
       imageAttribute="thumbnail"
       additionalContent={(row) => {

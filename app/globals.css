@@ -275,11 +275,20 @@ button {
 }
 
 .tm-dodo2 {
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .tm-dodo2__sticker {
   height: fit-content;
   color: var(--card-foreground) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  grid-template-columns: fit-content(100%) !important;
+}
+
+.tm-dodo2__grade {
+  width: fit-content;
 }
 
 @media (width >= 48rem /* 768px */) {

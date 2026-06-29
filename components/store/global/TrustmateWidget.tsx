@@ -3,7 +3,8 @@
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
-export const TRUSTMATE_COMPACT_WIDGET_ID = "ff7e17fd-609a-431f-bec8-6c57a2976b87";
+export const TRUSTMATE_COMPACT_WIDGET_ID =
+  "ff7e17fd-609a-431f-bec8-6c57a2976b87";
 export const TRUSTMATE_REVIEWS_WIDGET_ID =
   "ccd80311-43a6-4edb-838c-c4c239a05c67";
 
@@ -42,9 +43,5 @@ export default function TrustmateWidget({
     loadTrustmateScript(widgetId);
   }, [widgetId]);
 
-  return (
-    <div className={cn(className)}>
-      <div ref={containerRef} id={widgetId} />
-    </div>
-  );
+  return <div className={cn(className)} ref={containerRef} id={widgetId} />;
 }

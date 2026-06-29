@@ -81,7 +81,7 @@ export default async function Page() {
       <section className="flex flex-col gap-8 border-b-1 pb-16">
         <HomeSlider banners={homeSliderBannersWithCategoryIds} />
         <div className="flex gap-8 flex-col lg:flex-row">
-          <TrustmateWidget className="flex-2" />
+          <TrustmateWidget className="flex-2 bg-card rounded-xs flex items-center " />
           <AdvantagesBox className="bg-transparent px-0 py-0 lg:bg-card lg:px-6 lg:py-4" />
         </div>
       </section>

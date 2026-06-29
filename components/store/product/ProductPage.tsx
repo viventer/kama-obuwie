@@ -27,7 +27,7 @@ import { logEvent } from "firebase/analytics";
 import { ItemType } from "@/firebase/schemas/analyticsSchemas";
 import ProductPageSizeSelector from "./ProductPageSizeSelector";
 import SelectSizeDialogContent from "./SelectSizeDialogContent";
-import ShopReviewsWidget from "../global/ShopReviewsWidget";
+import TrustmateWidget from "../global/TrustmateWidget";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
 import MobileProductPageShopAdvantages from "./MobileProductPageShopAdvantages";
 import ReturnToListingButton from "./ReturnToListingButton";
@@ -393,13 +393,13 @@ export default function ProductPage({
               </Button>
               <ShippingInfo />
               {currentBreakpoint && currentBreakpoint.includes("s") ? (
-                <MobileProductPageShopAdvantages className="mt-8 mb-4" />
+                <>
+                  <TrustmateWidget className="mt-8 mb-4" />
+                  <MobileProductPageShopAdvantages className="mb-4" />
+                </>
               ) : (
                 <>
-                  <ShopReviewsWidget
-                    className="mt-6 mb-6"
-                    isProductPage={true}
-                  />
+                  <TrustmateWidget className="mt-6 mb-6" />
                   <AdvantagesBox className="h-fit flex-0" />
                 </>
               )}

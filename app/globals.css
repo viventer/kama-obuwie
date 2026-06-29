@@ -274,6 +274,14 @@ button {
   margin-bottom: 4px;
 }
 
+.tm-dodo2 {
+}
+
+.tm-dodo2__sticker {
+  height: fit-content;
+  color: var(--card-foreground) !important;
+}
+
 @media (width >= 48rem /* 768px */) {
   .product-sales-description h2 {
     font-size: 1.25rem;

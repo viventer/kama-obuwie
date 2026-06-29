@@ -8,6 +8,7 @@ import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import ShoppingCartItem from "./ShoppingCartItem";
 import { Button } from "@/components/ui/button";
 import AdvantagesBox from "../product/AdvantagesBox";
+import TrustmateWidget from "../global/TrustmateWidget";
 import { useRouter } from "next/navigation";
 import ShippingInfo from "../global/ShippingInfo";
 import { Card, CardContent } from "@/components/ui/card";
@@ -223,7 +224,10 @@ export default function ShoppingCartPage() {
           </Button>
           <ShippingInfo />
         </div>
-        <AdvantagesBox className="h-fit" />
+        <div className="flex flex-col gap-4">
+          <AdvantagesBox className="h-fit" />
+          <TrustmateWidget />
+        </div>
       </div>
     </div>
   );

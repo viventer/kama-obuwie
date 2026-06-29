@@ -6,7 +6,9 @@ import {
   homeSliderBanners,
 } from "@/lib/constants";
 import { orderByProductAvailability } from "@/helpers/availability";
-import TrustmateWidget from "@/components/store/global/TrustmateWidget";
+import TrustmateWidget, {
+  TRUSTMATE_REVIEWS_WIDGET_ID,
+} from "@/components/store/global/TrustmateWidget";
 import AdvantagesBox from "@/components/store/product/AdvantagesBox";
 import HomeSlider from "@/components/store/home/HomeSlider";
 import ProductSeriesSection, {
@@ -90,6 +92,12 @@ export default async function Page() {
           bestsellersCategoriesWithCategoryIds,
         )}
       />
+      <section className="flex flex-col gap-2">
+        <h2 className="text-xl md:text-2xl font-medium pb-2">
+          Co klienci mówią o nas?
+        </h2>
+        <TrustmateWidget widgetId={TRUSTMATE_REVIEWS_WIDGET_ID} />
+      </section>
     </div>
   );
 }

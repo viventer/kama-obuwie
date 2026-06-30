@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -9,22 +9,65 @@ export const TRUSTMATE_COMPACT_WIDGET_ID =
 export const TRUSTMATE_REVIEWS_WIDGET_ID =
   "ccd80311-43a6-4edb-838c-c4c239a05c67";
 
+const widgetStashes = new Map<string, HTMLDivElement>();
+
 function getTrustmateScriptUrl(widgetId: string) {
   return `https://trustmate.pro/widget/api/${widgetId}/script`;
 }
 
-function loadTrustmateScript(widgetId: string) {
-  const scriptUrl = getTrustmateScriptUrl(widgetId);
-  const existing = document.querySelector(`script[src="${scriptUrl}"]`);
+function getWidgetStash(widgetId: string) {
+  let stash = widgetStashes.get(widgetId);
 
-  if (existing) {
-    existing.remove();
+  if (!stash) {
+    stash = document.createElement("div");
+    stash.hidden = true;
+    stash.setAttribute("aria-hidden", "true");
+    document.body.appendChild(stash);
+    widgetStashes.set(widgetId, stash);
+  }
+
+  return stash;
+}
+
+function ensureTrustmateScript(widgetId: string, host: HTMLElement) {
+  if (host.innerHTML.trim()) {
+    return;
+  }
+
+  const scriptUrl = getTrustmateScriptUrl(widgetId);
+
+  if (document.querySelector(`script[src="${scriptUrl}"]`)) {
+    return;
   }
 
   const script = document.createElement("script");
   script.src = scriptUrl;
   script.defer = true;
   document.body.appendChild(script);
+}
+
+function acquireWidgetHost(widgetId: string, mount: HTMLElement) {
+  const stash = getWidgetStash(widgetId);
+  let host = document.getElementById(widgetId);
+
+  if (!host) {
+    host = document.createElement("div");
+    host.id = widgetId;
+  }
+
+  if (host.parentElement !== mount) {
+    mount.appendChild(host);
+  }
+
+  if (!host.innerHTML.trim()) {
+    ensureTrustmateScript(widgetId, host);
+  }
+
+  return () => {
+    if (host.isConnected && host.parentElement !== stash) {
+      stash.appendChild(host);
+    }
+  };
 }
 
 export default function TrustmateWidget({
@@ -36,16 +79,18 @@ export default function TrustmateWidget({
   widgetId?: string;
   alignActionEnd?: boolean;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const mountRef = useRef<HTMLDivElement>(null);
   const showReviewsButton = widgetId === TRUSTMATE_COMPACT_WIDGET_ID;
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    loadTrustmateScript(widgetId);
+  useLayoutEffect(() => {
+    const mount = mountRef.current;
+    if (!mount) return;
+
+    return acquireWidgetHost(widgetId, mount);
   }, [widgetId]);
 
   const openReviews = () => {
-    containerRef.current
+    mountRef.current
       ?.querySelector<HTMLElement>(".tm-dialog-open")
       ?.click();
   };
@@ -59,8 +104,7 @@ export default function TrustmateWidget({
       )}
     >
       <div
-        ref={containerRef}
-        id={widgetId}
+        ref={mountRef}
         className={cn(showReviewsButton && "min-w-0 flex-1")}
       />
       {showReviewsButton ? (

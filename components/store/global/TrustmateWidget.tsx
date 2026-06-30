@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const TRUSTMATE_COMPACT_WIDGET_ID =
@@ -16,9 +17,6 @@ function loadTrustmateScript(widgetId: string) {
   const scriptUrl = getTrustmateScriptUrl(widgetId);
   const existing = document.querySelector(`script[src="${scriptUrl}"]`);
 
-  // Skrypt Trustmate szuka tagu w DOM w momencie wykonania.
-  // Po nawigacji SPA lub opóźnionym renderze trzeba go załadować ponownie,
-  // gdy kontener już istnieje — tylko dla tego samego widgetu.
   if (existing) {
     existing.remove();
   }
@@ -32,16 +30,49 @@ function loadTrustmateScript(widgetId: string) {
 export default function TrustmateWidget({
   className,
   widgetId = TRUSTMATE_COMPACT_WIDGET_ID,
+  alignActionEnd = false,
 }: {
   className?: string;
   widgetId?: string;
+  alignActionEnd?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const showReviewsButton = widgetId === TRUSTMATE_COMPACT_WIDGET_ID;
 
   useEffect(() => {
     if (!containerRef.current) return;
     loadTrustmateScript(widgetId);
   }, [widgetId]);
 
-  return <div className={cn(className)} ref={containerRef} id={widgetId} />;
+  const openReviews = () => {
+    containerRef.current
+      ?.querySelector<HTMLElement>(".tm-dialog-open")
+      ?.click();
+  };
+
+  return (
+    <div
+      className={cn(
+        showReviewsButton &&
+          "flex flex-col gap-3 px-4 py-4 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:px-6 lg:py-6",
+        className,
+      )}
+    >
+      <div
+        ref={containerRef}
+        id={widgetId}
+        className={cn(showReviewsButton && "min-w-0 flex-1")}
+      />
+      {showReviewsButton ? (
+        <Button
+          type="button"
+          variant="outline"
+          onClick={openReviews}
+          className={cn("shrink-0", alignActionEnd && "self-end")}
+        >
+          Zobacz opinie
+        </Button>
+      ) : null}
+    </div>
+  );
 }

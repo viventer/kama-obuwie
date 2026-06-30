@@ -226,7 +226,7 @@ export default function ShoppingCartPage() {
         </div>
         <div className="flex flex-col gap-4">
           <AdvantagesBox className="h-fit" />
-          <TrustmateWidget />
+          <TrustmateWidget className="bg-card rounded-xs" />
         </div>
       </div>
     </div>

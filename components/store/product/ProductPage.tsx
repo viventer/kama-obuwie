@@ -394,12 +394,15 @@ export default function ProductPage({
               <ShippingInfo />
               {currentBreakpoint && currentBreakpoint.includes("s") ? (
                 <>
-                  <TrustmateWidget className="mt-8 mb-4" />
+                  <TrustmateWidget className="mt-8 mb-4 bg-card rounded-xs" />
                   <MobileProductPageShopAdvantages className="mb-4" />
                 </>
               ) : (
                 <>
-                  <TrustmateWidget className="mt-6 mb-6" />
+                  <TrustmateWidget
+                    className="bg-card rounded-xs"
+                    alignActionEnd
+                  />
                   <AdvantagesBox className="h-fit flex-0" />
                 </>
               )}

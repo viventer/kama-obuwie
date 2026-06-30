@@ -2,7 +2,8 @@
 
 import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import { useToast } from "@/hooks/useToast";
-import Loader from "@/components/adminPanel/global/Loader";
+import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
+import ShoppingCartPageSkeleton from "@/components/store/loading/ShoppingCartPageSkeleton";
 import { useEffect, useState, useCallback } from "react";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import ShoppingCartItem from "./ShoppingCartItem";
@@ -23,7 +24,6 @@ import LinkText from "@/components/adminPanel/global/LinkText";
 import { analytics } from "@/firebase/firebase";
 import { logEvent } from "firebase/analytics";
 import { ItemType } from "@/firebase/schemas/analyticsSchemas";
-import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 
 export default function ShoppingCartPage() {
   const {
@@ -103,11 +103,7 @@ export default function ShoppingCartPage() {
   };
 
   if (isLoading || loadingOffers) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-xs">
-        <Loader />
-      </div>
-    );
+    return <ShoppingCartPageSkeleton itemCount={Math.max(cart.length, 2)} />;
   }
 
   if (cart.length === 0 && !isLoading) {

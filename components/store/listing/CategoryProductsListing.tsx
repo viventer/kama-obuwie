@@ -2,7 +2,7 @@
 
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
 import ProductFromList from "../home/ProductFromList";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ListingFilters from "./ListingFilters";
 import {
   getPriceRangesForFiltering,
@@ -16,20 +16,12 @@ export default function CategoryProductsListing({
 }: {
   productsFromCategory: ProductListingData[];
 }) {
-  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
-  const [availablePriceRanges, setAvailablePriceRanges] = useState<
-    PriceRange[]
-  >([]);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [selectedPriceRange, setSelectedPriceRange] = useState<PriceRange[]>(
-    [],
+  const availableSizes = useMemo(
+    () => getAllListingSizes(productsFromCategory),
+    [productsFromCategory],
   );
-  const [filteredProducts, setFilteredProducts] =
-    useState<ProductListingData[]>(productsFromCategory);
 
-  useEffect(() => {
-    setAvailableSizes(getAllListingSizes(productsFromCategory));
-
+  const availablePriceRanges = useMemo(() => {
     const pricesSet = new Set<number>();
     productsFromCategory.forEach((product) => {
       if (product.price !== undefined && product.price !== null) {
@@ -37,14 +29,15 @@ export default function CategoryProductsListing({
       }
     });
 
-    const priceRanges: PriceRange[] | null = getPriceRangesForFiltering(
-      Array.from(pricesSet),
-    );
-
-    if (priceRanges !== null) {
-      setAvailablePriceRanges(priceRanges);
-    }
+    return getPriceRangesForFiltering(Array.from(pricesSet)) ?? [];
   }, [productsFromCategory]);
+
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<PriceRange[]>(
+    [],
+  );
+  const [filteredProducts, setFilteredProducts] =
+    useState<ProductListingData[]>(productsFromCategory);
 
   useEffect(() => {
     let filtered = productsFromCategory;

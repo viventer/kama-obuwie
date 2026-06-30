@@ -274,6 +274,10 @@ button {
   margin-bottom: 4px;
 }
 
+[data-slot="skeleton"] {
+  background-color: var(--card) !important;
+}
+
 .tm-dodo2 {
   width: 100% !important;
   max-width: 100% !important;

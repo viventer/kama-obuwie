@@ -18,7 +18,7 @@ export default function ReviewsDialogContent() {
         <div className="flex items-center gap-2">
           <ThumbsUpIcon className="size-6 text-success md:size-8" />
           <h4 className="text-lg font-medium md:text-xl">
-            99,4% pozytywnych opinii
+            99,5% pozytywnych opinii
           </h4>
         </div>
         <p>Na podstawie 800+ ocen sprzedawcy z ostatnich 12 miesięcy.</p>

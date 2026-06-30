@@ -280,7 +280,7 @@ button {
 }
 
 .tm-dodo2__sticker {
-  height: fit-content;
+  height: fit-content !important;
   color: var(--card-foreground) !important;
   width: 100% !important;
   max-width: 100% !important;

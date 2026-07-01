@@ -1,4 +1,5 @@
 import CustomerOrderDetails from "@/components/store/checkout/CustomerOrderDetails";
+import TrustmateReviewInvitation from "@/components/store/global/TrustmateReviewInvitation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { Order } from "@/firebase/schemas/ordersSchemas";
@@ -27,6 +28,11 @@ export default async function ThankYouPage(props: Props) {
     notFound();
   }
 
+  const userName =
+    [orderData.buyer.firstName, orderData.buyer.lastName]
+      .filter(Boolean)
+      .join(" ") || orderData.buyer.email;
+
   return (
     <div className="space-y-6 my-4">
       <section>
@@ -49,6 +55,11 @@ export default async function ThankYouPage(props: Props) {
         </CardContent>
       </Card>
       <CustomerOrderDetails orderData={orderData} />
+      <TrustmateReviewInvitation
+        userName={userName}
+        userEmail={orderData.buyer.email}
+        orderNumber={orderData.number}
+      />
     </div>
   );
 }

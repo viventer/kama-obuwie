@@ -400,7 +400,7 @@ export default function ProductPage({
               ) : (
                 <>
                   <TrustmateWidget
-                    className="bg-card rounded-xs"
+                    className="mt-8 mb-4 bg-card rounded-xs"
                     alignActionEnd
                   />
                   <AdvantagesBox className="h-fit flex-0" />

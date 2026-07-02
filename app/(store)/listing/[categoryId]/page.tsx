@@ -34,7 +34,7 @@ export default async function Page({ params }: Props) {
 
   const category = await getDocumentFromAdminDB<CategoryWithId>(
     "categories",
-    categoryId
+    categoryId,
   );
 
   if (!category.data) {
@@ -43,6 +43,17 @@ export default async function Page({ params }: Props) {
 
   const products = await getProductsListingData([categoryId]);
   const productsInCategory = products[categoryId];
+  if (!productsInCategory || productsInCategory.length === 0) {
+    return (
+      <div className="w-fit 2xs:w-full mx-auto sm:mx-0 mt-4">
+        <SubpageHeading text={`${getCategoryDisplayName(category.data)}`} />
+        <p className="text-sm text-muted-foreground">
+          W tej kategorii nie ma jeszcze produktów.
+        </p>
+      </div>
+    );
+  }
+
   const filteredProducts = productsInCategory
     ?.filter((product) => product.isActive)
     .sort((a, b) => orderByProductAvailability(a, b));

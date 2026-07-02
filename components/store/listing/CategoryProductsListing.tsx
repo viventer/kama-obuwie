@@ -16,10 +16,13 @@ export default function CategoryProductsListing({
 }: {
   productsFromCategory: ProductListingData[];
 }) {
-  const availableSizes = useMemo(
-    () => getAllListingSizes(productsFromCategory),
-    [productsFromCategory],
-  );
+  const availableSizes = useMemo(() => {
+    if (productsFromCategory?.length === 0) {
+      return [];
+    } else {
+      return getAllListingSizes(productsFromCategory);
+    }
+  }, [productsFromCategory]);
 
   const availablePriceRanges = useMemo(() => {
     const pricesSet = new Set<number>();

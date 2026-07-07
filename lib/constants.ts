@@ -220,13 +220,4 @@ export const homeSliderBanners: HomeSliderBanner[] = [
       categoryName: "klapki",
     },
   },
-  {
-    imageSrc: "/home-slider/4.jpg",
-    heading: "Espadryle męskie",
-    subheading: "Najlepszy wybór na upalne i aktywne dni",
-    destination: {
-      rootCategory: "obuwie męskie",
-      categoryName: "espadryle",
-    },
-  },
 ];

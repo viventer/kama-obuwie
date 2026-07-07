@@ -195,38 +195,38 @@ export type HomeSliderBanner = {
 export const homeSliderBanners: HomeSliderBanner[] = [
   {
     imageSrc: "/home-slider/1.jpg",
-    heading: "Czółenka",
-    subheading: "Eleganckie i wygodne czółenka na każdą okazję",
+    heading: "Sandały damskie",
+    subheading: "Stylowe, wygodne i przewiewne, idealne na lato",
     destination: {
       rootCategory: "obuwie damskie",
-      categoryName: "czółenka",
+      categoryName: "sandały",
     },
   },
   {
     imageSrc: "/home-slider/2.jpg",
-    heading: "Półbuty",
-    subheading: "Klasyczne półbuty - styl i komfort w jednym",
+    heading: "Mokasyny męskie",
+    subheading: "Doskonałe eleganckie buty na letnią porę",
     destination: {
       rootCategory: "obuwie męskie",
-      categoryName: "półbuty",
+      categoryName: "mokasyny",
     },
   },
   {
     imageSrc: "/home-slider/3.jpg",
-    heading: "Kapcie Damskie",
-    subheading: "Wygodne kapcie od polskiego producenta",
+    heading: "Klapki dziecięce",
+    subheading: "Uniwersalne klapki do domu, na basen i do ogródka",
     destination: {
-      rootCategory: "obuwie damskie",
-      categoryName: "kapcie",
+      rootCategory: "obuwie dziecięce",
+      categoryName: "klapki",
     },
   },
   {
     imageSrc: "/home-slider/4.jpg",
-    heading: "Kapcie Męskie",
-    subheading: "Wygodne kapcie od polskiego producenta",
+    heading: "Espadryle męskie",
+    subheading: "Najlepszy wybór na upalne i aktywne dni",
     destination: {
       rootCategory: "obuwie męskie",
-      categoryName: "kapcie",
+      categoryName: "espadryle",
     },
   },
 ];

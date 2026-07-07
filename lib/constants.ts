@@ -208,7 +208,7 @@ export const homeSliderBanners: HomeSliderBanner[] = [
     subheading: "Doskonałe eleganckie buty na letnią porę",
     destination: {
       rootCategory: "obuwie męskie",
-      categoryName: "mokasyny",
+      categoryName: "Mokasyny",
     },
   },
   {

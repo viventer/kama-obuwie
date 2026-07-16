@@ -209,7 +209,7 @@ export async function convertOfferToMerchantCenterProducts(
   const data: Omit<GetFootwearProductPayload, "size"> = {
     offerData: {
       SKU: offer.SKU,
-      title: offer.title,
+      title: offer.merchantCenterData?.title ?? offer.title,
       availability: offer.availability,
       sellingPrices: offer.sellingPrices,
       id: offer.id,

@@ -73,6 +73,11 @@ export const OfferSchema = z.object({
   EAN: z.record(z.string(), z.string().optional()).optional(), // { "31": "1234567890123", "32": "9876543210987" }
   SKU: z.string().optional(),
   isAddedToMerchantCenter: z.boolean().optional(),
+  merchantCenterData: z
+    .object({
+      title: z.string().min(3).max(140),
+    })
+    .optional(),
   connectedOffers: z.array(z.string()).optional(), // array of offer ids that are variants of the same model
 });
 

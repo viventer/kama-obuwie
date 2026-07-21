@@ -121,3 +121,6 @@ env:
 
   - variable: GOOGLE_MERCHANT_DATASOURCE
     secret: GOOGLE_MERCHANT_DATASOURCE
+
+  - variable: ALLEGRO_USER_AGENT
+    secret: ALLEGRO_USER_AGENT

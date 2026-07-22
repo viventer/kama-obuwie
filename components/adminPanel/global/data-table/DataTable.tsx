@@ -253,8 +253,15 @@ export function DataTable<T extends { id: string }>({
         </DropdownMenu>
       </div>
 
-      <div className="rounded-md border max-h-[45svh] overflow-auto scrollbar">
-        <Table>
+      <div
+        className={`rounded-md border max-h-[45svh] overflow-y-auto scrollbar ${
+          hasImages ? "overflow-x-hidden" : "overflow-x-auto"
+        }`}
+      >
+        <Table
+          className={hasImages ? "table-fixed" : undefined}
+          containerClassName={hasImages ? "overflow-x-hidden" : undefined}
+        >
           {!hasImages && (
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (

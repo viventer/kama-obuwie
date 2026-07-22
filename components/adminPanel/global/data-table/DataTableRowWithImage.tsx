@@ -61,7 +61,7 @@ export default function DataTableRowWithImage<T>({
   return (
     <TableRow
       data-state={row.getIsExpanded() ? "expanded" : undefined}
-      className="flex items-center justify-between gap-2 hover:bg-muted/50 transition-colors"
+      className="flex w-full min-w-0 items-center justify-between gap-2 hover:bg-muted/50 transition-colors"
       onClick={(e) => {
         const target = e.target as HTMLElement;
 
@@ -87,18 +87,18 @@ export default function DataTableRowWithImage<T>({
         }
       }}
     >
-      <div className="flex items-center gap-2">
-        <TableCell className="cursor-pointer">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <TableCell className="shrink-0 cursor-pointer">
           {flexRender(checkboxCellColumnDef, checkboxCellContext)}
         </TableCell>
-        <TableCell className="flex items-center gap-4 min-w-[200px]  cursor-pointer">
+        <TableCell className="flex min-w-0 flex-1 items-center gap-4 overflow-hidden whitespace-normal cursor-pointer">
           {imageUrl ? (
             <Image
               src={imageUrl}
               alt="Product Image"
               width={128}
               height={128}
-              className={`size-16 sm:size-32 object-contain bg-primary/15 border-b-[0.2rem] ${
+              className={`size-16 sm:size-32 shrink-0 object-contain bg-primary/15 border-b-[0.2rem] ${
                 isReady
                   ? "border-b-success"
                   : isReadyAttribute
@@ -107,21 +107,21 @@ export default function DataTableRowWithImage<T>({
               } border-l-solid`}
             />
           ) : (
-            <ImageIcon className="min-w-16 h-16 sm:min-w-32 sm:h-32" />
+            <ImageIcon className="size-16 sm:size-32 shrink-0" />
           )}
-          <section className="w-full pr-12" data-selectable-text>
+          <section
+            className="min-w-0 flex-1 overflow-hidden"
+            data-selectable-text
+          >
             {row.getVisibleCells().map((cell) => {
               const parameterName = cell.column.columnDef.header as string;
               if (typeof parameterName !== "string") {
                 return null;
               }
               return (
-                <p
-                  key={cell.id}
-                  className="select-text cursor-text w-sm max-w-full truncate"
-                >
+                <p key={cell.id} className="select-text cursor-text truncate">
                   <b className="max-[400px]:hidden">{parameterName}: </b>
-                  <span className="select-text ">
+                  <span className="select-text">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </span>
                 </p>
@@ -130,11 +130,13 @@ export default function DataTableRowWithImage<T>({
           </section>
         </TableCell>
         {additionalContent && (
-          <TableCell>{additionalContent(row.original)}</TableCell>
+          <TableCell className="shrink-0">
+            {additionalContent(row.original)}
+          </TableCell>
         )}
       </div>
 
-      <TableCell className="block cursor-pointer">
+      <TableCell className="block shrink-0 cursor-pointer">
         {flexRender(actionsCellColumnDef, actionsCellContext)}
       </TableCell>
     </TableRow>

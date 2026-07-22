@@ -20,8 +20,7 @@ const isPriceHistoryChannel = (
   channel: string,
 ): channel is PriceHistoryChannel => channel === "DTC" || channel === "AL1";
 
-const pricesEqual = (a: number, b: number): boolean =>
-  Math.abs(a - b) < 0.005;
+const pricesEqual = (a: number, b: number): boolean => Math.abs(a - b) < 0.005;
 
 export default function OffersDataTable({
   data,
@@ -146,7 +145,8 @@ export default function OffersDataTable({
                 if (!currentPriceStr) return null;
 
                 const currentPrice = Number.parseFloat(currentPriceStr);
-                const initialPriceStr = row.initialSellingPrices?.[salesChannel];
+                const initialPriceStr =
+                  row.initialSellingPrices?.[salesChannel];
                 const initialPrice = initialPriceStr
                   ? Number.parseFloat(initialPriceStr)
                   : null;
@@ -175,16 +175,16 @@ export default function OffersDataTable({
                 return (
                   <section
                     key={salesChannel}
-                    className="flex flex-col gap-0.5 mt-1"
+                    className="flex min-w-0 flex-col gap-0.5 mt-1"
                   >
-                    <div className="flex gap-2 items-center">
+                    <div className="flex min-w-0 flex-wrap gap-2 items-center">
                       <p className="font-medium">{salesChannel}</p>
                       {showReference && (
                         <>
                           <div className="bg-destructive/25 rounded-xs px-2 py-1 w-fit">
                             {formatPLN(referencePrice)}
                           </div>
-                          <MoveRightIcon />
+                          <MoveRightIcon className="shrink-0" />
                         </>
                       )}
                       <div className="bg-primary/25 rounded-xs px-2 py-1 w-fit">
@@ -192,7 +192,7 @@ export default function OffersDataTable({
                       </div>
                     </div>
                     {showInitialNote && (
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground truncate">
                         cena początkowa: {formatPLN(initialPrice)}
                       </p>
                     )}
@@ -200,9 +200,12 @@ export default function OffersDataTable({
                 );
               })}
 
-            <section className="grid grid-cols-6 gap-2 mt-2">
+            <section className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 mt-2 min-w-0">
               {Object.entries(row.availability).map(([size, availability]) => (
-                <div key={size} className="bg-primary/25 rounded-xs px-2 py-1">
+                <div
+                  key={size}
+                  className="bg-primary/25 rounded-xs px-2 py-1 min-w-0 truncate"
+                >
                   <span className="font-medium">{size}:</span>{" "}
                   {availability.value}
                 </div>

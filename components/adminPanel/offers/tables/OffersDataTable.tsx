@@ -5,11 +5,23 @@ import { DataTable } from "../../global/data-table/DataTable";
 import { useRouter } from "next/navigation";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { MoveRightIcon } from "lucide-react";
-import { allegroSalesChannels, salesChannels } from "@/lib/constants";
+import { salesChannels } from "@/lib/constants";
 import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import ChangeAvailabilityDialogContent from "../ChangeAvailabilityDialogContent";
 import { useToast } from "@/hooks/useToast";
 import ChangePricesDialogContent from "../ChangePricesDialogContent";
+import {
+  formatPLN,
+  getLowestPrice30dReference,
+  type PriceHistoryChannel,
+} from "@/helpers/prices";
+
+const isPriceHistoryChannel = (
+  channel: string,
+): channel is PriceHistoryChannel => channel === "DTC" || channel === "AL1";
+
+const pricesEqual = (a: number, b: number): boolean =>
+  Math.abs(a - b) < 0.005;
 
 export default function OffersDataTable({
   data,
@@ -129,27 +141,64 @@ export default function OffersDataTable({
           <>
             {salesChannels
               .filter((channel) => channel !== "POS")
-              .map((salesChannel) => (
-                <section
-                  key={salesChannel}
-                  className="flex gap-2 items-center mt-1"
-                >
-                  <p className="font-medium">{salesChannel}</p>
-                  {row.initialSellingPrices?.[salesChannel] &&
-                    row.initialSellingPrices[salesChannel] !==
-                      row.sellingPrices[salesChannel] && (
-                      <>
-                        <div className="bg-destructive/25 rounded-xs px-2 py-1 w-fit">
-                          {row.initialSellingPrices[salesChannel]} zł
-                        </div>
-                        <MoveRightIcon />
-                      </>
+              .map((salesChannel) => {
+                const currentPriceStr = row.sellingPrices?.[salesChannel];
+                if (!currentPriceStr) return null;
+
+                const currentPrice = Number.parseFloat(currentPriceStr);
+                const initialPriceStr = row.initialSellingPrices?.[salesChannel];
+                const initialPrice = initialPriceStr
+                  ? Number.parseFloat(initialPriceStr)
+                  : null;
+
+                const lowestPrice30d = isPriceHistoryChannel(salesChannel)
+                  ? getLowestPrice30dReference(row, salesChannel)
+                  : null;
+
+                // DTC/AL1: najniższa z 30 dni; AL2 (bez historii): fallback na cenę początkową
+                const referencePrice =
+                  lowestPrice30d ??
+                  (Number.isFinite(initialPrice) ? initialPrice : null);
+
+                const showReference =
+                  referencePrice != null &&
+                  Number.isFinite(currentPrice) &&
+                  !pricesEqual(referencePrice, currentPrice);
+
+                const showInitialNote =
+                  isPriceHistoryChannel(salesChannel) &&
+                  lowestPrice30d != null &&
+                  initialPrice != null &&
+                  Number.isFinite(initialPrice) &&
+                  !pricesEqual(initialPrice, lowestPrice30d);
+
+                return (
+                  <section
+                    key={salesChannel}
+                    className="flex flex-col gap-0.5 mt-1"
+                  >
+                    <div className="flex gap-2 items-center">
+                      <p className="font-medium">{salesChannel}</p>
+                      {showReference && (
+                        <>
+                          <div className="bg-destructive/25 rounded-xs px-2 py-1 w-fit">
+                            {formatPLN(referencePrice)}
+                          </div>
+                          <MoveRightIcon />
+                        </>
+                      )}
+                      <div className="bg-primary/25 rounded-xs px-2 py-1 w-fit">
+                        {formatPLN(currentPrice)}
+                      </div>
+                    </div>
+                    {showInitialNote && (
+                      <p className="text-xs text-muted-foreground">
+                        cena początkowa: {formatPLN(initialPrice)}
+                      </p>
                     )}
-                  <div className="bg-primary/25 rounded-xs px-2 py-1 w-fit">
-                    {row.sellingPrices?.[salesChannel]} zł
-                  </div>
-                </section>
-              ))}
+                  </section>
+                );
+              })}
 
             <section className="grid grid-cols-6 gap-2 mt-2">
               {Object.entries(row.availability).map(([size, availability]) => (

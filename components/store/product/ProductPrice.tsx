@@ -22,10 +22,13 @@ export default function ProductPrice({
       <p
         className={cn(
           variant === "page"
-            ? "text-xl md:text-2xl font-medium"
+            ? "text-xl md:text-2xl font-medium flex items-center gap-2"
             : "text-lg md:text-xl font-medium",
         )}
       >
+        {variant === "page" && (
+          <TagIcon className="text-success size-5 md:size-6" />
+        )}
         {formatPLN(currentPrice)}
       </p>
     );

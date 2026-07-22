@@ -17,6 +17,10 @@ import { isValidUrl } from "@/components/adminPanel/offers/helpers/validation";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import type { LegacyProductWithId } from "@/firebase/schemas/legacyProductsSchemas";
 import { parseSignature } from "@/helpers/signature";
+import {
+  getDiscountInfo,
+  getLowestPrice30dReference,
+} from "@/helpers/prices";
 
 const toUniqueNonEmptyStrings = (values: string[]): string[] =>
   Array.from(
@@ -104,6 +108,20 @@ const resolveThumbnailUrl = async (
   return "";
 };
 
+const getListingDiscountFields = (
+  offer: OfferWithId,
+  currentPrice: string,
+): Pick<ProductListingData, "lowestPrice30d" | "discountPercent"> => {
+  const reference = getLowestPrice30dReference(offer, "DTC");
+  const discount = getDiscountInfo(Number(currentPrice), reference);
+  if (!discount) return {};
+
+  return {
+    lowestPrice30d: discount.oldPrice.toFixed(2),
+    discountPercent: discount.percent,
+  };
+};
+
 const transformProductToProductListingData = async (
   product: ProductWithId,
   offerById: Map<string, OfferWithId>,
@@ -135,13 +153,16 @@ const transformProductToProductListingData = async (
       colorVariantName,
     );
 
+    const price =
+      offer.sellingPrices.DTC ||
+      offer.sellingPrices.AL1 ||
+      offer.sellingPrices.AL2 ||
+      "0";
+
     productListingDataArray.push({
       thumbnailUrl,
-      price:
-        offer.sellingPrices.DTC ||
-        offer.sellingPrices.AL1 ||
-        offer.sellingPrices.AL2 ||
-        "0",
+      price,
+      ...getListingDiscountFields(offer, price),
       id: product.id,
       brand: product?.brand || undefined,
       colorVariantName,
@@ -305,6 +326,7 @@ const transformLegacyOfferToListingData = (
   return {
     thumbnailUrl,
     price,
+    ...getListingDiscountFields(offer, price),
     id: offer.id,
     brand: legacy?.brand || undefined,
     colorVariantName,

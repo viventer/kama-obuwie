@@ -1,22 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
 import Link from "next/link";
+import ProductPrice from "@/components/store/product/ProductPrice";
 
 export default function ProductFromList({
   product,
 }: {
   product: ProductListingData;
 }) {
-  const router = useRouter();
-
   return (
     <Card
       key={product.id}
-      className="md:hover:translate-y-[-1rem] transition-all duration-200 delay-75 cursor-pointer relative p-0 hover:bg-card/50 gap-0 rounded-xs hover:shadow-md bg-card"
+      className="md:hover:translate-y-[-1rem] transition-all duration-200 delay-75 cursor-pointer relative p-0 hover:bg-card/50 gap-0 rounded-xs hover:shadow-md bg-card h-full"
     >
       <Link
         href={`/product/${product.id}?colorVariantName=${encodeURIComponent(
@@ -43,7 +41,15 @@ export default function ProductFromList({
               ? product.brand
               : "\u00A0"}
           </p>
-          <p className="text-lg md:text-xl font-medium">{product.price} zł</p>
+          <ProductPrice
+            variant="listing"
+            currentPrice={Number(product.price)}
+            reference={
+              product.lowestPrice30d != null
+                ? Number(product.lowestPrice30d)
+                : null
+            }
+          />
         </div>
       </Link>
     </Card>

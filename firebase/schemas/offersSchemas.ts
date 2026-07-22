@@ -36,6 +36,16 @@ export const AvailabilitySchema = z.object({
   allegroOffersIds: z.record(z.enum(["AL1", "AL2"]), z.string()).optional(),
 });
 
+export const PriceHistoryEntrySchema = z.object({
+  price: z.string(),
+  date: z.string(), // ISO 8601
+});
+
+export const PriceHistorySchema = z.object({
+  DTC: z.array(PriceHistoryEntrySchema).optional(),
+  AL1: z.array(PriceHistoryEntrySchema).optional(),
+});
+
 export const OfferSchema = z.object({
   id: z.string().optional(),
   title: z.string().min(3).max(72),
@@ -46,6 +56,7 @@ export const OfferSchema = z.object({
   colorVariantName: z.string().optional(),
   sellingPrices: z.record(SalesChannelSchema, z.string()),
   initialSellingPrices: z.record(SalesChannelSchema, z.string()),
+  priceHistory: PriceHistorySchema.optional(),
   statsId: z.string().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
@@ -297,6 +308,8 @@ export const AllegroOfferFromListingSchema = z.object({
 export type ShippingRate = z.infer<typeof shippingRateSchema>;
 export type ShippingRates = z.infer<typeof ShippingRatesSchema>;
 export type Availability = z.infer<typeof AvailabilitySchema>;
+export type PriceHistoryEntry = z.infer<typeof PriceHistoryEntrySchema>;
+export type PriceHistory = z.infer<typeof PriceHistorySchema>;
 export type Offer = z.infer<typeof OfferSchema>;
 export type AllegroOffer = z.infer<typeof AllegroOfferSchema>;
 export type AllegroOfferFromListing = z.infer<

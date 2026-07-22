@@ -151,7 +151,7 @@ export default function OffersDataTable({
                 </section>
               ))}
 
-            <section className="flex gap-2 mt-2">
+            <section className="grid grid-cols-6 gap-2 mt-2">
               {Object.entries(row.availability).map(([size, availability]) => (
                 <div key={size} className="bg-primary/25 rounded-xs px-2 py-1">
                   <span className="font-medium">{size}:</span>{" "}

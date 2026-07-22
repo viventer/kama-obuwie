@@ -14,8 +14,8 @@ import { useEffect, useRef, useState } from "react";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { TagIcon } from "lucide-react";
 import AdvantagesBox from "./AdvantagesBox";
+import ProductPrice from "./ProductPrice";
 import { useDialogWindow } from "@/app/providers/DialogWindowProvider";
 import { useShoppingCart } from "@/app/providers/ShoppingCartProvider";
 import { useToast } from "@/hooks/useToast";
@@ -36,6 +36,7 @@ import {
   connectedOfferData,
   StoreProductDataForStore,
 } from "@/server-actions/store/getStoreProductPageData";
+import { getLowestPrice30dReference } from "@/helpers/prices";
 
 export type VariantToChoose = {
   name: string;
@@ -311,9 +312,9 @@ export default function ProductPage({
           <ProductImagesSlider imagesUrls={imagesUrls[selectedColorVariant]} />
           <ProductInfo className="hidden md:flex" productData={productData} />
         </div>
-        <div className="flex flex-col gap-2 w-full flex-1">
+        <div className="flex flex-col gap-6 w-full flex-1">
           {productData?.brand && productData.brand != "bez marki" && (
-            <h2 className="capitalize font-bold text-xl text-text md:text-2xl md:bg-primary md:px-4 md:py-2 md:rounded-xs md:flex md:flex-col md:mb-4 md:text-white">
+            <h2 className="capitalize font-bold text-xl text-text md:text-2xl md:bg-primary md:px-4 md:py-2 md:rounded-xs md:flex md:flex-col  md:text-white">
               {category.name}
               <span className="font-normal">
                 {" "}
@@ -321,16 +322,15 @@ export default function ProductPage({
               </span>
             </h2>
           )}
-          <div className="border-2 border-success w-fit px-4 py-2 rounded-xs flex gap-2 items-center mb-4">
-            <TagIcon className="text-success size-5 md:size-6" />
-            <p className="text-xl md:text-2xl font-medium">
-              {new Intl.NumberFormat("pl-PL", {
-                style: "currency",
-                currency: "PLN",
-                minimumFractionDigits: 2,
-              }).format(price)}
-            </p>
-          </div>
+          <ProductPrice
+            variant="page"
+            currentPrice={price}
+            reference={
+              currentOffer
+                ? getLowestPrice30dReference(currentOffer, "DTC")
+                : null
+            }
+          />
           <div className="w-full flex flex-col gap-4">
             <SelectProductVariant
               colorVariants={filteredVariants}

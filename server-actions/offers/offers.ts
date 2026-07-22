@@ -17,6 +17,10 @@ import { Order } from "@/firebase/schemas/ordersSchemas";
 import { AllegroSalesChannel, SalesChannel } from "@/lib/constants";
 import { editAllegroOffer } from "../allegro/offers";
 import { changeIndividualSizeMerchantCenterAvailability } from "../merchantCenter/manageProducts";
+import {
+  appendPriceHistoryForChangedChannels,
+  buildInitialPriceHistory,
+} from "@/helpers/prices";
 
 export const createOffer = async function (newOffer: Partial<Offer>) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -36,8 +40,16 @@ export const createOffer = async function (newOffer: Partial<Offer>) {
   }
 
   const offerRef = adminDB.collection("offers").doc();
+  const offerToSave: Partial<Offer> = {
+    ...newOffer,
+    id: offerRef.id,
+  };
 
-  await offerRef.set({ ...newOffer, id: offerRef.id });
+  if (newOffer.sellingPrices && !newOffer.priceHistory) {
+    offerToSave.priceHistory = buildInitialPriceHistory(newOffer.sellingPrices);
+  }
+
+  await offerRef.set(offerToSave);
 
   return offerRef.id;
 };
@@ -55,9 +67,21 @@ export const updateOffer = async function (
     throw new Error("Oferta nie istnieje.");
   }
 
-  await offerRef.update(updateData);
-
   const currentOffer = offerDoc.data() as Offer | undefined;
+  const dataToUpdate: Partial<Offer> = { ...updateData };
+
+  if (currentOffer && updateData.sellingPrices) {
+    const nextPriceHistory = appendPriceHistoryForChangedChannels(
+      currentOffer,
+      updateData.sellingPrices,
+    );
+    if (nextPriceHistory) {
+      dataToUpdate.priceHistory = nextPriceHistory;
+    }
+  }
+
+  await offerRef.update(dataToUpdate);
+
   const productId =
     typeof currentOffer?.productId === "string" && currentOffer.productId.trim()
       ? currentOffer.productId

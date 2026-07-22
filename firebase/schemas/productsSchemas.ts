@@ -256,6 +256,8 @@ export const BrandInfoUpdateDataSchema = BrandInfoSchema.partial().strict();
 export type ProductListingData = {
   thumbnailUrl: string;
   price: string;
+  lowestPrice30d?: string;
+  discountPercent?: number;
   id: string;
   brand: string | undefined;
   colorVariantName: string;

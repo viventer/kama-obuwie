@@ -1,9 +1,175 @@
-import { Offer } from "@/firebase/schemas/offersSchemas";
+import {
+  Offer,
+  PriceHistory,
+  PriceHistoryEntry,
+} from "@/firebase/schemas/offersSchemas";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
 
 export type PriceRange = {
   from: number;
   to: number;
+};
+
+export type PriceHistoryChannel = "DTC" | "AL1";
+
+export type DiscountInfo = {
+  oldPrice: number;
+  newPrice: number;
+  percent: number;
+};
+
+const PRICE_HISTORY_CHANNELS: PriceHistoryChannel[] = ["DTC", "AL1"];
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+const PRICE_HISTORY_RETENTION_MS = 35 * 24 * 60 * 60 * 1000;
+const DISCOUNT_THRESHOLD = 0.95;
+
+export const formatPLN = (value: number): string =>
+  new Intl.NumberFormat("pl-PL", {
+    style: "currency",
+    currency: "PLN",
+    minimumFractionDigits: 2,
+  }).format(value);
+
+export const getDiscountInfo = (
+  current: number,
+  reference: number | null,
+): DiscountInfo | null => {
+  if (
+    reference == null ||
+    !Number.isFinite(current) ||
+    !Number.isFinite(reference) ||
+    reference <= 0 ||
+    current > reference * DISCOUNT_THRESHOLD
+  ) {
+    return null;
+  }
+
+  return {
+    oldPrice: reference,
+    newPrice: current,
+    percent: Math.round(((reference - current) / reference) * 100),
+  };
+};
+
+export const getLowestPrice30dReference = (
+  offer: Pick<Offer, "sellingPrices" | "initialSellingPrices" | "priceHistory">,
+  channel: PriceHistoryChannel = "DTC",
+): number | null => {
+  const history = offer.priceHistory?.[channel] ?? [];
+  const now = Date.now();
+  const windowStart = now - THIRTY_DAYS_MS;
+
+  // Exclude the current (latest) price — reference is the lowest
+  // price from the 30 days BEFORE the current price.
+  const previousEntries = history.slice(0, -1);
+  const inWindow: PriceHistoryEntry[] = [];
+  let latestOlder: PriceHistoryEntry | null = null;
+
+  for (const entry of previousEntries) {
+    const entryTime = Date.parse(entry.date);
+    if (!Number.isFinite(entryTime)) continue;
+
+    if (entryTime >= windowStart) {
+      inWindow.push(entry);
+      continue;
+    }
+
+    if (!latestOlder || entryTime > Date.parse(latestOlder.date)) {
+      latestOlder = entry;
+    }
+  }
+
+  const candidates = latestOlder ? [latestOlder, ...inWindow] : inWindow;
+
+  if (candidates.length > 0) {
+    const prices = candidates
+      .map((entry) => Number.parseFloat(entry.price))
+      .filter((price) => Number.isFinite(price) && price > 0);
+    if (prices.length > 0) {
+      return Math.min(...prices);
+    }
+  }
+
+  const fallback = offer.initialSellingPrices?.[channel];
+  if (!fallback) return null;
+  const fallbackPrice = Number.parseFloat(fallback);
+  return Number.isFinite(fallbackPrice) && fallbackPrice > 0
+    ? fallbackPrice
+    : null;
+};
+
+const prunePriceHistoryEntries = (
+  entries: PriceHistoryEntry[],
+  nowIso: string = new Date().toISOString(),
+): PriceHistoryEntry[] => {
+  const now = Date.parse(nowIso);
+  if (!Number.isFinite(now)) return entries;
+
+  const retentionStart = now - PRICE_HISTORY_RETENTION_MS;
+  const inWindow: PriceHistoryEntry[] = [];
+  let latestOlder: PriceHistoryEntry | null = null;
+
+  for (const entry of entries) {
+    const entryTime = Date.parse(entry.date);
+    if (!Number.isFinite(entryTime)) continue;
+
+    if (entryTime >= retentionStart) {
+      inWindow.push(entry);
+      continue;
+    }
+
+    if (
+      !latestOlder ||
+      entryTime > Date.parse(latestOlder.date)
+    ) {
+      latestOlder = entry;
+    }
+  }
+
+  return latestOlder ? [latestOlder, ...inWindow] : inWindow;
+};
+
+export const buildInitialPriceHistory = (
+  sellingPrices: Offer["sellingPrices"],
+  nowIso: string = new Date().toISOString(),
+): PriceHistory => {
+  const history: PriceHistory = {};
+
+  for (const channel of PRICE_HISTORY_CHANNELS) {
+    const price = sellingPrices?.[channel];
+    if (!price) continue;
+    history[channel] = [{ price, date: nowIso }];
+  }
+
+  return history;
+};
+
+export const appendPriceHistoryForChangedChannels = (
+  currentOffer: Pick<Offer, "sellingPrices" | "priceHistory">,
+  nextSellingPrices: Offer["sellingPrices"] | undefined,
+  nowIso: string = new Date().toISOString(),
+): PriceHistory | undefined => {
+  if (!nextSellingPrices) return undefined;
+
+  let changed = false;
+  const nextHistory: PriceHistory = {
+    ...(currentOffer.priceHistory || {}),
+  };
+
+  for (const channel of PRICE_HISTORY_CHANNELS) {
+    const nextPrice = nextSellingPrices[channel];
+    if (nextPrice == null) continue;
+    if (nextPrice === currentOffer.sellingPrices?.[channel]) continue;
+
+    changed = true;
+    const existing = nextHistory[channel] ?? [];
+    nextHistory[channel] = prunePriceHistoryEntries(
+      [...existing, { price: nextPrice, date: nowIso }],
+      nowIso,
+    );
+  }
+
+  return changed ? nextHistory : undefined;
 };
 
 export const addPercentToPrice = (amount: string, percent: number): string => {

@@ -290,6 +290,7 @@ button {
   max-width: 100% !important;
   grid-template-columns: fit-content(100%) !important;
   padding: 0 !important;
+  box-shadow: none !important;
 }
 
 .tm-dodo2__grade {

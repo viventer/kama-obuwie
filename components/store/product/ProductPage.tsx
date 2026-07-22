@@ -312,7 +312,7 @@ export default function ProductPage({
           <ProductImagesSlider imagesUrls={imagesUrls[selectedColorVariant]} />
           <ProductInfo className="hidden md:flex" productData={productData} />
         </div>
-        <div className="flex flex-col gap-6 w-full flex-1">
+        <div className="flex flex-col gap-2 md:gap-6 w-full flex-1">
           {productData?.brand && productData.brand != "bez marki" && (
             <h2 className="capitalize font-bold text-xl text-text md:text-2xl md:bg-primary md:px-4 md:py-2 md:rounded-xs md:flex md:flex-col  md:text-white">
               {category.name}

@@ -38,7 +38,7 @@ export default function ProductPrice({
 
   const pricesBlock = (
     <div className="flex flex-col gap-0.5">
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex flex-col md:flex-row md:items-center md:gap-2 flex-wrap">
         <p
           className={cn(
             "line-through text-muted-foreground",
@@ -51,19 +51,31 @@ export default function ProductPrice({
         </p>
         <p
           className={cn(
-            "font-medium underline decoration-success",
-            variant === "page" ? "text-xl md:text-2xl" : "text-lg md:text-xl",
+            "text-muted-foreground md:hidden",
+            variant === "page"
+              ? "text-xs md:text-sm"
+              : "text-[10px] xs:text-xs",
           )}
         >
-          {formatPLN(discount.newPrice)}
+          Najniższa cena z 30 dni
         </p>
-        <span className="border-2 border-success rounded-xs px-1.5 bg-card py-0.5 text-sm font-medium whitespace-nowrap">
-          -{discount.percent}%
-        </span>
+        <div className="flex items-center gap-2">
+          <p
+            className={cn(
+              "font-medium underline decoration-success",
+              variant === "page" ? "text-xl md:text-2xl" : "text-lg md:text-xl",
+            )}
+          >
+            {formatPLN(discount.newPrice)}
+          </p>
+          <span className="border-2 border-success rounded-xs px-1.5 bg-card text-sm font-medium whitespace-nowrap">
+            -{discount.percent}%
+          </span>
+        </div>
       </div>
       <p
         className={cn(
-          "text-muted-foreground",
+          "text-muted-foreground hidden md:block",
           variant === "page" ? "text-xs md:text-sm" : "text-[10px] xs:text-xs",
         )}
       >

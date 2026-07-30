@@ -12,9 +12,11 @@ export default function ListingPageSkeleton({
     <div className="w-fit 2xs:w-full mx-auto sm:mx-0 mt-4 min-h-[60vh]">
       <Skeleton className="h-8 w-48 mb-4 rounded-xs" />
 
-      <section className="mb-6 md:mb-8 flex flex-col gap-4">
-        <Skeleton className="h-10 w-full max-w-xl rounded-xs" />
-        <Skeleton className="h-10 w-full max-w-md rounded-xs" />
+      <section className="hidden md:flex mb-6 gap-2 items-center flex-wrap">
+        <Skeleton className="h-10 w-24 rounded-xs" />
+        <Skeleton className="h-10 w-28 rounded-xs" />
+        <Skeleton className="h-10 w-20 rounded-xs" />
+        <Skeleton className="h-10 w-36 rounded-xs" />
       </section>
 
       <section className={PRODUCT_GRID_CLASS}>

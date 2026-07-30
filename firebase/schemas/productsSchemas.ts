@@ -253,6 +253,13 @@ export const AccessoriesGroupUpdateDataSchema =
 
 export const BrandInfoUpdateDataSchema = BrandInfoSchema.partial().strict();
 
+export type ListingFilterAttributes = {
+  /** Base color from colorVariant.color (not shade/additional) */
+  color?: string;
+  externalMaterial?: string[];
+  fastening?: string[];
+};
+
 export type ProductListingData = {
   thumbnailUrl: string;
   price: string;
@@ -263,4 +270,5 @@ export type ProductListingData = {
   colorVariantName: string;
   isActive: boolean;
   availability: Record<string, number>; // key: size, value: availability value
+  filters?: ListingFilterAttributes;
 };

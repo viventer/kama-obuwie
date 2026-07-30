@@ -10,6 +10,28 @@ export type PriceRange = {
   to: number;
 };
 
+export const formatPriceRangeLabel = (range: PriceRange): string => {
+  if (range.from === 0) {
+    return `Do ${range.to} zł`;
+  }
+  if (range.to === Infinity) {
+    return `Od ${range.from} zł`;
+  }
+  return `${range.from} - ${range.to} zł`;
+};
+
+export const priceRangeToKey = (range: PriceRange): string =>
+  `${range.from}-${range.to === Infinity ? "Infinity" : range.to}`;
+
+export const parsePriceRangeKey = (key: string): PriceRange | null => {
+  const [fromStr, toStr] = key.split("-");
+  const from = Number.parseFloat(fromStr);
+  if (Number.isNaN(from)) return null;
+  const to = toStr === "Infinity" ? Infinity : Number.parseFloat(toStr);
+  if (Number.isNaN(to)) return null;
+  return { from, to };
+};
+
 export type PriceHistoryChannel = "DTC" | "AL1";
 
 export type DiscountInfo = {

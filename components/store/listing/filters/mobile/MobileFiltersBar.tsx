@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import MobileAllFiltersSheet from "./MobileAllFiltersSheet";
 import MobileFilterBarNav from "./MobileFilterBarNav";
 import MobileFilterBarPanel, {
@@ -43,13 +44,19 @@ export default function MobileFiltersBar() {
 
   return (
     <>
-      {openPanel && (
-        <div
-          className="fixed inset-0 z-40 bg-black/30 md:hidden"
-          aria-hidden
-          onClick={() => setOpenPanel(null)}
-        />
-      )}
+      <AnimatePresence>
+        {openPanel && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 bg-black/30 md:hidden"
+            aria-hidden
+            onClick={() => setOpenPanel(null)}
+          />
+        )}
+      </AnimatePresence>
 
       {/*
         z-50 < header z-100: when the bar scrolls up into the footer area
@@ -61,12 +68,14 @@ export default function MobileFiltersBar() {
         className="sticky bottom-0 z-50 mt-16 w-screen max-w-[100vw] ml-[calc(50%-50vw)] md:hidden"
       >
         <div className="relative">
-          {openPanel && (
-            <MobileFilterBarPanel
-              panel={openPanel}
-              onClose={() => setOpenPanel(null)}
-            />
-          )}
+          <AnimatePresence initial={false}>
+            {openPanel && (
+              <MobileFilterBarPanel
+                panel={openPanel}
+                onClose={() => setOpenPanel(null)}
+              />
+            )}
+          </AnimatePresence>
 
           <MobileFilterBarNav
             openPanel={openPanel}

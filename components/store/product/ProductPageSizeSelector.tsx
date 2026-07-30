@@ -53,9 +53,9 @@ export default function ProductPageSizeSelector({
                 value={size}
                 disabled={!available}
                 className={`
-                  p-3 w-10 h-10 max-w-10 md:w-12 md:h-12 md:max-w-12 aspect-square
+                  p-3 w-12 h-12 max-w-12 aspect-square
                   data-[state=active]:bg-primary 
-                   rounded-lg
+                   rounded-xs
                   transition-all font-medium
                   relative
                   data-[state=inactive]:text-text
@@ -65,12 +65,7 @@ export default function ProductPageSizeSelector({
                   ${available ? "" : " cursor-not-allowed !opacity-30"}
                 `}
               >
-                <span
-                  className={cn(
-                    "text-sm",
-                    !available && "line-through decoration-2",
-                  )}
-                >
+                <span className={cn(!available && "line-through decoration-2")}>
                   {size}
                 </span>
               </TabsTrigger>

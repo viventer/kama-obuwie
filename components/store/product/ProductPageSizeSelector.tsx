@@ -1,9 +1,7 @@
 "use client";
 
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import FilterChipGroup from "@/components/store/listing/filters/FilterChipGroup";
 import { Availability } from "@/firebase/schemas/offersSchemas";
-import { cn } from "@/lib/utils";
-import { XIcon } from "lucide-react";
 
 interface ProductPageSizeSelectorProps {
   availability: Record<string, Availability>;
@@ -31,70 +29,38 @@ export default function ProductPageSizeSelector({
     );
   };
 
+  const selectedAvailability = selectedSize
+    ? availability[selectedSize]
+    : undefined;
+  const selectedIsAvailable = selectedSize
+    ? isAvailable(selectedSize)
+    : false;
+
   return (
     <article className="mb-2">
-      <Tabs
-        value={selectedSize}
-        onValueChange={(value) => {
-          if (isAvailable(value)) {
-            onSizeChange(value);
-          }
-        }}
-        className="w-full"
-      >
-        <TabsList className="flex gap-2 h-fit bg-transparent flex-wrap justify-start">
-          {availableSizes.map((size) => {
-            const available = isAvailable(size);
-            const isSelected = selectedSize === size;
-
-            return (
-              <TabsTrigger
-                key={size}
-                value={size}
-                disabled={!available}
-                className={`
-                  p-3 w-12 h-12 max-w-12 aspect-square
-                  data-[state=active]:bg-primary 
-                   rounded-xs
-                  transition-all font-medium
-                  relative
-                  data-[state=inactive]:text-text
-                  data-[state=active]:text-white
-                  text-base bg-secondary/20 hover:bg-primary/30 shadow-none
-                  border-none
-                  ${available ? "" : " cursor-not-allowed !opacity-30"}
-                `}
-              >
-                <span className={cn(!available && "line-through decoration-2")}>
-                  {size}
-                </span>
-              </TabsTrigger>
-            );
-          })}
-        </TabsList>
-      </Tabs>
-      {/* Zawsze wyświetlana informacja o wybranym rozmiarze */}
+      <FilterChipGroup
+        type="single"
+        options={availableSizes.map((size) => ({
+          value: size,
+          label: size,
+          disabled: !isAvailable(size),
+        }))}
+        selected={selectedSize}
+        onChange={onSizeChange}
+        itemClassName="size-12 min-w-12 px-0"
+      />
       <div className="text-sm text-muted-foreground mt-1">
         {selectedSize ? (
           <>
             Wybrano rozmiar:{" "}
             <span className="font-medium text-text">{selectedSize}</span>
-            {(() => {
-              const available = isAvailable(selectedSize);
-              const sizeAvailability = availability[selectedSize];
-
-              if (available && sizeAvailability) {
-                return (
-                  <span className="ml-2 text-success font-medium">
-                    (dostępne: {sizeAvailability.value})
-                  </span>
-                );
-              } else {
-                return (
-                  <span className="ml-2 text-destructive">(niedostępne)</span>
-                );
-              }
-            })()}
+            {selectedIsAvailable && selectedAvailability ? (
+              <span className="ml-2 text-success font-medium">
+                (dostępne: {selectedAvailability.value})
+              </span>
+            ) : (
+              <span className="ml-2 text-destructive">(niedostępne)</span>
+            )}
           </>
         ) : (
           <span className="text-muted-foreground/70">Nie wybrano rozmiaru</span>

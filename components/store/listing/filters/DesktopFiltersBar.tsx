@@ -62,10 +62,9 @@ export default function DesktopFiltersBar() {
   const [openPopover, setOpenPopover] = useState<OpenPopover>(null);
   const [allFiltersOpen, setAllFiltersOpen] = useState(false);
 
-  const setPopover =
-    (id: Exclude<OpenPopover, null>) => (open: boolean) => {
-      setOpenPopover(open ? id : null);
-    };
+  const setPopover = (id: Exclude<OpenPopover, null>) => (open: boolean) => {
+    setOpenPopover(open ? id : null);
+  };
 
   const chipFilters = (
     [

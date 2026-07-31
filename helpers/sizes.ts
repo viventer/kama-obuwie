@@ -3,13 +3,27 @@ import {
   RootCategory,
 } from "@/firebase/schemas/productsSchemas";
 
-/** Fixed EU size ranges shown in listing filters, regardless of stock. */
+type SizeRange = { from: number; to: number };
+
+/** Max EU size span for listing filters per root category. */
 export const ROOT_CATEGORY_SIZE_RANGES: Partial<
-  Record<RootCategory, { from: number; to: number }>
+  Record<RootCategory, SizeRange>
 > = {
   "obuwie damskie": { from: 35, to: 43 },
   "obuwie męskie": { from: 36, to: 47 },
   "obuwie dziecięce": { from: 19, to: 41 },
+};
+
+/**
+ * Minimum span always shown (even without stock).
+ * Women's: entire catalog range. Men's/kids: core commercial sizes.
+ */
+export const ROOT_CATEGORY_GUARANTEED_SIZE_RANGES: Partial<
+  Record<RootCategory, SizeRange>
+> = {
+  "obuwie damskie": { from: 35, to: 43 },
+  "obuwie męskie": { from: 40, to: 46 },
+  "obuwie dziecięce": { from: 25, to: 36 },
 };
 
 export const generateNumericSizeRange = (
@@ -23,13 +37,41 @@ export const generateNumericSizeRange = (
   return sizes;
 };
 
-export const getListingSizeRangeForRootCategory = (
+/**
+ * Visible filter sizes: trim leading/trailing out-of-stock sizes,
+ * keep gaps in the middle, and never shrink below the guaranteed span.
+ */
+export const getVisibleListingSizeRange = (
   rootCategory: RootCategory | undefined,
+  availableSizes: Iterable<string>,
 ): string[] | null => {
   if (!rootCategory) return null;
-  const range = ROOT_CATEGORY_SIZE_RANGES[rootCategory];
-  if (!range) return null;
-  return generateNumericSizeRange(range.from, range.to);
+
+  const fullRange = ROOT_CATEGORY_SIZE_RANGES[rootCategory];
+  const guaranteed = ROOT_CATEGORY_GUARANTEED_SIZE_RANGES[rootCategory];
+  if (!fullRange || !guaranteed) return null;
+
+  const availableInRange = Array.from(availableSizes)
+    .map(Number)
+    .filter(
+      (size) =>
+        Number.isFinite(size) &&
+        size >= fullRange.from &&
+        size <= fullRange.to,
+    );
+
+  let displayFrom = guaranteed.from;
+  let displayTo = guaranteed.to;
+
+  if (availableInRange.length > 0) {
+    displayFrom = Math.min(displayFrom, ...availableInRange);
+    displayTo = Math.max(displayTo, ...availableInRange);
+  }
+
+  displayFrom = Math.max(displayFrom, fullRange.from);
+  displayTo = Math.min(displayTo, fullRange.to);
+
+  return generateNumericSizeRange(displayFrom, displayTo);
 };
 
 export const isRangeSize = (size: string) => {

@@ -4,7 +4,7 @@ import {
 } from "@/firebase/schemas/productsSchemas";
 import { getPriceRangesForFiltering } from "@/helpers/prices";
 import {
-  getListingSizeRangeForRootCategory,
+  getVisibleListingSizeRange,
   isRangeSize,
   parseRangeSize,
 } from "@/helpers/sizes";
@@ -37,10 +37,13 @@ const buildListingSizeFacets = (
   rootCategory: RootCategory | undefined,
 ): ListingSizeFacet[] => {
   const availableSizes = new Set(getAvailableListingSizes(products));
-  const fixedRange = getListingSizeRangeForRootCategory(rootCategory);
+  const visibleRange = getVisibleListingSizeRange(
+    rootCategory,
+    availableSizes,
+  );
 
-  if (fixedRange) {
-    return fixedRange.map((value) => ({
+  if (visibleRange) {
+    return visibleRange.map((value) => ({
       value,
       available: availableSizes.has(value),
     }));

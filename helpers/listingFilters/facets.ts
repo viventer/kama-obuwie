@@ -1,7 +1,14 @@
-import { ProductListingData } from "@/firebase/schemas/productsSchemas";
+import {
+  ProductListingData,
+  RootCategory,
+} from "@/firebase/schemas/productsSchemas";
 import { getPriceRangesForFiltering } from "@/helpers/prices";
-import { isRangeSize, parseRangeSize } from "@/helpers/sizes";
-import { ListingFacets } from "./types";
+import {
+  getListingSizeRangeForRootCategory,
+  isRangeSize,
+  parseRangeSize,
+} from "@/helpers/sizes";
+import { ListingFacets, ListingSizeFacet } from "./types";
 
 /** Collect sizes that have at least one product with availability > 0. */
 export const getAvailableListingSizes = (
@@ -25,6 +32,26 @@ export const getAvailableListingSizes = (
   return Array.from(sizesSet).sort((a, b) => Number(a) - Number(b));
 };
 
+const buildListingSizeFacets = (
+  products: ProductListingData[],
+  rootCategory: RootCategory | undefined,
+): ListingSizeFacet[] => {
+  const availableSizes = new Set(getAvailableListingSizes(products));
+  const fixedRange = getListingSizeRangeForRootCategory(rootCategory);
+
+  if (fixedRange) {
+    return fixedRange.map((value) => ({
+      value,
+      available: availableSizes.has(value),
+    }));
+  }
+
+  // Accessories / unknown root: only sizes that currently have stock.
+  return Array.from(availableSizes)
+    .sort((a, b) => Number(a) - Number(b))
+    .map((value) => ({ value, available: true }));
+};
+
 const uniqueSorted = (values: string[]): string[] =>
   Array.from(new Set(values)).sort((a, b) =>
     a.localeCompare(b, "pl", { sensitivity: "base" }),
@@ -32,6 +59,7 @@ const uniqueSorted = (values: string[]): string[] =>
 
 export const getListingFacets = (
   products: ProductListingData[],
+  rootCategory?: RootCategory,
 ): ListingFacets => {
   const colors: string[] = [];
   const externalMaterials: string[] = [];
@@ -55,7 +83,7 @@ export const getListingFacets = (
   });
 
   return {
-    sizes: getAvailableListingSizes(products),
+    sizes: buildListingSizeFacets(products, rootCategory),
     priceRanges: getPriceRangesForFiltering(Array.from(pricesSet)) ?? [],
     colors: uniqueSorted(colors),
     externalMaterials: uniqueSorted(externalMaterials),

@@ -1,6 +1,9 @@
 "use client";
 
-import { ProductListingData } from "@/firebase/schemas/productsSchemas";
+import {
+  ProductListingData,
+  RootCategory,
+} from "@/firebase/schemas/productsSchemas";
 import ProductFromList from "../home/ProductFromList";
 import {
   ListingFiltersProvider,
@@ -40,11 +43,16 @@ function CategoryProductsListingInner() {
 
 export default function CategoryProductsListing({
   productsFromCategory,
+  rootCategory,
 }: {
   productsFromCategory: ProductListingData[];
+  rootCategory: RootCategory;
 }) {
   return (
-    <ListingFiltersProvider products={productsFromCategory}>
+    <ListingFiltersProvider
+      products={productsFromCategory}
+      rootCategory={rootCategory}
+    >
       <CategoryProductsListingInner />
     </ListingFiltersProvider>
   );

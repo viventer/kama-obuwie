@@ -6,6 +6,12 @@ import { cn } from "@/lib/utils";
 const CHIP_CLASS =
   "text-base h-10 bg-foreground/10 border-none data-[state=on]:bg-primary data-[state=on]:text-primary-foreground hover:bg-primary/30 shadow-none px-3 w-fit hover:text-text cursor-pointer rounded-xs";
 
+export type FilterChipOption = {
+  value: string;
+  label: string;
+  disabled?: boolean;
+};
+
 export default function FilterChipGroup({
   options,
   selected,
@@ -13,7 +19,7 @@ export default function FilterChipGroup({
   className,
   itemClassName,
 }: {
-  options: { value: string; label: string }[];
+  options: FilterChipOption[];
   selected: string[];
   onChange: (values: string[]) => void;
   className?: string;
@@ -31,16 +37,27 @@ export default function FilterChipGroup({
         className,
       )}
     >
-      {options.map((option) => (
-        <ToggleGroupItem
-          key={option.value}
-          value={option.value}
-          aria-label={option.label}
-          className={cn(CHIP_CLASS, itemClassName)}
-        >
-          {option.label}
-        </ToggleGroupItem>
-      ))}
+      {options.map((option) => {
+        const disabled = option.disabled === true;
+
+        return (
+          <ToggleGroupItem
+            key={option.value}
+            value={option.value}
+            aria-label={option.label}
+            disabled={disabled}
+            className={cn(
+              CHIP_CLASS,
+              itemClassName,
+              disabled && "cursor-not-allowed !opacity-30 hover:bg-foreground/10",
+            )}
+          >
+            <span className={cn(disabled && "line-through decoration-2")}>
+              {option.label}
+            </span>
+          </ToggleGroupItem>
+        );
+      })}
     </ToggleGroup>
   );
 }

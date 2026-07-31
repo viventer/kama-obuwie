@@ -17,8 +17,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useStickyHeaderOffset } from "@/hooks/useStickyHeaderOffset";
-import FilterChipGroup from "./FilterChipGroup";
-import PriceRangeChipGroup, { toChipOptions } from "./PriceRangeChipGroup";
+import FilterChipGroup, { type FilterChipOption } from "./FilterChipGroup";
+import PriceRangeChipGroup, {
+  toChipOptions,
+  toSizeChipOptions,
+} from "./PriceRangeChipGroup";
 import SortSelector from "./SortSelector";
 import SelectedFiltersContent from "./SelectedFiltersContent";
 import { useListingFilters } from "./ListingFiltersContext";
@@ -34,7 +37,7 @@ type ChipFilterConfig = {
   label: string;
   title: string;
   icon: LucideIcon;
-  options: string[];
+  options: FilterChipOption[];
   selected: string[];
   onChange: (values: string[]) => void;
   itemClassName?: string;
@@ -71,7 +74,7 @@ export default function DesktopFiltersBar() {
         label: "Rozmiar",
         title: "Wybierz rozmiar",
         icon: Ruler,
-        options: facets.sizes,
+        options: toSizeChipOptions(facets.sizes),
         selected: state.sizes,
         onChange: setSizes,
         itemClassName: "size-10 min-w-10 px-0",
@@ -81,7 +84,7 @@ export default function DesktopFiltersBar() {
         label: "Kolor",
         title: "Wybierz kolor",
         icon: Palette,
-        options: facets.colors,
+        options: toChipOptions(facets.colors),
         selected: state.colors,
         onChange: setColors,
       },
@@ -90,7 +93,7 @@ export default function DesktopFiltersBar() {
         label: "Materiał",
         title: "Wybierz materiał zewnętrzny",
         icon: Layers,
-        options: facets.externalMaterials,
+        options: toChipOptions(facets.externalMaterials),
         selected: state.externalMaterials,
         onChange: setExternalMaterials,
       },
@@ -99,7 +102,7 @@ export default function DesktopFiltersBar() {
         label: "Zapięcie",
         title: "Wybierz zapięcie",
         icon: Link2,
-        options: facets.fastenings,
+        options: toChipOptions(facets.fastenings),
         selected: state.fastenings,
         onChange: setFastenings,
       },
@@ -121,7 +124,7 @@ export default function DesktopFiltersBar() {
       title={filter.title}
     >
       <FilterChipGroup
-        options={toChipOptions(filter.options)}
+        options={filter.options}
         selected={filter.selected}
         onChange={filter.onChange}
         itemClassName={filter.itemClassName}

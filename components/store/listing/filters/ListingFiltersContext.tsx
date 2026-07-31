@@ -9,7 +9,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { ProductListingData } from "@/firebase/schemas/productsSchemas";
+import {
+  ProductListingData,
+  RootCategory,
+} from "@/firebase/schemas/productsSchemas";
 import { PriceRange, priceRangeToKey } from "@/helpers/prices";
 import { applyListingFilters, countActiveFilters } from "@/helpers/listingFilters/applyFilters";
 import { getListingFacets } from "@/helpers/listingFilters/facets";
@@ -58,9 +61,11 @@ const writeFiltersToUrl = (state: ListingFiltersState) => {
 
 export function ListingFiltersProvider({
   products,
+  rootCategory,
   children,
 }: {
   products: ProductListingData[];
+  rootCategory?: RootCategory;
   children: ReactNode;
 }) {
   const [state, setState] = useState<ListingFiltersState>(
@@ -79,7 +84,10 @@ export function ListingFiltersProvider({
     writeFiltersToUrl(state);
   }, [state, hydrated]);
 
-  const facets = useMemo(() => getListingFacets(products), [products]);
+  const facets = useMemo(
+    () => getListingFacets(products, rootCategory),
+    [products, rootCategory],
+  );
 
   const filteredProducts = useMemo(
     () => applyListingFilters(products, state),

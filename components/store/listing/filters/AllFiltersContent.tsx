@@ -8,8 +8,11 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import PriceRangeChipGroup, { toChipOptions } from "./PriceRangeChipGroup";
-import FilterChipGroup from "./FilterChipGroup";
+import PriceRangeChipGroup, {
+  toChipOptions,
+  toSizeChipOptions,
+} from "./PriceRangeChipGroup";
+import FilterChipGroup, { type FilterChipOption } from "./FilterChipGroup";
 import SortSelector from "./SortSelector";
 import { useListingFilters } from "./ListingFiltersContext";
 
@@ -23,7 +26,7 @@ function chipSection({
 }: {
   id: string;
   label: string;
-  options: string[];
+  options: FilterChipOption[];
   selected: string[];
   onChange: (values: string[]) => void;
   itemClassName?: string;
@@ -35,7 +38,7 @@ function chipSection({
     label,
     content: (
       <FilterChipGroup
-        options={toChipOptions(options)}
+        options={options}
         selected={selected}
         onChange={onChange}
         itemClassName={itemClassName}
@@ -71,7 +74,7 @@ export default function AllFiltersContent({
     chipSection({
       id: "size",
       label: "Rozmiar",
-      options: facets.sizes,
+      options: toSizeChipOptions(facets.sizes),
       selected: state.sizes,
       onChange: setSizes,
       itemClassName: "size-10 min-w-10 px-0",
@@ -92,21 +95,21 @@ export default function AllFiltersContent({
     chipSection({
       id: "color",
       label: "Kolor",
-      options: facets.colors,
+      options: toChipOptions(facets.colors),
       selected: state.colors,
       onChange: setColors,
     }),
     chipSection({
       id: "material",
       label: "Materiał zewnętrzny",
-      options: facets.externalMaterials,
+      options: toChipOptions(facets.externalMaterials),
       selected: state.externalMaterials,
       onChange: setExternalMaterials,
     }),
     chipSection({
       id: "fastening",
       label: "Zapięcie",
-      options: facets.fastenings,
+      options: toChipOptions(facets.fastenings),
       selected: state.fastenings,
       onChange: setFastenings,
     }),

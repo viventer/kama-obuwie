@@ -3,7 +3,7 @@
 import { cubicBezier, motion } from "framer-motion";
 import { X } from "lucide-react";
 import FilterChipGroup from "../FilterChipGroup";
-import PriceRangeChipGroup, { toChipOptions } from "../PriceRangeChipGroup";
+import PriceRangeChipGroup, { toSizeChipOptions } from "../PriceRangeChipGroup";
 import SortSelector from "../SortSelector";
 import { useListingFilters } from "../ListingFiltersContext";
 
@@ -61,7 +61,7 @@ export default function MobileFilterBarPanel({
 
             {panel === "size" && facets.sizes.length > 0 && (
               <FilterChipGroup
-                options={toChipOptions(facets.sizes)}
+                options={toSizeChipOptions(facets.sizes)}
                 selected={state.sizes}
                 onChange={setSizes}
                 itemClassName="size-10 min-w-10 px-0"

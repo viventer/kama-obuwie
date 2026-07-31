@@ -11,8 +11,13 @@ export type ListingFiltersState = {
   fastenings: string[];
 };
 
+export type ListingSizeFacet = {
+  value: string;
+  available: boolean;
+};
+
 export type ListingFacets = {
-  sizes: string[];
+  sizes: ListingSizeFacet[];
   priceRanges: PriceRange[];
   colors: string[];
   externalMaterials: string[];

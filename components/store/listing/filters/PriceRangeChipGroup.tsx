@@ -5,10 +5,20 @@ import {
   priceRangeToKey,
   type PriceRange,
 } from "@/helpers/prices";
-import FilterChipGroup from "./FilterChipGroup";
+import type { ListingSizeFacet } from "@/helpers/listingFilters/types";
+import FilterChipGroup, { type FilterChipOption } from "./FilterChipGroup";
 
-export const toChipOptions = (values: string[]) =>
+export const toChipOptions = (values: string[]): FilterChipOption[] =>
   values.map((value) => ({ value, label: value }));
+
+export const toSizeChipOptions = (
+  sizes: ListingSizeFacet[],
+): FilterChipOption[] =>
+  sizes.map((size) => ({
+    value: size.value,
+    label: size.value,
+    disabled: !size.available,
+  }));
 
 export default function PriceRangeChipGroup({
   ranges,

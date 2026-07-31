@@ -1,4 +1,36 @@
-import { ProductListingData } from "@/firebase/schemas/productsSchemas";
+import {
+  ProductListingData,
+  RootCategory,
+} from "@/firebase/schemas/productsSchemas";
+
+/** Fixed EU size ranges shown in listing filters, regardless of stock. */
+export const ROOT_CATEGORY_SIZE_RANGES: Partial<
+  Record<RootCategory, { from: number; to: number }>
+> = {
+  "obuwie damskie": { from: 35, to: 43 },
+  "obuwie męskie": { from: 36, to: 47 },
+  "obuwie dziecięce": { from: 19, to: 41 },
+};
+
+export const generateNumericSizeRange = (
+  from: number,
+  to: number,
+): string[] => {
+  const sizes: string[] = [];
+  for (let size = from; size <= to; size++) {
+    sizes.push(String(size));
+  }
+  return sizes;
+};
+
+export const getListingSizeRangeForRootCategory = (
+  rootCategory: RootCategory | undefined,
+): string[] | null => {
+  if (!rootCategory) return null;
+  const range = ROOT_CATEGORY_SIZE_RANGES[rootCategory];
+  if (!range) return null;
+  return generateNumericSizeRange(range.from, range.to);
+};
 
 export const isRangeSize = (size: string) => {
   return size.includes("-");

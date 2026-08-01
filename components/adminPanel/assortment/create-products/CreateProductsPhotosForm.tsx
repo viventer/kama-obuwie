@@ -207,8 +207,16 @@ export default function CreateProductsPhotosForm({
           return;
         }
 
+        const aiImages = variantPhotos
+          .filter((photo) => photo.isAiCoCreated && photo.url)
+          .map((photo) => ({ url: photo.url }))
+          .filter(({ url }) => imageUrls.includes(url));
+
         const updateData = {
           images: imageUrls,
+          ...(aiImages.length > 0
+            ? { aiCoCreatedContent: { images: aiImages } }
+            : {}),
         };
 
         // Pobierz wszystkie rozmiary dla tego wariantu kolorystycznego
@@ -395,6 +403,8 @@ export default function CreateProductsPhotosForm({
               folderPath={`${folderPath}/${getColorVariantName(variant)}`}
               setNewPhotos={setNewPhotos}
               setIsUploading={(isStarting) => handleUploadChange(isStarting)}
+              showAiToggle={creationStage !== "photos"}
+              lockAiTogglesForExistingPhotos={creationStage === "done"}
             />
           </Fragment>
         ))
@@ -404,6 +414,8 @@ export default function CreateProductsPhotosForm({
           setNewPhotos={setNewPhotos}
           folderPath={folderPath}
           setIsUploading={(isStarting) => handleUploadChange(isStarting)}
+          showAiToggle={creationStage !== "photos"}
+          lockAiTogglesForExistingPhotos={creationStage === "done"}
         />
       )}
 

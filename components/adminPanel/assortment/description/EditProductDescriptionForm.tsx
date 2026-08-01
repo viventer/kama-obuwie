@@ -270,6 +270,7 @@ export const EditProductDescriptionForm = ({
     const newEditedPhotos = data.reorderedPhotos.map((photo) => ({
       colorVariantName: photo.colorVariantName || "",
       filePath: photo.filePath || "",
+      ...(photo.isAiCoCreated ? { isAiCoCreated: true as const } : {}),
     }));
     try {
       DescriptionSchema.parse(data.description);

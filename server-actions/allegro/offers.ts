@@ -30,7 +30,7 @@ import {
   getSingleAllegroHeaders,
 } from "./global";
 import axios from "axios";
-import { getImageUrl } from "../files/files";
+import { getImageUrl, getImagesUrls } from "../files/files";
 import { verifyUser } from "../auth/auth";
 import { choosingSizeImageFilePath, safetyInformation } from "@/lib/constants";
 import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
@@ -413,6 +413,18 @@ export async function postIndividualAllegroOffer(
     size: insoleLength?.size || null,
   });
 
+  const colorVariantName = getColorVariantName(colorVariant);
+  const aiPhotos = (product.editedPhotos || []).filter(
+    (p) => p.isAiCoCreated && p.colorVariantName === colorVariantName,
+  );
+  const aiUrls =
+    aiPhotos.length > 0
+      ? (await getImagesUrls(aiPhotos.map((p) => p.filePath))) || []
+      : [];
+  const aiCoCreatedImages = aiUrls
+    .filter((url) => images.includes(url))
+    .map((url) => ({ url }));
+
   const allegroOffer: AllegroOffer = {
     ...allegroOfferData,
     description,
@@ -424,6 +436,9 @@ export async function postIndividualAllegroOffer(
     external: {
       id: externalId,
     },
+    ...(aiCoCreatedImages.length > 0
+      ? { aiCoCreatedContent: { images: aiCoCreatedImages } }
+      : {}),
   };
 
   try {

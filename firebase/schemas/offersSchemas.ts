@@ -170,6 +170,11 @@ export const AllegroOfferSchema = z.object({
     })
     .optional(),
   images: z.array(z.string().url()).optional(),
+  aiCoCreatedContent: z
+    .object({
+      images: z.array(z.object({ url: z.string().url() })),
+    })
+    .optional(),
   afterSalesServices: z.object({
     warranty: z
       .object({

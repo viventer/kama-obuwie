@@ -33,6 +33,9 @@ interface MultipleImageUploaderProps {
   className?: string;
   setIsUploading?: (isUploading: boolean) => void;
   onImageDelete?: (filePath: string) => Promise<void>;
+  aiCoCreatedPaths?: string[];
+  onToggleAiCoCreated?: (filePath: string) => void;
+  lockedAiPaths?: string[];
 }
 
 interface ImageItem {
@@ -47,6 +50,9 @@ export default function MultipleImageUploader({
   folderPath,
   onImageDelete,
   setIsUploading,
+  aiCoCreatedPaths,
+  onToggleAiCoCreated,
+  lockedAiPaths,
 }: MultipleImageUploaderProps) {
   const [images, setImages] = useState<ImageItem[]>([]);
   const { showToast } = useToast();
@@ -184,6 +190,17 @@ export default function MultipleImageUploader({
                       id={img.filePath}
                       url={img.url}
                       onRemove={() => removeImage(img.filePath)}
+                      isAiCoCreated={
+                        onToggleAiCoCreated
+                          ? aiCoCreatedPaths?.includes(img.filePath)
+                          : undefined
+                      }
+                      onToggleAiCoCreated={
+                        onToggleAiCoCreated
+                          ? () => onToggleAiCoCreated(img.filePath)
+                          : undefined
+                      }
+                      aiToggleDisabled={lockedAiPaths?.includes(img.filePath)}
                     />
                   ))}
                 </div>

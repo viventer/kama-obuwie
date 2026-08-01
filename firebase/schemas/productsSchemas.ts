@@ -109,7 +109,9 @@ export const RawPhotoSchema = z.object({
   filePath: z.string(),
 });
 
-export const EditedPhotoSchema = RawPhotoSchema;
+export const EditedPhotoSchema = RawPhotoSchema.extend({
+  isAiCoCreated: z.boolean().optional(),
+});
 
 export const EditedPhotoWithUrlSchema = EditedPhotoSchema.extend({
   url: z.string(),

@@ -70,7 +70,7 @@ export default function ImageUploader({
           const newImageUrl = await uploadImageToStorage(
             bufferString,
             newFilePath,
-            file.type
+            file.type,
           );
 
           setImageUrl(newImageUrl);
@@ -82,7 +82,7 @@ export default function ImageUploader({
         }
       })();
     },
-    [filePath, showToast]
+    [filePath, showToast],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -114,7 +114,7 @@ export default function ImageUploader({
         {...(disabled ? {} : getRootProps())}
         className={cn(
           "border-2 border-dashed rounded text-center w-full aspect-[3/2] flex items-center justify-center relative bg-primary/15",
-          disabled ? "cursor-default" : "cursor-pointer"
+          disabled ? "cursor-default" : "cursor-pointer",
         )}
       >
         {!disabled && <input {...getInputProps()} />}

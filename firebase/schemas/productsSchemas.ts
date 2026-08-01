@@ -264,6 +264,7 @@ export type ListingFilterAttributes = {
 
 export type ProductListingData = {
   thumbnailUrl: string;
+  isThumbnailAiCoCreated?: boolean;
   price: string;
   lowestPrice30d?: string;
   discountPercent?: number;

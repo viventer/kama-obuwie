@@ -45,6 +45,7 @@ export type VariantToChoose = {
 
 export default function ProductPage({
   imagesUrls,
+  aiCoCreatedImageUrls,
   productData,
   category,
   initialColorVariantName,
@@ -54,6 +55,7 @@ export default function ProductPage({
   connectedOffers,
 }: {
   imagesUrls: Record<string, string[]>;
+  aiCoCreatedImageUrls?: Record<string, string[]>;
   productData: StoreProductDataForStore;
   category: CategoryWithId;
   initialColorVariantName?: string;
@@ -309,7 +311,10 @@ export default function ProductPage({
       <ReturnToListingButton category={category} className="mb-2 md:mb-3" />
       <div className="flex flex-col gap-4 md:flex-row sm:gap-8">
         <div className="flex flex-col gap-8 flex-0">
-          <ProductImagesSlider imagesUrls={imagesUrls[selectedColorVariant]} />
+          <ProductImagesSlider
+            imagesUrls={imagesUrls[selectedColorVariant]}
+            aiImagesUrls={aiCoCreatedImageUrls?.[selectedColorVariant]}
+          />
           <ProductInfo className="hidden md:flex" productData={productData} />
         </div>
         <div className="flex flex-col gap-2 md:gap-6 w-full flex-1">

@@ -87,26 +87,44 @@ const collectOfferIdsFromProducts = (products: ProductWithId[]): string[] => {
   return ids;
 };
 
-const resolveThumbnailUrl = async (
+const resolveThumbnail = async (
   offer: OfferWithId,
   product: ProductWithId,
   colorVariantName: string,
-): Promise<string> => {
+): Promise<{ url: string; isAiCoCreated: boolean }> => {
+  const editedPhotosForVariant = (product?.editedPhotos || []).filter(
+    (photo) => photo.colorVariantName === colorVariantName,
+  );
+
   if (offer.thumbnail) {
-    if (isValidUrl(offer.thumbnail)) return offer.thumbnail;
-    return (await getImageUrl(offer.thumbnail)) || "";
-  }
-
-  if (product?.editedPhotos) {
-    const editedPhotoForVariant = product.editedPhotos.find(
-      (photo) => photo.colorVariantName === colorVariantName,
-    );
-    if (editedPhotoForVariant) {
-      return (await getImageUrl(editedPhotoForVariant.filePath)) || "";
+    if (isValidUrl(offer.thumbnail)) {
+      for (const photo of editedPhotosForVariant) {
+        const url = await getImageUrl(photo.filePath);
+        if (url === offer.thumbnail) {
+          return { url: offer.thumbnail, isAiCoCreated: photo.isAiCoCreated === true };
+        }
+      }
+      return { url: offer.thumbnail, isAiCoCreated: false };
     }
+
+    const matchingPhoto = editedPhotosForVariant.find(
+      (photo) => photo.filePath === offer.thumbnail,
+    );
+    return {
+      url: (await getImageUrl(offer.thumbnail)) || "",
+      isAiCoCreated: matchingPhoto?.isAiCoCreated === true,
+    };
   }
 
-  return "";
+  const editedPhotoForVariant = editedPhotosForVariant[0];
+  if (editedPhotoForVariant) {
+    return {
+      url: (await getImageUrl(editedPhotoForVariant.filePath)) || "",
+      isAiCoCreated: editedPhotoForVariant.isAiCoCreated === true,
+    };
+  }
+
+  return { url: "", isAiCoCreated: false };
 };
 
 const getListingDiscountFields = (
@@ -148,11 +166,8 @@ const transformProductToProductListingData = async (
         availability.value !== "0",
     );
 
-    const thumbnailUrl = await resolveThumbnailUrl(
-      offer,
-      product,
-      colorVariantName,
-    );
+    const { url: thumbnailUrl, isAiCoCreated: isThumbnailAiCoCreated } =
+      await resolveThumbnail(offer, product, colorVariantName);
 
     const price =
       offer.sellingPrices.DTC ||
@@ -162,6 +177,7 @@ const transformProductToProductListingData = async (
 
     productListingDataArray.push({
       thumbnailUrl,
+      isThumbnailAiCoCreated,
       price,
       ...getListingDiscountFields(offer, price),
       id: product.id,

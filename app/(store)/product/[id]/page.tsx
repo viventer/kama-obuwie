@@ -51,6 +51,7 @@ export default async function ProductDetails({ params }: Props) {
   return (
     <ProductPage
       imagesUrls={pageData.imagesUrls}
+      aiCoCreatedImageUrls={pageData.aiCoCreatedImageUrls}
       productData={pageData.productData}
       category={pageData.category}
       offersData={pageData.offersData}

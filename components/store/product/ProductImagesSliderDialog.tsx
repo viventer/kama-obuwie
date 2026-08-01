@@ -1,18 +1,19 @@
 "use client";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import ProductImagesSlider from "./ProductImagesSlider";
 import ImagesSliderContent from "./ImagesSliderContent";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
-export default function SelectProductDialog({
+export default function ProductImagesSliderDialog({
   open,
   setOpen,
   imagesUrls,
+  aiImagesUrls,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
   imagesUrls: string[];
+  aiImagesUrls?: string[];
 }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -23,6 +24,7 @@ export default function SelectProductDialog({
       >
         <ImagesSliderContent
           imagesUrls={imagesUrls}
+          aiImagesUrls={aiImagesUrls}
           setOpen={setOpen}
           isFullPage={true}
         />

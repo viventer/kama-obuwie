@@ -11,13 +11,16 @@ import { useEffect, useRef, useState } from "react";
 import { Swiper as SwiperType } from "swiper/types";
 import { EffectFade, FreeMode, Navigation, Thumbs, Zoom } from "swiper/modules";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
+import AiImageBadge from "@/components/store/global/AiImageBadge";
 
 export default function ImagesSliderContent({
   imagesUrls,
+  aiImagesUrls,
   setOpen,
   isFullPage = false,
 }: {
   imagesUrls: string[];
+  aiImagesUrls?: string[];
   setOpen: (open: boolean) => void;
   isFullPage?: boolean;
 }) {
@@ -61,9 +64,12 @@ export default function ImagesSliderContent({
           {imagesUrls.map((image, index) => (
             <SwiperSlide key={index}>
               <div
-                className="flex h-full items-center justify-center"
-                onClick={() => setOpen(true)}
+                className="relative flex h-full items-center justify-center"
+                onClick={() => {
+                  if (!isFullPage) setOpen(true);
+                }}
               >
+                {aiImagesUrls?.includes(image) && <AiImageBadge />}
                 <div className="swiper-zoom-container flex items-center justify-center">
                   <Image
                     src={image}

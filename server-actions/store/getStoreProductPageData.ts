@@ -35,6 +35,7 @@ export type connectedOfferData = {
 
 export type StoreProductPageData = {
   imagesUrls: Record<string, string[]>;
+  aiCoCreatedImageUrls: Record<string, string[]>;
   category: CategoryWithId;
   offersData: Record<string, OfferWithId>;
   sizingTable?: SizingTableWithId;
@@ -70,6 +71,7 @@ export async function getStoreProductPageData(params: {
   );
 
   const imagesUrls: Record<string, string[]> = {};
+  const aiCoCreatedImageUrls: Record<string, string[]> = {};
   const offersData: Record<string, OfferWithId> = {};
 
   let category: CategoryWithId | undefined;
@@ -97,6 +99,9 @@ export async function getStoreProductPageData(params: {
       const urls = await getImagesUrls(filePaths);
       if (urls) {
         imagesUrls[variantName] = urls;
+        aiCoCreatedImageUrls[variantName] = variantImages
+          .map((image, index) => (image.isAiCoCreated ? urls[index] : null))
+          .filter((url): url is string => Boolean(url));
       }
     }
 
@@ -271,6 +276,7 @@ export async function getStoreProductPageData(params: {
 
   const result = {
     imagesUrls,
+    aiCoCreatedImageUrls,
     productData,
     category,
     offersData,

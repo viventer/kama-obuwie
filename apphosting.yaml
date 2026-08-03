@@ -126,4 +126,4 @@ env:
     secret: UPSTASH_REDIS_URL
 
   - variable: APPHOSTING_REFRESH
-    secret: "1"
+    value: 1

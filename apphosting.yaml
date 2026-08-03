@@ -119,8 +119,8 @@ env:
   - variable: ALLEGRO_USER_AGENT
     secret: ALLEGRO_USER_AGENT
 
-  - variable: UPSTASH_REDIS_REST_TOKEN
-    secret: UPSTASH_REDIS_REST_TOKEN
+  - variable: UPSTASH_REDIS_TOKEN
+    secret: UPSTASH_REDIS_TOKEN
 
-  - variable: UPSTASH_REDIS_REST_URL
-    secret: UPSTASH_REDIS_REST_URL
+  - variable: UPSTASH_REDIS_URL
+    secret: UPSTASH_REDIS_URL

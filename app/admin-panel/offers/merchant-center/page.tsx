@@ -1,5 +1,6 @@
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
 import AddOfferToGMCButton from "@/components/adminPanel/offers/AddOfferToGMCButton";
+import ResetLegacyGMCFlagsButton from "@/components/adminPanel/offers/ResetLegacyGMCFlagsButton";
 import OffersInGMCDataTable from "@/components/adminPanel/offers/tables/OffersInGMCDataTable";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
@@ -26,7 +27,10 @@ export default async function GoogleMerchantCenterPage() {
       <h3 className="text-lg font-medium mb-2">
         Oferty dodane do Google Merchant Center
       </h3>
-      <AddOfferToGMCButton offers={offersNotAdded} />
+      <div className="mb-4 flex flex-wrap gap-2">
+        <AddOfferToGMCButton offers={offersNotAdded} />
+        <ResetLegacyGMCFlagsButton />
+      </div>
       <OffersInGMCDataTable data={offersAdded} />
     </section>
   );

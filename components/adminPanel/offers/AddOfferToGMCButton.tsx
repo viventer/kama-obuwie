@@ -57,8 +57,14 @@ export default function AddOfferToGMCButton({
     } catch (err) {
       stopLoading();
       console.error("Error adding offer to GMC:", err);
+      const apiMessage =
+        axios.isAxiosError(err) &&
+        typeof err.response?.data?.message === "string"
+          ? err.response.data.message
+          : null;
       showToast(
-        "Błąd podczas dodawania oferty do GMC (brakujące dane).",
+        apiMessage ||
+          "Błąd podczas dodawania oferty do GMC (brakujące dane).",
         "error",
       );
     }

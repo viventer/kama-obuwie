@@ -12,6 +12,7 @@ import { getRequiredEnv } from "./env";
 import { google } from "googleapis";
 
 const NO_BRAND_SENTINELS = new Set(["bez marki"]);
+const MAX_ADDITIONAL_IMAGE_LINKS = 15;
 
 export function normalizeMerchantCenterBrand(
   brand?: string,
@@ -56,7 +57,7 @@ export function getMerchantCenterProductAvaiability(
 
 export function getMerchantCenterProductGender(
   rootCategory: CategoryWithId["rootCategory"],
-): MerchantCenterFootwearProduct["productAttributes"]["gender"] {
+): MerchantCenterFootwearProduct["productAttributes"]["gender"] | undefined {
   const genderMap: Record<
     string,
     MerchantCenterFootwearProduct["productAttributes"]["gender"]
@@ -116,6 +117,12 @@ export function getMerchantCenterFootwearProduct(
 ): MerchantCenterFootwearProduct {
   const { offerData, productData, category, thumbnailUrl, size } = payload;
 
+  if (!offerData.SKU) {
+    throw new Error(
+      `Brak SKU dla oferty o ID: ${offerData.id}. Nie można utworzyć produktu Merchant Center.`,
+    );
+  }
+
   const price = getOfferPriceForDTC(offerData.sellingPrices);
   if (!price) {
     throw new Error(
@@ -123,8 +130,21 @@ export function getMerchantCenterFootwearProduct(
     );
   }
 
+  const gender = getMerchantCenterProductGender(category.rootCategory);
+  if (!gender) {
+    throw new Error(
+      `Nie można wyznaczyć gender dla rootCategory='${category.rootCategory}' (oferta ID: ${offerData.id}).`,
+    );
+  }
+
   const brand = normalizeMerchantCenterBrand(productData.brand);
-  const mpn = productData.manufacturerCode;
+  const manufacturerCode = productData.manufacturerCode?.trim() || "";
+  const mpn = manufacturerCode || undefined;
+  const hasIdentifiers = Boolean(brand && mpn);
+
+  const additionalImageLinks = productData.imagesUrls
+    .filter((url) => url && url !== thumbnailUrl)
+    .slice(0, MAX_ADDITIONAL_IMAGE_LINKS);
 
   const merchantProduct: MerchantCenterFootwearProduct = {
     offerId: `${offerData.SKU}r${size}`,
@@ -138,7 +158,7 @@ export function getMerchantCenterFootwearProduct(
           : "kama-obuwie-dev--kama-obuwie-ap.europe-west4.hosted.app"
       }/product/${productData.id}?colorVariantName=${offerData.colorVariantName}`,
       imageLink: thumbnailUrl,
-      additionalImageLinks: productData.imagesUrls,
+      ...(additionalImageLinks.length > 0 ? { additionalImageLinks } : {}),
       availability: getMerchantCenterProductAvaiability(
         offerData.availability,
         size,
@@ -150,20 +170,24 @@ export function getMerchantCenterFootwearProduct(
       },
       googleProductCategory: "187",
       productTypes: [category.name],
-      itemGroupId: getMerchantCenterItemGroupId({
-        brand,
-        manufacturerCode: productData.manufacturerCode,
-      }),
       color: productData.colorVariant.color,
-      gender: getMerchantCenterProductGender(category.rootCategory),
+      gender,
       ageGroup: category.rootCategory === "obuwie dziecięce" ? "kids" : "adult",
       size,
       sizeSystem: "EU",
       sizeTypes: ["regular"],
-      mpn,
-      identifierExists: brand ? undefined : false,
+      identifierExists: hasIdentifiers ? undefined : false,
     },
   };
+
+  if (mpn) {
+    merchantProduct.productAttributes.mpn = mpn;
+    merchantProduct.productAttributes.itemGroupId =
+      getMerchantCenterItemGroupId({
+        brand,
+        manufacturerCode: mpn,
+      });
+  }
 
   if (productData.description) {
     merchantProduct.productAttributes.description = productData.description;

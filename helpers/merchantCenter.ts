@@ -12,7 +12,7 @@ import { getRequiredEnv } from "./env";
 import { google } from "googleapis";
 
 const NO_BRAND_SENTINELS = new Set(["bez marki"]);
-const MAX_ADDITIONAL_IMAGE_LINKS = 15;
+const MAX_ADDITIONAL_IMAGE_LINKS = 10;
 
 export function normalizeMerchantCenterBrand(
   brand?: string,
@@ -143,7 +143,7 @@ export function getMerchantCenterFootwearProduct(
   const hasIdentifiers = Boolean(brand && mpn);
 
   const additionalImageLinks = productData.imagesUrls
-    .filter((url) => url && url !== thumbnailUrl)
+    .filter((url) => Boolean(url))
     .slice(0, MAX_ADDITIONAL_IMAGE_LINKS);
 
   const merchantProduct: MerchantCenterFootwearProduct = {

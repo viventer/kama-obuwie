@@ -241,10 +241,15 @@ export async function convertOfferToMerchantCenterProducts(
       );
     }
 
-    const imagesUrls = await getImagesUrls(
-      photos.map((photo) => photo.filePath) || [],
-    );
-    if (!imagesUrls || imagesUrls.length === 0) {
+    // Pierwsze zdjęcie w editedPhotos to miniaturka (imageLink) — pomiń w additionalImageLinks
+    const additionalPhotos = photos.slice(1);
+    const imagesUrls =
+      additionalPhotos.length === 0
+        ? []
+        : await getImagesUrls(
+            additionalPhotos.map((photo) => photo.filePath),
+          );
+    if (imagesUrls === null) {
       return failConvert(
         `Oferta (ID: ${offer.id}) ma zdjęcia, ale nie udało się pobrać adresów URL obrazów.`,
       );

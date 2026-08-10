@@ -50,10 +50,11 @@ export async function POST(
   try {
     await insertNewOfferToMerchantCenter({ ...offer, merchantCenterData });
   } catch (err) {
-    return apiErrorResponse(
-      "Błąd podczas dodawania oferty do Google Merchant Center (brakujące dane).",
-      400,
-    );
+    const message =
+      err instanceof Error
+        ? err.message
+        : "Błąd podczas dodawania oferty do Google Merchant Center (brakujące dane).";
+    return apiErrorResponse(message, 400);
   }
 
   return apiResponse("Oferta została dodana do Google Merchant Center.", 200);

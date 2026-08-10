@@ -5,10 +5,15 @@ import {
   getDocumentsFromAdminDB,
 } from "@/firebase/getters";
 import { LegacyProductWithId } from "@/firebase/schemas/legacyProductsSchemas";
-import { MerchantCenterFootwearProduct } from "@/firebase/schemas/merchantCenterSchemas";
+import {
+  MerchantCenterFootwearProduct,
+  MerchantCenterFootwearProductSchema,
+} from "@/firebase/schemas/merchantCenterSchemas";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import {
   CategoryWithId,
+  ColorVariant,
+  ProductParameters,
   ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
 import {
@@ -32,6 +37,34 @@ import { updateOffer } from "../offers/offers";
 import { getRequiredEnv } from "@/helpers/env";
 import { mapWithConcurrency } from "@/helpers/other";
 import { stripEmoji } from "@/helpers/encoding";
+import { parseSignature } from "@/helpers/signature";
+
+export type ConvertOfferToMerchantCenterResult =
+  | { ok: true; products: MerchantCenterFootwearProduct[] }
+  | { ok: false; reason: string };
+
+type NormalizedMerchantCenterSource = {
+  storeId: string;
+  brand?: string;
+  manufacturerCode: string;
+  parameters: ProductParameters;
+  colorVariant: ColorVariant;
+  colorVariantName: string;
+  imagesUrls: string[];
+  description: string;
+  categoryId: string;
+};
+
+function failConvert(reason: string): ConvertOfferToMerchantCenterResult {
+  console.log(`⚠️ ${reason}`);
+  return { ok: false, reason };
+}
+
+function formatZodIssues(issues: { path: (string | number)[]; message: string }[]) {
+  return issues
+    .map((issue) => `${issue.path.join(".") || "payload"}: ${issue.message}`)
+    .join("; ");
+}
 
 export async function insertGoogleMerchantProduct(
   product: MerchantCenterFootwearProduct,
@@ -68,6 +101,15 @@ export async function updateGoogleMerchantProductAvailability(
 export async function insertProductsToGoogleMerchantCenter(
   products: MerchantCenterFootwearProduct[],
 ) {
+  for (const product of products) {
+    const parsed = MerchantCenterFootwearProductSchema.safeParse(product);
+    if (!parsed.success) {
+      throw new Error(
+        `Nieprawidłowy payload produktu Merchant Center (offerId: ${product.offerId}): ${formatZodIssues(parsed.error.issues)}`,
+      );
+    }
+  }
+
   const responses = await mapWithConcurrency(products, 10, async (product) =>
     insertGoogleMerchantProduct(product),
   );
@@ -76,9 +118,16 @@ export async function insertProductsToGoogleMerchantCenter(
 
 export async function convertOfferToMerchantCenterProducts(
   offer: OfferWithId,
-): Promise<MerchantCenterFootwearProduct[] | null> {
-  let product = null;
-  let legacyProduct = null;
+): Promise<ConvertOfferToMerchantCenterResult> {
+  if (!offer.SKU) {
+    return failConvert(
+      `Oferta (ID: ${offer.id}) nie ma ustawionego SKU.`,
+    );
+  }
+
+  let product: ProductWithId | null = null;
+  let legacyProduct: LegacyProductWithId | null = null;
+
   if (offer.productId) {
     const { data } = await getDocumentFromAdminDB<ProductWithId>(
       "products",
@@ -91,120 +140,178 @@ export async function convertOfferToMerchantCenterProducts(
       offer.legacyProductId,
     );
     legacyProduct = data;
-  }
-
-  if (!product) {
-    console.log(
-      "⚠️ Nie można znaleźć produktu powiązanego z ofertą (ID: " +
-        offer.id +
-        ").",
+  } else {
+    return failConvert(
+      `Oferta (ID: ${offer.id}) nie ma powiązanego productId ani legacyProductId.`,
     );
-    return null;
   }
-  if (!offer.colorVariantName) {
-    console.log(
-      `⚠️ Oferta (ID: ${offer.id}) nie ma ustawionego colorVariantName.`,
+
+  if (!product && !legacyProduct) {
+    return failConvert(
+      `Nie można znaleźć produktu powiązanego z ofertą (ID: ${offer.id}).`,
     );
-    return null;
   }
 
-  let categoryId = null;
+  const parsedSignature = parseSignature(offer.signature || "");
+  let source: NormalizedMerchantCenterSource;
 
-  const colorVariant = product.colorVariants?.find(
-    (variant) => getColorVariantName(variant) === offer.colorVariantName,
-  );
-  if (!colorVariant) {
-    console.log(
-      `⚠️ Oferta (ID: ${offer.id}) ma colorVariantName='${offer.colorVariantName}', ale produkt nie zawiera takiej warianty.`,
-    );
-    return null;
-  }
-
-  const productData = {
-    id: product.id,
-    brand: product.brand,
-    manufacturerCode: product.manufacturerCode,
-    parameters: product.parameters,
-    colorVariant,
-    imagesUrls: [] as string[],
-    description: "",
-  };
   if (legacyProduct) {
-    if (!legacyProduct.imagesUrls) {
-      console.log(
-        `⚠️ Oferta (ID: ${offer.id}) pochodzi z legacyProduct, ale brak pola imagesUrls w produkcie legacy.`,
-      );
-      return null;
-    }
-    productData.imagesUrls = legacyProduct.imagesUrls[offer.colorVariantName];
+    const colorVariantName =
+      offer.colorVariantName ||
+      legacyProduct.colorVariantName ||
+      parsedSignature.colorVariantName;
 
+    if (!colorVariantName) {
+      return failConvert(
+        `Oferta (ID: ${offer.id}) nie ma colorVariantName (ani w ofercie, ani w legacyProduct, ani w signature).`,
+      );
+    }
+
+    const legacyColorVariants =
+      legacyProduct.colorVariants && legacyProduct.colorVariants.length > 0
+        ? legacyProduct.colorVariants
+        : ([{ color: colorVariantName }] as ColorVariant[]);
+
+    const colorVariant =
+      legacyColorVariants.find(
+        (variant) => getColorVariantName(variant) === colorVariantName,
+      ) ?? ({ color: colorVariantName } as ColorVariant);
+
+    const imagesUrls = legacyProduct.imagesUrls?.[colorVariantName];
+    if (!imagesUrls || imagesUrls.length === 0) {
+      return failConvert(
+        `Oferta (ID: ${offer.id}) pochodzi z legacyProduct, ale brak zdjęć dla colorVariantName='${colorVariantName}'.`,
+      );
+    }
+
+    if (!legacyProduct.categoryId) {
+      return failConvert(
+        `Oferta (ID: ${offer.id}) pochodzi z legacyProduct bez categoryId.`,
+      );
+    }
+
+    const manufacturerCode =
+      legacyProduct.manufacturerCode ||
+      parsedSignature.manufacturerCode ||
+      "";
+
+    let description = "";
     const { salesDescription } = parseProductDescription(
       legacyProduct.allegroDescription,
     );
     if (salesDescription) {
-      productData.description = stripEmoji(salesDescription);
+      description = stripEmoji(salesDescription);
     }
 
-    categoryId = legacyProduct.categoryId;
-  } else {
+    source = {
+      storeId: offer.id,
+      brand: legacyProduct.brand || parsedSignature.brand,
+      manufacturerCode,
+      parameters:
+        legacyProduct.parameters ||
+        ({ required: {}, optional: {} } as ProductParameters),
+      colorVariant,
+      colorVariantName,
+      imagesUrls,
+      description,
+      categoryId: legacyProduct.categoryId,
+    };
+  } else if (product) {
+    if (!offer.colorVariantName) {
+      return failConvert(
+        `Oferta (ID: ${offer.id}) nie ma ustawionego colorVariantName.`,
+      );
+    }
+
+    const colorVariant = product.colorVariants?.find(
+      (variant) => getColorVariantName(variant) === offer.colorVariantName,
+    );
+    if (!colorVariant) {
+      return failConvert(
+        `Oferta (ID: ${offer.id}) ma colorVariantName='${offer.colorVariantName}', ale produkt nie zawiera takiej warianty.`,
+      );
+    }
+
     const photos = product.editedPhotos?.filter(
       (photo) => photo.colorVariantName === offer.colorVariantName,
     );
     if (!photos || photos.length === 0) {
-      console.log(
-        `⚠️ Oferta (ID: ${offer.id}) nie ma zdjęć edytowanych dla colorVariantName='${offer.colorVariantName}'.`,
+      return failConvert(
+        `Oferta (ID: ${offer.id}) nie ma zdjęć edytowanych dla colorVariantName='${offer.colorVariantName}'.`,
       );
-      return null;
     }
+
     const imagesUrls = await getImagesUrls(
       photos.map((photo) => photo.filePath) || [],
     );
     if (!imagesUrls || imagesUrls.length === 0) {
-      console.log(
-        `⚠️ Oferta (ID: ${offer.id}) ma zdjęcia, ale nie udało się pobrać adresów URL obrazów.`,
+      return failConvert(
+        `Oferta (ID: ${offer.id}) ma zdjęcia, ale nie udało się pobrać adresów URL obrazów.`,
       );
-      return null;
     }
-    productData.imagesUrls = imagesUrls;
+
+    if (!product.categoryId) {
+      return failConvert(
+        `Oferta (ID: ${offer.id}) nie ma przypisanej kategorii (categoryId).`,
+      );
+    }
+
+    let description = "";
     const { salesDescription } = parseProductDescription(product.description);
     if (salesDescription) {
-      productData.description = stripEmoji(salesDescription);
+      description = stripEmoji(salesDescription);
     }
 
-    categoryId = product.categoryId;
+    source = {
+      storeId: product.id,
+      brand: product.brand || parsedSignature.brand,
+      manufacturerCode:
+        product.manufacturerCode || parsedSignature.manufacturerCode || "",
+      parameters: product.parameters,
+      colorVariant,
+      colorVariantName: offer.colorVariantName,
+      imagesUrls,
+      description,
+      categoryId: product.categoryId,
+    };
+  } else {
+    return failConvert(
+      `Nie można znaleźć produktu powiązanego z ofertą (ID: ${offer.id}).`,
+    );
   }
 
-  if (!categoryId) {
-    console.log(
-      `⚠️ Oferta (ID: ${offer.id}) nie ma przypisanej kategorii (categoryId).`,
-    );
-    return null;
-  }
   if (!offer.thumbnail) {
-    console.log(`⚠️ Oferta (ID: ${offer.id}) nie ma pola thumbnail.`);
-    return null;
+    return failConvert(`Oferta (ID: ${offer.id}) nie ma pola thumbnail.`);
   }
 
   const { data: category } = await getDocumentFromAdminDB<CategoryWithId>(
     "categories",
-    categoryId,
+    source.categoryId,
   );
   if (!category) {
-    console.log(
-      `⚠️ Oferta (ID: ${offer.id}) ma nieprawidłowy categoryId='${categoryId}', brak kategorii w DB.`,
+    return failConvert(
+      `Oferta (ID: ${offer.id}) ma nieprawidłowy categoryId='${source.categoryId}', brak kategorii w DB.`,
     );
-    return null;
   }
 
   const thumbnailUrl = isValidUrl(offer.thumbnail)
     ? offer.thumbnail
     : await getImageUrl(offer.thumbnail);
   if (!thumbnailUrl) {
-    console.log(
-      `⚠️ Oferta (ID: ${offer.id}) ma niepoprawny thumbnail ('${offer.thumbnail}') i nie udało się go pobrać.`,
+    return failConvert(
+      `Oferta (ID: ${offer.id}) ma niepoprawny thumbnail ('${offer.thumbnail}') i nie udało się go pobrać.`,
     );
-    return null;
   }
+
+  const productData: GetFootwearProductPayload["productData"] = {
+    id: source.storeId,
+    brand: source.brand,
+    manufacturerCode: source.manufacturerCode,
+    parameters: source.parameters,
+    colorVariant: source.colorVariant,
+    imagesUrls: source.imagesUrls,
+    description: source.description,
+  };
 
   const data: Omit<GetFootwearProductPayload, "size"> = {
     offerData: {
@@ -213,23 +320,31 @@ export async function convertOfferToMerchantCenterProducts(
       availability: offer.availability,
       sellingPrices: offer.sellingPrices,
       id: offer.id,
-      colorVariantName: offer.colorVariantName,
+      colorVariantName: source.colorVariantName,
     },
     productData,
     category,
     thumbnailUrl,
   };
 
-  const products: MerchantCenterFootwearProduct[] = Object.keys(
-    data.offerData.availability,
-  ).map((size) =>
-    getMerchantCenterFootwearProduct({
-      ...data,
-      size,
-    }),
-  );
+  try {
+    const products: MerchantCenterFootwearProduct[] = Object.keys(
+      data.offerData.availability,
+    ).map((size) =>
+      getMerchantCenterFootwearProduct({
+        ...data,
+        size,
+      }),
+    );
 
-  return products;
+    return { ok: true, products };
+  } catch (err) {
+    return failConvert(
+      err instanceof Error
+        ? err.message
+        : `Nie udało się zbudować produktów Merchant Center dla oferty (ID: ${offer.id}).`,
+    );
+  }
 }
 
 export type SyncOffersWithGoogleMerchantCenterBatch = {
@@ -251,36 +366,58 @@ export async function syncOffersWithGoogleMerchantCenter(
   );
 
   if (!offers || offers.length === 0) {
-    return { inserted: 0, updatedOffers: 0 };
+    return { inserted: 0, updatedOffers: 0, scannedOffers: 0 };
   }
 
-  const productsToInsert = await Promise.all(
+  const converted = await Promise.all(
     offers.map(async (offer) => {
       if (offer?.isAddedToMerchantCenter) {
-        return;
+        return null;
       }
-      const products = await convertOfferToMerchantCenterProducts(offer);
-      if (products && products.length > 0) return products;
+
+      const result = await convertOfferToMerchantCenterProducts(offer);
+      if (!result.ok) {
+        console.log(
+          `Pominięto ofertę (ID: ${offer.id}) podczas sync GMC: ${result.reason}`,
+        );
+        return null;
+      }
+
+      if (result.products.length === 0) {
+        return null;
+      }
+
+      return { offerId: offer.id, products: result.products };
     }),
   );
 
-  if (!productsToInsert || productsToInsert.length === 0) {
-    return { inserted: 0, updatedOffers: 0 };
+  const successful = converted.filter(
+    (
+      item,
+    ): item is {
+      offerId: string;
+      products: MerchantCenterFootwearProduct[];
+    } => item !== null,
+  );
+
+  if (successful.length === 0) {
+    return { inserted: 0, updatedOffers: 0, scannedOffers: offers.length };
   }
 
-  const products = productsToInsert
-    .flat()
-    .filter((product) => product !== undefined);
-
+  const products = successful.flatMap((item) => item.products);
   await insertProductsToGoogleMerchantCenter(products);
 
   await Promise.all(
-    offers.map(async (offer) => {
-      await updateOffer(offer.id, { isAddedToMerchantCenter: true });
+    successful.map(async ({ offerId }) => {
+      await updateOffer(offerId, { isAddedToMerchantCenter: true });
     }),
   );
 
-  return { inserted: products.length, updatedOffers: offers.length };
+  return {
+    inserted: products.length,
+    updatedOffers: successful.length,
+    scannedOffers: offers.length,
+  };
 }
 
 export async function syncAllOffersWithGoogleMerchantCenter(batchSize = 50) {
@@ -292,7 +429,7 @@ export async function syncAllOffersWithGoogleMerchantCenter(batchSize = 50) {
 
   const maxIterations = 1000;
   for (let i = 0; i < maxIterations; i++) {
-    const { inserted, updatedOffers } =
+    const { inserted, updatedOffers, scannedOffers } =
       await syncOffersWithGoogleMerchantCenter({
         lastOfferIndex,
         batchSize,
@@ -301,9 +438,9 @@ export async function syncAllOffersWithGoogleMerchantCenter(batchSize = 50) {
     totalInserted += inserted;
     totalUpdatedOffers += updatedOffers;
 
-    if (updatedOffers <= 0) break;
-    lastOfferIndex += updatedOffers;
-    if (updatedOffers < batchSize) break;
+    if (scannedOffers <= 0) break;
+    lastOfferIndex += scannedOffers;
+    if (scannedOffers < batchSize) break;
   }
 
   console.log(
@@ -424,15 +561,21 @@ export async function changeIndividualSizeMerchantCenterAvailability(
 export async function insertNewOfferToMerchantCenter(offer: OfferWithId) {
   await verifyUser(["ADMIN"]);
 
-  const products = await convertOfferToMerchantCenterProducts(offer);
-  if (!products || products.length === 0)
+  const result = await convertOfferToMerchantCenterProducts(offer);
+  if (!result.ok) {
+    throw new Error(result.reason);
+  }
+  if (result.products.length === 0) {
     throw new Error(
-      "Nie można przekonwertować oferty na produkty Google Merchant Center.",
+      `Oferta (ID: ${offer.id}) nie wygenerowała żadnych produktów Merchant Center.`,
     );
+  }
 
   let insertResponse;
   try {
-    insertResponse = await insertProductsToGoogleMerchantCenter(products);
+    insertResponse = await insertProductsToGoogleMerchantCenter(
+      result.products,
+    );
   } catch (err) {
     console.error(
       `Błąd podczas wstawiania produktów do Google Merchant Center dla oferty (ID: ${offer.id}): ${err}`,
@@ -448,4 +591,27 @@ export async function insertNewOfferToMerchantCenter(offer: OfferWithId) {
   await updateOffer(offer.id, { isAddedToMerchantCenter: true });
 
   return insertResponse;
+}
+
+export async function resetLegacyOffersMerchantCenterFlags() {
+  await verifyUser(["ADMIN"]);
+
+  const offers = await getDocumentsFromAdminDB<OfferWithId>("offers", (ref) =>
+    ref.where("legacyProductId", ">", ""),
+  );
+
+  const toReset =
+    offers?.filter((offer) => offer.isAddedToMerchantCenter === true) ?? [];
+
+  if (toReset.length === 0) {
+    return { resetCount: 0 };
+  }
+
+  await Promise.all(
+    toReset.map(async (offer) => {
+      await updateOffer(offer.id, { isAddedToMerchantCenter: false });
+    }),
+  );
+
+  return { resetCount: toReset.length };
 }

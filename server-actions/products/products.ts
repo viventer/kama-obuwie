@@ -1,7 +1,6 @@
 "use server";
 
 import { adminDB } from "@/firebase/firebaseAdmin";
-import { FieldPath } from "firebase-admin/firestore";
 import {
   Product,
   ProductPartialSchema,
@@ -12,212 +11,23 @@ import {
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { verifyUser } from "../auth/auth";
-import { getImageUrl } from "@/server-actions/files/files";
-import { isValidUrl } from "@/components/adminPanel/offers/helpers/validation";
-import { getColorVariantName } from "@/components/adminPanel/assortment/helpers/productsHelpers";
 import type { LegacyProductWithId } from "@/firebase/schemas/legacyProductsSchemas";
-import { parseSignature } from "@/helpers/signature";
 import {
-  getDiscountInfo,
-  getLowestPrice30dReference,
-} from "@/helpers/prices";
-import { extractListingFilterAttributes } from "@/helpers/listingFilters/extractAttributes";
+  chunkArray,
+  toUniqueNonEmptyStrings,
+  getOffersByDocumentIds,
+  buildProductsByCategoryId,
+  collectOfferIdsFromProducts,
+  transformProductToProductListingData,
+  getLegacyProductsByCategoryIds,
+  getLegacyOffersByLegacyProductIds,
+  groupLegacyOffersByCategoryId,
+  transformLegacyOfferToListingData,
+} from "@/lib/products/listingJoins";
+import { invalidateSearchIndexCache } from "@/lib/search/indexCache";
 
-const toUniqueNonEmptyStrings = (values: string[]): string[] =>
-  Array.from(
-    new Set(values.filter((id) => typeof id === "string" && id.trim())),
-  );
-
-const chunkArray = <T>(values: T[], chunkSize: number): T[][] => {
-  if (chunkSize <= 0) return [values];
-  const chunks: T[][] = [];
-  for (let i = 0; i < values.length; i += chunkSize) {
-    chunks.push(values.slice(i, i + chunkSize));
-  }
-  return chunks;
-};
-
-const getOffersByDocumentIds = async (
-  offerIds: string[],
-): Promise<OfferWithId[]> => {
-  const uniqueIds = toUniqueNonEmptyStrings(offerIds);
-  if (uniqueIds.length === 0) return [];
-
-  const chunks = chunkArray(uniqueIds, 10);
-
-  const snapshots = await Promise.all(
-    chunks.map((batch) =>
-      adminDB
-        .collection("offers")
-        .where(FieldPath.documentId(), "in", batch)
-        .get(),
-    ),
-  );
-
-  return snapshots.flatMap((snap) =>
-    snap.docs.map(
-      (doc) =>
-        ({
-          id: doc.id,
-          ...(doc.data() as Omit<OfferWithId, "id">),
-        }) as OfferWithId,
-    ),
-  );
-};
-
-const buildProductsByCategoryId = (
-  products: ProductWithId[],
-): Record<string, ProductWithId[]> =>
-  products.reduce<Record<string, ProductWithId[]>>((acc, product) => {
-    if (!product.categoryId) return acc;
-    (acc[product.categoryId] ||= []).push(product);
-    return acc;
-  }, {});
-
-const collectOfferIdsFromProducts = (products: ProductWithId[]): string[] => {
-  const ids: string[] = [];
-  for (const product of products) {
-    if (!product.offersIds) continue;
-    for (const offerId of Object.values(product.offersIds)) {
-      if (typeof offerId === "string" && offerId.trim()) {
-        ids.push(offerId);
-      }
-    }
-  }
-  return ids;
-};
-
-const resolveThumbnail = async (
-  offer: OfferWithId,
-  product: ProductWithId,
-  colorVariantName: string,
-): Promise<{ url: string; isAiCoCreated: boolean }> => {
-  const editedPhotosForVariant = (product?.editedPhotos || []).filter(
-    (photo) => photo.colorVariantName === colorVariantName,
-  );
-
-  if (offer.thumbnail) {
-    if (isValidUrl(offer.thumbnail)) {
-      for (const photo of editedPhotosForVariant) {
-        const url = await getImageUrl(photo.filePath);
-        if (url === offer.thumbnail) {
-          return { url: offer.thumbnail, isAiCoCreated: photo.isAiCoCreated === true };
-        }
-      }
-      return { url: offer.thumbnail, isAiCoCreated: false };
-    }
-
-    const matchingPhoto = editedPhotosForVariant.find(
-      (photo) => photo.filePath === offer.thumbnail,
-    );
-    return {
-      url: (await getImageUrl(offer.thumbnail)) || "",
-      isAiCoCreated: matchingPhoto?.isAiCoCreated === true,
-    };
-  }
-
-  const editedPhotoForVariant = editedPhotosForVariant[0];
-  if (editedPhotoForVariant) {
-    return {
-      url: (await getImageUrl(editedPhotoForVariant.filePath)) || "",
-      isAiCoCreated: editedPhotoForVariant.isAiCoCreated === true,
-    };
-  }
-
-  return { url: "", isAiCoCreated: false };
-};
-
-const getListingDiscountFields = (
-  offer: OfferWithId,
-  currentPrice: string,
-): Pick<ProductListingData, "lowestPrice30d" | "discountPercent"> => {
-  const reference = getLowestPrice30dReference(offer, "DTC");
-  const discount = getDiscountInfo(Number(currentPrice), reference);
-  if (!discount) return {};
-
-  return {
-    lowestPrice30d: discount.oldPrice.toFixed(2),
-    discountPercent: discount.percent,
-  };
-};
-
-const transformProductToProductListingData = async (
-  product: ProductWithId,
-  offerById: Map<string, OfferWithId>,
-): Promise<ProductListingData[]> => {
-  const productListingDataArray: ProductListingData[] = [];
-
-  if (!product.offersIds || !product.colorVariants) {
-    return productListingDataArray;
-  }
-
-  for (const colorVariant of product.colorVariants) {
-    const colorVariantName = getColorVariantName(colorVariant);
-    const offerId = product.offersIds[colorVariantName];
-    if (!offerId) continue;
-
-    const offer = offerById.get(offerId);
-    if (!offer) continue;
-
-    const isActive = Object.values(offer.availability).some(
-      (availability) =>
-        availability.value &&
-        availability.value !== "" &&
-        availability.value !== "0",
-    );
-
-    const { url: thumbnailUrl, isAiCoCreated: isThumbnailAiCoCreated } =
-      await resolveThumbnail(offer, product, colorVariantName);
-
-    const price =
-      offer.sellingPrices.DTC ||
-      offer.sellingPrices.AL1 ||
-      offer.sellingPrices.AL2 ||
-      "0";
-
-    productListingDataArray.push({
-      thumbnailUrl,
-      isThumbnailAiCoCreated,
-      price,
-      ...getListingDiscountFields(offer, price),
-      id: product.id,
-      brand: product?.brand || undefined,
-      colorVariantName,
-      isActive,
-      availability: Object.fromEntries(
-        Object.entries(offer.availability).map(([size, avail]) => [
-          size,
-          parseInt(avail.value || "0"),
-        ]),
-      ),
-      filters: extractListingFilterAttributes({
-        parameters: product.parameters,
-        color: colorVariant.color,
-      }),
-    });
-  }
-
-  return productListingDataArray;
-};
-
-const getLegacyProductsByCategoryIds = async (
-  categoryIds: string[],
-): Promise<LegacyProductWithId[]> => {
-  const chunks = chunkArray(categoryIds, 10);
-  const legacyProductsAll = (
-    await Promise.all(
-      chunks.map((chunk) =>
-        getDocumentsFromAdminDB<LegacyProductWithId>("legacyProducts", (ref) =>
-          ref.where("categoryId", "in", chunk),
-        ),
-      ),
-    )
-  )
-    .flat()
-    .filter(Boolean) as LegacyProductWithId[];
-
-  return legacyProductsAll;
-};
+/** Firestore `in` supports at most 30 values. */
+const FIRESTORE_IN_LIMIT = 30;
 
 const normalizeLimit = (value: number | undefined): number | undefined => {
   if (typeof value !== "number" || !Number.isFinite(value)) return undefined;
@@ -232,13 +42,18 @@ const getProductsByCategoryIds = async (
 ): Promise<ProductWithId[]> => {
   const limit = normalizeLimit(productsLimit);
 
-  // Bez limitu: jedno zapytanie "in".
+  // Bez limitu: chunkowane zapytania "in" (max 30 wartości).
   if (limit === undefined) {
-    return (
-      (await getDocumentsFromAdminDB<ProductWithId>("products", (ref) =>
-        ref.where("categoryId", "in", categoryIds),
-      )) ?? []
+    const chunks = chunkArray(categoryIds, FIRESTORE_IN_LIMIT);
+    const batches = await Promise.all(
+      chunks.map(
+        (chunk) =>
+          getDocumentsFromAdminDB<ProductWithId>("products", (ref) =>
+            ref.where("categoryId", "in", chunk),
+          ) ?? [],
+      ),
     );
+    return batches.flat().filter(Boolean) as ProductWithId[];
   }
 
   // Limit = 0: nie pobieramy nic.
@@ -268,107 +83,6 @@ const getProductsByCategoryIds = async (
   );
 };
 
-const getLegacyOffersByLegacyProductIds = async (
-  legacyProductIds: string[],
-): Promise<OfferWithId[]> => {
-  const uniqueLegacyIds = toUniqueNonEmptyStrings(legacyProductIds);
-  if (uniqueLegacyIds.length === 0) return [];
-
-  const chunks = chunkArray(uniqueLegacyIds, 10);
-  const snapshots = await Promise.all(
-    chunks.map((batch) =>
-      adminDB.collection("offers").where("legacyProductId", "in", batch).get(),
-    ),
-  );
-
-  return snapshots.flatMap((snap) =>
-    snap.docs.map(
-      (doc) =>
-        ({
-          id: doc.id,
-          ...(doc.data() as Omit<OfferWithId, "id">),
-        }) as OfferWithId,
-    ),
-  );
-};
-
-const groupLegacyOffersByCategoryId = (
-  legacyOffers: OfferWithId[],
-  legacyById: Map<string, LegacyProductWithId>,
-): Record<string, OfferWithId[]> => {
-  const grouped: Record<string, OfferWithId[]> = {};
-
-  for (const offer of legacyOffers) {
-    const legacyProductId = offer.legacyProductId;
-    if (!legacyProductId) continue;
-    const legacy = legacyById.get(legacyProductId);
-    const categoryId = legacy?.categoryId;
-    if (!categoryId) continue;
-    (grouped[categoryId] ||= []).push(offer);
-  }
-
-  return grouped;
-};
-
-const transformLegacyOfferToListingData = (
-  offer: OfferWithId,
-  legacy: LegacyProductWithId | null,
-): ProductListingData | null => {
-  const parsed = parseSignature(offer.signature || "");
-  const colorVariantName =
-    legacy?.colorVariantName ||
-    offer.colorVariantName ||
-    parsed.colorVariantName ||
-    "";
-
-  if (!colorVariantName) return null;
-
-  const isActive = Object.values(offer.availability || {}).some(
-    (availability) =>
-      availability.value &&
-      availability.value !== "" &&
-      availability.value !== "0",
-  );
-
-  const legacyImages = legacy?.imagesUrls || {};
-  const fallbackThumb = legacyImages[colorVariantName]?.[0] || "";
-  const thumbnailUrl = offer.thumbnail || fallbackThumb;
-
-  const price =
-    offer.sellingPrices?.DTC ||
-    offer.sellingPrices?.AL1 ||
-    offer.sellingPrices?.AL2 ||
-    null;
-
-  if (!price) {
-    return null;
-  }
-
-  const matchedColorVariant = legacy?.colorVariants?.find(
-    (cv) => getColorVariantName(cv) === colorVariantName,
-  );
-
-  return {
-    thumbnailUrl,
-    price,
-    ...getListingDiscountFields(offer, price),
-    id: offer.id,
-    brand: legacy?.brand || undefined,
-    colorVariantName,
-    isActive,
-    availability: Object.fromEntries(
-      Object.entries(offer.availability || {}).map(([size, avail]) => [
-        size,
-        parseInt(avail.value || "0"),
-      ]),
-    ),
-    filters: extractListingFilterAttributes({
-      parameters: legacy?.parameters,
-      color: matchedColorVariant?.color,
-    }),
-  };
-};
-
 export const createProduct = async function (newProduct: Product) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
@@ -377,6 +91,7 @@ export const createProduct = async function (newProduct: Product) {
   const productRef = adminDB.collection("products").doc();
 
   await productRef.set(newProduct);
+  await invalidateSearchIndexCache();
 
   return productRef.id;
 };
@@ -406,6 +121,7 @@ export const updateProduct = async function (
   }
 
   await productRef.update(updateData);
+  await invalidateSearchIndexCache();
 };
 
 export const getProductsListingData = async function (

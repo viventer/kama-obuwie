@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   ProductListingData,
   RootCategory,
@@ -32,17 +33,24 @@ type ListingFiltersContextValue = {
   facets: ListingFacets;
   filteredProducts: ProductListingData[];
   activeFilterCount: number;
+  enableCategoryFilter: boolean;
+  categoryLabels: Record<string, string>;
+  defaultSortLabel?: string;
   setSort: (sort: ListingSort) => void;
   setSizes: (sizes: string[]) => void;
   setPriceRanges: (ranges: PriceRange[]) => void;
   setColors: (colors: string[]) => void;
   setExternalMaterials: (materials: string[]) => void;
   setFastenings: (fastenings: string[]) => void;
+  setRootCategory: (root: RootCategory | undefined) => void;
+  setCategoryId: (categoryId: string | undefined) => void;
   removeSize: (size: string) => void;
   removePriceRange: (key: string) => void;
   removeColor: (color: string) => void;
   removeExternalMaterial: (material: string) => void;
   removeFastening: (fastening: string) => void;
+  clearRootCategory: () => void;
+  clearCategoryId: () => void;
   clearAll: () => void;
 };
 
@@ -51,7 +59,8 @@ const ListingFiltersContext =
 
 const writeFiltersToUrl = (state: ListingFiltersState) => {
   if (typeof window === "undefined") return;
-  const params = serializeListingFiltersToSearchParams(state);
+  const current = new URLSearchParams(window.location.search);
+  const params = serializeListingFiltersToSearchParams(state, current);
   const qs = params.toString();
   const next = qs
     ? `${window.location.pathname}?${qs}`
@@ -62,32 +71,64 @@ const writeFiltersToUrl = (state: ListingFiltersState) => {
 export function ListingFiltersProvider({
   products,
   rootCategory,
+  enableCategoryFilter = false,
+  categoryLabels = {},
+  defaultSortLabel,
   children,
 }: {
   products: ProductListingData[];
   rootCategory?: RootCategory;
+  enableCategoryFilter?: boolean;
+  categoryLabels?: Record<string, string>;
+  defaultSortLabel?: string;
   children: ReactNode;
 }) {
+  const searchParams = useSearchParams();
+  const searchKey = searchParams.toString();
+
   const [state, setState] = useState<ListingFiltersState>(
     DEFAULT_LISTING_FILTERS_STATE,
   );
   const [hydrated, setHydrated] = useState(false);
 
+  // Sync from Next searchParams on mount and when Link/back changes the URL.
+  // UI filter edits use history.replaceState (below), which does NOT update
+  // useSearchParams — so this won't fight local state changes.
   useEffect(() => {
-    const fromUrl = parseListingFiltersFromSearch(window.location.search);
+    const fromUrl = parseListingFiltersFromSearch(
+      searchKey ? `?${searchKey}` : "",
+    );
     setState(fromUrl);
     setHydrated(true);
-  }, []);
+  }, [searchKey]);
 
   useEffect(() => {
     if (!hydrated) return;
     writeFiltersToUrl(state);
   }, [state, hydrated]);
 
-  const facets = useMemo(
-    () => getListingFacets(products, rootCategory),
-    [products, rootCategory],
-  );
+  // Facets for category filter use products after rootCategory filter only,
+  // so stage-2 options stay relevant when gender is selected.
+  const productsForCategoryFacets = useMemo(() => {
+    if (!state.rootCategory) return products;
+    return products.filter((p) => p.rootCategory === state.rootCategory);
+  }, [products, state.rootCategory]);
+
+  const facets = useMemo(() => {
+    const effectiveRoot = state.rootCategory || rootCategory;
+    const base = getListingFacets(
+      state.rootCategory ? productsForCategoryFacets : products,
+      effectiveRoot,
+      categoryLabels,
+    );
+    return base;
+  }, [
+    products,
+    productsForCategoryFacets,
+    rootCategory,
+    state.rootCategory,
+    categoryLabels,
+  ]);
 
   const filteredProducts = useMemo(
     () => applyListingFilters(products, state),
@@ -125,6 +166,23 @@ export function ListingFiltersProvider({
   );
   const setFastenings = useCallback(
     (fastenings: string[]) => update({ fastenings }),
+    [update],
+  );
+
+  const setRootCategory = useCallback(
+    (next: RootCategory | undefined) => {
+      setState((prev) => ({
+        ...prev,
+        rootCategory: next,
+        // Changing gender clears concrete category
+        categoryId: undefined,
+      }));
+    },
+    [],
+  );
+
+  const setCategoryId = useCallback(
+    (categoryId: string | undefined) => update({ categoryId }),
     [update],
   );
 
@@ -173,7 +231,20 @@ export function ListingFiltersProvider({
     [],
   );
 
+  const clearRootCategory = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      rootCategory: undefined,
+      categoryId: undefined,
+    }));
+  }, []);
+
+  const clearCategoryId = useCallback(() => {
+    setState((prev) => ({ ...prev, categoryId: undefined }));
+  }, []);
+
   const clearAll = useCallback(() => {
+    // Preserve query `q` in URL — clearAll only resets filter state
     setState(DEFAULT_LISTING_FILTERS_STATE);
   }, []);
 
@@ -183,17 +254,24 @@ export function ListingFiltersProvider({
       facets,
       filteredProducts,
       activeFilterCount,
+      enableCategoryFilter,
+      categoryLabels,
+      defaultSortLabel,
       setSort,
       setSizes,
       setPriceRanges,
       setColors,
       setExternalMaterials,
       setFastenings,
+      setRootCategory,
+      setCategoryId,
       removeSize,
       removePriceRange,
       removeColor,
       removeExternalMaterial,
       removeFastening,
+      clearRootCategory,
+      clearCategoryId,
       clearAll,
     }),
     [
@@ -201,17 +279,24 @@ export function ListingFiltersProvider({
       facets,
       filteredProducts,
       activeFilterCount,
+      enableCategoryFilter,
+      categoryLabels,
+      defaultSortLabel,
       setSort,
       setSizes,
       setPriceRanges,
       setColors,
       setExternalMaterials,
       setFastenings,
+      setRootCategory,
+      setCategoryId,
       removeSize,
       removePriceRange,
       removeColor,
       removeExternalMaterial,
       removeFastening,
+      clearRootCategory,
+      clearCategoryId,
       clearAll,
     ],
   );

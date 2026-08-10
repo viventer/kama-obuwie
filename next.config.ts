@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
       "allegro.pl.allegrosandbox.pl",
     ],
   },
+  // Keep WASM Snowball stemmer out of Turbopack/webpack bundles — its
+  // import.meta.url + readFileSync(wasm) path breaks when rewritten.
+  serverExternalPackages: ["multilingual-stemmer"],
   experimental: {
     serverActions: {
       bodySizeLimit: "128mb",

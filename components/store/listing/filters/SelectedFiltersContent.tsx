@@ -25,11 +25,46 @@ export default function SelectedFiltersContent({
     removeColor,
     removeExternalMaterial,
     removeFastening,
+    clearRootCategory,
+    clearCategoryId,
     clearAll,
     activeFilterCount,
+    enableCategoryFilter,
+    categoryLabels,
   } = useListingFilters();
 
   const groups: SelectedGroup[] = [];
+
+  if (enableCategoryFilter && state.rootCategory) {
+    const labels: Record<string, string> = {
+      "obuwie męskie": "Męskie",
+      "obuwie damskie": "Damskie",
+      "obuwie dziecięce": "Dziecięce",
+    };
+    groups.push({
+      label: "Płeć",
+      items: [
+        {
+          key: `root-${state.rootCategory}`,
+          label: labels[state.rootCategory] || state.rootCategory,
+          onRemove: () => clearRootCategory(),
+        },
+      ],
+    });
+  }
+
+  if (enableCategoryFilter && state.categoryId) {
+    groups.push({
+      label: "Kategoria",
+      items: [
+        {
+          key: `category-${state.categoryId}`,
+          label: categoryLabels[state.categoryId] || state.categoryId,
+          onRemove: () => clearCategoryId(),
+        },
+      ],
+    });
+  }
 
   if (state.sizes.length > 0) {
     groups.push({

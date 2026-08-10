@@ -22,7 +22,7 @@ export default function MobileFilterBarPanel({
   panel: MobileFilterPanel;
   onClose: () => void;
 }) {
-  const { state, facets, setSort, setSizes, setPriceRanges } =
+  const { state, facets, setSort, setSizes, setPriceRanges, defaultSortLabel } =
     useListingFilters();
 
   return (
@@ -56,6 +56,7 @@ export default function MobileFilterBarPanel({
                   setSort(sort);
                   onClose();
                 }}
+                defaultLabel={defaultSortLabel}
               />
             )}
 

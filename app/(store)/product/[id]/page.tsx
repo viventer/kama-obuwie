@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import ProductPage from "@/components/store/product/ProductPage";
+import ProductPageSkeleton from "@/components/store/loading/ProductPageSkeleton";
 import { notFound } from "next/navigation";
 import { getStoreProductPageData } from "@/server-actions/store/getStoreProductPageData";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
@@ -49,15 +51,17 @@ export default async function ProductDetails({ params }: Props) {
   }
 
   return (
-    <ProductPage
-      imagesUrls={pageData.imagesUrls}
-      aiCoCreatedImageUrls={pageData.aiCoCreatedImageUrls}
-      productData={pageData.productData}
-      category={pageData.category}
-      offersData={pageData.offersData}
-      sizingTable={pageData.sizingTable}
-      choosingSizeImageUrl={pageData.choosingSizeImageUrl}
-      connectedOffers={pageData?.connectedOffers}
-    />
+    <Suspense fallback={<ProductPageSkeleton />}>
+      <ProductPage
+        imagesUrls={pageData.imagesUrls}
+        aiCoCreatedImageUrls={pageData.aiCoCreatedImageUrls}
+        productData={pageData.productData}
+        category={pageData.category}
+        offersData={pageData.offersData}
+        sizingTable={pageData.sizingTable}
+        choosingSizeImageUrl={pageData.choosingSizeImageUrl}
+        connectedOffers={pageData?.connectedOffers}
+      />
+    </Suspense>
   );
 }

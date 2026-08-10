@@ -8,7 +8,11 @@ import {
   isRangeSize,
   parseRangeSize,
 } from "@/helpers/sizes";
-import { ListingFacets, ListingSizeFacet } from "./types";
+import {
+  ListingCategoryFacet,
+  ListingFacets,
+  ListingSizeFacet,
+} from "./types";
 
 /** Collect sizes that have at least one product with availability > 0. */
 export const getAvailableListingSizes = (
@@ -60,9 +64,33 @@ const uniqueSorted = (values: string[]): string[] =>
     a.localeCompare(b, "pl", { sensitivity: "base" }),
   );
 
+const buildCategoryFacets = (
+  products: ProductListingData[],
+  categoryLabels?: Record<string, string>,
+): ListingCategoryFacet[] => {
+  const counts = new Map<string, number>();
+
+  for (const product of products) {
+    if (!product.categoryId) continue;
+    counts.set(product.categoryId, (counts.get(product.categoryId) || 0) + 1);
+  }
+
+  return Array.from(counts.entries())
+    .map(([id, count]) => ({
+      id,
+      label: categoryLabels?.[id] || id,
+      count,
+    }))
+    .sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count;
+      return a.label.localeCompare(b.label, "pl", { sensitivity: "base" });
+    });
+};
+
 export const getListingFacets = (
   products: ProductListingData[],
   rootCategory?: RootCategory,
+  categoryLabels?: Record<string, string>,
 ): ListingFacets => {
   const colors: string[] = [];
   const externalMaterials: string[] = [];
@@ -91,5 +119,6 @@ export const getListingFacets = (
     colors: uniqueSorted(colors),
     externalMaterials: uniqueSorted(externalMaterials),
     fastenings: uniqueSorted(fastenings),
+    categories: buildCategoryFacets(products, categoryLabels),
   };
 };

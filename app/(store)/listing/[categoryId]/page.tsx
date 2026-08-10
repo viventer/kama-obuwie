@@ -62,7 +62,7 @@ export default async function Page({ params }: Props) {
     <div className="w-fit 2xs:w-full mx-auto sm:mx-0 mt-4">
       <SubpageHeading text={`${getCategoryDisplayName(category.data)}`} />
       <CategoryProductsListing
-        productsFromCategory={filteredProducts}
+        products={filteredProducts}
         rootCategory={category.data.rootCategory}
       />
     </div>

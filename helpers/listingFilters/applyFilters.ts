@@ -27,6 +27,18 @@ export const applyListingFilters = (
 ): ProductListingData[] => {
   let filtered = products;
 
+  if (state.rootCategory) {
+    filtered = filtered.filter(
+      (product) => product.rootCategory === state.rootCategory,
+    );
+  }
+
+  if (state.categoryId) {
+    filtered = filtered.filter(
+      (product) => product.categoryId === state.categoryId,
+    );
+  }
+
   if (state.sizes.length > 0) {
     filtered = filtered.filter((product) =>
       hasSelectedSizes(state.sizes, product.availability),
@@ -83,7 +95,9 @@ export const countActiveFilters = (state: ListingFiltersState): number => {
     state.priceRanges.length +
     state.colors.length +
     state.externalMaterials.length +
-    state.fastenings.length
+    state.fastenings.length +
+    (state.rootCategory ? 1 : 0) +
+    (state.categoryId ? 1 : 0)
   );
 };
 

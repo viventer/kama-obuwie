@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import {
   ProductListingData,
   RootCategory,
@@ -42,18 +43,29 @@ function CategoryProductsListingInner() {
 }
 
 export default function CategoryProductsListing({
-  productsFromCategory,
+  products,
   rootCategory,
+  enableCategoryFilter = false,
+  categoryLabels = {},
+  defaultSortLabel,
 }: {
-  productsFromCategory: ProductListingData[];
-  rootCategory: RootCategory;
+  products: ProductListingData[];
+  rootCategory?: RootCategory;
+  enableCategoryFilter?: boolean;
+  categoryLabels?: Record<string, string>;
+  defaultSortLabel?: string;
 }) {
   return (
-    <ListingFiltersProvider
-      products={productsFromCategory}
-      rootCategory={rootCategory}
-    >
-      <CategoryProductsListingInner />
-    </ListingFiltersProvider>
+    <Suspense fallback={null}>
+      <ListingFiltersProvider
+        products={products}
+        rootCategory={rootCategory}
+        enableCategoryFilter={enableCategoryFilter}
+        categoryLabels={categoryLabels}
+        defaultSortLabel={defaultSortLabel}
+      >
+        <CategoryProductsListingInner />
+      </ListingFiltersProvider>
+    </Suspense>
   );
 }

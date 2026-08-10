@@ -21,6 +21,7 @@ import {
   appendPriceHistoryForChangedChannels,
   buildInitialPriceHistory,
 } from "@/helpers/prices";
+import { invalidateSearchIndexCache } from "@/lib/search/indexCache";
 
 export const createOffer = async function (newOffer: Partial<Offer>) {
   await verifyUser(["ADMIN", "VERIFIED"]);
@@ -50,6 +51,7 @@ export const createOffer = async function (newOffer: Partial<Offer>) {
   }
 
   await offerRef.set(offerToSave);
+  await invalidateSearchIndexCache();
 
   return offerRef.id;
 };
@@ -81,6 +83,7 @@ export const updateOffer = async function (
   }
 
   await offerRef.update(dataToUpdate);
+  await invalidateSearchIndexCache();
 
   const productId =
     typeof currentOffer?.productId === "string" && currentOffer.productId.trim()

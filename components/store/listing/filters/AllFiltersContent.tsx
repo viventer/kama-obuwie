@@ -15,6 +15,7 @@ import PriceRangeChipGroup, {
 import FilterChipGroup, { type FilterChipOption } from "./FilterChipGroup";
 import SortSelector from "./SortSelector";
 import { useListingFilters } from "./ListingFiltersContext";
+import CategoryStageFilters from "./CategoryStageFilters";
 
 function chipSection({
   id,
@@ -63,14 +64,29 @@ export default function AllFiltersContent({
     setFastenings,
     clearAll,
     filteredProducts,
+    enableCategoryFilter,
+    defaultSortLabel,
   } = useListingFilters();
 
   const sections = [
     {
       id: "sort",
       label: "Sortowanie",
-      content: <SortSelector value={state.sort} onChange={setSort} />,
+      content: (
+        <SortSelector
+          value={state.sort}
+          onChange={setSort}
+          defaultLabel={defaultSortLabel}
+        />
+      ),
     },
+    enableCategoryFilter
+      ? {
+          id: "category",
+          label: "Kategoria",
+          content: <CategoryStageFilters />,
+        }
+      : null,
     chipSection({
       id: "size",
       label: "Rozmiar",

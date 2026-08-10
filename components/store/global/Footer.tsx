@@ -43,7 +43,7 @@ export default function Footer() {
   return (
     <footer
       data-store-footer
-      className="bg-card border-t border-border mt-auto py-6 "
+      className="bg-card border-t border-border mt-auto py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
     >
       <div className="max-w-[1440px] w-[90vw] mx-auto lg:flex justify-start items-start gap-16">
         <div className="flex gap-x-8 gap-y-4 sm:gap-x-16 mb-8 lg:border-r-1 border-secondary/50 lg:pr-16 flex-col xs:flex-row">

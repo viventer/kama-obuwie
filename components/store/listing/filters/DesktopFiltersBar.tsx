@@ -2,6 +2,7 @@
 
 import {
   ArrowDownUp,
+  FolderTree,
   Funnel,
   Layers,
   Link2,
@@ -29,6 +30,7 @@ import DesktopFilterPopover, {
   desktopFilterTriggerClass,
 } from "./desktop/DesktopFilterPopover";
 import DesktopAllFiltersSheet from "./desktop/DesktopAllFiltersSheet";
+import CategoryStageFilters from "./CategoryStageFilters";
 
 type ChipFilterId = "size" | "color" | "material" | "fastening";
 
@@ -43,7 +45,7 @@ type ChipFilterConfig = {
   itemClassName?: string;
 };
 
-type OpenPopover = "sort" | "price" | ChipFilterId | "selected" | null;
+type OpenPopover = "sort" | "price" | "category" | ChipFilterId | "selected" | null;
 
 export default function DesktopFiltersBar() {
   const {
@@ -56,6 +58,8 @@ export default function DesktopFiltersBar() {
     setExternalMaterials,
     setFastenings,
     activeFilterCount,
+    enableCategoryFilter,
+    defaultSortLabel,
   } = useListingFilters();
 
   const headerOffset = useStickyHeaderOffset();
@@ -152,8 +156,23 @@ export default function DesktopFiltersBar() {
               setSort(sort);
               setOpenPopover(null);
             }}
+            defaultLabel={defaultSortLabel}
           />
         </DesktopFilterPopover>
+
+        {enableCategoryFilter && (
+          <DesktopFilterPopover
+            label="Kategoria"
+            icon={FolderTree}
+            open={openPopover === "category"}
+            onOpenChange={setPopover("category")}
+            hasSelection={!!state.rootCategory || !!state.categoryId}
+            title="Wybierz kategorię"
+            contentClassName="w-96"
+          >
+            <CategoryStageFilters />
+          </DesktopFilterPopover>
+        )}
 
         {sizeFilter && renderChipPopover(sizeFilter)}
 

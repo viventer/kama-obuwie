@@ -11,15 +11,22 @@ export default function SortSelector({
   value,
   onChange,
   className,
+  defaultLabel,
 }: {
   value: ListingSort;
   onChange: (sort: ListingSort) => void;
   className?: string;
+  /** Override label for the "default" sort option (e.g. "Trafność"). */
+  defaultLabel?: string;
 }) {
   return (
     <ul className={cn("flex flex-col gap-2 w-full", className)}>
       {SORT_OPTIONS.map((option) => {
         const isActive = value === option.value;
+        const label =
+          option.value === "default" && defaultLabel
+            ? defaultLabel
+            : option.label;
         return (
           <li key={option.value}>
             <button
@@ -32,7 +39,7 @@ export default function SortSelector({
                   : "bg-foreground/10 text-foreground hover:bg-primary/30",
               )}
             >
-              <span>{option.label}</span>
+              <span>{label}</span>
               {isActive && <Check className="size-4 shrink-0" aria-hidden />}
             </button>
           </li>

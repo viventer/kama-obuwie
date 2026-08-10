@@ -1,14 +1,35 @@
 import { PriceRange, parsePriceRangeKey, priceRangeToKey } from "@/helpers/prices";
-import { ListingFiltersState, ListingSort } from "./types";
+import {
+  ListingFiltersState,
+  ListingSort,
+  ROOT_CATEGORY_FROM_URL,
+  ROOT_CATEGORY_URL_VALUES,
+} from "./types";
+import { RootCategory } from "@/firebase/schemas/productsSchemas";
 
-const URL_KEYS = {
+export const URL_KEYS = {
   sort: "sort",
   sizes: "rozmiar",
   priceRanges: "cena",
   colors: "kolor",
   externalMaterials: "material",
   fastenings: "zapiecie",
+  query: "q",
+  rootCategory: "plec",
+  categoryId: "kategoria",
 } as const;
+
+/** Filter keys that ListingFiltersState owns (excludes `q`). */
+export const LISTING_FILTER_URL_KEYS = [
+  URL_KEYS.sort,
+  URL_KEYS.sizes,
+  URL_KEYS.priceRanges,
+  URL_KEYS.colors,
+  URL_KEYS.externalMaterials,
+  URL_KEYS.fastenings,
+  URL_KEYS.rootCategory,
+  URL_KEYS.categoryId,
+] as const;
 
 const SORT_URL_VALUES: Record<ListingSort, string> = {
   default: "domyslne",
@@ -35,8 +56,15 @@ const decodeList = (raw: string | null): string[] => {
 
 export const serializeListingFiltersToSearchParams = (
   state: ListingFiltersState,
+  base?: URLSearchParams,
 ): URLSearchParams => {
-  const params = new URLSearchParams();
+  const params = base
+    ? new URLSearchParams(base.toString())
+    : new URLSearchParams();
+
+  for (const key of LISTING_FILTER_URL_KEYS) {
+    params.delete(key);
+  }
 
   if (state.sort !== "default") {
     params.set(URL_KEYS.sort, SORT_URL_VALUES[state.sort]);
@@ -59,6 +87,17 @@ export const serializeListingFiltersToSearchParams = (
   if (state.fastenings.length > 0) {
     params.set(URL_KEYS.fastenings, encodeList(state.fastenings));
   }
+  if (state.rootCategory && state.rootCategory in ROOT_CATEGORY_URL_VALUES) {
+    params.set(
+      URL_KEYS.rootCategory,
+      ROOT_CATEGORY_URL_VALUES[
+        state.rootCategory as keyof typeof ROOT_CATEGORY_URL_VALUES
+      ],
+    );
+  }
+  if (state.categoryId) {
+    params.set(URL_KEYS.categoryId, state.categoryId);
+  }
 
   return params;
 };
@@ -78,6 +117,12 @@ export const parseListingFiltersFromSearch = (
     .map(parsePriceRangeKey)
     .filter((r): r is PriceRange => r !== null);
 
+  const plecRaw = params.get(URL_KEYS.rootCategory);
+  const rootCategory: RootCategory | undefined =
+    (plecRaw && ROOT_CATEGORY_FROM_URL[plecRaw]) || undefined;
+
+  const categoryId = params.get(URL_KEYS.categoryId)?.trim() || undefined;
+
   return {
     sort,
     sizes: decodeList(params.get(URL_KEYS.sizes)),
@@ -85,5 +130,16 @@ export const parseListingFiltersFromSearch = (
     colors: decodeList(params.get(URL_KEYS.colors)),
     externalMaterials: decodeList(params.get(URL_KEYS.externalMaterials)),
     fastenings: decodeList(params.get(URL_KEYS.fastenings)),
+    rootCategory,
+    categoryId,
   };
+};
+
+export const rootCategoryToUrlSlug = (
+  root: RootCategory | undefined,
+): string | undefined => {
+  if (!root || !(root in ROOT_CATEGORY_URL_VALUES)) return undefined;
+  return ROOT_CATEGORY_URL_VALUES[
+    root as keyof typeof ROOT_CATEGORY_URL_VALUES
+  ];
 };

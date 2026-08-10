@@ -4,27 +4,11 @@ import type {
   Description,
   ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
+import { normalizeForSearch } from "@/helpers/text";
 
 export type ParsedProductDescription = {
   advantages: string[];
   salesDescription?: string;
-};
-
-const normalizeForSearch = (value: string): string => {
-  return value
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[łŁ]/g, "l")
-    .replace(/[ąĄ]/g, "a")
-    .replace(/[ćĆ]/g, "c")
-    .replace(/[ęĘ]/g, "e")
-    .replace(/[ńŃ]/g, "n")
-    .replace(/[óÓ]/g, "o")
-    .replace(/[śŚ]/g, "s")
-    .replace(/[żŻ]/g, "z")
-    .replace(/[źŹ]/g, "z");
 };
 
 const stripHtml = (html: string): string => {

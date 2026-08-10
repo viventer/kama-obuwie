@@ -274,4 +274,6 @@ export type ProductListingData = {
   isActive: boolean;
   availability: Record<string, number>; // key: size, value: availability value
   filters?: ListingFilterAttributes;
+  categoryId?: string;
+  rootCategory?: RootCategory;
 };

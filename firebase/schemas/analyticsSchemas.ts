@@ -76,7 +76,6 @@ export const UserDataSchema = z.object({
 export const PurchaseSchema = ShoppingEventBaseSchema.extend({
   transaction_id: z.string(), // order id
   payment_type: PaymentMethodSchema,
-  user_data: UserDataSchema,
 });
 
 export type ItemType = z.infer<typeof ItemSchema>;

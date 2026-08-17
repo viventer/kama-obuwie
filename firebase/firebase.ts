@@ -2,7 +2,7 @@ import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { Analytics, getAnalytics } from "firebase/analytics";
+import { Analytics, getAnalytics, settings } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -28,6 +28,10 @@ googleAuthProvider.setCustomParameters({
 const storage = getStorage(app);
 let analytics: Analytics | null = null;
 if (typeof window !== "undefined") {
+  // Firebase replaces window.gtag with a wrapper that drops the field name
+  // in gtag("set", <field>, <value>). A dedicated name leaves the snippet
+  // gtag intact; dataLayer stays shared.
+  settings({ gtagName: "gtagFirebase" });
   analytics = getAnalytics(app);
 }
 

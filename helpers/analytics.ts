@@ -66,3 +66,10 @@ export function buildPurchaseUserData(
     address,
   };
 }
+
+export function setGtagUserData(userData: UserDataType): void {
+  if (typeof window === "undefined" || typeof window.gtag !== "function") {
+    return;
+  }
+  window.gtag("set", "user_data", userData);
+}

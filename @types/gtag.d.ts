@@ -11,11 +11,29 @@ interface GtagConsentParams {
   wait_for_update?: number;
 }
 
-interface Window {
-  dataLayer: unknown[];
-  gtag?: (
+interface GtagUserData {
+  email: string;
+  phone_number: string;
+  address: {
+    first_name: string;
+    last_name: string;
+    street?: string;
+    city?: string;
+    postal_code?: string;
+    country: string;
+  };
+}
+
+interface GtagFunction {
+  (
     command: "consent",
     action: "default" | "update",
     params: GtagConsentParams,
-  ) => void;
+  ): void;
+  (command: "set", field: "user_data", value: GtagUserData): void;
+}
+
+interface Window {
+  dataLayer: unknown[];
+  gtag?: GtagFunction;
 }

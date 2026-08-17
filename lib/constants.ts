@@ -195,11 +195,12 @@ export type HomeSliderBanner = {
 export const homeSliderBanners: HomeSliderBanner[] = [
   {
     imageSrc: "/home-slider/1.jpg",
-    heading: "Sandały damskie",
-    subheading: "Stylowe, wygodne i przewiewne, idealne na lato",
+    heading: "Trampki do szkoły i przedszkola",
+    subheading:
+      "Wygodne, lekkie i stworzone na każdy dzień pełen dziecięcych przygód",
     destination: {
-      rootCategory: "obuwie damskie",
-      categoryName: "sandały",
+      rootCategory: "obuwie dziecięce",
+      categoryName: "trampki",
     },
   },
   {

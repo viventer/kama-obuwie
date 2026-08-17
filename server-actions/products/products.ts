@@ -21,7 +21,10 @@ import {
   getDiscountInfo,
   getLowestPrice30dReference,
 } from "@/helpers/prices";
-import { extractListingFilterAttributes } from "@/helpers/listingFilters/extractAttributes";
+import {
+  extractListingFilterAttributes,
+  getListingColorFromOptionalParameters,
+} from "@/helpers/listingFilters/extractAttributes";
 
 const toUniqueNonEmptyStrings = (values: string[]): string[] =>
   Array.from(
@@ -344,10 +347,6 @@ const transformLegacyOfferToListingData = (
     return null;
   }
 
-  const matchedColorVariant = legacy?.colorVariants?.find(
-    (cv) => getColorVariantName(cv) === colorVariantName,
-  );
-
   return {
     thumbnailUrl,
     price,
@@ -364,7 +363,7 @@ const transformLegacyOfferToListingData = (
     ),
     filters: extractListingFilterAttributes({
       parameters: legacy?.parameters,
-      color: matchedColorVariant?.color,
+      color: getListingColorFromOptionalParameters(legacy?.parameters),
     }),
   };
 };

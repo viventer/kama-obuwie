@@ -33,6 +33,7 @@ import { useEffect, useState } from "react";
 import { analytics } from "@/firebase/firebase";
 import { logEvent } from "firebase/analytics";
 import { ItemType } from "@/firebase/schemas/analyticsSchemas";
+import { buildPurchaseUserData } from "@/helpers/analytics";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
@@ -222,6 +223,7 @@ export default function CheckoutForms() {
           transaction_id: createdOrder.id,
           value: parseFloat(createdOrder.summary.totalToPay.amount),
           currency: "PLN",
+          user_data: buildPurchaseUserData(checkoutData),
         });
       }
 

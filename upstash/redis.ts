@@ -12,7 +12,7 @@ if (!url || !token) {
 
 const redisCommandCounts = new AsyncLocalStorage<Map<string, number>>();
 
-const COMMAND_LOG_ENABLED = "1";
+const COMMAND_LOG_ENABLED = true;
 
 const SKIP_PROXY_KEYS = new Set([
   "then",

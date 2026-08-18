@@ -30,7 +30,6 @@ import {
   type ProductParameters,
   ProductWithId,
 } from "@/firebase/schemas/productsSchemas";
-import { redis } from "@/upstash/redis";
 import {
   legacyProductIdFromSignature,
   parseSignature,
@@ -739,18 +738,6 @@ const syncAL1Offers = async (
 
     processedSignatures++;
 
-    // Progress tracking
-    const progress = Math.round((processedSignatures / totalSignatures) * 100);
-    await redis.set(
-      "allegro:sync:progress:AL1",
-      JSON.stringify({
-        processed: processedSignatures,
-        total: totalSignatures,
-        percentage: progress,
-        lastSignature: signature,
-      }),
-    );
-
     // Delay między signature aby uniknąć rate limiting (150ms)
     if (processedSignatures < totalSignatures) {
       await delay(150);
@@ -940,20 +927,6 @@ const syncAL2Offers = async (
 
       processedSignatures++;
       console.log(`🎉 AL2: Completed signature "${signature}"`);
-
-      // Progress tracking
-      const progress = Math.round(
-        (processedSignatures / offersBySignature.size) * 100,
-      );
-      await redis.set(
-        "allegro:sync:progress:AL2",
-        JSON.stringify({
-          processed: processedSignatures,
-          total: offersBySignature.size,
-          percentage: progress,
-          lastSignature: signature,
-        }),
-      );
 
       // Delay między signature aby uniknąć rate limiting (150ms)
       if (processedSignatures < offersBySignature.size) {

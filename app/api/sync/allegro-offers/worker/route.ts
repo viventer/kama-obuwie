@@ -1,68 +1,87 @@
 import { syncAllegroOffers } from "@/server-actions/allegro/sync/syncOffers";
 import { NextRequest, NextResponse } from "next/server";
-import { redis } from "@/upstash/redis";
+import { Client } from "@upstash/qstash";
+import { qstashPostHandler } from "@/upstash/qstashRoute";
+import {
+  ALLEGRO_SYNC_KEY,
+  getSyncJobState,
+  isAllegroBatchAlreadyProcessed,
+  patchSyncJobState,
+} from "@/upstash/syncJobState";
+
+const qstashClient = new Client({
+  token: process.env.QSTASH_TOKEN!,
+});
 
 async function handler(req: NextRequest) {
+  const body = await req.json();
+  const userId = body?.userId || null;
+  const batch = body.batch ?? 0;
+  const channel = body.channel ?? "AL1";
+
+  console.log(
+    `[SYNC] allegro-offers worker channel=${channel} batch=${batch}`,
+  );
+
+  const state = await getSyncJobState(ALLEGRO_SYNC_KEY);
+  if (isAllegroBatchAlreadyProcessed({ channel, batch }, state)) {
+    console.log(
+      `[SYNC] skipping already processed ${channel} batch ${batch}`,
+    );
+    return NextResponse.json({
+      success: true,
+      skipped: true,
+      channel,
+      batch,
+    });
+  }
+
+  if (batch === 0 && channel === "AL1") {
+    await patchSyncJobState(ALLEGRO_SYNC_KEY, {
+      status: "running",
+      started: new Date().toISOString(),
+      error: "",
+    });
+  }
+
   try {
-    console.log("🚀 QStash worker: Starting background Allegro sync job...");
-
-    const body = await req.json();
-    const userId = body?.userId || null;
-    const batch = body.batch ?? 0;
-    const channel = body.channel ?? "AL1";
-
-    console.log(`👤 Running sync for channel: ${channel}, batch: ${batch}`);
-
-    // Ustaw status na "running" tylko dla pierwszego batcha
-    if (batch === 0 && channel === "AL1") {
-      await redis.set("allegro:sync:status", "running");
-      await redis.set("allegro:sync:started", new Date().toISOString());
-      await redis.del("allegro:sync:progress"); // Wyczyść stary progress
-    }
-
-    // Wykonaj synchronizację dla tego batcha
     const result = await syncAllegroOffers(userId, channel, batch);
 
-    // Sprawdź czy są kolejne batche do przetworzenia
+    await patchSyncJobState(ALLEGRO_SYNC_KEY, {
+      lastChannel: channel,
+      lastBatch: String(batch),
+      nextChannel: result.nextChannel ?? "",
+      nextBatch:
+        result.nextBatch !== null && result.nextBatch !== undefined
+          ? String(result.nextBatch)
+          : "",
+    });
+
     if (result.hasMore) {
       console.log(
         `🔗 Queueing next batch: ${result.nextBatch} for ${result.nextChannel}`,
       );
 
-      // Zakolejkuj następny batch
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/sync/allegro-offers`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId,
-            batch: result.nextBatch,
-            channel: result.nextChannel,
-          }),
+      const workerUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/sync/allegro-offers/worker`;
+      await qstashClient.publishJSON({
+        url: workerUrl,
+        body: {
+          userId,
+          batch: result.nextBatch,
+          channel: result.nextChannel,
         },
-      );
-
-      if (!response.ok) {
-        console.error(
-          `❌ Failed to queue next batch: ${await response.text()}`,
-        );
-      }
+        retries: 2,
+        timeout: "14m",
+      });
     } else {
-      // To był ostatni batch - ustaw status na completed
       const hasAnySuccess = result.AL1?.success || result.AL2?.success;
-      const status = hasAnySuccess ? "completed" : "error";
-
-      await redis.set("allegro:sync:status", status);
-      await redis.set("allegro:sync:completed", new Date().toISOString());
-      await redis.set("allegro:sync:results", JSON.stringify(result));
-
+      await patchSyncJobState(ALLEGRO_SYNC_KEY, {
+        status: hasAnySuccess ? "completed" : "error",
+        completed: new Date().toISOString(),
+        results: JSON.stringify(result),
+      });
       console.log("✅ QStash worker: All batches completed!");
     }
-
-    console.log(
-      "✅ QStash worker: Background Allegro sync job completed successfully",
-    );
 
     return NextResponse.json({
       success: true,
@@ -77,11 +96,10 @@ async function handler(req: NextRequest) {
       error,
     );
 
-    await redis.set("allegro:sync:status", "error");
-    await redis.set(
-      "allegro:sync:error",
-      error instanceof Error ? error.message : "Unknown error",
-    );
+    await patchSyncJobState(ALLEGRO_SYNC_KEY, {
+      status: "error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
 
     return NextResponse.json(
       {
@@ -93,5 +111,4 @@ async function handler(req: NextRequest) {
   }
 }
 
-// Eksportuj handler jako POST - weryfikacja podpisu QStash wyłączona na razie
-export const POST = handler;
+export const POST = qstashPostHandler("allegro-offers-worker", handler);

@@ -1,4 +1,5 @@
 import { AllegroAuthError } from "@/firebase/schemas/shipmentsSchemas";
+import { invalidateAllegroTokenCache } from "@/server-actions/allegro/auth";
 
 export function formatAllegroError(
   baseMessage: string,
@@ -90,6 +91,10 @@ export function handleAllegroApiError(
   defaultMessage: string
 ): never {
   if (error.response) {
+    if (error.response.status === 401) {
+      invalidateAllegroTokenCache();
+    }
+
     console.error("Status:", error.response.status);
     console.error("Body:", JSON.stringify(error.response.data, null, 2));
 

@@ -1,3 +1,5 @@
+"use server";
+
 import axios from "axios";
 import { redis } from "@/upstash/redis";
 import { adminDB } from "@/firebase/firebaseAdmin";
@@ -18,15 +20,13 @@ type TokenCache = AllegroTokens & {
   expiresAt: number;
 };
 
-type RefreshTokens = Partial<
-  Record<AllegroAccount, { refreshToken?: string }>
->;
+type RefreshTokens = Partial<Record<AllegroAccount, { refreshToken?: string }>>;
 
 let tokenCache: TokenCache | null = null;
 let refreshTokensCache: RefreshTokens | null = null;
 let didPersistAuthKey = false;
 
-export function invalidateAllegroTokenCache(): void {
+export async function invalidateAllegroTokenCache(): Promise<void> {
   tokenCache = null;
   refreshTokensCache = null;
 }
@@ -74,9 +74,7 @@ async function refreshAccountAccessToken(
   });
 
   const clientId =
-    account === "AL1"
-      ? process.env.AL1_CLIENT_ID!
-      : process.env.AL2_CLIENT_ID!;
+    account === "AL1" ? process.env.AL1_CLIENT_ID! : process.env.AL2_CLIENT_ID!;
   const clientSecret =
     account === "AL1"
       ? process.env.AL1_CLIENT_SECRET!
@@ -183,7 +181,8 @@ export async function getAllegroUserAccessToken(
   return tokens[account];
 }
 
-export const getAllegroAccessTokensForBackgroundJob = getAllegroUserAccessTokens;
+export const getAllegroAccessTokensForBackgroundJob =
+  getAllegroUserAccessTokens;
 
 export async function exchangeCodeForTokens(
   code: string,

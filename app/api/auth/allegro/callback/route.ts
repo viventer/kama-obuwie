@@ -58,7 +58,7 @@ export async function GET(request: Request) {
       [`${account}TokenExpiry`]: expiryTs.toString(),
     });
     await redis.persist("allegroAuthData");
-    invalidateAllegroTokenCache();
+    await invalidateAllegroTokenCache();
 
     // 4) Zapis refreshToken w Firestore
     await adminDB

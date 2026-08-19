@@ -223,7 +223,7 @@ export default function ProductPage({
     }
 
     if (analytics) {
-      logEvent(analytics, "view_item", {
+      logEvent(analytics, "add_to_cart", {
         items: [
           {
             item_id: offersData[selectedColorVariant]?.SKU || "none",

@@ -34,14 +34,14 @@ export default function Page() {
         if (syncStatus.results) {
           const { AL1, AL2 } = syncStatus.results;
           detailsMsg += `\n\n📊 Szczegóły:\n`;
-          detailsMsg += `• AL1: ${AL1.success ? "✅ Sukces" : "❌ Błąd"} (${
-            AL1.offersCount
+          detailsMsg += `• AL1: ${AL1?.success ? "✅ Sukces" : "❌ Błąd"} (${
+            AL1?.offersCount ?? 0
           } ofert)`;
-          if (AL1.error) detailsMsg += `\n  Błąd: ${AL1.error}`;
-          detailsMsg += `\n• AL2: ${AL2.success ? "✅ Sukces" : "❌ Błąd"} (${
-            AL2.offersCount
+          if (AL1?.error) detailsMsg += `\n  Błąd: ${AL1.error}`;
+          detailsMsg += `\n• AL2: ${AL2?.success ? "✅ Sukces" : "❌ Błąd"} (${
+            AL2?.offersCount ?? 0
           } ofert)`;
-          if (AL2.error) detailsMsg += `\n  Błąd: ${AL2.error}`;
+          if (AL2?.error) detailsMsg += `\n  Błąd: ${AL2.error}`;
         }
 
         setMessage(detailsMsg);

@@ -2,10 +2,15 @@
 
 import { Client } from "@upstash/qstash";
 import { verifyUser, getCurrentUserId } from "../../auth/auth";
-import { redis } from "@/upstash/redis";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { OfferWithId } from "@/firebase/schemas/offersSchemas";
 import { syncMerchantCenterProductAvailability } from "@/server-actions/merchantCenter/manageProducts";
+import {
+  GMC_SYNC_KEY,
+  getSyncJobState,
+  patchSyncJobState,
+  resetSyncJobState,
+} from "@/upstash/syncJobState";
 
 const qstashClient = new Client({
   token: process.env.QSTASH_TOKEN!,
@@ -19,16 +24,18 @@ export const triggerGMCSync = async () => {
     throw new Error("Nie można zidentyfikować użytkownika");
   }
 
-  const currentStatus = await redis.get("gmc:sync:status");
-  if (currentStatus === "running") {
+  const current = await getSyncJobState(GMC_SYNC_KEY);
+  if (current.status === "running") {
     throw new Error(
       "Synchronizacja jest już w toku. Poczekaj na zakończenie poprzedniej synchronizacji.",
     );
   }
 
   try {
-    await redis.set("gmc:sync:status", "queued");
-    await redis.set("gmc:sync:queued", new Date().toISOString());
+    await resetSyncJobState(GMC_SYNC_KEY, {
+      status: "queued",
+      queued: new Date().toISOString(),
+    });
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
     const url = `${
@@ -48,7 +55,9 @@ export const triggerGMCSync = async () => {
 
     console.log(`✅ Sync job queued with ID: ${result.messageId}`);
 
-    await redis.set("gmc:sync:jobId", result.messageId);
+    await patchSyncJobState(GMC_SYNC_KEY, {
+      jobId: result.messageId,
+    });
 
     return {
       success: true,
@@ -58,11 +67,10 @@ export const triggerGMCSync = async () => {
   } catch (error) {
     console.error("❌ Failed to trigger sync:", error);
 
-    await redis.set("gmc:sync:status", "error");
-    await redis.set(
-      "gmc:sync:error",
-      error instanceof Error ? error.message : "Unknown error",
-    );
+    await patchSyncJobState(GMC_SYNC_KEY, {
+      status: "error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
 
     throw new Error(
       `Nie udało się uruchomić synchronizacji: ${

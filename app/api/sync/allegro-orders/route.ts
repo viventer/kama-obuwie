@@ -1,18 +1,17 @@
 import { syncAllegroOrders } from "@/server-actions/allegro/orders";
-import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 import { NextRequest, NextResponse } from "next/server";
+import { qstashPostHandler } from "@/upstash/qstashRoute";
 
-// Chroniona przez QStash weryfikacja podpisu
-async function handler(req: NextRequest) {
+async function handler(_req: NextRequest) {
   try {
     console.log(
-      "[CRON] Rozpoczynam automatyczną synchronizację zamówień z Allegro..."
+      "[CRON] Rozpoczynam automatyczną synchronizację zamówień z Allegro...",
     );
 
     await syncAllegroOrders();
 
     console.log(
-      "[CRON] Zakończono automatyczną synchronizację zamówień z Allegro"
+      "[CRON] Zakończono automatyczną synchronizację zamówień z Allegro",
     );
 
     return NextResponse.json({
@@ -23,7 +22,7 @@ async function handler(req: NextRequest) {
   } catch (error) {
     console.error(
       "[CRON] Błąd podczas automatycznej synchronizacji zamówień:",
-      error
+      error,
     );
 
     return NextResponse.json(
@@ -35,16 +34,9 @@ async function handler(req: NextRequest) {
             : "Nieznany błąd synchronizacji",
         timestamp: new Date().toISOString(),
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-// Owinięcie handlera weryfikacją QStash
-// Jeśli nie używasz QStash lub testujesz lokalnie, zakomentuj tę linię i odkomentuj poniższą
-// export const POST = verifySignatureAppRouter(handler);
-
-// Dla testów lokalnych (bez weryfikacji QStash):
-export async function POST(req: NextRequest) {
-  return handler(req);
-}
+export const POST = qstashPostHandler("allegro-orders-cron", handler);

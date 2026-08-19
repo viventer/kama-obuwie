@@ -1,10 +1,116 @@
+"use server";
+
 import axios from "axios";
 import { redis } from "@/upstash/redis";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { getSingleAllegroHeaders } from "./global";
 
-// client access token jest używany do autoryzacji zapytań do Allegro API, które nie wymagają dostępu do danych użytkownika
 const ALLEGRO_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_BASE_URL!;
+const ALLEGRO_AUTH_KEY = "allegroAuthData";
+const REFRESH_BUFFER = 60;
+
+type AllegroAccount = "AL1" | "AL2";
+
+type AllegroTokens = {
+  AL1: string;
+  AL2: string;
+};
+
+type TokenCache = AllegroTokens & {
+  expiresAt: number;
+};
+
+type RefreshTokens = Partial<Record<AllegroAccount, { refreshToken?: string }>>;
+
+let tokenCache: TokenCache | null = null;
+let refreshTokensCache: RefreshTokens | null = null;
+let didPersistAuthKey = false;
+
+export async function invalidateAllegroTokenCache(): Promise<void> {
+  tokenCache = null;
+  refreshTokensCache = null;
+}
+
+async function persistAllegroAuthKeyOnce(): Promise<void> {
+  if (didPersistAuthKey) {
+    return;
+  }
+  await redis.persist(ALLEGRO_AUTH_KEY);
+  didPersistAuthKey = true;
+}
+
+async function getRefreshTokens(): Promise<RefreshTokens> {
+  if (refreshTokensCache) {
+    return refreshTokensCache;
+  }
+
+  const refreshTokensDoc = await adminDB
+    .collection("allegroAuthData")
+    .doc("tokens")
+    .get();
+  const refreshTokensData = refreshTokensDoc.data();
+
+  if (!refreshTokensData) {
+    throw new Error("Brak tokenów Allegro w bazie danych");
+  }
+
+  refreshTokensCache = refreshTokensData as RefreshTokens;
+  return refreshTokensCache;
+}
+
+async function refreshAccountAccessToken(
+  account: AllegroAccount,
+  now: number,
+): Promise<{ accessToken: string; expiresAt: number }> {
+  const refreshTokens = await getRefreshTokens();
+  const refreshToken = refreshTokens[account]?.refreshToken;
+  if (!refreshToken) {
+    throw new Error(`Brak refresh tokena Allegro dla konta ${account}`);
+  }
+
+  const params = new URLSearchParams({
+    grant_type: "refresh_token",
+    refresh_token: refreshToken,
+  });
+
+  const clientId =
+    account === "AL1" ? process.env.AL1_CLIENT_ID! : process.env.AL2_CLIENT_ID!;
+  const clientSecret =
+    account === "AL1"
+      ? process.env.AL1_CLIENT_SECRET!
+      : process.env.AL2_CLIENT_SECRET!;
+
+  const basic = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+  const tokenEndpoint = `${ALLEGRO_BASE_URL}/auth/oauth/token`;
+
+  const resp = await axios.post(`${tokenEndpoint}?${params.toString()}`, null, {
+    headers: {
+      Authorization: `Basic ${basic}`,
+      "User-Agent": process.env.ALLEGRO_USER_AGENT!,
+    },
+  });
+
+  const { access_token, refresh_token, expires_in } = resp.data;
+  const expiresAt = now + expires_in;
+
+  await redis.hset(ALLEGRO_AUTH_KEY, {
+    [`${account}AccessToken`]: access_token,
+    [`${account}TokenExpiry`]: expiresAt.toString(),
+  });
+  await persistAllegroAuthKeyOnce();
+
+  await adminDB
+    .collection("allegroAuthData")
+    .doc("tokens")
+    .set({ [account]: { refreshToken: refresh_token } }, { merge: true });
+
+  refreshTokensCache = {
+    ...refreshTokens,
+    [account]: { refreshToken: refresh_token },
+  };
+
+  return { accessToken: access_token, expiresAt };
+}
 
 export async function getAllegroClientAccessToken() {
   const clientId = process.env.ALLEGRO_CLIENT_ID!;
@@ -26,116 +132,57 @@ export async function getAllegroClientAccessToken() {
   return resp.data.access_token;
 }
 
-const REFRESH_BUFFER = 60; // sekundy, bufor bezpieczeństwa przed wygaśnięciem tokena
-
-export async function getAllegroUserAccessTokens(): Promise<{
-  AL1: string;
-  AL2: string;
-}> {
-  // 2. Pobierz globalne tokeny Allegro z Redis
-  const redisTokens = await redis.hgetall("allegroAuthData");
-  if (!redisTokens) {
-    throw new Error("Brak tokenów Allegro w Redis");
-  }
-
+export async function getAllegroUserAccessTokens(): Promise<AllegroTokens> {
   const now = Math.floor(Date.now() / 1000);
-  const result = { AL1: "", AL2: "" };
 
-  // 3. Pobierz refresh tokeny z Firestore
-  const refreshTokensDoc = await adminDB
-    .collection("allegroAuthData")
-    .doc("tokens")
-    .get();
-  const refreshTokensData = refreshTokensDoc.data();
-
-  if (!refreshTokensData) {
-    throw new Error("Brak tokenów Allegro w bazie danych");
+  if (
+    tokenCache &&
+    tokenCache.AL1 &&
+    tokenCache.AL2 &&
+    now + REFRESH_BUFFER < tokenCache.expiresAt
+  ) {
+    return { AL1: tokenCache.AL1, AL2: tokenCache.AL2 };
   }
 
-  // Przetwórz oba konta
-  for (const account of ["AL1", "AL2"] as const) {
-    const accessToken = redisTokens[`${account}AccessToken`] as
-      | string
-      | undefined;
-    const expiryTs = parseInt(
-      (redisTokens[`${account}TokenExpiry`] as string) || "0",
-      10,
-    );
+  const redisTokens =
+    (await redis.hgetall<Record<string, string>>(ALLEGRO_AUTH_KEY)) ?? {};
+  await persistAllegroAuthKeyOnce();
 
-    // 4. Jeśli token jest nadal ważny (z buforem), użyj go
+  const result: AllegroTokens = { AL1: "", AL2: "" };
+  const expiries: number[] = [];
+
+  for (const account of ["AL1", "AL2"] as const) {
+    const accessToken = redisTokens[`${account}AccessToken`];
+    const expiryTs = parseInt(redisTokens[`${account}TokenExpiry`] || "0", 10);
+
     if (accessToken && now + REFRESH_BUFFER < expiryTs) {
       result[account] = accessToken;
+      expiries.push(expiryTs);
       continue;
     }
 
-    // 5. Token wygasł — pobierz refreshToken z Firestore
-    const refreshToken = refreshTokensData[account]?.refreshToken as
-      | string
-      | undefined;
-    if (!refreshToken) {
-      throw new Error(`Brak refresh tokena Allegro dla konta ${account}`);
-    }
-
-    // 6. Odśwież token w Allegro
-    const params = new URLSearchParams({
-      grant_type: "refresh_token",
-      refresh_token: refreshToken,
-    });
-
-    const clientId =
-      account === "AL1"
-        ? process.env.AL1_CLIENT_ID!
-        : process.env.AL2_CLIENT_ID!;
-    const clientSecret =
-      account === "AL1"
-        ? process.env.AL1_CLIENT_SECRET!
-        : process.env.AL2_CLIENT_SECRET!;
-
-    const basic = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
-    const tokenEndpoint = `${ALLEGRO_BASE_URL}/auth/oauth/token`;
-
-    const resp = await axios.post(
-      `${tokenEndpoint}?${params.toString()}`,
-      null,
-      {
-        headers: {
-          Authorization: `Basic ${basic}`,
-          "User-Agent": process.env.ALLEGRO_USER_AGENT!,
-        },
-      },
-    );
-    const { access_token, refresh_token, expires_in } = resp.data;
-
-    // 7. Zapisz nowy access token w Redis (globalnie)
-    const newExpiry = now + expires_in;
-    await redis.hset("allegroAuthData", {
-      [`${account}AccessToken`]: access_token,
-      [`${account}TokenExpiry`]: newExpiry.toString(),
-    });
-    await redis.expire("allegroAuthData", 60 * 60 * 24 * 7);
-
-    // 8. Zapisz nowy refresh token w Firestore
-    await adminDB
-      .collection("allegroAuthData")
-      .doc("tokens")
-      .set({ [account]: { refreshToken: refresh_token } }, { merge: true });
-
-    result[account] = access_token;
+    const refreshed = await refreshAccountAccessToken(account, now);
+    result[account] = refreshed.accessToken;
+    expiries.push(refreshed.expiresAt);
   }
 
-  // Przedłuż TTL sesji w Redis
-  await redis.expire("allegroAuthData", 60 * 60 * 24 * 7);
+  tokenCache = {
+    ...result,
+    expiresAt: Math.min(...expiries),
+  };
 
   return result;
 }
 
-// Funkcja pomocnicza dla kompatybilności wstecznej - domyślnie zwraca token AL1
 export async function getAllegroUserAccessToken(
-  account: "AL1" | "AL2" = "AL1",
+  account: AllegroAccount = "AL1",
 ): Promise<string> {
   const tokens = await getAllegroUserAccessTokens();
   return tokens[account];
 }
+
+export const getAllegroAccessTokensForBackgroundJob =
+  getAllegroUserAccessTokens;
 
 export async function exchangeCodeForTokens(
   code: string,
@@ -198,99 +245,4 @@ export async function checkAccountInfo(
     console.log("Błąd podczas sprawdzania informacji o koncie Allegro:", err);
     return false;
   }
-}
-
-export async function getAllegroAccessTokensForBackgroundJob(): Promise<{
-  AL1: string;
-  AL2: string;
-}> {
-  const now = Math.floor(Date.now() / 1000);
-  const result = { AL1: "", AL2: "" };
-
-  // 1. Pobierz globalne tokeny z Redis
-  const redisTokens = await redis.hgetall("allegroAuthData");
-
-  // 2. Pobierz refresh tokeny z Firestore
-  const refreshTokensDoc = await adminDB
-    .collection("allegroAuthData")
-    .doc("tokens")
-    .get();
-  const refreshTokensData = refreshTokensDoc.data();
-
-  if (!refreshTokensData) {
-    throw new Error("Brak tokenów Allegro w bazie danych");
-  }
-
-  for (const account of ["AL1", "AL2"] as const) {
-    const cachedToken = redisTokens?.[`${account}AccessToken`] as
-      | string
-      | undefined;
-    const cachedExpiry = parseInt(
-      (redisTokens?.[`${account}TokenExpiry`] as string) || "0",
-      10,
-    );
-
-    // 3. Jeśli token jest nadal ważny (z buforem), użyj go
-    if (cachedToken && cachedExpiry && now + REFRESH_BUFFER < cachedExpiry) {
-      result[account] = cachedToken;
-      continue;
-    }
-
-    // 4. Token wygasł - pobierz refreshToken z Firestore
-    const refreshToken = refreshTokensData[account]?.refreshToken as
-      | string
-      | undefined;
-    if (!refreshToken) {
-      throw new Error(`Brak refresh tokena Allegro dla konta ${account}`);
-    }
-
-    // 5. Odśwież token w Allegro
-    const params = new URLSearchParams({
-      grant_type: "refresh_token",
-      refresh_token: refreshToken,
-    });
-
-    const clientId =
-      account === "AL1"
-        ? process.env.AL1_CLIENT_ID!
-        : process.env.AL2_CLIENT_ID!;
-    const clientSecret =
-      account === "AL1"
-        ? process.env.AL1_CLIENT_SECRET!
-        : process.env.AL2_CLIENT_SECRET!;
-
-    const basic = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
-    const tokenEndpoint = `${ALLEGRO_BASE_URL}/auth/oauth/token`;
-
-    const resp = await axios.post(
-      `${tokenEndpoint}?${params.toString()}`,
-      null,
-      {
-        headers: {
-          Authorization: `Basic ${basic}`,
-          "User-Agent": process.env.ALLEGRO_USER_AGENT!,
-        },
-      },
-    );
-
-    const { access_token, refresh_token, expires_in } = resp.data;
-    const newExpiry = now + expires_in;
-
-    // 6. Zapisz nowy access token w Redis
-    await redis.hset("allegroAuthData", {
-      [`${account}AccessToken`]: access_token,
-      [`${account}TokenExpiry`]: newExpiry.toString(),
-    });
-    await redis.expire("allegroAuthData", 60 * 60 * 24 * 7);
-
-    // 7. Zapisz nowy refresh token w Firestore
-    await adminDB
-      .collection("allegroAuthData")
-      .doc("tokens")
-      .set({ [account]: { refreshToken: refresh_token } }, { merge: true });
-
-    result[account] = access_token;
-  }
-
-  return result;
 }

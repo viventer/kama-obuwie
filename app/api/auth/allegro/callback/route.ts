@@ -2,6 +2,7 @@ import { adminDB } from "@/firebase/firebaseAdmin";
 import {
   checkAccountInfo,
   exchangeCodeForTokens,
+  invalidateAllegroTokenCache,
 } from "@/server-actions/allegro/auth";
 import { redis } from "@/upstash/redis";
 import { NextResponse } from "next/server";
@@ -56,7 +57,8 @@ export async function GET(request: Request) {
       [`${account}AccessToken`]: access_token,
       [`${account}TokenExpiry`]: expiryTs.toString(),
     });
-    await redis.expire("allegroAuthData", 60 * 60 * 24 * 7);
+    await redis.persist("allegroAuthData");
+    await invalidateAllegroTokenCache();
 
     // 4) Zapis refreshToken w Firestore
     await adminDB

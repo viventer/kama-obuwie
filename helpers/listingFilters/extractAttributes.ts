@@ -8,6 +8,7 @@ import { z } from "zod";
 type ParamValue = z.infer<typeof ParamValueSchema>;
 
 const PARAMETER_ALIASES = {
+  color: ["kolor"],
   externalMaterial: ["materiał zewnętrzny", "materiał"],
   fastening: ["zapięcie", "rodzaj zapięcia"],
 } as const;
@@ -53,6 +54,22 @@ const findParamValues = (
   }
 
   return [];
+};
+
+/** Color from `parameters.optional.Kolor` (legacy products). */
+export const getListingColorFromOptionalParameters = (
+  parameters?: ProductParameters,
+): string | undefined => {
+  const optional = parameters?.optional;
+  if (!optional) return undefined;
+
+  const aliasSet = new Set<string>(PARAMETER_ALIASES.color);
+  const entry = Object.entries(optional).find(([key]) =>
+    aliasSet.has(key.toLowerCase()),
+  );
+  if (!entry) return undefined;
+
+  return normalizeParamValue(entry[1])[0];
 };
 
 /** Extract listing filter attributes from product parameters + color variant. */

@@ -33,6 +33,11 @@ import { useEffect, useState } from "react";
 import { analytics } from "@/firebase/firebase";
 import { logEvent } from "firebase/analytics";
 import { ItemType } from "@/firebase/schemas/analyticsSchemas";
+import {
+  buildPurchaseUserData,
+  setGtagUserData,
+} from "@/helpers/analytics";
+import { readConsentCookie } from "@/lib/consent";
 
 export default function CheckoutForms() {
   const { showToast } = useToast();
@@ -205,6 +210,10 @@ export default function CheckoutForms() {
       }
 
       if (analytics) {
+        if (readConsentCookie()?.marketing) {
+          setGtagUserData(buildPurchaseUserData(checkoutData));
+        }
+
         logEvent(analytics, "purchase", {
           items: cart.map(
             (cartItem) =>

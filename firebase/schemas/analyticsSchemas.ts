@@ -56,6 +56,23 @@ export const BeginPaymentSchema = ShoppingEventBaseSchema.extend({
   payment_type: PaymentMethodSchema,
 });
 
+// User-provided data for GA4 enhanced conversions.
+// Unhashed values — Google normalizes and hashes them. Phone must be E.164.
+export const UserDataAddressSchema = z.object({
+  first_name: z.string(),
+  last_name: z.string(),
+  street: z.string().optional(),
+  city: z.string().optional(),
+  postal_code: z.string().optional(),
+  country: z.string().length(2),
+});
+
+export const UserDataSchema = z.object({
+  email: z.string(),
+  phone_number: z.string(),
+  address: UserDataAddressSchema,
+});
+
 export const PurchaseSchema = ShoppingEventBaseSchema.extend({
   transaction_id: z.string(), // order id
   payment_type: PaymentMethodSchema,
@@ -72,3 +89,5 @@ export type SelectParcelLockerType = z.infer<typeof SelectParcelLockerSchema>;
 export type AddPaymentInfoType = z.infer<typeof AddPaymentInfoSchema>;
 export type BeginPaymentType = z.infer<typeof BeginPaymentSchema>;
 export type PurchaseType = z.infer<typeof PurchaseSchema>;
+export type UserDataType = z.infer<typeof UserDataSchema>;
+export type UserDataAddressType = z.infer<typeof UserDataAddressSchema>;

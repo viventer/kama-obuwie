@@ -100,8 +100,12 @@ export default function CreateLabelForm({
     const deliveryPrice = Number(orderDeliveryData?.cost?.amount) || 0;
     const refundAmount = Number(orderData.refund?.amount?.amount) || 0;
     const totalToPay = Number(orderSummary.totalToPay.amount);
+    const isCOD = orderData.paymentType == "COD";
 
-    const insuranceAmount = totalToPay - deliveryPrice - refundAmount;
+    // InPost wymaga, żeby insurance === cod; dla COD nie odejmujemy dostawy/zwrotu
+    const insuranceAmount = isCOD
+      ? totalToPay
+      : totalToPay - deliveryPrice - refundAmount;
 
     const formData = form.getValues();
 
@@ -143,7 +147,7 @@ export default function CreateLabelForm({
       },
     };
 
-    if (orderData.paymentType == "COD") {
+    if (isCOD) {
       data.cod = {
         amount: totalToPay,
         currency: "PLN",

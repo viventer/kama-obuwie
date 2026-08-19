@@ -1,61 +1,71 @@
 import { NextRequest, NextResponse } from "next/server";
-import { redis } from "@/upstash/redis";
+import { Client } from "@upstash/qstash";
 import { syncGMCAvailability } from "@/server-actions/allegro/sync/syncGMCAvailability";
+import { qstashPostHandler } from "@/upstash/qstashRoute";
+import {
+  GMC_SYNC_KEY,
+  getSyncJobState,
+  isGmcBatchAlreadyProcessed,
+  patchSyncJobState,
+} from "@/upstash/syncJobState";
+
+const qstashClient = new Client({
+  token: process.env.QSTASH_TOKEN!,
+});
 
 async function handler(req: NextRequest) {
+  const body = await req.json();
+  const batch = body.batch ?? 0;
+
+  console.log(`[SYNC] gmc/availability worker batch=${batch}`);
+
+  const state = await getSyncJobState(GMC_SYNC_KEY);
+  if (isGmcBatchAlreadyProcessed(batch, state)) {
+    console.log(`[SYNC] skipping already processed GMC batch ${batch}`);
+    return NextResponse.json({
+      success: true,
+      skipped: true,
+      batch,
+    });
+  }
+
+  if (batch === 0) {
+    await patchSyncJobState(GMC_SYNC_KEY, {
+      status: "running",
+      started: new Date().toISOString(),
+      error: "",
+    });
+  }
+
   try {
-    console.log("🚀 QStash worker: Starting background GMC sync job...");
-
-    const body = await req.json();
-    const batch = body.batch ?? 0;
-
-    console.log(`👤 Running sync batch: ${batch}`);
-
-    // Ustaw status na "running" tylko dla pierwszego batcha
-    if (batch === 0) {
-      await redis.set("gmc:sync:status", "running");
-      await redis.set("gmc:sync:started", new Date().toISOString());
-      await redis.del("gmc:sync:progress"); // Wyczyść stary progress
-    }
-
-    // Wykonaj synchronizację dla tego batcha
     const result = await syncGMCAvailability(batch);
 
-    // Sprawdź czy są kolejne batche do przetworzenia
+    await patchSyncJobState(GMC_SYNC_KEY, {
+      lastBatch: String(batch),
+      nextBatch:
+        result.nextBatch !== null && result.nextBatch !== undefined
+          ? String(result.nextBatch)
+          : "",
+    });
+
     if (result.hasMore) {
       console.log(`🔗 Queueing next batch: ${result.nextBatch}`);
 
-      // Zakolejkuj następny batch
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/sync/gmc/availability`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            batch: result.nextBatch,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        console.error(
-          `❌ Failed to queue next batch: ${await response.text()}`,
-        );
-      }
+      const workerUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/sync/gmc/availability/worker`;
+      await qstashClient.publishJSON({
+        url: workerUrl,
+        body: { batch: result.nextBatch },
+        retries: 2,
+        timeout: "14m",
+      });
     } else {
-      // To był ostatni batch - ustaw status na completed
-      const status = result.success ? "completed" : "error";
-
-      await redis.set("gmc:sync:status", status);
-      await redis.set("gmc:sync:completed", new Date().toISOString());
-      await redis.set("gmc:sync:results", JSON.stringify(result));
-
+      await patchSyncJobState(GMC_SYNC_KEY, {
+        status: result.success ? "completed" : "error",
+        completed: new Date().toISOString(),
+        results: JSON.stringify(result),
+      });
       console.log("✅ QStash worker: All batches completed!");
     }
-
-    console.log(
-      "✅ QStash worker: Background GMC sync job completed successfully",
-    );
 
     return NextResponse.json({
       success: true,
@@ -67,11 +77,10 @@ async function handler(req: NextRequest) {
   } catch (error) {
     console.error("❌ QStash worker: Background GMC sync job failed:", error);
 
-    await redis.set("gmc:sync:status", "error");
-    await redis.set(
-      "gmc:sync:error",
-      error instanceof Error ? error.message : "Unknown error",
-    );
+    await patchSyncJobState(GMC_SYNC_KEY, {
+      status: "error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
 
     return NextResponse.json(
       {
@@ -83,4 +92,4 @@ async function handler(req: NextRequest) {
   }
 }
 
-export const POST = handler;
+export const POST = qstashPostHandler("gmc-availability-worker", handler);

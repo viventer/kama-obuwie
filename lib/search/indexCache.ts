@@ -9,8 +9,8 @@ import { buildFacetLexicon, buildSearchDocs } from "@/lib/search/buildDocs";
 import { FacetLexicon, SearchDoc } from "@/lib/search/types";
 import { SEARCH_FIELDS, SEARCH_STORE_FIELDS } from "./constants";
 
-const REDIS_INDEX_KEY = "search:minisearch:v4";
-const REDIS_DOCS_KEY = "search:docs:v4";
+const REDIS_INDEX_KEY = "search:minisearch:v5";
+const REDIS_DOCS_KEY = "search:docs:v5";
 const CACHE_TTL_SECONDS = 24 * 60 * 60; // 24h — invalidate on product/offer writes
 
 type CachedBundle = {

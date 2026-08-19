@@ -1,6 +1,52 @@
 {
-  "czółenka": ["obcasy", "szpilki"],
-  "adidasy": ["buty sportowe", "sneakersy"],
-  "klapki": ["laczki"],
-  "mokasyny": ["loafersy"]
+  "baleriny": ["balerinki", "baletki"],
+  "sportowe": [
+    "adidasy",
+    "adidasiki",
+    "adidaski",
+    "sneakersy",
+    "sneakers",
+    "treningowe",
+    "fitnessowe"
+  ],
+  "kozaki": ["kozaczki", "oficerki", "muszkieterki", "kowbojki"],
+  "korki": ["turfy", "lanki", "kopańce", "piłkarskie"],
+  "kapcie": [
+    "papcie",
+    "papucie",
+    "bambosze",
+    "bamboszki",
+    "kapcioki",
+    "cieplaki",
+    "homysły"
+  ],
+  "mokasyny": ["loafersy", "loafers", "lordsy", "mokasynki"],
+  "trampki": ["tenisówki", "trampeczki", "conversy", "platówki"],
+  "basenowe": ["basenówki", "słowki", "pływackie"],
+  "botki": ["boteczki", "sztyblety", "chelsea", "sztylblety"],
+  "japonki": [
+    "japoneczki",
+    "palcaki",
+    "palcówki",
+    "flipflopy",
+    "flipflop",
+    "thongi"
+  ],
+  "półbuty": ["oxfordy", "oksfordy", "derby", "brogsy", "wizytowe", "półbutki"],
+  "śniegowce": ["uszatki", "moonbooty", "apresy", "śniegule"],
+  "kalosze": [
+    "kaloszki",
+    "gumowce",
+    "gumaki",
+    "gumiaki",
+    "wellingtony",
+    "wellsy"
+  ],
+  "casual": ["mule", "mulesy", "chodaki"],
+  "klapki": ["laczki", "klapeczki", "slajdy", "slidesy"],
+  "halówki": ["halowe", "indoor"],
+  "czółenka": ["szpilki", "szpile", "szpileczki", "obcasy", "pumps", "łódki"],
+  "sandały": ["sandałki", "sandałeczki", "rzymianki", "gladiatorki"],
+  "trekkingowe": ["trekkingi", "treki", "hikingi", "terenowe"],
+  "trzewiki": ["trapery", "traperki", "glany", "workery", "martensy"]
 }

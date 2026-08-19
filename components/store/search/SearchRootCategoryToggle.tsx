@@ -6,22 +6,18 @@ import { RootCategory } from "@/firebase/schemas/productsSchemas";
 import { useStoreSearch } from "./StoreSearchContext";
 import { cn } from "@/lib/utils";
 
-const OPTIONS: { value: string; label: string; root?: RootCategory }[] = [
-  { value: "all", label: "Wszystkie" },
+const OPTIONS: { value: RootCategory; label: string }[] = [
   {
     value: "obuwie męskie",
     label: ROOT_CATEGORY_LABELS["obuwie męskie"],
-    root: "obuwie męskie",
   },
   {
     value: "obuwie damskie",
     label: ROOT_CATEGORY_LABELS["obuwie damskie"],
-    root: "obuwie damskie",
   },
   {
     value: "obuwie dziecięce",
     label: ROOT_CATEGORY_LABELS["obuwie dziecięce"],
-    root: "obuwie dziecięce",
   },
 ];
 
@@ -31,14 +27,13 @@ export default function SearchRootCategoryToggle({
   className?: string;
 }) {
   const { rootCategory, setRootCategory } = useStoreSearch();
-  const selected = rootCategory || "all";
 
   return (
     <ToggleGroup
       type="single"
-      value={selected}
+      value={rootCategory ?? ""}
       onValueChange={(value) => {
-        if (!value || value === "all") {
+        if (!value) {
           setRootCategory(undefined);
           return;
         }

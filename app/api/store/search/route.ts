@@ -24,9 +24,15 @@ export async function GET(request: NextRequest) {
   const limit = Number.isFinite(limitRaw)
     ? Math.min(Math.max(Math.floor(limitRaw), 1), SEARCH_LISTING_LIMIT)
     : 8;
+  const groupByRoot = searchParams.get("groupByRoot") === "1";
 
   try {
-    const result = await searchProducts({ query, rootCategory, limit });
+    const result = await searchProducts({
+      query,
+      rootCategory,
+      limit,
+      groupByRoot,
+    });
     return NextResponse.json(result);
   } catch (error) {
     console.error("GET /api/store/search failed:", error);

@@ -14,15 +14,14 @@ import {
 import { usePathname, useSearchParams } from "next/navigation";
 import { RootCategory } from "@/firebase/schemas/productsSchemas";
 import type { RankedSearchHit } from "@/lib/search/ranking";
-import {
-  ROOT_CATEGORY_FROM_URL,
-  ROOT_CATEGORY_URL_VALUES,
-} from "@/helpers/listingFilters/types";
+import { ROOT_CATEGORY_FROM_URL } from "@/helpers/listingFilters/types";
 import { rootCategoryToUrlSlug } from "@/helpers/listingFilters/url";
 import {
   SEARCH_DEBOUNCE_MS,
+  SEARCH_INSTANT_DISPLAY_LIMIT,
   SEARCH_MIN_QUERY_LENGTH,
 } from "@/lib/search/constants";
+import { isShoeRootCategory } from "@/lib/search/types";
 
 type StoreSearchContextValue = {
   isOpen: boolean;
@@ -80,7 +79,10 @@ function StoreSearchProviderInner({ children }: { children: ReactNode }) {
   const [rootCategory, setRootCategory] = useState<RootCategory | undefined>(
     urlPlec ? ROOT_CATEGORY_FROM_URL[urlPlec] : undefined,
   );
-  const [results, setResults] = useState<RankedSearchHit[]>([]);
+  const [allHits, setAllHits] = useState<RankedSearchHit[]>([]);
+  const [hitsByRoot, setHitsByRoot] = useState<
+    Partial<Record<RootCategory, RankedSearchHit[]>>
+  >({});
   const [isSearching, setIsSearching] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestIdRef = useRef(0);
@@ -95,7 +97,8 @@ function StoreSearchProviderInner({ children }: { children: ReactNode }) {
     setQueryState(urlQuery);
     setRootCategory(urlPlec ? ROOT_CATEGORY_FROM_URL[urlPlec] : undefined);
     if (!urlQuery) {
-      setResults([]);
+      setAllHits([]);
+      setHitsByRoot({});
     }
   }, [urlQuery, urlPlec, pathname]);
 
@@ -103,7 +106,8 @@ function StoreSearchProviderInner({ children }: { children: ReactNode }) {
   const closeSearch = useCallback(
     (options?: { resetQueryToUrl?: boolean }) => {
       setIsOpen(false);
-      setResults([]);
+      setAllHits([]);
+      setHitsByRoot({});
       // After Enter→navigate, keep typed query; URL sync will catch up.
       // When dismissing overlay without navigate, snap back to page q.
       if (options?.resetQueryToUrl === false) return;
@@ -132,7 +136,8 @@ function StoreSearchProviderInner({ children }: { children: ReactNode }) {
     }
 
     if (trimmed.length < SEARCH_MIN_QUERY_LENGTH) {
-      setResults([]);
+      setAllHits([]);
+      setHitsByRoot({});
       setIsSearching(false);
       return;
     }
@@ -142,30 +147,34 @@ function StoreSearchProviderInner({ children }: { children: ReactNode }) {
 
     debounceRef.current = setTimeout(async () => {
       try {
-        const params = new URLSearchParams({ q: trimmed, limit: "8" });
-        const slug =
-          rootCategory && rootCategory in ROOT_CATEGORY_URL_VALUES
-            ? ROOT_CATEGORY_URL_VALUES[
-                rootCategory as keyof typeof ROOT_CATEGORY_URL_VALUES
-              ]
-            : undefined;
-        if (slug) params.set("plec", slug);
+        const params = new URLSearchParams({
+          q: trimmed,
+          limit: String(SEARCH_INSTANT_DISPLAY_LIMIT),
+          groupByRoot: "1",
+        });
 
         // GET /api/store/search — not a Server Action, so Network tab shows
         // the actual q= being searched (not the stale page URL).
+        // No `plec`: one unfiltered search fills every gender bucket so
+        // toggling Damskie/Męskie is instant client-side filtering.
         const res = await fetch(`/api/store/search?${params.toString()}`, {
           method: "GET",
           cache: "no-store",
         });
         if (!res.ok) throw new Error(`search HTTP ${res.status}`);
-        const data = (await res.json()) as { results: RankedSearchHit[] };
+        const data = (await res.json()) as {
+          results: RankedSearchHit[];
+          byRootCategory?: Partial<Record<RootCategory, RankedSearchHit[]>>;
+        };
         if (requestId === requestIdRef.current) {
-          setResults(data.results || []);
+          setAllHits(data.results || []);
+          setHitsByRoot(data.byRootCategory || {});
         }
       } catch (error) {
         console.error("Search failed:", error);
         if (requestId === requestIdRef.current) {
-          setResults([]);
+          setAllHits([]);
+          setHitsByRoot({});
         }
       } finally {
         if (requestId === requestIdRef.current) {
@@ -177,7 +186,18 @@ function StoreSearchProviderInner({ children }: { children: ReactNode }) {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query, rootCategory, isOpen]);
+  }, [query, isOpen]);
+
+  const results = useMemo(() => {
+    if (rootCategory && isShoeRootCategory(rootCategory)) {
+      const grouped = hitsByRoot[rootCategory];
+      if (grouped !== undefined) return grouped;
+      return allHits
+        .filter((hit) => hit.rootCategory === rootCategory)
+        .slice(0, SEARCH_INSTANT_DISPLAY_LIMIT);
+    }
+    return allHits;
+  }, [allHits, hitsByRoot, rootCategory]);
 
   const buildResultsHref = useCallback(
     (overrideQuery?: string) => {

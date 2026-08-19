@@ -4,6 +4,9 @@ export const SEARCH_MIN_QUERY_LENGTH = 3;
 /** Wait this long after the last keystroke before fetching instant results. */
 export const SEARCH_DEBOUNCE_MS = 300;
 
+/** Hits shown in the overlay under the search input. */
+export const SEARCH_INSTANT_DISPLAY_LIMIT = 6;
+
 /** Max hits for the full `/listing?q=` results page. */
 export const SEARCH_LISTING_LIMIT = 300;
 

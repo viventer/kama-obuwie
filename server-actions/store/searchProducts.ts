@@ -8,7 +8,7 @@ import {
   rerankSearchResults,
   type RankedSearchHit,
 } from "@/lib/search/ranking";
-import { isShoeRootCategory } from "@/lib/search/types";
+import { isShoeRootCategory, SHOE_ROOT_CATEGORIES } from "@/lib/search/types";
 import { z } from "zod";
 
 const SearchProductsInputSchema = z.object({
@@ -17,25 +17,34 @@ const SearchProductsInputSchema = z.object({
     .enum(["obuwie męskie", "obuwie damskie", "obuwie dziecięce"])
     .optional(),
   limit: z.number().int().positive().max(500).optional(),
+  /** Top `limit` hits per shoe root, so overlay gender toggles need no refetch. */
+  groupByRoot: z.boolean().optional(),
 });
+
+export type SearchHitsByRoot = Record<
+  (typeof SHOE_ROOT_CATEGORIES)[number],
+  RankedSearchHit[]
+>;
 
 export type SearchProductsResult = {
   results: RankedSearchHit[];
   query: string;
   expandedQuery: string;
+  byRootCategory?: SearchHitsByRoot;
 };
 
 export const searchProducts = async function (input: {
   query: string;
   rootCategory?: RootCategory;
   limit?: number;
+  groupByRoot?: boolean;
 }): Promise<SearchProductsResult> {
   const parsed = SearchProductsInputSchema.safeParse(input);
   if (!parsed.success) {
     return { results: [], query: input.query || "", expandedQuery: "" };
   }
 
-  const { query, rootCategory, limit = 100 } = parsed.data;
+  const { query, rootCategory, limit = 100, groupByRoot } = parsed.data;
 
   // Defensive: Next may pass still-encoded query strings in edge cases
   let decodedQuery = query;
@@ -84,6 +93,15 @@ export const searchProducts = async function (input: {
     intent,
   );
 
+  const byRootCategory: SearchHitsByRoot | undefined = groupByRoot
+    ? (Object.fromEntries(
+        SHOE_ROOT_CATEGORIES.map((root) => [
+          root,
+          ranked.filter((doc) => doc.rootCategory === root).slice(0, limit),
+        ]),
+      ) as SearchHitsByRoot)
+    : undefined;
+
   if (rootCategory && isShoeRootCategory(rootCategory)) {
     ranked = ranked.filter((doc) => doc.rootCategory === rootCategory);
   }
@@ -92,5 +110,6 @@ export const searchProducts = async function (input: {
     results: ranked.slice(0, limit),
     query: decodedQuery,
     expandedQuery,
+    ...(byRootCategory ? { byRootCategory } : {}),
   };
 };

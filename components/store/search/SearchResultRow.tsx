@@ -38,7 +38,7 @@ export default function SearchResultRow({
         ) : null}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-base truncate capitalize">
+        <p className="font-medium text-base truncate capitalize">
           {titleLabel}
         </p>
         {hasBrand && categoryLabel ? (

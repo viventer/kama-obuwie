@@ -27,7 +27,7 @@ export default function ContactPage() {
               <div className="flex items-center space-x-3">
                 <MailIcon className="text-brand w-6 h-6" />
                 <div>
-                  <h3 className="font-semibold text-foreground">Email</h3>
+                  <h3 className="font-medium text-foreground">Email</h3>
                   <LinkText href={`mailto:${companyData.email}`}>
                     {companyData.email}
                   </LinkText>
@@ -37,7 +37,7 @@ export default function ContactPage() {
               <div className="flex items-center space-x-3">
                 <PhoneIcon className="text-brand w-6 h-6" />
                 <div>
-                  <h3 className="font-semibold text-foreground">Telefon</h3>
+                  <h3 className="font-medium text-foreground">Telefon</h3>
                   <LinkText href={companyData.phoneHref}>
                     {companyData.phone}
                   </LinkText>
@@ -49,9 +49,7 @@ export default function ContactPage() {
               <div className="flex items-center space-x-3">
                 <ClockIcon className="text-brand w-6 h-6" />
                 <div>
-                  <h3 className="font-semibold text-foreground">
-                    Godziny pracy
-                  </h3>
+                  <h3 className="font-medium text-foreground">Godziny pracy</h3>
                   <div className=" space-y-1">
                     <p>Poniedziałek - Piątek: 8:00 - 16:30</p>
                     <p>Sobota: 8:00 - 13:30</p>
@@ -104,7 +102,7 @@ export default function ContactPage() {
           <div className="space-y-4">
             <Card className="gap-0 bg-background">
               <CardHeader>
-                <h3 className="font-semibold text-foreground">
+                <h3 className="font-medium text-foreground">
                   Jak mogę sprawdzić status zamówienia?
                 </h3>
               </CardHeader>
@@ -118,7 +116,7 @@ export default function ContactPage() {
 
             <Card className="gap-0 bg-background">
               <CardHeader>
-                <h3 className="font-semibold text-foreground">
+                <h3 className="font-medium text-foreground">
                   Jak zwrócić produkt?
                 </h3>
               </CardHeader>
@@ -132,7 +130,7 @@ export default function ContactPage() {
 
             <Card className="gap-0 bg-background">
               <CardHeader>
-                <h3 className="font-semibold text-foreground">
+                <h3 className="font-medium text-foreground">
                   Jak wymienić niepasujący rozmiar?
                 </h3>
               </CardHeader>
@@ -146,7 +144,7 @@ export default function ContactPage() {
 
             <Card className="gap-0 bg-background">
               <CardHeader>
-                <h3 className="font-semibold text-foreground">
+                <h3 className="font-medium text-foreground">
                   Ile kosztuje dostawa?
                 </h3>
               </CardHeader>
@@ -154,14 +152,14 @@ export default function ContactPage() {
                 <div className=" space-y-2">
                   <p>
                     W przypadku zamówień o wartości przekraczającej{" "}
-                    <span className="font-semibold underline decoration-2 decoration-success">
+                    <span className="font-medium underline decoration-2 decoration-success">
                       55 złotych dostawa jest darmowa
                     </span>
                     .
                   </p>
                   <p>
                     Cena podstawowa to{" "}
-                    <span className="font-semibold">9,99 zł</span> w przypadku
+                    <span className="font-medium">9,99 zł</span> w przypadku
                     wszystkich metod.
                   </p>
                 </div>
@@ -170,7 +168,7 @@ export default function ContactPage() {
 
             <Card className="gap-0 bg-background">
               <CardHeader>
-                <h3 className="font-semibold text-foreground">
+                <h3 className="font-medium text-foreground">
                   Jak długo trwa dostawa?
                 </h3>
               </CardHeader>
@@ -178,7 +176,7 @@ export default function ContactPage() {
                 <div className=" space-y-2">
                   <p>
                     Całkowity czas realizacji zamówienia to zwykle{" "}
-                    <span className="font-semibold">24 godziny</span>.
+                    <span className="font-medium">24 godziny</span>.
                   </p>
                   <p>
                     Przesyłki najczęściej są doręczane kolejnego dnia roboczego.
@@ -193,14 +191,14 @@ export default function ContactPage() {
 
             <Card className="gap-0 bg-background">
               <CardHeader>
-                <h3 className="font-semibold text-foreground">
+                <h3 className="font-medium text-foreground">
                   Kiedy otrzymam zwrot środków?
                 </h3>
               </CardHeader>
               <CardContent className="pt-0">
                 <p className="">
                   Pieniądze zwracamy zazwyczaj w ciągu{" "}
-                  <span className="font-semibold">24 godzin</span> od momentu
+                  <span className="font-medium">24 godzin</span> od momentu
                   otrzymania zwrotu. Na koncie mogą pojawić się w ciągu kilku
                   dni roboczych.
                 </p>
@@ -209,7 +207,7 @@ export default function ContactPage() {
 
             <Card className="gap-0 bg-background">
               <CardHeader>
-                <h3 className="font-semibold text-foreground">
+                <h3 className="font-medium text-foreground">
                   Czy mogę anulować lub modyfikować zamówienie?
                 </h3>
               </CardHeader>

@@ -1,7 +1,6 @@
 import { Suspense } from "react";
-import ListingSearchView, {
-  CatalogListingView,
-} from "@/components/store/listing/ListingSearchView";
+import CatalogListingView from "@/components/store/listing/CatalogListingView";
+import ListingSearchView from "@/components/store/listing/ListingSearchView";
 import { getDocumentsFromAdminDB } from "@/firebase/getters";
 import { CategoryWithId } from "@/firebase/schemas/productsSchemas";
 import { orderByProductAvailability } from "@/helpers/availability";

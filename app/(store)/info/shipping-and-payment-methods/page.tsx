@@ -54,13 +54,13 @@ export default function ShippingAndPaymentMethods() {
             <h3 className="font-bold text-lg mb-2">Koszty dostawy</h3>
             <div className="flex justify-between items-center">
               <span className="text-foreground">Cena podstawowa:</span>
-              <span className="font-semibold  text-lg">9,99 zł</span>
+              <span className="font-medium  text-lg">9,99 zł</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-foreground">
                 Przy zakupach za min. 55 zł:
               </span>
-              <span className="font-semibold text-success text-lg">GRATIS</span>
+              <span className="font-medium text-success text-lg">GRATIS</span>
             </div>
           </article>
 

@@ -20,7 +20,7 @@ export default function PrivacyPage() {
           </CardHeader>
           <CardContent>
             <p className="mb-2">Administratorem danych osobowych jest:</p>
-            <p className="font-semibold">{companyData.name}</p>
+            <p className="font-medium">{companyData.name}</p>
             <p>{companyData.street}</p>
             <p>
               {companyData.postalCode} {companyData.city}
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
             <p className="mb-3">
               W sklepie przetwarzane są dane niezbędne do realizacji zamówień
               oraz obsługi klienta, takie jak:{" "}
-              <span className="font-semibold">
+              <span className="font-medium">
                 imię i nazwisko, adres e-mail, numer telefonu, adres dostawy
               </span>{" "}
               oraz dane niezbędne do obsługi płatności.
@@ -70,25 +70,25 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc list-inside space-y-1 mb-3">
               <li>
-                <span className="font-semibold">Art. 6 ust. 1 lit. b RODO</span>{" "}
-                – przetwarzanie niezbędne do wykonania umowy sprzedaży
-                (realizacja zamówienia, dostawa, obsługa płatności).
+                <span className="font-medium">Art. 6 ust. 1 lit. b RODO</span> –
+                przetwarzanie niezbędne do wykonania umowy sprzedaży (realizacja
+                zamówienia, dostawa, obsługa płatności).
               </li>
               <li>
-                <span className="font-semibold">Art. 6 ust. 1 lit. c RODO</span>{" "}
-                – przetwarzanie niezbędne do wypełnienia obowiązków prawnych
+                <span className="font-medium">Art. 6 ust. 1 lit. c RODO</span> –
+                przetwarzanie niezbędne do wypełnienia obowiązków prawnych
                 ciążących na administratorze (np. przepisy podatkowe i księgowe
                 dotyczące przechowywania dokumentacji).
               </li>
               <li>
-                <span className="font-semibold">Art. 6 ust. 1 lit. a RODO</span>{" "}
-                – przetwarzanie na podstawie dobrowolnie wyrażonej zgody (np.
+                <span className="font-medium">Art. 6 ust. 1 lit. a RODO</span> –
+                przetwarzanie na podstawie dobrowolnie wyrażonej zgody (np.
                 niektóre cookies lub zgoda marketingowa, jeśli zostanie
                 udzielona).
               </li>
               <li>
-                <span className="font-semibold">Art. 6 ust. 1 lit. f RODO</span>{" "}
-                – prawnie uzasadnione interesy administratora (np. zapobieganie
+                <span className="font-medium">Art. 6 ust. 1 lit. f RODO</span> –
+                prawnie uzasadnione interesy administratora (np. zapobieganie
                 nadużyciom i oszustwom, dochodzenie roszczeń, zapewnienie
                 bezpieczeństwa systemów).
               </li>
@@ -112,15 +112,14 @@ export default function PrivacyPage() {
             </p>
             <ul className="list-disc list-inside space-y-1 mb-3">
               <li>
-                <span className="font-semibold">InPost</span> – dostawa
-                przesyłek
+                <span className="font-medium">InPost</span> – dostawa przesyłek
               </li>
               <li>
-                <span className="font-semibold">Przelewy24</span> (PayPro S.A.)
-                – obsługa płatności
+                <span className="font-medium">Przelewy24</span> (PayPro S.A.) –
+                obsługa płatności
               </li>
               <li>
-                <span className="font-semibold">Google</span> (Google Ireland
+                <span className="font-medium">Google</span> (Google Ireland
                 Limited / Google LLC) – statystyki (Google Analytics) oraz
                 reklama i pomiar konwersji (Google Ads), wyłącznie po wyrażeniu
                 zgody na odpowiednie pliki cookies
@@ -169,7 +168,7 @@ export default function PrivacyPage() {
           <CardContent>
             <p className="mb-3">
               Sklep{" "}
-              <span className="font-semibold">
+              <span className="font-medium">
                 nie udostępnia funkcji zakładania kont użytkowników
               </span>
               .
@@ -178,7 +177,7 @@ export default function PrivacyPage() {
               Działania marketingowe z wykorzystaniem plików cookies i narzędzi
               Google (Google Ads – śledzenie konwersji oraz remarketing)
               prowadzone są{" "}
-              <span className="font-semibold">
+              <span className="font-medium">
                 wyłącznie po wyrażeniu przez użytkownika zgody
               </span>{" "}
               za pośrednictwem banera zgód (Consent Mode v2). Szczegóły opisano
@@ -200,34 +199,32 @@ export default function PrivacyPage() {
           <CardContent>
             <p className="mb-3">
               Witryna korzysta z usług dostarczanych przez{" "}
-              <span className="font-semibold">
-                Google Ireland Limited
-              </span>{" "}
-              (oraz Google LLC):
+              <span className="font-medium">Google Ireland Limited</span> (oraz
+              Google LLC):
             </p>
             <ul className="list-disc list-inside space-y-1 mb-3">
               <li>
-                <span className="font-semibold">Google Analytics</span> – do
+                <span className="font-medium">Google Analytics</span> – do
                 prowadzenia statystyk korzystania ze strony. Dane mają charakter
                 pseudonimowy i zbiorczy (identyfikatory cookies, adres IP,
                 zdarzenia) i nie służą identyfikacji konkretnej osoby przez
                 Administratora.
               </li>
               <li>
-                <span className="font-semibold">Google Ads</span> – do{" "}
-                <span className="font-semibold">
+                <span className="font-medium">Google Ads</span> – do{" "}
+                <span className="font-medium">
                   pomiaru konwersji (śledzenie konwersji)
                 </span>{" "}
-                oraz <span className="font-semibold">remarketingu</span>, czyli
+                oraz <span className="font-medium">remarketingu</span>, czyli
                 wyświetlania reklam dopasowanych do wcześniejszych odwiedzin w
                 Sklepie.
               </li>
             </ul>
             <p className="mb-3">
               Korzystanie z Google Ads wiąże się z{" "}
-              <span className="font-semibold">profilowaniem</span> w celach
+              <span className="font-medium">profilowaniem</span> w celach
               marketingowych (dopasowanie reklam). Profilowanie to{" "}
-              <span className="font-semibold">
+              <span className="font-medium">
                 nie wywołuje wobec użytkownika skutków prawnych ani nie wpływa w
                 istotny sposób na jego sytuację
               </span>{" "}
@@ -237,26 +234,24 @@ export default function PrivacyPage() {
             <p className="mb-3">
               Cookies statystyczne (Google Analytics) oraz marketingowe (Google
               Ads) są uruchamiane{" "}
-              <span className="font-semibold">
+              <span className="font-medium">
                 wyłącznie po wyrażeniu przez użytkownika zgody
               </span>
               . Do momentu udzielenia zgody usługi te nie zapisują plików
               cookies na urządzeniu użytkownika. Stosujemy mechanizm{" "}
-              <span className="font-semibold">Google Consent Mode v2</span>, w
+              <span className="font-medium">Google Consent Mode v2</span>, w
               którym domyślnym stanem jest brak zgody (denied) na cookies
               analityczne i marketingowe.
             </p>
             <p className="mb-3">
-              W związku z korzystaniem z usług Google dane (w tym dane
-              zbierane przez cookies) mogą być{" "}
-              <span className="font-semibold">
+              W związku z korzystaniem z usług Google dane (w tym dane zbierane
+              przez cookies) mogą być{" "}
+              <span className="font-medium">
                 przekazywane do państw trzecich, w tym do USA
               </span>
               . Google deklaruje stosowanie odpowiednich zabezpieczeń, w
               szczególności certyfikacji w ramach{" "}
-              <span className="font-semibold">
-                EU‑US Data Privacy Framework
-              </span>{" "}
+              <span className="font-medium">EU‑US Data Privacy Framework</span>{" "}
               oraz standardowych klauzul umownych (SCC) zatwierdzonych przez
               Komisję Europejską.
             </p>
@@ -336,29 +331,27 @@ export default function PrivacyPage() {
           <CardContent>
             <p className="mb-3">
               Strona wykorzystuje{" "}
-              <span className="font-semibold">pliki cookies</span> w celach
+              <span className="font-medium">pliki cookies</span> w celach
               technicznych (niezbędnych do działania serwisu) oraz
               statystycznych. Cookies to małe pliki tekstowe zapisywane w
               urządzeniu użytkownika.
             </p>
-            <p className="mb-3">
-              Rodzaje cookies używane na stronie:
-            </p>
+            <p className="mb-3">Rodzaje cookies używane na stronie:</p>
             <ul className="list-disc list-inside space-y-1 mb-3">
               <li>
-                <span className="font-semibold">Niezbędne</span> – konieczne do
+                <span className="font-medium">Niezbędne</span> – konieczne do
                 działania sklepu (np. utrzymanie zawartości koszyka). Nie
                 wymagają zgody i są zawsze aktywne.
               </li>
               <li>
-                <span className="font-semibold">Statystyczne</span> (Google
+                <span className="font-medium">Statystyczne</span> (Google
                 Analytics) – służą do zbierania pseudonimowych, zbiorczych
                 informacji o korzystaniu ze strony. Uruchamiane wyłącznie za
                 zgodą użytkownika.
               </li>
               <li>
-                <span className="font-semibold">Marketingowe</span> (Google Ads)
-                – służą do pomiaru konwersji oraz remarketingu (dopasowania
+                <span className="font-medium">Marketingowe</span> (Google Ads) –
+                służą do pomiaru konwersji oraz remarketingu (dopasowania
                 reklam). Uruchamiane wyłącznie za zgodą użytkownika.
               </li>
             </ul>
@@ -366,9 +359,8 @@ export default function PrivacyPage() {
               Przy pierwszej wizycie wyświetlamy baner umożliwiający wyrażenie
               lub odrzucenie zgody na poszczególne kategorie cookies. Zgodę
               można w każdej chwili zmienić lub wycofać, korzystając z odnośnika{" "}
-              <span className="font-semibold">„Ustawienia cookies"</span> w
-              stopce strony. Wycofanie zgody jest równie proste jak jej
-              udzielenie.
+              <span className="font-medium">„Ustawienia cookies"</span> w stopce
+              strony. Wycofanie zgody jest równie proste jak jej udzielenie.
             </p>
             <p>
               Użytkownik może również w każdej chwili zmienić ustawienia
@@ -401,7 +393,7 @@ export default function PrivacyPage() {
             <p className="mb-3">
               Niniejsza polityka obowiązuje od dnia publikacji na stronie.
             </p>
-            <p className="font-semibold">
+            <p className="font-medium">
               Data ostatniej aktualizacji: 11 czerwca 2026
             </p>
           </CardContent>

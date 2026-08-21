@@ -63,26 +63,25 @@ export default function RegulationsPage() {
           <CardContent>
             <ul className="list-disc list-inside space-y-1">
               <li>
-                <span className="font-semibold">Sprzedawca</span> – podmiot
+                <span className="font-medium">Sprzedawca</span> – podmiot
                 wskazany w punkcie 1 powyżej.
               </li>
               <li>
-                <span className="font-semibold">Sklep</span> – sklep
-                internetowy dostępny pod adresem kama-obuwie.pl.
+                <span className="font-medium">Sklep</span> – sklep internetowy
+                dostępny pod adresem kama-obuwie.pl.
               </li>
               <li>
-                <span className="font-semibold">Klient</span> – osoba fizyczna,
+                <span className="font-medium">Klient</span> – osoba fizyczna,
                 osoba prawna lub jednostka organizacyjna dokonująca zakupów w
                 Sklepie.
               </li>
               <li>
-                <span className="font-semibold">Konsument</span> – osoba
-                fizyczna dokonująca ze Sprzedawcą czynności prawnej
-                niezwiązanej bezpośrednio z jej działalnością gospodarczą lub
-                zawodową.
+                <span className="font-medium">Konsument</span> – osoba fizyczna
+                dokonująca ze Sprzedawcą czynności prawnej niezwiązanej
+                bezpośrednio z jej działalnością gospodarczą lub zawodową.
               </li>
               <li>
-                <span className="font-semibold">
+                <span className="font-medium">
                   Przedsiębiorca na prawach konsumenta
                 </span>{" "}
                 – osoba fizyczna zawierająca umowę bezpośrednio związaną z jej
@@ -92,7 +91,7 @@ export default function RegulationsPage() {
                 uprawnienia jak Konsumentowi.
               </li>
               <li>
-                <span className="font-semibold">Umowa sprzedaży</span> – umowa
+                <span className="font-medium">Umowa sprzedaży</span> – umowa
                 zawierana na odległość pomiędzy Klientem a Sprzedawcą za
                 pośrednictwem Sklepu.
               </li>
@@ -119,9 +118,8 @@ export default function RegulationsPage() {
               na adres e-mail podany przez Klienta.
             </p>
             <p>
-              Informacje prezentowane w Sklepie stanowią zaproszenie do
-              zawarcia umowy w rozumieniu art. 71 Kodeksu cywilnego, a nie
-              ofertę.
+              Informacje prezentowane w Sklepie stanowią zaproszenie do zawarcia
+              umowy w rozumieniu art. 71 Kodeksu cywilnego, a nie ofertę.
             </p>
           </CardContent>
         </Card>
@@ -139,7 +137,7 @@ export default function RegulationsPage() {
             </p>
             <p className="mb-3">
               Płatności online obsługiwane są przez operatora{" "}
-              <span className="font-semibold">Przelewy24</span> (PayPro S.A.).
+              <span className="font-medium">Przelewy24</span> (PayPro S.A.).
               Dostępne metody płatności (m.in. szybki przelew, BLIK, karta
               płatnicza, Google Pay) oraz płatność przy odbiorze opisane są na
               stronie:{" "}
@@ -170,9 +168,9 @@ export default function RegulationsPage() {
             </ul>
             <p className="mb-3">
               Koszt podstawowej przesyłki wynosi{" "}
-              <span className="font-semibold">9,99 zł</span>. Dla zamówień o
+              <span className="font-medium">9,99 zł</span>. Dla zamówień o
               wartości co najmniej 55 zł dostawa jest{" "}
-              <span className="font-semibold underline decoration-2 decoration-success">
+              <span className="font-medium underline decoration-2 decoration-success">
                 bezpłatna
               </span>
               .
@@ -199,16 +197,16 @@ export default function RegulationsPage() {
             <p className="mb-3">
               Konsument oraz Przedsiębiorca na prawach konsumenta, który zawarł
               umowę na odległość, może w terminie{" "}
-              <span className="font-semibold">14 dni</span> odstąpić od niej bez
+              <span className="font-medium">14 dni</span> odstąpić od niej bez
               podania przyczyny i bez ponoszenia kosztów, z wyjątkiem kosztów
               określonych w przepisach. Sprzedawca, wychodząc naprzeciw
               oczekiwaniom Klientów, wydłuża ten termin do{" "}
-              <span className="font-semibold">30 dni</span> od dnia objęcia
-              towaru w posiadanie.
+              <span className="font-medium">30 dni</span> od dnia objęcia towaru
+              w posiadanie.
             </p>
             <p className="mb-3">
               Zwroty obsługujemy przez usługę{" "}
-              <span className="font-semibold">InPost Szybkie Zwroty</span> –
+              <span className="font-medium">InPost Szybkie Zwroty</span> –
               najwygodniej skorzystać z formularza zwrotu dostępnego na stronie{" "}
               <LinkText href="/info/returns" className="font-medium">
                 Zasady zwrotów
@@ -227,7 +225,7 @@ export default function RegulationsPage() {
               Towar należy odesłać niezwłocznie, nie później niż w terminie 14
               dni od dnia odstąpienia. Odesłanie towaru przez Paczkomaty InPost
               jest{" "}
-              <span className="font-semibold underline decoration-2 decoration-success">
+              <span className="font-medium underline decoration-2 decoration-success">
                 bezpłatne
               </span>
               . W przypadku wyboru innego sposobu zwrotu Klient ponosi
@@ -239,11 +237,11 @@ export default function RegulationsPage() {
               otrzymane płatności, w tym koszty dostawy (z wyjątkiem dodatkowych
               kosztów wynikających z wybranego przez Klienta sposobu dostawy
               innego niż najtańszy oferowany przez Sklep). Zwrot następuje tą
-              samą metodą płatności, której użył Klient, chyba że Klient wyraźnie
-              zgodził się na inne rozwiązanie. Sprzedawca może wstrzymać się ze
-              zwrotem płatności do chwili otrzymania towaru lub dostarczenia
-              dowodu jego odesłania, w zależności od tego, które zdarzenie
-              nastąpi wcześniej.
+              samą metodą płatności, której użył Klient, chyba że Klient
+              wyraźnie zgodził się na inne rozwiązanie. Sprzedawca może
+              wstrzymać się ze zwrotem płatności do chwili otrzymania towaru lub
+              dostarczenia dowodu jego odesłania, w zależności od tego, które
+              zdarzenie nastąpi wcześniej.
             </p>
             <p>
               Prawo odstąpienia nie przysługuje m.in. w odniesieniu do umów, w
@@ -262,7 +260,7 @@ export default function RegulationsPage() {
           <CardContent>
             <p className="mb-3">
               Zwroty realizowane są za pośrednictwem usługi{" "}
-              <span className="font-semibold">InPost Szybkie Zwroty</span>. Aby
+              <span className="font-medium">InPost Szybkie Zwroty</span>. Aby
               zwrócić produkt:
             </p>
             <ol className="list-decimal list-inside space-y-1 mb-3">
@@ -293,25 +291,23 @@ export default function RegulationsPage() {
               Sprzedawca ma obowiązek dostarczenia towaru zgodnego z umową. W
               odniesieniu do Konsumentów oraz Przedsiębiorców na prawach
               konsumenta zasady odpowiedzialności reguluje{" "}
-              <span className="font-semibold">
-                ustawa o prawach konsumenta
-              </span>{" "}
+              <span className="font-medium">ustawa o prawach konsumenta</span>{" "}
               (rozdział o odpowiedzialności za zgodność towaru z umową,
               obowiązujący od 1 stycznia 2023 r.). Sprzedawca odpowiada za brak
               zgodności towaru z umową istniejący w chwili dostarczenia i
-              ujawniony w ciągu{" "}
-              <span className="font-semibold">2 lat</span> od tej chwili.
+              ujawniony w ciągu <span className="font-medium">2 lat</span> od
+              tej chwili.
             </p>
             <p className="mb-3">
               W razie braku zgodności towaru z umową Klient może żądać w
               pierwszej kolejności{" "}
-              <span className="font-semibold">naprawy lub wymiany</span> towaru.
+              <span className="font-medium">naprawy lub wymiany</span> towaru.
               Jeżeli naprawa lub wymiana są niemożliwe, nadmiernie kosztowne
               albo Sprzedawca ich nie dokona w rozsądnym czasie, Klient może
               złożyć oświadczenie o{" "}
-              <span className="font-semibold">obniżeniu ceny</span> albo – gdy
+              <span className="font-medium">obniżeniu ceny</span> albo – gdy
               brak zgodności jest istotny – o{" "}
-              <span className="font-semibold">odstąpieniu od umowy</span>.
+              <span className="font-medium">odstąpieniu od umowy</span>.
             </p>
             <p className="mb-3">
               Reklamację należy zgłosić na adres{" "}
@@ -324,8 +320,8 @@ export default function RegulationsPage() {
                 Reklamacje
               </LinkText>
               . Sprzedawca ustosunkuje się do reklamacji niezwłocznie, nie
-              później niż w terminie{" "}
-              <span className="font-semibold">14 dni</span> od jej otrzymania.
+              później niż w terminie <span className="font-medium">14 dni</span>{" "}
+              od jej otrzymania.
             </p>
             <p>
               W przypadku Klientów niebędących Konsumentami ani Przedsiębiorcami
@@ -429,7 +425,7 @@ export default function RegulationsPage() {
               </LinkText>
               .
             </p>
-            <p className="font-semibold">
+            <p className="font-medium">
               Regulamin obowiązuje od dnia 11 czerwca 2026 r.
             </p>
           </CardContent>

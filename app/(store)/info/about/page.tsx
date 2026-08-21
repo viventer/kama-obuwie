@@ -93,7 +93,7 @@ export default function AboutPage() {
               <div className="flex items-start space-x-3">
                 <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h3 className="font-medium text-foreground mb-1">
                     Sprawdzona jakość
                   </h3>
                   <p className="text-sm text-foreground">
@@ -105,7 +105,7 @@ export default function AboutPage() {
               <div className="flex items-start space-x-3">
                 <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h3 className="font-medium text-foreground mb-1">
                     Darmowe, łatwe zwroty
                   </h3>
                   <p className="text-sm text-foreground">
@@ -117,7 +117,7 @@ export default function AboutPage() {
               <div className="flex items-start space-x-3">
                 <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h3 className="font-medium text-foreground mb-1">
                     Szybka dostawa
                   </h3>
                   <p className="text-sm text-foreground">
@@ -132,7 +132,7 @@ export default function AboutPage() {
               <div className="flex items-start space-x-3">
                 <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h3 className="font-medium text-foreground mb-1">
                     Profesjonalna obsługa
                   </h3>
                   <p className="text-sm text-foreground">
@@ -144,7 +144,7 @@ export default function AboutPage() {
               <div className="flex items-start space-x-3">
                 <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h3 className="font-medium text-foreground mb-1">
                     Darmowa dostawa przez InPost
                   </h3>
                   <p className="text-sm text-foreground">
@@ -156,7 +156,7 @@ export default function AboutPage() {
               <div className="flex items-start space-x-3">
                 <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h3 className="font-medium text-foreground mb-1">
                     Bezpieczne i szybkie metody płatności
                   </h3>
                   <p className="text-sm text-foreground">
@@ -169,7 +169,7 @@ export default function AboutPage() {
               <div className="flex items-start space-x-3">
                 <div className="size-2 rounded-full bg-brand mt-2 shrink-0"></div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">
+                  <h3 className="font-medium text-foreground mb-1">
                     Długoletnie doświadczenie
                   </h3>
                   <p className="text-sm text-foreground">
@@ -196,7 +196,7 @@ export default function AboutPage() {
               <div className="flex items-start space-x-3">
                 <MapPinIcon className="text-brand w-6 h-6 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">Adres</h3>
+                  <h3 className="font-medium text-foreground mb-2">Adres</h3>
                   <div className="text-foreground space-y-1">
                     <p className="font-medium">Hala Targowa Gazaris</p>
                     <p>pl. Gazaris 10, box 39</p>
@@ -211,7 +211,7 @@ export default function AboutPage() {
               <div className="flex items-start space-x-3">
                 <ClockIcon className="text-brand w-6 h-6 mt-1" />
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">
+                  <h3 className="font-medium text-foreground mb-2">
                     Godziny otwarcia
                   </h3>
                   <div className="text-foreground space-y-1">

@@ -31,6 +31,7 @@ import DesktopFilterPopover, {
 } from "./desktop/DesktopFilterPopover";
 import DesktopAllFiltersSheet from "./desktop/DesktopAllFiltersSheet";
 import CategoryStageFilters from "./CategoryStageFilters";
+import { Button } from "@/components/ui/button";
 
 type ChipFilterId = "size" | "color" | "material" | "fastening";
 
@@ -45,7 +46,13 @@ type ChipFilterConfig = {
   itemClassName?: string;
 };
 
-type OpenPopover = "sort" | "price" | "category" | ChipFilterId | "selected" | null;
+type OpenPopover =
+  | "sort"
+  | "price"
+  | "category"
+  | ChipFilterId
+  | "selected"
+  | null;
 
 export default function DesktopFiltersBar() {
   const {
@@ -211,12 +218,9 @@ export default function DesktopFiltersBar() {
             onOpenChange={setPopover("selected")}
           >
             <PopoverTrigger asChild>
-              <button
-                type="button"
-                className="ml-2 underline underline-offset-2 text-sm font-medium cursor-pointer hover:text-primary"
-              >
+              <Button variant="link">
                 Wybrane filtry ({activeFilterCount})
-              </button>
+              </Button>
             </PopoverTrigger>
             <PopoverContent
               align="start"

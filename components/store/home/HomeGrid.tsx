@@ -32,7 +32,7 @@ export default function HomeGrid({ icon, title, categories }: HomeGridProps) {
           <div className="min-w-8 min-h-8 lg:min-w-12 lg:min-h-12 text-brand">
             {icon}
           </div>
-          <h3 className="text-lg lg:text-2xl font-semibold">{title}</h3>
+          <h3 className="text-lg lg:text-2xl font-medium">{title}</h3>
         </Card>
 
         {categories.map((category) => (
@@ -59,7 +59,7 @@ export default function HomeGrid({ icon, title, categories }: HomeGridProps) {
                 width={128}
                 height={128}
               />
-              <h3 className="text-lg font-semibold">{category.displayName}</h3>
+              <h3 className="text-lg font-medium">{category.displayName}</h3>
             </div>
             <Button
               variant="ghost"
@@ -84,7 +84,7 @@ export default function HomeGrid({ icon, title, categories }: HomeGridProps) {
         <Card className="col-span-2 row-span-1 hidden sm:flex flex-row justify-center items-center px-4 bg-brand/25 gap-4">
           <div className="flex items-center gap-4 justify-center">
             <PackageIcon className="hidden md:block min-w-8 min-h-8 text-brand" />
-            <h3 className="text-lg lg:text-xl font-semibold">
+            <h3 className="text-lg lg:text-xl font-medium">
               Z darmową i szybką wysyłką
             </h3>
           </div>

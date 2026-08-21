@@ -87,7 +87,7 @@ export default function ComplaintsPage() {
           <CardContent>
             Możesz zgłosić niezgodność towaru z umową, jeśli ujawni się ona w
             ciągu{" "}
-            <span className="font-semibold">2 lat od otrzymania towaru</span>,
+            <span className="font-medium">2 lat od otrzymania towaru</span>,
             zgodnie z obowiązującymi przepisami (ustawa o prawach konsumenta).
           </CardContent>
         </Card>
@@ -98,7 +98,7 @@ export default function ComplaintsPage() {
           </CardHeader>
           <CardContent>
             Reklamację rozpatrujemy w ciągu{" "}
-            <span className="font-semibold">14 dni kalendarzowych</span> od
+            <span className="font-medium">14 dni kalendarzowych</span> od
             otrzymania zgłoszenia lub produktu.
           </CardContent>
         </Card>
@@ -108,7 +108,7 @@ export default function ComplaintsPage() {
             <h4>Czy muszę odsyłać buty, żeby złożyć reklamację?</h4>
           </CardHeader>
           <CardContent>
-            <span className="font-semibold">Niekoniecznie</span> – w wielu
+            <span className="font-medium">Niekoniecznie</span> – w wielu
             przypadkach wystarczą zdjęcia wady i formularz. Jeśli konieczne będą
             dokładniejsze oględziny, poprosimy o odesłanie obuwia na nasz koszt.
           </CardContent>
@@ -120,7 +120,7 @@ export default function ComplaintsPage() {
           </CardHeader>
           <CardContent>
             Koszt odesłania reklamowanego produktu{" "}
-            <span className="font-semibold underline decoration-2 decoration-success">
+            <span className="font-medium underline decoration-2 decoration-success">
               zawsze pokrywa sklep
             </span>
             .
@@ -146,7 +146,7 @@ export default function ComplaintsPage() {
             <h4>Czy mogę złożyć reklamację bez paragonu?</h4>
           </CardHeader>
           <CardContent>
-            <span className="font-semibold">Tak</span> – wystarczy inny dowód
+            <span className="font-medium">Tak</span> – wystarczy inny dowód
             zakupu, np. potwierdzenie płatności, mail z zamówieniem lub faktura.
           </CardContent>
         </Card>
@@ -157,7 +157,7 @@ export default function ComplaintsPage() {
           </CardHeader>
           <CardContent>
             Zwrot środków realizujemy{" "}
-            <span className="font-semibold">
+            <span className="font-medium">
               tą samą metodą, którą dokonano płatności
             </span>{" "}
             (chyba że poprosisz o inną formę).

@@ -31,7 +31,7 @@ export default function AiImageBadge({ className }: { className?: string }) {
           aria-label="Informacja o zdjęciu wygenerowanym przez AI"
         >
           <SparklesIcon className="size-3.5" />
-          <span className="text-xs font-semibold leading-none">AI</span>
+          <span className="text-xs font-medium leading-none">AI</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent

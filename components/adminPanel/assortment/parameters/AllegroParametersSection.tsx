@@ -126,7 +126,7 @@ export default function AllegroParametersSection({
         className="shadow-md bg-background/50 rounded-xs max-w-md px-4"
       >
         <AccordionItem value="optional">
-          <AccordionTrigger className="font-semibold text-lg hover:cursor-pointer">
+          <AccordionTrigger className="font-medium text-lg hover:cursor-pointer">
             Parametry opcjonalne
           </AccordionTrigger>
           <AccordionContent className="flex flex-col gap-4 pt-2">

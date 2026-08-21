@@ -19,12 +19,12 @@ export default function ReturnsPage() {
         <li>Wypełnij formularz zwrotu.</li>
         <li>
           Na podany adres e‑mail otrzymasz{" "}
-          <span className="font-semibold">kod nadania</span>.
+          <span className="font-medium">kod nadania</span>.
         </li>
         <li>Napisz kod nadania w widocznym miejscu na paczce.</li>
         <li>
           Umieść paczkę w dowolnym automacie{" "}
-          <span className="font-semibold">Paczkomat® InPost</span>.
+          <span className="font-medium">Paczkomat® InPost</span>.
         </li>
       </ol>
 
@@ -81,7 +81,7 @@ export default function ReturnsPage() {
           </CardHeader>
           <CardContent>
             Na nadanie przesyłki zwrotnej masz aż{" "}
-            <span className="font-semibold">30 dni</span> od dnia otrzymania
+            <span className="font-medium">30 dni</span> od dnia otrzymania
             zamówienia.
           </CardContent>
         </Card>
@@ -92,7 +92,7 @@ export default function ReturnsPage() {
           </CardHeader>
           <CardContent>
             W przypadku pozytywnego rozpatrzenia zwrotu, środki zazwyczaj
-            zwracamy w ciągu <span className="font-semibold">24 godzin</span> od
+            zwracamy w ciągu <span className="font-medium">24 godzin</span> od
             otrzymania przesyłki zwrotnej. Na koncie mogą pojawić się w ciągu
             kilku dni roboczych.
           </CardContent>

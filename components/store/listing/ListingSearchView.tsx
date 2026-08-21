@@ -1,91 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
-import CategoryProductsListing from "@/components/store/listing/CategoryProductsListing";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import CatalogListingView from "@/components/store/listing/CatalogListingView";
+import EmptyListingState, {
+  type PopularCategoryLink,
+} from "@/components/store/listing/EmptyListingState";
 import ListingPageSkeleton from "@/components/store/listing/ListingPageSkeleton";
+import SearchHeading from "@/components/store/listing/SearchHeading";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
 import {
   SEARCH_LISTING_LIMIT,
   SEARCH_MIN_QUERY_LENGTH,
 } from "@/lib/search/constants";
-
-export type PopularCategoryLink = {
-  id: string;
-  label: string;
-};
-
-function EmptyListingState({
-  heading,
-  message,
-  popularCategories,
-}: {
-  heading: string;
-  message: string;
-  popularCategories: PopularCategoryLink[];
-}) {
-  return (
-    <div className="w-fit 2xs:w-full mx-auto sm:mx-0 mt-4">
-      <SubpageHeading text={heading} />
-      <p className="text-sm text-muted-foreground mb-4">{message}</p>
-      {popularCategories.length > 0 && (
-        <div>
-          <p className="font-medium mb-2">Popularne kategorie</p>
-          <ul className="flex flex-wrap gap-2">
-            {popularCategories.slice(0, 8).map((category) => (
-              <li key={category.id}>
-                <Link
-                  href={`/listing/${category.id}`}
-                  className="inline-flex rounded-xs bg-foreground/10 px-3 py-1.5 text-sm hover:bg-primary/20"
-                >
-                  {category.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export function CatalogListingView({
-  products,
-  categoryLabels,
-  popularCategories,
-  heading = "Wszystkie produkty",
-  defaultSortLabel = "Domyślne",
-}: {
-  products: ProductListingData[];
-  categoryLabels: Record<string, string>;
-  popularCategories: PopularCategoryLink[];
-  heading?: string;
-  defaultSortLabel?: string;
-}) {
-  if (products.length === 0) {
-    return (
-      <EmptyListingState
-        heading={heading}
-        message="Brak aktywnych produktów."
-        popularCategories={popularCategories}
-      />
-    );
-  }
-
-  return (
-    <div className="w-fit 2xs:w-full mx-auto sm:mx-0 mt-4">
-      <SubpageHeading text={heading} />
-      <CategoryProductsListing
-        products={products}
-        enableCategoryFilter
-        categoryLabels={categoryLabels}
-        defaultSortLabel={defaultSortLabel}
-      />
-    </div>
-  );
-}
 
 /**
  * Reads `q` on the client so the `/listing` server page can stay ISR.
@@ -100,6 +27,7 @@ export default function ListingSearchView({
   categoryLabels: Record<string, string>;
   popularCategories: PopularCategoryLink[];
 }) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const q = (searchParams.get("q") || "").trim();
   const isSearch = q.length >= SEARCH_MIN_QUERY_LENGTH;
@@ -108,6 +36,16 @@ export default function ListingSearchView({
     ProductListingData[] | null
   >(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const clearSearchQuery = useCallback(() => {
+    const params = new URLSearchParams(window.location.search);
+    params.delete("q");
+    const qs = params.toString();
+    router.replace(
+      qs ? `${window.location.pathname}?${qs}` : window.location.pathname,
+      { scroll: false },
+    );
+  }, [router]);
 
   useEffect(() => {
     if (!isSearch) {
@@ -161,7 +99,7 @@ export default function ListingSearchView({
     );
   }
 
-  const heading = `Wyniki dla „${q}”`;
+  const headingNode = <SearchHeading q={q} onClear={clearSearchQuery} />;
 
   if (isLoading || searchResults === null) {
     return <ListingPageSkeleton productCount={12} />;
@@ -170,7 +108,7 @@ export default function ListingSearchView({
   if (searchResults.length === 0) {
     return (
       <EmptyListingState
-        heading={heading}
+        headingNode={headingNode}
         message="Nie znaleziono produktów pasujących do wyszukiwania."
         popularCategories={popularCategories}
       />
@@ -182,7 +120,7 @@ export default function ListingSearchView({
       products={searchResults}
       categoryLabels={categoryLabels}
       popularCategories={popularCategories}
-      heading={heading}
+      headingNode={headingNode}
       defaultSortLabel="Trafność"
     />
   );

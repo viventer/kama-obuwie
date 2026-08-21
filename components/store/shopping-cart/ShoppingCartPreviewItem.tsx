@@ -30,7 +30,7 @@ export default function ShoppingCartPreviewItem({
           <span className="break-words">{item.formattedMainColor}</span>
         </div>
         <div className="text-xs text-muted-foreground"></div>
-        <div className="text-sm font-semibold text-foreground mt-1">
+        <div className="text-sm font-medium text-foreground mt-1">
           {new Intl.NumberFormat("pl-PL", {
             style: "currency",
             currency: "PLN",

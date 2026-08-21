@@ -1,52 +1,30 @@
 {
   "baleriny": ["balerinki", "baletki"],
-  "sportowe": [
-    "adidasy",
-    "adidasiki",
-    "adidaski",
-    "sneakersy",
-    "sneakers",
-    "treningowe",
-    "fitnessowe"
-  ],
+  "sportowe": ["adidasy", "sneakersy"],
   "kozaki": ["kozaczki", "oficerki", "muszkieterki", "kowbojki"],
-  "korki": ["turfy", "lanki", "kopańce", "piłkarskie"],
-  "kapcie": [
-    "papcie",
-    "papucie",
-    "bambosze",
-    "bamboszki",
-    "kapcioki",
-    "cieplaki",
-    "homysły"
+  "korki": ["turfy", "lanki", "piłkarskie", "piłka"],
+  "kapcie": ["papcie", "bambosze", "ciapy", "laczki", "pantofle"],
+  "mokasyny": ["loafersy", "lordsy", "mocs"],
+  "trampki": ["tenisówki", "conversy"],
+  "basenowe": ["basenówki", "basen"],
+  "botki": ["sztyblety", "chelsea", "zimowe"],
+  "półbuty": [
+    "oxfordy",
+    "oksfordy",
+    "derby",
+    "brogsy",
+    "wizytowe",
+    "pantofle",
+    "do garnituru",
+    "ślubne"
   ],
-  "mokasyny": ["loafersy", "loafers", "lordsy", "mokasynki"],
-  "trampki": ["tenisówki", "trampeczki", "conversy", "platówki"],
-  "basenowe": ["basenówki", "słowki", "pływackie"],
-  "botki": ["boteczki", "sztyblety", "chelsea", "sztylblety"],
-  "japonki": [
-    "japoneczki",
-    "palcaki",
-    "palcówki",
-    "flipflopy",
-    "flipflop",
-    "thongi"
-  ],
-  "półbuty": ["oxfordy", "oksfordy", "derby", "brogsy", "wizytowe", "półbutki"],
-  "śniegowce": ["uszatki", "moonbooty", "apresy", "śniegule"],
-  "kalosze": [
-    "kaloszki",
-    "gumowce",
-    "gumaki",
-    "gumiaki",
-    "wellingtony",
-    "wellsy"
-  ],
-  "casual": ["mule", "mulesy", "chodaki"],
-  "klapki": ["laczki", "klapeczki", "slajdy", "slidesy"],
-  "halówki": ["halowe", "indoor"],
-  "czółenka": ["szpilki", "szpile", "szpileczki", "obcasy", "pumps", "łódki"],
-  "sandały": ["sandałki", "sandałeczki", "rzymianki", "gladiatorki"],
-  "trekkingowe": ["trekkingi", "treki", "hikingi", "terenowe"],
-  "trzewiki": ["trapery", "traperki", "glany", "workery", "martensy"]
+  "śniegowce": ["zimowe", "trzewiki"],
+  "kalosze": ["gumowce", "gumiaki", "gumowifilce"],
+  "casual": ["na co dzień"],
+  "klapki": ["laczki", "chodaki", "kroksy", "crocsy"],
+  "halówki": ["halowe", "na hale", "piłkarskie", "piłka"],
+  "czółenka": ["szpilki", "obcasy", "na obcasie"],
+  "sandały": ["sandałki"],
+  "trekkingowe": ["trekkingi", "outdoor", "terenowe", "taktyczne"],
+  "trzewiki": ["trapery", "glany", "workery", "martensy", "zimowe", "śniegowce"]
 }

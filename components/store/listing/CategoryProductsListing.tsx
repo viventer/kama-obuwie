@@ -11,6 +11,7 @@ import {
   useListingFilters,
 } from "./filters/ListingFiltersContext";
 import MobileFiltersBar from "./filters/mobile/MobileFiltersBar";
+import MobileCategoryPathBar from "./filters/mobile/MobileCategoryPathBar";
 import DesktopFiltersBar from "./filters/DesktopFiltersBar";
 import SelectedFiltersSticky from "./filters/SelectedFiltersSticky";
 
@@ -20,6 +21,7 @@ function CategoryProductsListingInner() {
   return (
     <>
       <DesktopFiltersBar />
+      <MobileCategoryPathBar />
       <SelectedFiltersSticky />
 
       {filteredProducts.length > 0 ? (

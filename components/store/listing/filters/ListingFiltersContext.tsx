@@ -27,6 +27,7 @@ import {
   parseListingFiltersFromSearch,
   serializeListingFiltersToSearchParams,
 } from "@/helpers/listingFilters/url";
+import { SEARCH_MIN_QUERY_LENGTH } from "@/lib/search/constants";
 
 type ListingFiltersContextValue = {
   state: ListingFiltersState;
@@ -34,6 +35,7 @@ type ListingFiltersContextValue = {
   filteredProducts: ProductListingData[];
   activeFilterCount: number;
   enableCategoryFilter: boolean;
+  isSearchListing: boolean;
   categoryLabels: Record<string, string>;
   defaultSortLabel?: string;
   setSort: (sort: ListingSort) => void;
@@ -85,6 +87,8 @@ export function ListingFiltersProvider({
 }) {
   const searchParams = useSearchParams();
   const searchKey = searchParams.toString();
+  const isSearchListing =
+    (searchParams.get("q") || "").trim().length >= SEARCH_MIN_QUERY_LENGTH;
 
   const [state, setState] = useState<ListingFiltersState>(
     DEFAULT_LISTING_FILTERS_STATE,
@@ -255,6 +259,7 @@ export function ListingFiltersProvider({
       filteredProducts,
       activeFilterCount,
       enableCategoryFilter,
+      isSearchListing,
       categoryLabels,
       defaultSortLabel,
       setSort,
@@ -280,6 +285,7 @@ export function ListingFiltersProvider({
       filteredProducts,
       activeFilterCount,
       enableCategoryFilter,
+      isSearchListing,
       categoryLabels,
       defaultSortLabel,
       setSort,

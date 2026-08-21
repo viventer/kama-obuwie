@@ -50,8 +50,10 @@ function chipSection({
 
 export default function AllFiltersContent({
   onShowProducts,
+  variant = "desktop",
 }: {
   onShowProducts?: () => void;
+  variant?: "mobile" | "desktop";
 }) {
   const {
     state,
@@ -65,6 +67,7 @@ export default function AllFiltersContent({
     clearAll,
     filteredProducts,
     enableCategoryFilter,
+    isSearchListing,
     defaultSortLabel,
   } = useListingFilters();
 
@@ -80,7 +83,7 @@ export default function AllFiltersContent({
         />
       ),
     },
-    enableCategoryFilter
+    enableCategoryFilter && !(variant === "mobile" && isSearchListing)
       ? {
           id: "category",
           label: "Kategoria",

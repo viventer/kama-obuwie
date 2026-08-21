@@ -143,7 +143,11 @@ export default function SelectedFiltersContent({
                   onClick={item.onRemove}
                   className="inline-flex items-center gap-1.5 rounded-xs bg-foreground/10 px-2.5 py-1.5 text-sm cursor-pointer hover:bg-primary/20"
                 >
-                  <span>{item.label}</span>
+                  <span
+                    className={group.label === "Kategoria" ? "capitalize" : undefined}
+                  >
+                    {item.label}
+                  </span>
                   <span
                     className="inline-flex size-4 items-center justify-center rounded-full bg-secondary text-secondary-foreground"
                     aria-hidden

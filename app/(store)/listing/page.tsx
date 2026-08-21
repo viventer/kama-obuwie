@@ -18,7 +18,7 @@ export default async function ListingSearchPage() {
     isShoeRootCategory(c.rootCategory),
   );
   const categoryLabels = Object.fromEntries(
-    shoeCategories.map((c) => [c.id, getCategoryDisplayName(c)]),
+    shoeCategories.map((c) => [c.id, c.name]),
   );
   const popularCategories = shoeCategories.map((c) => ({
     id: c.id,

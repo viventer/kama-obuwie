@@ -85,7 +85,8 @@ export default function MobileCategoryPathBar() {
           </button>
           {currentLabel && (
             <p className="text-sm text-muted-foreground mb-2">
-              W kategorii „{currentLabel}”
+              W kategorii „
+              <span className="capitalize">{currentLabel}</span>”
             </p>
           )}
         </>
@@ -108,6 +109,7 @@ export default function MobileCategoryPathBar() {
           type="single"
           options={categoryOptions}
           selected=""
+          itemClassName="capitalize"
           onChange={(value) => {
             if (!value) return;
             setCategoryId(value);

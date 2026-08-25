@@ -17,7 +17,10 @@ export const URL_KEYS = {
   query: "q",
   rootCategory: "plec",
   categoryId: "kategoria",
+  page: "page",
 } as const;
+
+export const PAGE_URL_KEY = URL_KEYS.page;
 
 /** Filter keys that ListingFiltersState owns (excludes `q`). */
 export const LISTING_FILTER_URL_KEYS = [
@@ -100,6 +103,15 @@ export const serializeListingFiltersToSearchParams = (
   }
 
   return params;
+};
+
+export const parsePageFromSearch = (search: string): number => {
+  const params = new URLSearchParams(
+    search.startsWith("?") ? search.slice(1) : search,
+  );
+  const raw = Number.parseInt(params.get(PAGE_URL_KEY) ?? "", 10);
+  if (!Number.isFinite(raw) || raw < 1) return 1;
+  return raw;
 };
 
 export const parseListingFiltersFromSearch = (

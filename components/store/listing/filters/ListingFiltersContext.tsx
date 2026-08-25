@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -19,12 +20,15 @@ import { applyListingFilters, countActiveFilters } from "@/helpers/listingFilter
 import { getListingFacets } from "@/helpers/listingFilters/facets";
 import {
   DEFAULT_LISTING_FILTERS_STATE,
+  PRODUCTS_PER_PAGE,
   type ListingFacets,
   type ListingFiltersState,
   type ListingSort,
 } from "@/helpers/listingFilters/types";
 import {
+  PAGE_URL_KEY,
   parseListingFiltersFromSearch,
+  parsePageFromSearch,
   serializeListingFiltersToSearchParams,
 } from "@/helpers/listingFilters/url";
 import { SEARCH_MIN_QUERY_LENGTH } from "@/lib/search/constants";
@@ -33,6 +37,10 @@ type ListingFiltersContextValue = {
   state: ListingFiltersState;
   facets: ListingFacets;
   filteredProducts: ProductListingData[];
+  pageProducts: ProductListingData[];
+  page: number;
+  totalPages: number;
+  setPage: (page: number) => void;
   activeFilterCount: number;
   enableCategoryFilter: boolean;
   isSearchListing: boolean;
@@ -59,10 +67,15 @@ type ListingFiltersContextValue = {
 const ListingFiltersContext =
   createContext<ListingFiltersContextValue | null>(null);
 
-const writeFiltersToUrl = (state: ListingFiltersState) => {
+const writeFiltersToUrl = (state: ListingFiltersState, page: number) => {
   if (typeof window === "undefined") return;
   const current = new URLSearchParams(window.location.search);
   const params = serializeListingFiltersToSearchParams(state, current);
+  if (page > 1) {
+    params.set(PAGE_URL_KEY, String(page));
+  } else {
+    params.delete(PAGE_URL_KEY);
+  }
   const qs = params.toString();
   const next = qs
     ? `${window.location.pathname}?${qs}`
@@ -93,23 +106,40 @@ export function ListingFiltersProvider({
   const [state, setState] = useState<ListingFiltersState>(
     DEFAULT_LISTING_FILTERS_STATE,
   );
+  const [page, setPageState] = useState(1);
   const [hydrated, setHydrated] = useState(false);
+  const prevFilterSignatureRef = useRef<string | null>(null);
+  const skipNextProductsResetRef = useRef(true);
 
   // Sync from Next searchParams on mount and when Link/back changes the URL.
   // UI filter edits use history.replaceState (below), which does NOT update
   // useSearchParams — so this won't fight local state changes.
   useEffect(() => {
-    const fromUrl = parseListingFiltersFromSearch(
-      searchKey ? `?${searchKey}` : "",
-    );
+    const search = searchKey ? `?${searchKey}` : "";
+    const fromUrl = parseListingFiltersFromSearch(search);
     setState(fromUrl);
+    setPageState(parsePageFromSearch(search));
+    prevFilterSignatureRef.current = JSON.stringify(fromUrl);
+    skipNextProductsResetRef.current = true;
     setHydrated(true);
   }, [searchKey]);
 
   useEffect(() => {
     if (!hydrated) return;
-    writeFiltersToUrl(state);
+    const signature = JSON.stringify(state);
+    if (prevFilterSignatureRef.current === signature) return;
+    prevFilterSignatureRef.current = signature;
+    setPageState(1);
   }, [state, hydrated]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    if (skipNextProductsResetRef.current) {
+      skipNextProductsResetRef.current = false;
+      return;
+    }
+    setPageState(1);
+  }, [products, hydrated]);
 
   // Facets for category filter use products after rootCategory filter only,
   // so stage-2 options stay relevant when gender is selected.
@@ -138,6 +168,30 @@ export function ListingFiltersProvider({
     () => applyListingFilters(products, state),
     [products, state],
   );
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE),
+  );
+  const currentPage = Math.min(Math.max(1, page), totalPages);
+  const pageProducts = useMemo(
+    () =>
+      filteredProducts.slice(
+        (currentPage - 1) * PRODUCTS_PER_PAGE,
+        currentPage * PRODUCTS_PER_PAGE,
+      ),
+    [filteredProducts, currentPage],
+  );
+
+  useEffect(() => {
+    if (!hydrated) return;
+    writeFiltersToUrl(state, currentPage);
+  }, [state, currentPage, hydrated]);
+
+  const setPage = useCallback((nextPage: number) => {
+    const normalized = Math.floor(nextPage);
+    setPageState(Number.isFinite(normalized) && normalized >= 1 ? normalized : 1);
+  }, []);
 
   const activeFilterCount = useMemo(() => countActiveFilters(state), [state]);
 
@@ -257,6 +311,10 @@ export function ListingFiltersProvider({
       state,
       facets,
       filteredProducts,
+      pageProducts,
+      page: currentPage,
+      totalPages,
+      setPage,
       activeFilterCount,
       enableCategoryFilter,
       isSearchListing,
@@ -283,6 +341,10 @@ export function ListingFiltersProvider({
       state,
       facets,
       filteredProducts,
+      pageProducts,
+      currentPage,
+      totalPages,
+      setPage,
       activeFilterCount,
       enableCategoryFilter,
       isSearchListing,

@@ -6,6 +6,7 @@ import {
   RootCategory,
 } from "@/firebase/schemas/productsSchemas";
 import ProductFromList from "../home/ProductFromList";
+import ListingPagination from "./ListingPagination";
 import {
   ListingFiltersProvider,
   useListingFilters,
@@ -16,7 +17,7 @@ import DesktopFiltersBar from "./filters/DesktopFiltersBar";
 import SelectedFiltersSticky from "./filters/SelectedFiltersSticky";
 
 function CategoryProductsListingInner() {
-  const { filteredProducts } = useListingFilters();
+  const { filteredProducts, pageProducts } = useListingFilters();
 
   return (
     <>
@@ -26,7 +27,7 @@ function CategoryProductsListingInner() {
 
       {filteredProducts.length > 0 ? (
         <section className="grid gap-x-2 gap-y-8 md:gap-8 grid-cols-[repeat(auto-fill,_minmax(9rem,_1fr))] md:grid-cols-[repeat(auto-fill,_minmax(16rem,_1fr))]">
-          {filteredProducts.map((product) => (
+          {pageProducts.map((product) => (
             <ProductFromList
               key={`${product.id}-${product.colorVariantName}`}
               product={product}
@@ -39,6 +40,7 @@ function CategoryProductsListingInner() {
         </div>
       )}
 
+      <ListingPagination />
       <MobileFiltersBar />
     </>
   );

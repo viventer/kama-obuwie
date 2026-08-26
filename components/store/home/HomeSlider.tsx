@@ -77,7 +77,8 @@ export default function HomeSlider({
                 <Image
                   src={banner.imageSrc}
                   alt=""
-                  priority
+                  priority={index === 0}
+                  sizes="100vw"
                   width={1600}
                   height={450}
                   className="rounded-xs w-full aspect-[3/2] md:aspect-[21/9] object-cover"

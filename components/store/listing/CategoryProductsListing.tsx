@@ -5,7 +5,6 @@ import {
   ProductListingData,
   RootCategory,
 } from "@/firebase/schemas/productsSchemas";
-import ProductFromList from "../home/ProductFromList";
 import ListingPagination from "./ListingPagination";
 import {
   ListingFiltersProvider,
@@ -15,9 +14,11 @@ import MobileFiltersBar from "./filters/mobile/MobileFiltersBar";
 import MobileCategoryPathBar from "./filters/mobile/MobileCategoryPathBar";
 import DesktopFiltersBar from "./filters/DesktopFiltersBar";
 import SelectedFiltersSticky from "./filters/SelectedFiltersSticky";
+import ProductGrid from "./ProductGrid";
+import { PRODUCTS_PER_PAGE } from "@/helpers/listingFilters/types";
 
 function CategoryProductsListingInner() {
-  const { filteredProducts, pageProducts } = useListingFilters();
+  const { filteredProducts, pageProducts, page } = useListingFilters();
 
   return (
     <>
@@ -26,14 +27,10 @@ function CategoryProductsListingInner() {
       <SelectedFiltersSticky />
 
       {filteredProducts.length > 0 ? (
-        <section className="grid gap-x-2 gap-y-8 md:gap-8 grid-cols-[repeat(auto-fill,_minmax(9rem,_1fr))] md:grid-cols-[repeat(auto-fill,_minmax(16rem,_1fr))]">
-          {pageProducts.map((product) => (
-            <ProductFromList
-              key={`${product.id}-${product.colorVariantName}`}
-              product={product}
-            />
-          ))}
-        </section>
+        <ProductGrid
+          products={pageProducts}
+          priorityCount={page === 1 ? 6 : 0}
+        />
       ) : (
         <div className="text-lg">
           Nie znaleziono produktów spełniających podane kryteria.
@@ -60,7 +57,14 @@ export default function CategoryProductsListing({
   defaultSortLabel?: string;
 }) {
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={
+        <ProductGrid
+          products={products.slice(0, PRODUCTS_PER_PAGE)}
+          priorityCount={6}
+        />
+      }
+    >
       <ListingFiltersProvider
         products={products}
         rootCategory={rootCategory}

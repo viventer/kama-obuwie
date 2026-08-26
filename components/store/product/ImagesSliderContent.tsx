@@ -77,6 +77,8 @@ export default function ImagesSliderContent({
                     className={`block w-full ${isFullPage ? " md:h-[70vh] md:w-auto" : "h-full"} object-contain bg-white rounded-xs max-w-[400px]  md:max-w-full aspect-square`}
                     height={1000}
                     width={1000}
+                    sizes="(max-width: 768px) 100vw, 600px"
+                    priority={index === 0}
                   />
                 </div>
               </div>
@@ -122,6 +124,7 @@ export default function ImagesSliderContent({
                 className={`block ${isFullPage ? "w-[14vh]" : "w-full"}  object-cover bg-white opacity-75 rounded-xs hover:opacity-100 transition-opacity cursor-pointer aspect-square`}
                 height={200}
                 width={200}
+                sizes="200px"
               />
             </button>
           </SwiperSlide>

@@ -90,9 +90,7 @@ export default function TrustmateWidget({
   }, [widgetId]);
 
   const openReviews = () => {
-    mountRef.current
-      ?.querySelector<HTMLElement>(".tm-dialog-open")
-      ?.click();
+    mountRef.current?.querySelector<HTMLElement>(".tm-dialog-open")?.click();
   };
 
   return (

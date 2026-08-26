@@ -78,7 +78,7 @@ export default function HomeSlider({
                   src={banner.imageSrc}
                   alt=""
                   priority={index === 0}
-                  sizes="100vw"
+                  sizes="(min-width: 1600px) 1440px, 90vw"
                   width={1600}
                   height={450}
                   className="rounded-xs w-full aspect-[3/2] md:aspect-[21/9] object-cover"

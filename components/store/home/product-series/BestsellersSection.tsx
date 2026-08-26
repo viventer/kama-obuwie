@@ -20,7 +20,10 @@ export default function BestsellersSection({
             key={`${product.id}-${product.colorVariantName}`}
             className="w-[40vw] max-w-[250px]"
           >
-            <ProductFromList product={product} />
+            <ProductFromList
+              product={product}
+              sizes="(min-width: 640px) 250px, 40vw"
+            />
           </div>
         ))}
       </div>

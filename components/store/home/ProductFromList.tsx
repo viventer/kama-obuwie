@@ -10,9 +10,11 @@ import AiImageBadge from "@/components/store/global/AiImageBadge";
 export default function ProductFromList({
   product,
   priority = false,
+  sizes,
 }: {
   product: ProductListingData;
   priority?: boolean;
+  sizes?: string;
 }) {
   return (
     <Card
@@ -36,6 +38,7 @@ export default function ProductFromList({
             width={300}
             height={300}
             priority={priority}
+            sizes={sizes}
             className="object-contain rounded-t-xs w-full"
           />
         </div>

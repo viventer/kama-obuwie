@@ -41,7 +41,9 @@ export default function ImagesSliderContent({
 
   return (
     <>
-      <div className="relative">
+      <div
+        className={`relative ${isFullPage ? "" : "mx-auto aspect-square w-full max-w-[400px] md:max-w-full"}`}
+      >
         <Swiper
           onSwiper={(swiper) => {
             swiperRef.current = swiper;
@@ -59,7 +61,7 @@ export default function ImagesSliderContent({
           }}
           modules={[FreeMode, Navigation, Thumbs, EffectFade, Zoom]}
           zoom={{ maxRatio: 3 }}
-          className="w-full  rounded-xs "
+          className={`w-full rounded-xs ${isFullPage ? "" : "h-full"}`}
         >
           {imagesUrls.map((image, index) => (
             <SwiperSlide key={index}>
@@ -70,11 +72,13 @@ export default function ImagesSliderContent({
                 }}
               >
                 {aiImagesUrls?.includes(image) && <AiImageBadge />}
-                <div className="swiper-zoom-container flex items-center justify-center">
+                <div
+                  className={`swiper-zoom-container flex items-center justify-center ${isFullPage ? "" : "h-full w-full"}`}
+                >
                   <Image
                     src={image}
                     alt={""}
-                    className={`block w-full ${isFullPage ? " md:h-[70vh] md:w-auto" : "h-full"} object-contain bg-white rounded-xs max-w-[400px]  md:max-w-full aspect-square`}
+                    className={`block object-contain bg-white rounded-xs ${isFullPage ? "w-full md:h-[70vh] md:w-auto max-w-[400px] md:max-w-full aspect-square" : "h-full w-full"}`}
                     height={1000}
                     width={1000}
                     sizes="(max-width: 768px) 100vw, 600px"

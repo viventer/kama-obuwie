@@ -4,11 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { analytics } from "@/firebase/firebase";
 import { CategoryWithId } from "@/firebase/schemas/productsSchemas";
-import { getCategoryDisplayName } from "@/helpers/categories";
 import { cn } from "@/lib/utils";
 import { logEvent } from "firebase/analytics";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+
+const enteredProductPageDirectly = (): boolean => {
+  const [nav] = performance.getEntriesByType("navigation");
+  if (!nav) return true;
+  return new URL(nav.name).pathname === window.location.pathname;
+};
 
 export default function ReturnToListingButton({
   category,
@@ -20,6 +25,11 @@ export default function ReturnToListingButton({
   const router = useRouter();
 
   const clickHandler = () => {
+    if (!enteredProductPageDirectly()) {
+      router.back();
+      return;
+    }
+
     if (analytics) {
       logEvent(analytics, "view_item_list", {
         item_list_id: category.id,
@@ -37,17 +47,15 @@ export default function ReturnToListingButton({
         className,
       )}
       onClick={clickHandler}
+      aria-label="Wróć"
     >
       <Button
         variant="ghost"
-        onClick={clickHandler}
         className="hover:translate-x-[-4px] transition-transform px-0! md:px-2! hover:bg-transparent md:hover:bg-foreground/15"
       >
         <ArrowLeft className="size-5" />
       </Button>
-      <p className="capitalize text-base font-medium">
-        {getCategoryDisplayName(category)}
-      </p>
+      <p className="capitalize text-base font-medium">Wróć</p>
     </Card>
   );
 }

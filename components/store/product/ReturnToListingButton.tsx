@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { analytics } from "@/firebase/firebase";
 import { CategoryWithId } from "@/firebase/schemas/productsSchemas";
+import { getCategoryDisplayName } from "@/helpers/categories";
 import { cn } from "@/lib/utils";
 import { logEvent } from "firebase/analytics";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const enteredProductPageDirectly = (): boolean => {
   const [nav] = performance.getEntriesByType("navigation");
@@ -23,6 +25,15 @@ export default function ReturnToListingButton({
   className?: string;
 }) {
   const router = useRouter();
+  const [enteredDirectly, setEnteredDirectly] = useState(false);
+
+  useEffect(() => {
+    setEnteredDirectly(enteredProductPageDirectly());
+  }, []);
+
+  const label = enteredDirectly
+    ? getCategoryDisplayName(category)
+    : "Wróć";
 
   const clickHandler = () => {
     if (!enteredProductPageDirectly()) {
@@ -47,7 +58,7 @@ export default function ReturnToListingButton({
         className,
       )}
       onClick={clickHandler}
-      aria-label="Wróć"
+      aria-label={label}
     >
       <Button
         variant="ghost"
@@ -55,7 +66,7 @@ export default function ReturnToListingButton({
       >
         <ArrowLeft className="size-5" />
       </Button>
-      <p className="capitalize text-base font-medium">Wróć</p>
+      <p className="capitalize text-base font-medium">{label}</p>
     </Card>
   );
 }

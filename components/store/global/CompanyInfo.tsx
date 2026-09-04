@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { companyData } from "@/lib/constants";
 import Link from "next/link";
+import LinkText from "@/components/adminPanel/global/LinkText";
 
 export default function CompanyInfo({ className }: { className?: string }) {
   return (
@@ -16,8 +17,14 @@ export default function CompanyInfo({ className }: { className?: string }) {
         <p>REGON: {companyData.regon}</p>
       </div>
       <div className="mb-4">
-        <p>{companyData.phone}</p>
-        <p>{companyData.email}</p>
+        <p>
+          <LinkText href={companyData.phoneHref}>{companyData.phone}</LinkText>
+        </p>
+        <p>
+          <LinkText href={`mailto:${companyData.email}`}>
+            {companyData.email}
+          </LinkText>
+        </p>
       </div>
       <Link href="/info/about">
         <Button variant="outline">Więcej informacji o sklepie</Button>

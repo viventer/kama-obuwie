@@ -175,7 +175,7 @@ export function getMerchantCenterFootwearProduct(
         currencyCode: "PLN",
       },
       googleProductCategory: "187",
-      productTypes: [category.name],
+      productTypes: [`${category.rootCategory} > ${category.name}`],
       color: productData.colorVariant.color,
       gender,
       ageGroup: category.rootCategory === "obuwie dziecięce" ? "kids" : "adult",

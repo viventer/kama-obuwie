@@ -37,6 +37,10 @@ import {
   StoreProductDataForStore,
 } from "@/server-actions/store/getStoreProductPageData";
 import { getLowestPrice30dReference } from "@/helpers/prices";
+import {
+  applyProductAdsParams,
+  buildProductPagePath,
+} from "@/helpers/productUrl";
 
 export type VariantToChoose = {
   name: string;
@@ -174,12 +178,35 @@ export default function ProductPage({
     }
   }, [searchParams, productData.colorVariants]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    const changed = applyProductAdsParams(params, {
+      rootCategory: category.rootCategory,
+      categoryName: category.name,
+    });
+    if (!changed) return;
+
+    router.replace(`/product/${productData.id}?${params.toString()}`, {
+      scroll: false,
+    });
+  }, [
+    searchParams,
+    category.rootCategory,
+    category.name,
+    productData.id,
+    router,
+  ]);
+
   const handleVariantChange = (newVariant: string) => {
     if (imagesUrls[newVariant]) {
       setSelectedColorVariant(newVariant);
       setSelectedSize("");
       const params = new URLSearchParams(searchParams);
       params.set("colorVariantName", newVariant);
+      applyProductAdsParams(params, {
+        rootCategory: category.rootCategory,
+        categoryName: category.name,
+      });
       router.replace(`/product/${productData.id}?${params.toString()}`, {
         scroll: false,
       });
@@ -192,7 +219,13 @@ export default function ProductPage({
         return;
       }
 
-      router.push(`/product/${selectedOffer?.offerId}`);
+      router.push(
+        buildProductPagePath({
+          id: selectedOffer.offerId,
+          rootCategory: category.rootCategory,
+          categoryName: category.name,
+        }),
+      );
     }
   };
 

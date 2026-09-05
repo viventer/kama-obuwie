@@ -143,6 +143,16 @@ export default function AppSidebar() {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Raporty</SidebarGroupLabel>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <LinkText href="/admin-panel/reports" onClick={handleLinkClick}>
+                Raporty
+              </LinkText>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
         {/* <SidebarGroup>
           <SidebarGroupLabel>Szablony</SidebarGroupLabel>
           <SidebarMenu>

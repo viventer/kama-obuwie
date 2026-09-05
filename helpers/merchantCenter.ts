@@ -9,6 +9,7 @@ import {
 import { getOfferPriceForDTC, moneyValueToMicros } from "./prices";
 import { toBase64UrlNoPadding } from "./encoding";
 import { getRequiredEnv } from "./env";
+import { buildProductPagePath } from "./productUrl";
 import { google } from "googleapis";
 
 const NO_BRAND_SENTINELS = new Set(["bez marki"]);
@@ -156,7 +157,12 @@ export function getMerchantCenterFootwearProduct(
         process.env.NEXT_PUBLIC_NODE_ENV == "production"
           ? "kama-obuwie.pl"
           : "kama-obuwie-dev--kama-obuwie-ap.europe-west4.hosted.app"
-      }/product/${productData.id}?colorVariantName=${offerData.colorVariantName}`,
+      }${buildProductPagePath({
+        id: productData.id,
+        colorVariantName: offerData.colorVariantName,
+        rootCategory: category.rootCategory,
+        categoryName: category.name,
+      })}`,
       imageLink: thumbnailUrl,
       ...(additionalImageLinks.length > 0 ? { additionalImageLinks } : {}),
       availability: getMerchantCenterProductAvaiability(
@@ -169,7 +175,7 @@ export function getMerchantCenterFootwearProduct(
         currencyCode: "PLN",
       },
       googleProductCategory: "187",
-      productTypes: [category.name],
+      productTypes: [`${category.rootCategory} > ${category.name}`],
       color: productData.colorVariant.color,
       gender,
       ageGroup: category.rootCategory === "obuwie dziecięce" ? "kids" : "adult",

@@ -37,6 +37,10 @@ import {
   StoreProductDataForStore,
 } from "@/server-actions/store/getStoreProductPageData";
 import { getLowestPrice30dReference } from "@/helpers/prices";
+import {
+  applyProductAdsParams,
+  buildProductPagePath,
+} from "@/helpers/productUrl";
 
 export type VariantToChoose = {
   name: string;
@@ -174,12 +178,35 @@ export default function ProductPage({
     }
   }, [searchParams, productData.colorVariants]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    const changed = applyProductAdsParams(params, {
+      rootCategory: category.rootCategory,
+      categoryName: category.name,
+    });
+    if (!changed) return;
+
+    router.replace(`/product/${productData.id}?${params.toString()}`, {
+      scroll: false,
+    });
+  }, [
+    searchParams,
+    category.rootCategory,
+    category.name,
+    productData.id,
+    router,
+  ]);
+
   const handleVariantChange = (newVariant: string) => {
     if (imagesUrls[newVariant]) {
       setSelectedColorVariant(newVariant);
       setSelectedSize("");
       const params = new URLSearchParams(searchParams);
       params.set("colorVariantName", newVariant);
+      applyProductAdsParams(params, {
+        rootCategory: category.rootCategory,
+        categoryName: category.name,
+      });
       router.replace(`/product/${productData.id}?${params.toString()}`, {
         scroll: false,
       });
@@ -192,7 +219,13 @@ export default function ProductPage({
         return;
       }
 
-      router.push(`/product/${selectedOffer?.offerId}`);
+      router.push(
+        buildProductPagePath({
+          id: selectedOffer.offerId,
+          rootCategory: category.rootCategory,
+          categoryName: category.name,
+        }),
+      );
     }
   };
 
@@ -397,20 +430,11 @@ export default function ProductPage({
                 Dodaj do koszyka
               </Button>
               <ShippingInfo />
-              {currentBreakpoint && currentBreakpoint.includes("s") ? (
-                <>
-                  <TrustmateWidget className="mt-8 mb-4 bg-card rounded-xs" />
-                  <MobileProductPageShopAdvantages className="mb-4" />
-                </>
-              ) : (
-                <>
-                  <TrustmateWidget
-                    className="mt-8 mb-4 bg-card rounded-xs"
-                    alignActionEnd
-                  />
-                  <AdvantagesBox className="h-fit flex-0" />
-                </>
-              )}
+              <AdvantagesBox className="mt-8 mb-4 h-fit flex-0 border-success border-2 bg-transparent" />
+              <TrustmateWidget
+                className="mb-4 bg-card rounded-xs"
+                alignActionEnd
+              />
             </article>
             <ProductInfo className="md:hidden" productData={productData} />
           </div>

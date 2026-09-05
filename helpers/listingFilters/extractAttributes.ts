@@ -3,6 +3,7 @@ import {
   ProductParameters,
   ParamValueSchema,
 } from "@/firebase/schemas/productsSchemas";
+import { normalizeColorForFilter } from "@/helpers/listingFilters/normalizeColor";
 import { z } from "zod";
 
 type ParamValue = z.infer<typeof ParamValueSchema>;
@@ -69,7 +70,7 @@ export const getListingColorFromOptionalParameters = (
   );
   if (!entry) return undefined;
 
-  return normalizeParamValue(entry[1])[0];
+  return normalizeColorForFilter(normalizeParamValue(entry[1])[0]);
 };
 
 /** Extract listing filter attributes from product parameters + color variant. */
@@ -85,10 +86,10 @@ export const extractListingFilterAttributes = ({
     PARAMETER_ALIASES.externalMaterial,
   );
   const fastening = findParamValues(parameters, PARAMETER_ALIASES.fastening);
-  const trimmedColor = color?.trim();
+  const normalizedColor = normalizeColorForFilter(color);
 
   if (
-    !trimmedColor &&
+    !normalizedColor &&
     externalMaterial.length === 0 &&
     fastening.length === 0
   ) {
@@ -96,7 +97,7 @@ export const extractListingFilterAttributes = ({
   }
 
   return {
-    ...(trimmedColor ? { color: trimmedColor } : {}),
+    ...(normalizedColor ? { color: normalizedColor } : {}),
     ...(externalMaterial.length > 0 ? { externalMaterial } : {}),
     ...(fastening.length > 0 ? { fastening } : {}),
   };

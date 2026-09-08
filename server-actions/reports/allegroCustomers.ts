@@ -31,25 +31,16 @@ function toCsv(rows: AllegroCustomerRow[]): string {
   const lines = [
     CSV_HEADER,
     ...rows.map((row) =>
-      [
-        row.firstName,
-        row.lastName,
-        "PL",
-        row.zip,
-        row.email,
-        row.phone,
-      ]
+      [row.firstName, row.lastName, "PL", row.zip, row.email, row.phone]
         .map(escapeCsvField)
-        .join(",")
+        .join(","),
     ),
   ];
 
   return `\uFEFF${lines.join("\r\n")}`;
 }
 
-function mapOrderToRow(
-  data: OrderCustomerFields
-): AllegroCustomerRow | null {
+function mapOrderToRow(data: OrderCustomerFields): AllegroCustomerRow | null {
   const buyer = data.buyer;
   const email = buyer?.email?.trim();
   if (!buyer || !email) {
@@ -79,7 +70,6 @@ export async function generateAllegroCustomersCsv() {
     let query = adminDB
       .collection("orders")
       .where("salesChannel", "==", "AL1")
-      .orderBy("createdAt", "desc")
       .select("buyer", "delivery")
       .limit(BATCH_SIZE);
 

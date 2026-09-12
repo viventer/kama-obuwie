@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { cubicBezier, motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
 import ProductPrice from "@/components/store/product/ProductPrice";
@@ -10,6 +11,11 @@ import AiImageBadge from "@/components/store/global/AiImageBadge";
 import ProductFromListHoverDetails from "@/components/store/home/ProductFromListHoverDetails";
 import { buildProductPagePath } from "@/helpers/productUrl";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
+
+const paddingTransition = {
+  duration: 0.25,
+  ease: cubicBezier(0.22, 1, 0.36, 1),
+};
 
 export default function ProductFromList({
   product,
@@ -25,6 +31,7 @@ export default function ProductFromList({
   const { isAtLeast } = useBreakpoint();
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredVariant, setHoveredVariant] = useState<string | null>(null);
+  const restPadding = 16 as const;
 
   const previewName = hoveredVariant ?? product.colorVariantName;
   const previewVariant =
@@ -50,7 +57,16 @@ export default function ProductFromList({
     >
       {product.isThumbnailAiCoCreated && <AiImageBadge />}
       <Link href={ownHref} className="block">
-        <div className="relative py-2 sm:py-4 w-full aspect-square bg-white rounded-t-xs flex justify-center items-center">
+        <motion.div
+          className="relative w-full aspect-square bg-white rounded-t-xs flex justify-center items-center"
+          initial={false}
+          animate={
+            isHovered
+              ? { paddingTop: 0, paddingBottom: 32 }
+              : { paddingTop: restPadding, paddingBottom: restPadding }
+          }
+          transition={paddingTransition}
+        >
           <Image
             src={previewVariant.thumbnailUrl}
             alt=""
@@ -60,7 +76,7 @@ export default function ProductFromList({
             sizes={sizes}
             className="object-contain rounded-t-xs w-full"
           />
-        </div>
+        </motion.div>
       </Link>
 
       <div className="relative z-10 bg-card py-2 px-2 xs:px-3">

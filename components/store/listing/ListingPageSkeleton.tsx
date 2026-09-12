@@ -21,10 +21,12 @@ export default function ListingPageSkeleton({
 
       <section className={PRODUCT_GRID_CLASS}>
         {Array.from({ length: productCount }).map((_, index) => (
-          <div key={index} className="flex flex-col gap-2">
+          <div key={index} className="flex flex-col">
             <Skeleton className="aspect-square w-full rounded-xs" />
-            <Skeleton className="h-5 w-2/3 rounded-xs" />
-            <Skeleton className="h-6 w-1/3 rounded-xs" />
+            <div className="py-2 px-2 xs:px-3 flex flex-col gap-2">
+              <Skeleton className="h-6 w-2/3 rounded-xs" />
+              <Skeleton className="h-6 w-1/3 rounded-xs" />
+            </div>
           </div>
         ))}
       </section>

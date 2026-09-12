@@ -67,7 +67,7 @@ export default function ProductFromListHoverDetails({
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={hoverDetailsTransition}
-          className="absolute bottom-full inset-x-0 bg-card/40 px-2 xs:px-3 overflow-hidden will-change-[height,opacity]"
+          className="absolute bottom-full inset-x-0 bg-card/30 px-2 xs:px-3 overflow-hidden will-change-[height,opacity]"
         >
           <div className="py-1.5 flex flex-col gap-1.5">
             {showSwatches && (

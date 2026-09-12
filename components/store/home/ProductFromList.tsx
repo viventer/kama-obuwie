@@ -31,7 +31,7 @@ export default function ProductFromList({
   const { isAtLeast } = useBreakpoint();
   const [isHovered, setIsHovered] = useState(false);
   const [hoveredVariant, setHoveredVariant] = useState<string | null>(null);
-  const restPadding = 16 as const;
+  const restPadding = 12 as const;
 
   const previewName = hoveredVariant ?? product.colorVariantName;
   const previewVariant =
@@ -62,7 +62,7 @@ export default function ProductFromList({
           initial={false}
           animate={
             isHovered
-              ? { paddingTop: 0, paddingBottom: 32 }
+              ? { paddingTop: 0, paddingBottom: 24 }
               : { paddingTop: restPadding, paddingBottom: restPadding }
           }
           transition={paddingTransition}

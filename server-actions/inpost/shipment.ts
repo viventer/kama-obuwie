@@ -20,10 +20,22 @@ export async function createInpostShipment(
 
   CreateInpostShipmentDataSchema.parse(createShipmentData);
 
+  // Szablon lockerowy (small/medium/large) ma na stałe wagę 25 kg.
+  // Przy kurierze InPost ignoruje weight z formularza, jeśli template jest w payloadzie.
+  const shipmentPayload =
+    createShipmentData.service === "inpost_courier_standard"
+      ? {
+          ...createShipmentData,
+          parcels: createShipmentData.parcels.map(
+            ({ template: _template, ...parcel }) => parcel
+          ),
+        }
+      : createShipmentData;
+
   try {
     const response = await axios.post(
       `${INPOST_API_BASE_URL}/v1/organizations/${INPOST_ORGANIZATION_ID}/shipments`,
-      createShipmentData,
+      shipmentPayload,
       {
         headers: getInpostHeaders(),
       }

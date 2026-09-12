@@ -50,6 +50,8 @@ export default function CreateLabelForm({
   const { handleError } = useErrorHandler();
   const { startLoading, stopLoading } = useFullPageLoading();
 
+  const isCourier = orderDeliveryData.method === "courier";
+
   const form = useForm<CreateInpostShipmentData>({
     defaultValues: {
       receiver: {
@@ -71,16 +73,30 @@ export default function CreateLabelForm({
           country_code: "PL",
         },
       },
-      parcels: [
-        {
-          template: "medium",
-        },
-      ],
+      // Kurier: wymiary + waga (bez template). Paczkomat: tylko template.
+      // Szablon lockerowy ma na stałe przypisaną wagę 25 kg i nadpisuje weight w API InPost.
+      parcels: isCourier
+        ? [
+            {
+              dimensions: {
+                length: 64,
+                width: 38,
+                height: 19,
+                unit: "mm",
+              },
+              weight: {
+                amount: 1,
+                unit: "kg",
+              },
+            },
+          ]
+        : [
+            {
+              template: "medium",
+            },
+          ],
       reference: orderNumber,
-      service:
-        orderDeliveryData.method == "courier"
-          ? "inpost_courier_standard"
-          : "inpost_locker_standard",
+      service: isCourier ? "inpost_courier_standard" : "inpost_locker_standard",
       // additional_services: ["sms", "email"],
     },
   });
@@ -110,25 +126,25 @@ export default function CreateLabelForm({
     const formData = form.getValues();
 
     const parcels = formData.parcels.map((parcel) => {
-      const convertedParcel = { ...parcel };
-
-      if (convertedParcel.dimensions) {
-        convertedParcel.dimensions = {
-          length: Number(convertedParcel.dimensions.length),
-          width: Number(convertedParcel.dimensions.width),
-          height: Number(convertedParcel.dimensions.height),
-          unit: "mm" as const,
+      if (formData.service === "inpost_courier_standard") {
+        return {
+          dimensions: {
+            // Formularz zbiera cm, ShipX wymaga mm
+            length: Number(parcel.dimensions?.length) * 10,
+            width: Number(parcel.dimensions?.width) * 10,
+            height: Number(parcel.dimensions?.height) * 10,
+            unit: "mm" as const,
+          },
+          weight: {
+            amount: Number(parcel.weight?.amount),
+            unit: "kg" as const,
+          },
         };
       }
 
-      if (convertedParcel.weight) {
-        convertedParcel.weight = {
-          amount: Number(convertedParcel.weight.amount),
-          unit: "kg" as const,
-        };
-      }
-
-      return convertedParcel;
+      return {
+        template: parcel.template,
+      };
     });
 
     // Usuń adres odbiorcy dla przesyłek do paczkomatu

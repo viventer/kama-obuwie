@@ -32,12 +32,14 @@ import {
   serializeListingFiltersToSearchParams,
 } from "@/helpers/listingFilters/url";
 import { SEARCH_MIN_QUERY_LENGTH } from "@/lib/search/constants";
+import { groupVariantsByProductId } from "@/helpers/listingVariants";
 
 type ListingFiltersContextValue = {
   state: ListingFiltersState;
   facets: ListingFacets;
   filteredProducts: ProductListingData[];
   pageProducts: ProductListingData[];
+  variantsByProductId: Map<string, ProductListingData[]>;
   page: number;
   totalPages: number;
   setPage: (page: number) => void;
@@ -163,6 +165,11 @@ export function ListingFiltersProvider({
     state.rootCategory,
     categoryLabels,
   ]);
+
+  const variantsByProductId = useMemo(
+    () => groupVariantsByProductId(products),
+    [products],
+  );
 
   const filteredProducts = useMemo(
     () => applyListingFilters(products, state),
@@ -312,6 +319,7 @@ export function ListingFiltersProvider({
       facets,
       filteredProducts,
       pageProducts,
+      variantsByProductId,
       page: currentPage,
       totalPages,
       setPage,
@@ -342,6 +350,7 @@ export function ListingFiltersProvider({
       facets,
       filteredProducts,
       pageProducts,
+      variantsByProductId,
       currentPage,
       totalPages,
       setPage,

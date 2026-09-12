@@ -16,9 +16,11 @@ import DesktopFiltersBar from "./filters/DesktopFiltersBar";
 import SelectedFiltersSticky from "./filters/SelectedFiltersSticky";
 import ProductGrid from "./ProductGrid";
 import { PRODUCTS_PER_PAGE } from "@/helpers/listingFilters/types";
+import { groupVariantsByProductId } from "@/helpers/listingVariants";
 
 function CategoryProductsListingInner() {
-  const { filteredProducts, pageProducts, page } = useListingFilters();
+  const { filteredProducts, pageProducts, page, variantsByProductId } =
+    useListingFilters();
 
   return (
     <>
@@ -30,6 +32,7 @@ function CategoryProductsListingInner() {
         <ProductGrid
           products={pageProducts}
           priorityCount={page === 1 ? 6 : 0}
+          variantsByProductId={variantsByProductId}
         />
       ) : (
         <div className="text-lg">
@@ -62,6 +65,7 @@ export default function CategoryProductsListing({
         <ProductGrid
           products={products.slice(0, PRODUCTS_PER_PAGE)}
           priorityCount={6}
+          variantsByProductId={groupVariantsByProductId(products)}
         />
       }
     >

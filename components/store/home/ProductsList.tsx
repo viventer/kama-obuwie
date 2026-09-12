@@ -7,6 +7,7 @@ import { ArrowRightIcon, Ghost } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
 import { ProductListingData } from "@/firebase/schemas/productsSchemas";
+import { groupVariantsByProductId } from "@/helpers/listingVariants";
 import { analytics } from "@/firebase/firebase";
 import { logEvent } from "firebase/analytics";
 import SubpageHeading from "@/components/adminPanel/global/SubpageHeading";
@@ -43,6 +44,7 @@ export default function ProductsList({
   };
 
   const productsToShow = getProductsCount();
+  const variantsByProductId = groupVariantsByProductId(products);
 
   return (
     <section>
@@ -53,6 +55,7 @@ export default function ProductsList({
             <ProductFromList
               key={`${product.id}-${product.colorVariantName}`}
               product={product}
+              variants={variantsByProductId.get(product.id)}
             />
           ))}
         </div>

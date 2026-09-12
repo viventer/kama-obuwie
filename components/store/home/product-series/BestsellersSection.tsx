@@ -1,4 +1,5 @@
 import type { Bestsellers, BestsellersRootCategory } from "@/lib/bestsellers";
+import { groupVariantsByProductId } from "@/helpers/listingVariants";
 import ProductFromList from "../ProductFromList";
 
 export default function BestsellersSection({
@@ -8,6 +9,10 @@ export default function BestsellersSection({
   bestsellersData: Bestsellers;
   rootCategory: BestsellersRootCategory;
 }) {
+  const variantsByProductId = groupVariantsByProductId(
+    bestsellersData[rootCategory],
+  );
+
   return (
     <article className="max-w-full">
       <h2 className="text-xl md:text-2xl pb-4 md:pb-0">
@@ -23,6 +28,7 @@ export default function BestsellersSection({
             <ProductFromList
               product={product}
               sizes="(min-width: 640px) 250px, 40vw"
+              variants={variantsByProductId.get(product.id)}
             />
           </div>
         ))}

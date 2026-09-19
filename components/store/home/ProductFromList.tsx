@@ -74,7 +74,7 @@ export default function ProductFromList({
             height={300}
             priority={priority}
             sizes={sizes}
-            className="object-contain rounded-t-xs w-full"
+            className="object-contain rounded-t-xs w-full aspect-square"
           />
         </motion.div>
       </Link>

@@ -67,7 +67,6 @@ export default function AllFiltersContent({
     clearAll,
     filteredProducts,
     enableCategoryFilter,
-    isSearchListing,
     defaultSortLabel,
   } = useListingFilters();
 
@@ -83,7 +82,7 @@ export default function AllFiltersContent({
         />
       ),
     },
-    enableCategoryFilter && !(variant === "mobile" && isSearchListing)
+    enableCategoryFilter && variant !== "mobile"
       ? {
           id: "category",
           label: "Kategoria",

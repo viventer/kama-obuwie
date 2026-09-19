@@ -21,7 +21,6 @@ const rootLabel = (root: RootCategory | undefined): string | undefined => {
 export default function MobileCategoryPathBar() {
   const {
     enableCategoryFilter,
-    isSearchListing,
     state,
     facets,
     filteredProducts,
@@ -45,7 +44,7 @@ export default function MobileCategoryPathBar() {
     }));
   }, [filteredProducts]);
 
-  if (!enableCategoryFilter || !isSearchListing) return null;
+  if (!enableCategoryFilter) return null;
 
   const hasCategory = Boolean(state.categoryId);
   const hasRoot = Boolean(state.rootCategory);

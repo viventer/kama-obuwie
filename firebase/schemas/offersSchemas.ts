@@ -226,12 +226,28 @@ export const PostOfferFormSchema = OfferSchema.pick({
   returnPolicy: true,
   warranty: true,
   impliedWarranty: true,
-}).extend({
-  title: z.record(z.string(), z.string().min(12).max(72)),
-  EAN: z
-    .record(z.string(), z.record(z.string(), z.string().optional()))
-    .optional(),
-});
+})
+  .extend({
+    title: z.record(z.string(), z.string().min(12).max(72)),
+    EAN: z
+      .record(z.string(), z.record(z.string(), z.string().optional()))
+      .optional(),
+    addToMerchantCenter: z.boolean(),
+    merchantCenterTitle: z.record(z.string(), z.string()).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.addToMerchantCenter) return;
+    for (const variant of Object.keys(data.title)) {
+      const t = data.merchantCenterTitle?.[variant]?.trim() ?? "";
+      if (t.length < 3 || t.length > 140) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["merchantCenterTitle", variant],
+          message: "Tytuł Merchant Center jest wymagany (3-140 znaków).",
+        });
+      }
+    }
+  });
 
 export const AllegroOfferFromListingSchema = z.object({
   id: z.string(),

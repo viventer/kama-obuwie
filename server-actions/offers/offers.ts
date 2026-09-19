@@ -104,7 +104,10 @@ export const getPostOfferBody = async ({
   oldOfferData,
   sizingTable,
 }: {
-  formDataWithoutTitlesAndEAN: Omit<PostOfferFormValues, "title" | "EAN">;
+  formDataWithoutTitlesAndEAN: Omit<
+    PostOfferFormValues,
+    "title" | "EAN" | "addToMerchantCenter" | "merchantCenterTitle"
+  >;
   productData: ProductWithId;
   oldOfferData: OfferWithId;
   sizingTable: SizingTableWithId;

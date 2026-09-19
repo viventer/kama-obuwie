@@ -33,6 +33,7 @@ import { handleApiError } from "@/server-actions/errorHandlers";
 import ImpliedWarrantySelector from "./ImpliedWarrantySelector";
 import WarrantySelector from "./WarrantySelector";
 import TitlesField from "./TitlesField";
+import MerchantCenterField from "./MerchantCenterField";
 import EANsField from "./EANsField";
 import { generateUniqueSKU } from "@/server-actions/products/SKU";
 import { validateOfferForm } from "../helpers/validation";
@@ -48,6 +49,8 @@ export type PostOfferFormValues = Pick<
 > & {
   title: Record<string, string>; // { colorVariantName: title }
   EAN?: Record<string, Record<string, string | undefined>>; // { colorVariantName: { size: EAN } }
+  addToMerchantCenter: boolean;
+  merchantCenterTitle?: Record<string, string>;
 };
 
 export default function PostOfferForm({
@@ -92,6 +95,8 @@ export default function PostOfferForm({
       warranty: oldOfferData.warranty || {},
       impliedWarranty: oldOfferData.impliedWarranty || {},
       EAN: {},
+      addToMerchantCenter: true,
+      merchantCenterTitle: {},
     },
   });
 
@@ -140,11 +145,13 @@ export default function PostOfferForm({
       (photo) => photo.colorVariantName === colorVariantsNames[0],
     )?.filePath;
 
-    const formDataWithoutTitlesAndEAN = {
-      ...formData,
-      title: "",
-      EAN: {},
-    };
+    const {
+      title: _title,
+      EAN: _ean,
+      addToMerchantCenter,
+      merchantCenterTitle,
+      ...formDataWithoutTitlesAndEAN
+    } = formData;
 
     const SKUsArray = await Promise.all(
       colorVariantsNames.map(async (variant) => {
@@ -209,6 +216,8 @@ export default function PostOfferForm({
         sizingTable,
       });
 
+      const gmcFailures: string[] = [];
+
       for (const variant of productData.colorVariants) {
         if (!productData.editedPhotos) {
           showToast("Brak zdjęć produktu", "error");
@@ -249,13 +258,26 @@ export default function PostOfferForm({
           SKU: SKUs,
         });
 
-        // if (process.env.NEXT_PUBLIC_NODE_ENV === "production") {
-        //   await axios.post(`/api/merchant-center/offer/${offerId}`); // Sync to Merchant Center
-        // }
+        if (addToMerchantCenter) {
+          try {
+            await axios.post(`/api/merchant-center/offer/${offerId}`, {
+              title: merchantCenterTitle?.[colorVariantName],
+            });
+          } catch {
+            gmcFailures.push(colorVariantName);
+          }
+        }
       }
 
       setIsPosting(false);
-      showToast("Oferta została wystawiona.", "success");
+      if (gmcFailures.length > 0) {
+        showToast(
+          `Oferta wystawiona, ale nie dodano do Merchant Center: ${gmcFailures.join(", ")}`,
+          "error",
+        );
+      } else {
+        showToast("Oferta została wystawiona.", "success");
+      }
       router.replace("/admin-panel/create-products/post-offer");
     } catch (err: any) {
       handleError(err, "Nie udało się wystawić oferty", () =>
@@ -317,6 +339,13 @@ export default function PostOfferForm({
     <Form {...form}>
       <div className="flex flex-col gap-6">
         <TitlesField
+          colorVariants={
+            productData.colorVariants?.map((variant) =>
+              getColorVariantName(variant),
+            ) || []
+          }
+        />
+        <MerchantCenterField
           colorVariants={
             productData.colorVariants?.map((variant) =>
               getColorVariantName(variant),

@@ -32,9 +32,7 @@ export default function ProductPageSizeSelector({
   const selectedAvailability = selectedSize
     ? availability[selectedSize]
     : undefined;
-  const selectedIsAvailable = selectedSize
-    ? isAvailable(selectedSize)
-    : false;
+  const selectedIsAvailable = selectedSize ? isAvailable(selectedSize) : false;
 
   return (
     <article className="mb-2">

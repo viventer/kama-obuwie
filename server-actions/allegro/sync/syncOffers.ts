@@ -52,6 +52,7 @@ import {
   updateOfferInDB,
   updateProductOffersIds,
 } from "./syncOffersHelpers";
+import { revalidateStorefrontListings } from "../../store/revalidate";
 
 const ALLEGRO_API_BASE_URL = process.env.NEXT_PUBLIC_ALLEGRO_API_BASE_URL!;
 
@@ -1034,6 +1035,15 @@ export const syncAllegroOffers = async (
         success: true,
         offersCount: currentChannel === "AL2" ? allOffers.length : 0,
       };
+    }
+
+    try {
+      revalidateStorefrontListings();
+    } catch (revalidateError) {
+      console.error(
+        "Nie udało się zrewalidować listingów po batchu sync Allegro:",
+        revalidateError,
+      );
     }
 
     return result;

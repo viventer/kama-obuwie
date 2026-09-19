@@ -41,6 +41,7 @@ import {
   applyProductAdsParams,
   buildProductPagePath,
 } from "@/helpers/productUrl";
+import { useLiveProductAvailability } from "@/hooks/useLiveProductAvailability";
 
 export type VariantToChoose = {
   name: string;
@@ -72,6 +73,7 @@ export default function ProductPage({
   const [filteredVariants, setFilteredVariants] = useState<VariantToChoose[]>(
     [],
   );
+  const { offersData: liveOffersData } = useLiveProductAvailability(offersData);
 
   if (!productData.colorVariants) {
     console.log(
@@ -84,7 +86,7 @@ export default function ProductPage({
   useEffect(() => {
     const availableVariants = productData.colorVariants.filter((variant) => {
       const variantName = getColorVariantName(variant);
-      const offer = offersData[variantName];
+      const offer = liveOffersData[variantName];
       if (!offer || Object.keys(offer.availability).length === 0) return false;
       const isActive = Object.values(offer.availability).some(
         (availability) =>
@@ -119,7 +121,9 @@ export default function ProductPage({
     }
 
     setFilteredVariants(variantsToChoose);
+  }, [liveOffersData, productData.colorVariants, imagesUrls, connectedOffers]);
 
+  useEffect(() => {
     if (analytics) {
       logEvent(analytics, "view_item", {
         items: [
@@ -230,6 +234,7 @@ export default function ProductPage({
   };
 
   const currentOffer = offersData[selectedColorVariant];
+  const liveCurrentOffer = liveOffersData[selectedColorVariant];
 
   const priceStr =
     currentOffer?.sellingPrices?.DTC ||
@@ -376,11 +381,11 @@ export default function ProductPage({
               onVariantChange={handleVariantChange}
             />
             <section>
-              {currentOffer && currentOffer.availability && (
+              {liveCurrentOffer && liveCurrentOffer.availability && (
                 <section>
                   <h3 className="text-lg font-medium"> Rozmiar</h3>
                   <ProductPageSizeSelector
-                    availability={currentOffer.availability}
+                    availability={liveCurrentOffer.availability}
                     selectedSize={selectedSize}
                     onSizeChange={setSelectedSize}
                   />
@@ -408,7 +413,7 @@ export default function ProductPage({
                     title: "Wybierz rozmiar",
                     content: (
                       <SelectSizeDialogContent
-                        availability={currentOffer?.availability}
+                        availability={liveCurrentOffer?.availability ?? {}}
                         selectedSize={selectedSize}
                         onSizeChange={setSelectedSize}
                       />

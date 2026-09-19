@@ -32,11 +32,11 @@ export function OrderInfoDisplay({ order }: OrderInfoDisplayProps) {
             : order.buyer.companyName || "Brak nazwy"}
         </div>
         {order.buyer.phoneNumber && (
-          <div className="text-xs text-white/75 flex items-center gap-1">
+          <div className="text-xs flex items-center gap-1">
             <PhoneIcon className="size-3" /> {order.buyer.phoneNumber}
           </div>
         )}
-        <div className="text-xs text-white/75 flex items-center gap-1">
+        <div className="text-xs flex items-center gap-1">
           <UserIcon className="size-3" />{" "}
           {order.buyer.login || order.buyer.email}
         </div>

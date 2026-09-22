@@ -331,7 +331,6 @@ export async function postIndividualAllegroOffer(
     {
       productParameters: product.parameters,
       allegroCategoryId,
-      productBrand: product.brand,
     },
     parametersNames,
   );
@@ -650,12 +649,11 @@ export async function formatAllegroProductParameters(
   productData: {
     productParameters: ProductParameters;
     allegroCategoryId: string;
-    productBrand?: string;
   },
   parametersNames: string[],
 ): Promise<AllegroOfferParameters> {
   const result: AllegroOfferParameters = [];
-  const { productParameters, allegroCategoryId, productBrand } = productData;
+  const { productParameters, allegroCategoryId } = productData;
 
   // 1. Scalamy wszystkie required + optional
   const allEntries: [string, Primitive | Primitive[]][] = [
@@ -691,25 +689,13 @@ export async function formatAllegroProductParameters(
         continue;
       }
 
+      // "inna" / "Inna marka" nie jest już dostępna w Allegro (brak ambiguousValueId).
+      // Oferty legacy z tą wartością mapujemy na słownikową wartość "bez marki".
       if (
         name === "Marka" &&
         (rawValue === "inna" || rawValue === "Inna marka")
       ) {
-        if (!productBrand) {
-          throw new Error(
-            "Brak marki produktu, ale marka 'inna' została wybrana.",
-          );
-        }
-
-        const { ambiguousValueId, parameterId } =
-          await getAllegroBrandAmbiguousValueId(allegroCategoryId);
-
-        result.push({
-          name: "Marka",
-          valuesIds: [ambiguousValueId],
-          values: [productBrand],
-        });
-
+        result.push({ name: "Marka", values: ["bez marki"] });
         continue;
       }
 
@@ -718,36 +704,6 @@ export async function formatAllegroProductParameters(
   }
 
   return result;
-}
-
-async function getAllegroBrandAmbiguousValueId(categoryId: string): Promise<{
-  ambiguousValueId: string;
-  parameterId: string;
-}> {
-  const accessToken = await getAllegroUserAccessToken();
-  const headers = getSingleAllegroHeaders(accessToken);
-
-  const url = `${ALLEGRO_API_BASE_URL}/sale/categories/${categoryId}/parameters`;
-
-  const resp = await axios.get(url, {
-    headers,
-  });
-  const parameters = resp.data.parameters;
-
-  const brandParameter = parameters.find(
-    (p: { name: string }) => p.name === "Marka",
-  );
-
-  if (!brandParameter) {
-    throw new Error("Nie znaleziono parametru 'Marka' w kategorii.");
-  }
-
-  const ambiguousValueId = brandParameter.options.ambiguousValueId;
-
-  return {
-    ambiguousValueId,
-    parameterId: brandParameter.id,
-  };
 }
 
 export { convertToAllegroDescription };

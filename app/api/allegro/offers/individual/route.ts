@@ -210,7 +210,6 @@ export async function POST(request: NextRequest) {
           {
             productParameters: legacyProductParameters as any,
             allegroCategoryId,
-            productBrand: legacy.brand,
           },
           availableParameterNames,
         );

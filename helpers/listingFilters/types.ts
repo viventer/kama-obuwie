@@ -36,7 +36,7 @@ export type ListingFacets = {
   categories: ListingCategoryFacet[];
 };
 
-export const PRODUCTS_PER_PAGE = 60;
+export const PRODUCTS_PER_PAGE = 30;
 
 export const DEFAULT_LISTING_FILTERS_STATE: ListingFiltersState = {
   sort: "default",

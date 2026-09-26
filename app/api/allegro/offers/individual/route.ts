@@ -19,6 +19,8 @@ import {
   postIndividualAllegroOfferFromLegacy,
 } from "@/server-actions/allegro/offers";
 import { updateOffer } from "@/server-actions/offers/offers";
+import { adminDB } from "@/firebase/firebaseAdmin";
+import { FieldPath } from "firebase-admin/firestore";
 import { parseSignature } from "@/helpers/signature";
 import type { LegacyProductWithId } from "@/firebase/schemas/legacyProductsSchemas";
 import { resolveSingleAvailabilityKey } from "@/helpers/availability";
@@ -288,17 +290,13 @@ export async function POST(request: NextRequest) {
           sizeTableAllegroId,
         });
 
-        const nextAllegroOffersIds = {
-          ...(offer.allegroOffersIds || {}),
-          [salesChannel]: {
-            ...((offer.allegroOffersIds as any)?.[salesChannel] || {}),
-            [requestedSize]: allegroOfferId,
-          },
-        };
-
-        await updateOffer(offerId, {
-          allegroOffersIds: nextAllegroOffersIds as any,
-        });
+        await adminDB
+          .collection("offers")
+          .doc(offerId)
+          .update(
+            new FieldPath("allegroOffersIds", salesChannel, requestedSize),
+            allegroOfferId,
+          );
 
         return apiResponse("Oferta utworzona.", 201, { allegroOfferId });
       }
@@ -468,15 +466,13 @@ export async function POST(request: NextRequest) {
       availableParameterNames,
     );
 
-    const newAllegroOffersIds = {
-      ...(offer.allegroOffersIds || { AL1: {}, AL2: {} }),
-      [salesChannel]: {
-        ...(offer.allegroOffersIds?.[salesChannel] || {}),
-        [availabilityKey]: allegroOfferId,
-      },
-    } as any;
-
-    await updateOffer(offerId, { allegroOffersIds: newAllegroOffersIds });
+    await adminDB
+      .collection("offers")
+      .doc(offerId)
+      .update(
+        new FieldPath("allegroOffersIds", salesChannel, availabilityKey),
+        allegroOfferId,
+      );
 
     return apiResponse("Oferta Allegro została utworzona.", 201, {
       allegroOfferId,

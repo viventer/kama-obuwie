@@ -195,30 +195,38 @@ export type HomeSliderBanner = {
 export const homeSliderBanners: HomeSliderBanner[] = [
   {
     imageSrc: "/home-slider/1.jpg",
-    heading: "Trampki do szkoły i przedszkola",
-    subheading:
-      "Wygodne, lekkie i stworzone na każdy dzień pełen dziecięcych przygód",
+    heading: "Kalosze dziecięce",
+    subheading: "Na deszczowe spacery i beztroską zabawę",
     destination: {
       rootCategory: "obuwie dziecięce",
-      categoryName: "trampki",
+      categoryName: "kalosze",
     },
   },
   {
     imageSrc: "/home-slider/2.jpg",
-    heading: "Mokasyny męskie",
-    subheading: "Doskonałe eleganckie buty na letnią porę",
+    heading: "Półbuty damskie",
+    subheading: "Elegancja i komfort na jesienne dni",
     destination: {
-      rootCategory: "obuwie męskie",
-      categoryName: "Mokasyny",
+      rootCategory: "obuwie damskie",
+      categoryName: "półbuty",
     },
   },
   {
     imageSrc: "/home-slider/3.jpg",
-    heading: "Klapki dziecięce",
-    subheading: "Uniwersalne klapki do domu, na basen i do ogródka",
+    heading: "Półbuty męskie",
+    subheading: "Klasyka i elegancja na każdą okazję",
     destination: {
-      rootCategory: "obuwie dziecięce",
-      categoryName: "klapki",
+      rootCategory: "obuwie męskie",
+      categoryName: "półbuty",
+    },
+  },
+  {
+    imageSrc: "/home-slider/4.jpg",
+    heading: "Czółenka damskie",
+    subheading: "Ponadczasowa elegancja w najlepszym wydaniu",
+    destination: {
+      rootCategory: "obuwie damskie",
+      categoryName: "czółenka",
     },
   },
 ];

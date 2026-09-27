@@ -8,10 +8,13 @@ export default function OrderCostDisplay({ order }: { order: Order }) {
   );
 
   const allegroMethodName = order.delivery?.allegroMethod?.name;
+  const isCourier = order.delivery?.method === "courier";
+  const isDtcCodCourier =
+    order.salesChannel === "DTC" && order.paymentType === "COD" && isCourier;
 
-  const DTCMethodName =
-    "Inpost" +
-    (order.delivery?.method === "courier" ? " Kurier" : " Paczkomat");
+  const DTCMethodName = isDtcCodCourier
+    ? "Inpost Kurier Pobranie"
+    : "Inpost" + (isCourier ? " Kurier" : " Paczkomat");
 
   return (
     <div>

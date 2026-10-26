@@ -257,6 +257,15 @@ export const P24TransactionSchema = z.object({
   isRedundant: z.boolean().optional(),
 });
 
+export const OrderStatsSchema = z.object({
+  counted: z.boolean(),
+  date: z.string(), // YYYY-MM-DD, bucket dzienny sprzedaży
+  cogsEstimated: z.boolean().optional(),
+  // Zapisane kwoty (grosze), żeby anulowanie cofało dokładnie tę samą wartość.
+  revenue: z.number().int().nonnegative().optional(),
+  cogs: z.number().int().nonnegative().optional(),
+});
+
 export const OrderSchema = z.object({
   id: z.string().optional(),
   number: z.string(),
@@ -288,6 +297,8 @@ export const OrderSchema = z.object({
   updatedAt: z.string().nullable(),
   createdAt: z.string(),
   salesChannel: SalesChannelSchema,
+  statusChangedAt: z.string().optional(), // UTC ISO, do okna 24h
+  stats: OrderStatsSchema.optional(),
   refund: RefundSchema.optional(),
   shipment: OrderShipmentSchema.optional(),
   returnDocumentFilePath: z.string().optional(),

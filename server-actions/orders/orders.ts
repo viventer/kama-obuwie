@@ -17,21 +17,40 @@ import { Offer } from "@/firebase/schemas/offersSchemas";
 import { randomUUID } from "crypto";
 import { PickupPointSchema } from "@/firebase/schemas/commonSchemas";
 import { getCurrentDateTimeInPoland } from "@/helpers/datetime";
+import { reconcileOrderSale } from "@/server-actions/stats/salesStats";
+
+async function syncOrderSaleStats(orderId: string) {
+  try {
+    await reconcileOrderSale(orderId);
+  } catch (error) {
+    console.error(
+      `[sales-stats] Nie udało się zaktualizować statystyk zamówienia ${orderId}`,
+      error,
+    );
+  }
+}
 
 export const createOrder = async function (newOrder: Order) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
-  OrderSchema.parse(newOrder);
+  const orderToSave: Order = {
+    ...newOrder,
+    statusChangedAt: new Date().toISOString(),
+  };
+
+  OrderSchema.parse(orderToSave);
 
   const orderRef = adminDB.collection("orders").doc();
 
-  await orderRef.set(newOrder);
+  await orderRef.set(orderToSave);
 
   await syncOffersAvailability(
-    newOrder.lineItems,
-    newOrder.salesChannel,
-    "order"
+    orderToSave.lineItems,
+    orderToSave.salesChannel,
+    "order",
   );
+
+  await syncOrderSaleStats(orderRef.id);
 
   return orderRef.id;
 };
@@ -42,14 +61,32 @@ export const updateOrder = async function (
 ) {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
-  OrderSchema.partial().parse(updateData);
   const orderRef = adminDB.collection("orders").doc(id);
   const orderDoc = await orderRef.get();
   if (!orderDoc.exists) {
     throw new Error("Zamówienie nie istnieje.");
   }
 
-  await orderRef.update(updateData);
+  const before = orderDoc.data() as Order;
+  const nextStatus = updateData.fulfillment?.status;
+  const statusChanged =
+    nextStatus != null && nextStatus !== before.fulfillment?.status;
+
+  // stats ustawia wyłącznie reconcileOrderSale. Pole z patcha klienta
+  // nadpisałoby kwoty używane przy cofaniu sprzedaży.
+  const updateWithoutStats: Partial<Order> = { ...updateData };
+  delete updateWithoutStats.stats;
+
+  const patch: Partial<Order> = statusChanged
+    ? { ...updateWithoutStats, statusChangedAt: new Date().toISOString() }
+    : updateWithoutStats;
+
+  OrderSchema.partial().parse(patch);
+  if (Object.keys(patch).length > 0) {
+    await orderRef.update(patch);
+  }
+
+  await syncOrderSaleStats(id);
 };
 
 export const getOrders = async function (lastOrderId?: string) {

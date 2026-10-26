@@ -1,4 +1,4 @@
-import { addCalendarDays } from "@/helpers/datetime";
+import { addCalendarDays, getPolandDateString } from "@/helpers/datetime";
 import { FulfillmentStatus } from "@/firebase/schemas/ordersSchemas";
 import { ReturnStatus } from "@/firebase/schemas/returnsSchemas";
 
@@ -11,9 +11,12 @@ export const COUNTED_FULFILLMENT_STATUSES = [
   "PICKED_UP",
 ] as const satisfies readonly FulfillmentStatus[];
 
+// SUSPENDED nie jest sprzedażą. Zawieszenie cofa policzone zamówienie,
+// a powrót do statusu liczonego dolicza je ponownie.
 export const REVERSED_FULFILLMENT_STATUSES = [
   "CANCELLED",
   "RETURNED",
+  "SUSPENDED",
 ] as const satisfies readonly FulfillmentStatus[];
 
 export type StatsSalesChannel = "DTC" | "AL1" | "AL2";
@@ -28,6 +31,19 @@ export function isCountedFulfillmentStatus(
   status: string,
 ): status is (typeof COUNTED_FULFILLMENT_STATUSES)[number] {
   return (COUNTED_FULFILLMENT_STATUSES as readonly string[]).includes(status);
+}
+
+export function isReversedFulfillmentStatus(
+  status: string,
+): status is (typeof REVERSED_FULFILLMENT_STATUSES)[number] {
+  return (REVERSED_FULFILLMENT_STATUSES as readonly string[]).includes(status);
+}
+
+/** Dzień sprzedaży w Europe/Warsaw. Akceptuje ISO z offsetem PL i UTC z Z. */
+export function salesDayFromCreatedAt(createdAt: string): string | null {
+  const created = new Date(createdAt);
+  if (Number.isNaN(created.getTime())) return null;
+  return getPolandDateString(created);
 }
 
 export type SalesChannelTotals = {

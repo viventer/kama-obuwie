@@ -72,12 +72,19 @@ export const updateOrder = async function (
   const statusChanged =
     nextStatus != null && nextStatus !== before.fulfillment?.status;
 
+  // stats ustawia wyłącznie reconcileOrderSale. Pole z patcha klienta
+  // nadpisałoby kwoty używane przy cofaniu sprzedaży.
+  const updateWithoutStats: Partial<Order> = { ...updateData };
+  delete updateWithoutStats.stats;
+
   const patch: Partial<Order> = statusChanged
-    ? { ...updateData, statusChangedAt: new Date().toISOString() }
-    : updateData;
+    ? { ...updateWithoutStats, statusChangedAt: new Date().toISOString() }
+    : updateWithoutStats;
 
   OrderSchema.partial().parse(patch);
-  await orderRef.update(patch);
+  if (Object.keys(patch).length > 0) {
+    await orderRef.update(patch);
+  }
 
   await syncOrderSaleStats(id);
 };

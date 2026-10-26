@@ -5,7 +5,9 @@ import { Order } from "@/firebase/schemas/ordersSchemas";
 import { Product } from "@/firebase/schemas/productsSchemas";
 import {
   isCountedFulfillmentStatus,
+  isReversedFulfillmentStatus,
   isStatsSalesChannel,
+  salesDayFromCreatedAt,
   StatsSalesChannel,
 } from "@/lib/stats/sales";
 
@@ -21,7 +23,7 @@ function lineRevenueGrosze(amount: string, quantity: number): number {
   return unit * quantity;
 }
 
-async function resolveOrderEconomics(
+export async function resolveOrderEconomics(
   order: Order,
   read: (collection: string, id: string) => Promise<FirebaseFirestore.DocumentData | null>,
 ): Promise<OrderEconomics> {
@@ -117,8 +119,8 @@ export async function reconcileOrderSale(orderId: string) {
     const channel = current.salesChannel;
 
     if (!counted && isCountedFulfillmentStatus(status)) {
-      if (!current.createdAt || current.createdAt.length < 10) return;
-      const day = current.createdAt.slice(0, 10);
+      const day = salesDayFromCreatedAt(current.createdAt);
+      if (!day) return;
       const economics = await resolveOrderEconomics(current, async (collection, id) => {
         const doc = await transaction.get(adminDB.collection(collection).doc(id));
         return doc.exists ? (doc.data() ?? null) : null;
@@ -145,11 +147,7 @@ export async function reconcileOrderSale(orderId: string) {
       return;
     }
 
-    if (
-      counted &&
-      current.stats?.date &&
-      (status === "CANCELLED" || status === "RETURNED")
-    ) {
+    if (counted && current.stats?.date && isReversedFulfillmentStatus(status)) {
       applyDailyDelta(
         transaction,
         current.stats.date,
@@ -163,5 +161,38 @@ export async function reconcileOrderSale(orderId: string) {
         "stats.counted": false,
       });
     }
+  });
+}
+
+/**
+ * Usuwa zamówienie i, jeśli było policzone w sprzedaży, odejmuje tę samą deltę.
+ * Zwraca false, gdy dokument nie istnieje.
+ */
+export async function deleteOrderReversingSale(orderId: string): Promise<boolean> {
+  const orderRef = adminDB.collection("orders").doc(orderId);
+
+  return adminDB.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(orderRef);
+    if (!snapshot.exists) return false;
+
+    const current = snapshot.data() as Order;
+    if (
+      current.stats?.counted === true &&
+      current.stats.date &&
+      isStatsSalesChannel(current.salesChannel)
+    ) {
+      applyDailyDelta(
+        transaction,
+        current.stats.date,
+        current.salesChannel,
+        -(current.stats.revenue ?? 0),
+        -(current.stats.cogs ?? 0),
+        -1,
+        current.stats.cogsEstimated ? -1 : 0,
+      );
+    }
+
+    transaction.delete(orderRef);
+    return true;
   });
 }

@@ -3,6 +3,7 @@ import { getDocumentFromAdminDB } from "@/firebase/getters";
 import { apiResponse } from "@/server-actions/helpers";
 import { Order } from "@/firebase/schemas/ordersSchemas";
 import { updateOrder } from "@/server-actions/orders/orders";
+import { deleteOrderReversingSale } from "@/server-actions/stats/salesStats";
 
 export async function GET(
   request: NextRequest,
@@ -33,11 +34,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const { data, ref } = await getDocumentFromAdminDB("orders", id);
-  if (!data) {
+  const removed = await deleteOrderReversingSale(id);
+  if (!removed) {
     return apiResponse("Zamówienie nie istnieje.", 404);
   }
 
-  await ref.delete();
   return apiResponse("Zamówienie zostało usunięte.", 200);
 }

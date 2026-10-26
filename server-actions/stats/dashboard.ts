@@ -1,6 +1,7 @@
 "use server";
 
 import { FieldPath } from "firebase-admin/firestore";
+import { z } from "zod";
 import { adminDB } from "@/firebase/firebaseAdmin";
 import { addCalendarDays, getPolandDateString } from "@/helpers/datetime";
 import { verifyUser } from "@/server-actions/auth/auth";
@@ -17,6 +18,8 @@ import {
   type SalesChannelTotals,
   type SalesDailyPoint,
 } from "@/lib/stats/sales";
+
+const salesWindowSchema = z.union([z.literal(7), z.literal(30)]);
 
 export type SalesDailyResult = {
   today: string;
@@ -48,11 +51,12 @@ function firestoreErrorMessage(error: unknown): string {
   return "Nie udało się pobrać danych.";
 }
 
-export async function getSalesDaily(days = 30): Promise<SalesDailyResult> {
+export async function getSalesDaily(days: 7 | 30 = 30): Promise<SalesDailyResult> {
   await verifyUser(["ADMIN", "VERIFIED"]);
 
+  const windowDays = salesWindowSchema.parse(days);
   const today = getPolandDateString();
-  const from = addCalendarDays(today, -days);
+  const from = addCalendarDays(today, -windowDays);
 
   const snapshot = await adminDB
     .collection("salesDaily")
@@ -72,7 +76,7 @@ export async function getSalesDaily(days = 30): Promise<SalesDailyResult> {
   }
 
   const points: SalesDailyPoint[] = [];
-  for (let offset = days; offset >= 0; offset -= 1) {
+  for (let offset = windowDays; offset >= 0; offset -= 1) {
     const date = addCalendarDays(today, -offset);
     points.push(
       byDate.get(date) ?? {

@@ -48,11 +48,11 @@
     --popover: #1a1f23;
     --popover-foreground: #ececec;
 
-    --chart-1: #4a7ba7;
-    --chart-2: #94bc68;
-    --chart-3: #dc2626;
-    --chart-4: #f59e0b;
-    --chart-5: #8b5cf6;
+    --chart-1: #4a7ba7; /* niebieski - zgodny z --brand */
+    --chart-2: #8b5cf6; /* fiolet */
+    --chart-3: #bc6894; /* roz - zgodny z --accent */
+    --chart-4: #7fb2d9; /* jasny niebieski */
+    --chart-5: #c9a2f0; /* jasny fiolet */
 
     --radius: 0.75rem;
   }
@@ -95,10 +95,10 @@
       --popover-foreground: #1b1b1b;
 
       --chart-1: #2e5e90;
-      --chart-2: #79b83b;
-      --chart-3: #d64545;
-      --chart-4: #f59e0b;
-      --chart-5: #8b5cf6;
+      --chart-2: #6d3fd1;
+      --chart-3: #7c365d; /* zgodny z --accent w motywie jasnym */
+      --chart-4: #5a8fc0;
+      --chart-5: #9a6fd8;
     }
   }
 }

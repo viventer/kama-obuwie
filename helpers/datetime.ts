@@ -61,6 +61,27 @@ export function getCurrentDateTimeInPoland(): string {
 /**
  * Zwraca offset strefy czasowej dla Europe/Warsaw w formacie +HH:MM lub -HH:MM
  */
+/**
+ * Data kalendarzowa w Europe/Warsaw jako YYYY-MM-DD.
+ * en-CA zwraca ten format niezależnie od locale procesu.
+ */
+export function getPolandDateString(date: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Warsaw",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+/** Przesuwa datę YYYY-MM-DD o pełne dni kalendarzowe, bez DST. */
+export function addCalendarDays(isoDate: string, days: number): string {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  const shifted = new Date(Date.UTC(year, month - 1, day));
+  shifted.setUTCDate(shifted.getUTCDate() + days);
+  return shifted.toISOString().slice(0, 10);
+}
+
 function getTimezoneOffset(date: Date): string {
   // Stwórz dwie daty - jedną w UTC, drugą w polskiej strefie
   const utcDate = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
